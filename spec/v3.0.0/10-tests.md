@@ -1,6 +1,6 @@
 # FlowMCP Specification v3.0.0 — Tests
 
-Tests are executable examples embedded in tool and resource query definitions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
+Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
 
 ---
 
@@ -12,11 +12,13 @@ Without tests, a tool or resource query is a black box. The `description` field 
 flowchart LR
     A[Tests] --> B[Learning: what is possible]
     A --> C[Execution: call API or query DB]
-    C --> D[Capture: store response]
-    D --> E[Generate: output schema]
+    A --> D[Agent Tests: verify tool usage]
+    C --> E[Capture: store response]
+    E --> F[Generate: output schema]
+    D --> G[Verify: expectedTools + expectedContent]
 ```
 
-The diagram shows the four roles of a test: teaching consumers what the tool or resource can do, executing real API calls (for tools) or database queries (for resources), capturing the response, and generating the output schema from that response.
+The diagram shows the five roles of a test: teaching consumers what the tool or resource can do, executing real API calls (for tools) or database queries (for resources), capturing the response, generating the output schema from that response, and — for agents — verifying that the correct tools are invoked and that responses contain expected content.
 
 ### Tests as Learning Instrument
 
@@ -191,22 +193,22 @@ The API response may change over time (prices update, new data appears), but the
 
 | Scenario | Minimum | Recommended |
 |----------|---------|-------------|
-| Tool with no parameters | 1 | 1 |
-| Tool with 1-2 parameters | 1 | 2-3 |
-| Tool with enum/chain parameters | 1 | 2-4 (different enum values) |
-| Tool with multiple optional parameters | 1 | 2-3 (with/without optionals) |
+| Tool with no parameters | 3 | 3 |
+| Tool with 1-2 parameters | 3 | 3-5 |
+| Tool with enum/chain parameters | 3 | 4-6 (different enum values) |
+| Tool with multiple optional parameters | 3 | 4-6 (with/without optionals) |
 
-**Minimum: 1 test per tool is required.** A tool without tests is a validation error (TST001). The recommended count depends on the parameter variety — more diverse parameters benefit from more tests.
+**Minimum: 3 tests per tool is required.** A tool with fewer than 3 tests is a validation error (TST001). Three tests ensure breadth coverage: one basic case, one edge case, and one cross-cutting case. The recommended count depends on the parameter variety — more diverse parameters benefit from more tests.
 
 ### Resource Query Test Count
 
 | Scenario | Minimum | Recommended |
 |----------|---------|-------------|
-| Query with no parameters | 1 | 1 |
-| Query with 1-2 parameters | 1 | 2-3 |
-| Query with enum parameters | 1 | 2-3 (different enum values) |
+| Query with no parameters | 3 | 3 |
+| Query with 1-2 parameters | 3 | 3-5 |
+| Query with enum parameters | 3 | 4-6 (different enum values) |
 
-**Minimum: 1 test per resource query is required.** Resource query tests execute against the bundled database, so they are always runnable without API keys or network access. Results are deterministic.
+**Minimum: 3 tests per resource query is required.** Three tests ensure breadth coverage: one basic case, one edge case, and one cross-cutting case. Resource query tests execute against the bundled database, so they are always runnable without API keys or network access. Results are deterministic.
 
 **Maximum: No hard limit**, but tests should be purposeful. Each test must demonstrate something different. Duplicate or near-duplicate tests waste execution time during response capture.
 
@@ -453,7 +455,7 @@ queries: {
 | API keys required | Often yes (`requiredServerParams`) | Never |
 | Network required | Yes | No |
 | Result determinism | Response may vary over time | Always deterministic (bundled data) |
-| Test count minimum | 1 per tool | 1 per query |
+| Test count minimum | 3 per tool | 3 per query |
 | Server params in test | Never included | Not applicable |
 
 ### Resource Test Design Principles
@@ -478,11 +480,119 @@ See `13-resources.md` for the complete resource specification including query de
 
 ---
 
+## Agent Tests
+
+Agent tests validate end-to-end behavior at the agent level. Instead of testing individual tool calls with parameter values, agent tests provide a **natural language prompt** and assert which tools the agent should invoke and what content the response should contain.
+
+### Agent Test Format
+
+```json
+{
+    "tests": [
+        {
+            "_description": "Basic token lookup",
+            "input": "What is the current price of Ethereum?",
+            "expectedTools": ["coingecko-com/tool/simplePrice"],
+            "expectedContent": ["current price", "24h change"]
+        }
+    ]
+}
+```
+
+### Agent Test Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `_description` | `string` | Yes | What this test demonstrates |
+| `input` | `string` | Yes | Natural language prompt (as a user would ask) |
+| `expectedTools` | `string[]` | Yes | Tool IDs that should be called (deterministic check) |
+| `expectedContent` | `string[]` | No | Content assertions against response text |
+
+The `input` field contains a prompt exactly as a human user would type it. The `expectedTools` array lists the tool IDs (in `namespace/tool/name` format) that the agent must invoke to answer the prompt. The optional `expectedContent` array contains substrings that the final response text must include (case-insensitive matching).
+
+### Three-Level Test Model
+
+Agent test validation operates on three levels, each with a different degree of determinism:
+
+```mermaid
+flowchart LR
+    T[Agent Test] --> A[Tool Usage — deterministic]
+    T --> B[Content — assertions]
+    T --> C[Quality — manual/LLM-as-Judge]
+```
+
+| Level | Checkable | Method |
+|-------|-----------|--------|
+| Tool Usage | Yes — deterministic | expectedTools[] against actual tool calls |
+| Content | Partially — assertions | expectedContent[] against response text (case-insensitive) |
+| Quality | No — subjective | Human review or LLM-as-Judge |
+
+**Tool Usage** is the strongest assertion. Given a well-scoped prompt, the set of tools an agent should call is deterministic. If the prompt is "What is the current price of Ethereum?", the agent must call the price tool — there is no ambiguity.
+
+**Content** assertions are semi-deterministic. The response text will vary across LLM runs, but certain factual elements (like "current price" or "24h change") should always appear if the agent answered correctly.
+
+**Quality** is subjective and cannot be validated by the spec runtime. It is included in the model for completeness — teams may use LLM-as-Judge or human review to evaluate response quality beyond the scope of automated checks.
+
+### Consistency: Tool Tests vs Agent Tests
+
+| Aspect | Tool Test | Agent Test |
+|--------|-----------|------------|
+| Minimum | 3 | 3 |
+| `_description` | Required | Required |
+| Input | Parameter values | Natural language prompt |
+| Output | API response (deterministic) | Tool calls + text (partially deterministic) |
+| Validation | Schema match | expectedTools + expectedContent |
+
+Both test types share the same `_description` convention and the same minimum of 3 tests. The difference is in **what they test**: tool tests validate a single API call with concrete parameter values, while agent tests validate the agent's ability to select and orchestrate the right tools for a given user intent.
+
+### Complete Agent Test Example
+
+A crypto-research agent with three tests demonstrating breadth:
+
+```json
+{
+    "tests": [
+        {
+            "_description": "Single token price lookup — basic case",
+            "input": "What is the current price of Ethereum?",
+            "expectedTools": ["coingecko-com/tool/simplePrice"],
+            "expectedContent": ["current price", "USD"]
+        },
+        {
+            "_description": "Cross-chain token comparison — edge case with multiple tools",
+            "input": "Compare the TVL of Aave on Ethereum vs Arbitrum",
+            "expectedTools": [
+                "defillama-com/tool/getProtocolTvl",
+                "defillama-com/tool/getProtocolChainTvl"
+            ],
+            "expectedContent": ["TVL", "Ethereum", "Arbitrum"]
+        },
+        {
+            "_description": "Wallet analysis — cross-cutting case combining on-chain data",
+            "input": "Show me the top 5 token holdings in vitalik.eth",
+            "expectedTools": [
+                "etherscan-io/tool/getTokenBalances",
+                "coingecko-com/tool/simplePrice"
+            ],
+            "expectedContent": ["token", "balance"]
+        }
+    ]
+}
+```
+
+**What these tests demonstrate:**
+
+- **Test 1** (basic case): A simple single-tool lookup. Validates that the agent correctly routes a straightforward price question to the CoinGecko price tool.
+- **Test 2** (edge case): A comparative question requiring multiple calls to the same provider. Validates that the agent can decompose a comparison into separate data fetches.
+- **Test 3** (cross-cutting case): A question that requires data from multiple providers (on-chain balances + price data). Validates that the agent can orchestrate tools across different namespaces.
+
+---
+
 ## Validation Rules
 
 | Code | Severity | Rule |
 |------|----------|------|
-| TST001 | error | Each tool must have at least 1 test. Each resource query must have at least 1 test. |
+| TST001 | error | Each tool must have at least 3 tests. Each resource query must have at least 3 tests. Each agent must have at least 3 tests. |
 | TST002 | error | Each test must have a `_description` field of type string |
 | TST003 | error | Each test must provide values for all required `{{USER_PARAM}}` parameters |
 | TST004 | error | Test parameter values must pass the corresponding `z` validation |
@@ -490,3 +600,8 @@ See `13-resources.md` for the complete resource specification including query de
 | TST006 | error | Test objects must only contain keys that match `{{USER_PARAM}}` parameter keys or `_description` |
 | TST007 | warning | Tools/queries with enum or chain parameters should have tests covering multiple enum values |
 | TST008 | info | Consider adding tests that demonstrate optional parameter usage |
+| TST009 | error | Each agent test must have an `input` field of type string |
+| TST010 | error | Each agent test must have an `expectedTools` field as non-empty array |
+| TST011 | error | Each expectedTools entry must be a valid ID (contains `/`) |
+| TST012 | warning | Agent tests should cover different tool combinations |
+| TST013 | info | Consider adding expectedContent assertions for richer validation |

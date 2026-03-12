@@ -1,5 +1,30 @@
 # Changelog
 
+## v3.0.0 Revision 8.0 — 2026-03-12
+
+Three-level architecture, Agents, Prompt Architecture, Catalog, and ID Schema.
+
+### Added
+
+- **Agents**: Groups evolve into full agent manifests (`manifest.json`) with model binding (OpenRouter syntax), system prompts, tool cherry-picking via ID schema, and minimum 3 tests per agent. Agent tests use `expectedTools` (deterministic) and `expectedContent` (assertions). See `06-agents.md`.
+- **Prompt Architecture**: Two-tier prompt system — Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific with `testedWith`, multi-provider). Unified `[[...]]` placeholder syntax. Composable via `references[]` (1 level deep). Version `flowmcp-prompt/1.0.0`. See `12-prompt-architecture.md`.
+- **Catalog**: Named directory with `registry.json` manifest listing shared lists, provider schemas, and agent definitions. Multiple catalogs can coexist. Import flow via `import-registry` + `import-agent`. See `15-catalog.md`.
+- **ID Schema**: Unified `namespace/type/name` format for referencing tools, resources, and prompts. Short form `namespace/name` in unambiguous contexts. Validation rules ID001-ID006. See `16-id-schema.md`.
+- **Placeholder Syntax**: `[[...]]` for prompt content — with `/` = reference (resolved via ID schema), without `/` = parameter (user input). Validation rules PH001-PH004. See `02-parameters.md`.
+- **Agent Tests**: Three-level test model — Tool Usage (deterministic), Content (assertions), Quality (subjective). `expectedTools[]` and `expectedContent[]`. Validation rules TST009-TST013. See `10-tests.md`.
+- **Example Files**: Agent manifest, Agent-Prompt, Provider-Prompt, and registry.json examples in `examples/v3.0.0/`.
+- **New Validation Rules**: AGT001-AGT012 (agents), PRM001-PRM010 (prompts), CAT001-CAT007 (catalog), ID001-ID006 (IDs), PH001-PH004 (placeholders). See `09-validation-rules.md`.
+
+### Changed
+
+- **Groups renamed to Agents**: `06-groups.md` becomes `06-agents.md`. Groups were simple tool lists; Agents are complete definitions with model, prompts, tests, and system prompt.
+- **Group Skills renamed to Prompt Architecture**: `12-group-skills.md` becomes `12-prompt-architecture.md`. Skills (14-skills.md) remain separate.
+- **Test minimum increased from 1 to 3**: TST001 now requires minimum 3 tests per tool, resource query, and agent.
+- **Three-level architecture**: Root (shared lists, helpers, registry) → Provider (one API per namespace) → Agent (purpose-driven compositions).
+- **LLM-First Design Philosophy**: Open/flat structures optimized for LLM comprehension, not machine enforcement.
+
+---
+
 ## v3.0.0 — 2026-03-11
 
 Major release aligning FlowMCP with all three MCP primitives: Tools, Resources, and Skills.

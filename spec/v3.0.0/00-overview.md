@@ -1,65 +1,184 @@
 # FlowMCP Specification v3.0.0 — Overview
 
-FlowMCP is a deterministic normalization layer that converts heterogeneous web data sources into uniform, AI-consumable tools. This document provides the conceptual foundation, positioning, terminology, and document index for the v3.0.0 specification.
+FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:
+
+1. **CLI** — Direct access to Tools, Resources, and Prompts
+2. **MCP/A2A Server** — Agents and MCP clients can use FlowMCP as a server (compatible with OpenClaw)
+
+This document provides the conceptual foundation, positioning, terminology, and document index for the v3.0.0 specification.
 
 ---
 
-## Problem
+## The Problem FlowMCP Solves
 
-Web data sources are organized by **provider** — Etherscan exposes smart contract endpoints, CoinGecko exposes market data, DeFi Llama exposes TVL metrics, government portals publish RSS feeds, legacy PHP sites return HTML tables. Each source has its own interface style, authentication scheme, URL structure, response format, and error handling.
+Not every data source is a clean REST API. The real world is messy — some APIs have quirks, some tasks require combining multiple APIs, and some data lives behind websites with no API at all. FlowMCP provides a solution for each scenario:
 
-AI agents, however, need tools organized by **application domain** — token prices, contract ABIs, TVL data, wallet balances. An agent solving a user's question about a token's market cap should not need to know whether the answer comes from CoinGecko, CoinCap, or DeFi Llama — or whether the source returns JSON, XML, or HTML.
+| Data Source Type | Challenge | FlowMCP Solution |
+|------------------|-----------|-------------------|
+| Complete REST API | Standard endpoints, predictable responses | **Tool** (deterministic) |
+| API with peculiarities | Rate limits, pagination, unusual auth, response quirks | **Tool + Prompt** |
+| Multiple APIs combined | Cross-provider workflows, data enrichment chains | **Agent-Prompt** (Workflow) |
+| Website without API | Data locked in HTML, no programmatic access | **Prompt** (Instructions) |
 
-Manual integration per source is unsustainable at scale. With 187+ schemas across dozens of providers, the combinatorial complexity of authentication, parameter formatting, response parsing, and error handling makes hand-written integrations fragile and expensive to maintain.
+The key insight: not everything can be solved deterministically. A clean API call is deterministic — combine three APIs or scrape a website, and you need instructions for an LLM. FlowMCP covers both sides.
 
 ---
 
-## Solution
+## What FlowMCP Offers
 
-FlowMCP introduces a **schema-driven normalization layer** between web data sources and AI clients. Each schema is a `.mjs` file that declaratively defines:
+FlowMCP provides two categories of primitives: deterministic building blocks that always behave the same way, and non-deterministic guidance that helps LLMs combine those building blocks effectively.
 
-- **Tools** with input parameters, Zod-based validation (type, constraints, enum values), URL construction rules, and response transformation
-- **Resources** with embedded SQLite databases for local, deterministic data access
-- **Skills** with reusable instructions for AI agents, mapping to MCP prompts
-- **Security constraints** (no imports, no filesystem access, no eval)
+```mermaid
+flowchart TD
+    A[FlowMCP] --> B[Deterministic]
+    A --> C[Non-Deterministic]
 
-The runtime reads these schemas and exposes them through the three MCP primitives: **Tools** (API endpoints), **Resources** (local data), and **Skills** (agent instructions via MCP prompts). The AI client sees a flat catalog of tools, queryable resources, and composable skills — the underlying source complexity (REST, RSS, HTML scraping, legacy APIs, embedded databases) is completely abstracted away.
+    B --> D[Tools — API endpoint wrappers]
+    B --> E[Resources — Local SQLite data]
+
+    C --> F[Provider-Prompts — Single-namespace guidance]
+    C --> G[Agent-Prompts — Multi-provider workflows]
+
+    G --> H[Tool Combinatorics — How to chain tools across providers]
+```
+
+The main focus of Prompts is **tool combinatorics** — teaching an LLM which tools to call in which order, how to pass results between them, and when to fall back to alternative providers. This is the knowledge that would take hours to figure out manually.
+
+---
+
+## Partial Validatability
+
+Different primitives have different levels of validatability. FlowMCP embraces this spectrum rather than pretending everything is fully testable:
+
+| Primitive | Validatable? | What Can Be Validated |
+|-----------|-------------|----------------------|
+| **Tools** | Completely | Schema structure, parameter types, output format, live API tests (minimum 3 deterministic test cases) |
+| **Prompts** | Partially | Tool references resolve, parameter syntax `[[...]]` is valid, `dependsOn` tools exist |
+| **Agents** | Partially | Manifest structure, tool references exist, `expectedTools` (deterministic), `expectedContent` (partially — LLM output varies) |
+
+This is a feature, not a limitation. Tools are the deterministic anchor. Prompts and Agents build on that anchor but acknowledge that LLM behavior introduces variability.
+
+---
+
+## Core Principles
+
+### 1. Everything would be possible without FlowMCP
+
+FlowMCP saves time through pre-built templates. Every tool, prompt, and agent definition encodes knowledge that a developer *could* acquire by reading API docs, experimenting with endpoints, and writing integration code. FlowMCP packages that work so it does not need to be repeated.
+
+### 2. Providers AND Agents are important
+
+Providers deliver data — one namespace per API source, model-neutral, reusable. Agents bundle tools from multiple providers for a specific task — purpose-driven, model-specific, opinionated. Neither is more important than the other. Providers are the building blocks, Agents are the compositions.
+
+### 3. LLM-First
+
+The specification must be written so an LLM can import it as plaintext and write tools itself. Schema files are `.mjs` with named exports — no build steps, no binary formats, no complex inheritance. An LLM reading a schema file should immediately understand what it does.
+
+### 4. Token efficiency
+
+Correct structure upfront saves LLM time and tokens at runtime. Shared lists avoid repeating enum values across schemas. Prompt placeholders reference tools by ID instead of duplicating descriptions. Agent manifests declare exactly which tools are needed — no discovery overhead.
+
+### 5. Seamlessly extensible
+
+From local `.env` auth today to OAuth in the future. The architecture does not lock into a single auth mechanism. API keys in environment variables work now. OAuth flows, token refresh, and delegated auth can be added without breaking existing schemas.
+
+---
+
+## LLM-First Design Philosophy
+
+### Open Structures Instead of Strict Hierarchies
+
+Traditional API frameworks optimize for machine enforcement — strict types, deep inheritance, access control layers. FlowMCP optimizes for LLM comprehension:
+
+| Aspect | Traditional Architecture | LLM-First Architecture |
+|--------|------------------------|----------------------|
+| File format | JSON/YAML with strict schema | `.mjs` with named exports — readable as plaintext |
+| Composition | Import chains, class hierarchies | Flat references by ID, no nesting |
+| Access control | Roles, permissions, scopes | None — FlowMCP is local, the user controls access |
+| Categorization | Enforced taxonomy | Efficiency categorization, not access control |
+| Extension | Plugin APIs, hook systems | Add a new `.mjs` file, reference it in registry |
+
+### Why This Works
+
+FlowMCP is **local software**. It runs on the developer's machine or in their infrastructure. There is no multi-tenant permission system because there is only one tenant. The provider/agent categorization exists for **efficiency** — helping LLMs find the right tool quickly — not for access control.
+
+### Consequences for Architecture
+
+Because the system is open and local, an LLM can create new agents at runtime by combining existing provider tools:
 
 ```mermaid
 flowchart LR
-    A[Web Data Sources] --> B[FlowMCP Schemas]
-    B --> C[Core Runtime]
-    C --> D[MCP Server]
-    D --> E[AI Client]
+    A[LLM receives task] --> B[Reads available providers]
+    B --> C[Selects relevant tools]
+    C --> D[Composes ad-hoc agent]
+    D --> E[Executes tool chain]
 
     F[Shared Lists] --> C
-    G[Security Scan] --> B
+    G[Provider-Prompts] --> D
 ```
 
-The diagram shows the data flow from raw web data sources (REST APIs, RSS feeds, HTML pages, legacy endpoints) through schemas into the Core Runtime, which resolves shared lists and enforces security, then exposes tools via the MCP Server to the AI Client.
+Shared lists and provider-prompts are available as context at every step. The LLM does not need to discover capabilities through trial and error — it reads the catalog.
 
 ---
 
-## Positioning
+## Three-Level Architecture
 
-FlowMCP is the **deterministic anchor** in a system that pairs it with non-deterministic AI agents.
+FlowMCP organizes its catalog in three levels. The root level holds shared resources. Provider and Agent levels are peers that both reference root-level data:
 
-| Layer | Nature | Responsibility |
-|-------|--------|----------------|
-| AI Client / Agent | Non-deterministic | Decides *which* tool to use, follows skill instructions, *how* to interpret results |
-| FlowMCP Tools | Deterministic | Guarantees the tool itself behaves identically every time |
-| FlowMCP Resources | Deterministic | Provides local, read-only data via SQLite — always available, no network |
-| FlowMCP Skills | Non-deterministic | Reusable instructions for AI agents — declares dependencies, defines workflows |
-| Web Data Sources | External | Provides the raw data — REST, RSS, HTML, legacy APIs (uncontrolled) |
+```mermaid
+flowchart TD
+    R[Root Level — Shared]
+    R --> P[Provider Level]
+    R --> AG[Agent Level]
 
-While AI decides strategy and interprets semantics, FlowMCP guarantees that:
+    subgraph Root
+        SL[Shared Lists — exclusively root]
+        SH[Shared Helpers]
+        REG[registry.json]
+    end
 
-- The same input parameters always produce the same API call
-- Parameter validation is enforced before any network request
-- Response transformations are consistent and reproducible
-- Security constraints are verified at load-time, not runtime
+    subgraph Providers
+        P1[etherscan/ — tools, resources, prompts]
+        P2[coingecko/ — tools, resources, prompts]
+        P3[defillama/ — tools, resources, prompts]
+    end
 
-This separation means schema authors can focus on correct API mapping without worrying about AI behavior, and AI developers can trust that tools will not produce surprises.
+    subgraph Agents
+        A1[token-analyst — tools + prompts + model + systemPrompt]
+        A2[wallet-auditor — tools + prompts + model + systemPrompt]
+    end
+
+    R --> Root
+    P --> Providers
+    AG --> Agents
+```
+
+### Root Level
+
+- **Shared Lists** — Reusable, versioned value lists (EVM chains, country codes, trading pairs). Shared lists live exclusively at root level and are injected into schemas at load-time.
+- **Shared Helpers** — Utility functions available to all schemas via dependency injection.
+- **registry.json** — The catalog manifest listing all providers, agents, and shared lists.
+
+### Provider Level
+
+One API provider per namespace. Each provider directory contains:
+
+- **Tools** — Deterministic API endpoint wrappers (`main.tools`)
+- **Resources** — Local SQLite data access (`main.resources`)
+- **Prompts** — Model-neutral guidance for using this provider's tools (`main.prompts`)
+
+Provider-level prompts are **model-neutral** — they describe how to use the provider's tools without assuming a specific LLM. Any model can benefit from them.
+
+### Agent Level
+
+A complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Each agent includes:
+
+- **Tools** — Cherry-picked from multiple providers
+- **Prompts** — Model-specific, tested against a specific LLM
+- **Model** — The target LLM (e.g. `claude-sonnet-4-20250514`, `gpt-4o`)
+- **System Prompt** — The agent's persona and behavioral instructions
+
+Agent-level prompts are **model-specific** — they are written and tested for a particular LLM, leveraging its strengths and working around its weaknesses.
 
 ---
 
@@ -67,17 +186,20 @@ This separation means schema authors can focus on correct API mapping without wo
 
 | Term | Definition |
 |------|-----------|
-| **Schema** | A `.mjs` file with two named exports: `main` (static) and optionally `handlers` (factory function). Defines tools, resources, and/or skills. |
+| **Schema** | A `.mjs` file with two named exports: `main` (static) and optionally `handlers` (factory function). Defines tools, resources, and/or prompts. |
 | **Tool** | A single API endpoint within a schema (formerly called "Route" in v2). Maps to the MCP `server.tool` primitive. Each tool has parameters, a method, a path, and optional handlers. Defined in `main.tools`. |
 | **Route** | Deprecated alias for Tool. `main.routes` is accepted in v3.0.0 with a deprecation warning but will be removed in v3.2.0. Schemas must not define both `tools` and `routes`. |
 | **Resource** | Embedded, read-only data access via SQLite databases. Maps to the MCP `server.resource` primitive. Defined in `main.resources`. See `13-resources.md`. |
-| **Skill** | Reusable instructions for AI agents. Maps to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with `export const skill`, referenced in `main.skills`. Uses `flowmcp-skill/1.0.0` versioning. See `14-skills.md`. |
+| **Provider-Prompt** | A model-neutral prompt explaining a single namespace. Describes how to use one provider's tools effectively without assuming a specific LLM model. |
+| **Agent-Prompt** | A model-specific prompt tested against a specific LLM model. Contains tool combinatorics, chaining instructions, and fallback strategies. |
+| **Prompt Placeholder** | `[[...]]` syntax for dynamic content in prompts. With `/` prefix = reference to a tool or resource (e.g. `[[etherscan/getContractAbi]]`). Without `/` = parameter (e.g. `[[chainId]]`). |
 | **Namespace** | Provider identifier, lowercase letters only (e.g. `etherscan`, `coingecko`). Groups schemas by data source. |
 | **Handler** | An async function returned by the `handlers` factory. Performs pre- or post-processing for a tool or resource query. Receives dependencies via injection. |
 | **Modifier** | Handler subtype: `preRequest` transforms input before the API call, `postRequest` transforms output after the API call (or after a resource query). |
 | **Shared List** | A reusable, versioned value list (e.g. EVM chain identifiers, country codes) referenced by schemas and injected at load-time. |
-| **Group** | A named collection of cherry-picked tools and resources with an integrity hash. Used for project-level activation. May include skills. |
-| **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `skills`. Hashable for integrity verification. |
+| **Agent** | A complete, purpose-driven definition with tools, prompts, model, and behavior. Bundles tools from multiple providers for a specific task. Replaces "Group" from v2. |
+| **Catalog** | A named directory containing a `registry.json` manifest with shared lists, provider schemas, and agent definitions. The top-level organizational unit. |
+| **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `prompts`. Hashable for integrity verification. |
 | **Handlers Export** | `export const handlers = ({ sharedLists, libraries }) => ({...})` — factory function receiving injected dependencies. Subject to security scanning. |
 
 ---
@@ -86,20 +208,22 @@ This separation means schema authors can focus on correct API mapping without wo
 
 | Document | Title | Description |
 |----------|-------|-------------|
-| `00-overview.md` | Overview | Problem, solution, positioning, terminology, design principles (this document) |
+| `00-overview.md` | Overview | Vision, architecture, terminology, design principles (this document) |
 | `01-schema-format.md` | Schema Format | File structure, main/handlers split, tool definitions, naming conventions |
-| `02-parameters.md` | Parameters | Position block, Z block validation, shared list interpolation, API key injection, resource and skill parameters |
+| `02-parameters.md` | Parameters | Position block, Z block validation, shared list interpolation, API key injection, resource and prompt parameters |
 | `03-shared-lists.md` | Shared Lists | List format, versioning, field definitions, filtering, resolution lifecycle |
 | `04-output-schema.md` | Output Schema | Response type declarations, field mapping, flattening rules |
 | `05-security.md` | Security Model | Zero-import policy, library allowlist, static scan, dependency injection |
-| `06-groups.md` | Groups | Group format, cherry-picking, integrity verification, type discriminators, resources and skills in groups |
+| `06-agents.md` | Agents | Agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification |
 | `07-tasks.md` | Tasks | Deferred — MCP Tasks integration placeholder |
 | `08-migration.md` | Migration | v1.2.0 to v2.0.0 and v2.0.0 to v3.0.0 migration guides, backward compatibility |
-| `09-validation-rules.md` | Validation Rules | Complete validation checklist for schemas, lists, groups, resources, and skills |
+| `09-validation-rules.md` | Validation Rules | Complete validation checklist for schemas, lists, agents, resources, and prompts |
 | `10-tests.md` | Tests | Test format for tools and resources, design principles, response capture lifecycle, output schema generation |
-| `12-group-skills.md` | Group Skills | Schema-level skills, group-level skills, cross-schema skill composition |
+| `12-prompt-architecture.md` | Prompt Architecture | Provider-Prompts (model-neutral), Agent-Prompts (model-specific), placeholder syntax, cross-schema composition |
 | `13-resources.md` | Resources | SQLite resource format, queries, parameters, SQL security, handler integration |
 | `14-skills.md` | Skills | Skill .mjs format, fields, placeholders, versioning, validation rules |
+| `15-catalog.md` | Catalog | Catalog manifest, registry.json, named catalogs, import flow |
+| `16-id-schema.md` | ID Schema | ID format `namespace/type/name`, short form, resolution rules |
 
 ---
 
@@ -119,7 +243,7 @@ Schemas receive data through dependency injection, never import. A handler that 
 
 ### 4. Hash over trust
 
-Integrity verification through SHA-256 hashes. The `main` block is hashable because it is pure JSON-serializable data. Groups store hashes of their member tools. Changes to a schema invalidate the hash, signaling that review is needed.
+Integrity verification through SHA-256 hashes. The `main` block is hashable because it is pure JSON-serializable data. Agents store hashes of their member tools. Changes to a schema invalidate the hash, signaling that review is needed.
 
 ### 5. Constrain over permit
 
@@ -129,24 +253,30 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 
 ## Version History
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2025-06 | Initial schema format. Flat structure with inline parameters and direct URL construction. |
-| 1.2.0 | 2025-11 | Added handlers (preRequest/postRequest), Zod-based parameter validation, modifier pattern for input/output transformation. |
-| 2.0.0 | 2026-02 | Two-export format (`main` + `handlers` factory). Dependency injection via allowlist. Shared lists for reusable values. Output schema declarations. Zero-import security model. Groups with integrity hashes. Maximum routes reduced from 10 to 8. |
-| 3.0.0 | 2026-03 | Three MCP primitives: Tools (renamed from Routes), Resources (SQLite), Skills (.mjs format). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
+| Version | Revision | Date | Changes |
+|---------|----------|------|---------|
+| 1.0.0 | — | 2025-06 | Initial schema format. Flat structure with inline parameters and direct URL construction. |
+| 1.2.0 | — | 2025-11 | Added handlers (preRequest/postRequest), Zod-based parameter validation, modifier pattern for input/output transformation. |
+| 2.0.0 | — | 2026-02 | Two-export format (`main` + `handlers` factory). Dependency injection via allowlist. Shared lists for reusable values. Output schema declarations. Zero-import security model. Groups with integrity hashes. Maximum routes reduced from 10 to 8. |
+| 3.0.0 | 1.0 | 2026-03 | Three MCP primitives: Tools (renamed from Routes), Resources (SQLite), Skills (.mjs format). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
+| 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with manifest format. Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `[[...]]`. ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
 
 ---
 
 ## What Changed in v3.0.0
 
-The v3.0.0 release extends FlowMCP to cover all three MCP primitives and introduces a consistent terminology:
+The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API knowledge platform covering all three MCP primitives:
 
 - **Tools replace Routes** — `main.tools` is the primary key. `main.routes` is accepted as a deprecated alias with a warning (removed in v3.2.0). Schemas must not define both `tools` and `routes`.
-- **Resources** — embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
-- **Skills** — reusable AI agent instructions in `.mjs` format with `export const skill`. Uses independent `flowmcp-skill/1.0.0` versioning. Defined in `main.skills`. See `14-skills.md`.
-- **Groups with type discriminators** — `::tool::` and `::resource::` prefixes for unambiguous references in groups. Default (no prefix) is tool for backward compatibility.
-- **0-tool schemas are valid** — resource-only or skill-only schemas are allowed (E1).
+- **Resources** — Embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
+- **Groups renamed to Agents** — Groups evolve into full agent manifests with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
+- **Prompt Architecture** — Two-tier prompt system: Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific, multi-provider workflows). Unified `[[...]]` placeholder syntax. See `12-prompt-architecture.md`.
+- **Catalog with registry.json** — Named catalogs with a manifest file listing all providers, agents, and shared lists. Enables import and distribution. See `15-catalog.md`.
+- **ID Schema** — Unified `namespace/type/name` format for referencing tools, resources, and prompts across the catalog. Short form for common cases. See `16-id-schema.md`.
+- **Test minimum increased to 3** — Every tool must have at least 3 deterministic test cases (up from 1 in v2).
+- **Agent tests** — `expectedTools` validates which tools the agent selects (deterministic). `expectedContent` validates LLM output (partially deterministic).
+- **0-tool schemas are valid** — Resource-only or prompt-only schemas are allowed.
+- **Three-level architecture** — Root (shared lists, helpers, registry), Provider (one API per namespace), Agent (purpose-driven compositions).
 
 The migration path from v2.0.0 to v3.0.0 is documented in `08-migration.md`.
 

@@ -234,20 +234,87 @@ Async fields are reserved for future versions. If present, they are ignored by t
 
 ---
 
-## Group Validation Rules
+## Agent Validation Rules
 
 | Code | Severity | Rule |
 |------|----------|------|
-| GRP001 | error | Group name must match `^[a-z][a-z0-9-]*$` |
-| GRP002 | error | Maximum 50 tools per group |
-| GRP003 | error | Tool reference must follow `namespace/file::tool` format |
-| GRP004 | error | All referenced tools must be resolvable |
-| GRP005 | error | Duplicate tool references are forbidden |
-| GRP006 | error | Group hash must match calculated hash |
-| GRP009 | error | Maximum 10 resources per group |
-| GRP010 | error | All referenced resources must be resolvable |
-| GRP011 | error | Resource references must use `::resource::` prefix |
-| GRP012 | error | Duplicate resource references are forbidden |
+| AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
+| AGT002 | error | `description` is required, must be a non-empty string |
+| AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
+| AGT004 | error | `version` must be `flowmcp/3.0.0` |
+| AGT005 | error | `systemPrompt` is required, must be a non-empty string |
+| AGT006 | error | `tools[]` is required, must be a non-empty array |
+| AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
+| AGT008 | error | `tests[]` is required, minimum 3 tests |
+| AGT009 | error | Each test must have an `input` field of type string |
+| AGT010 | error | Each test must have an `expectedTools` field as a non-empty array |
+| AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
+| AGT012 | warning | Tests should cover different tool combinations |
+
+See `06-agents.md` for the complete agent specification.
+
+---
+
+## Prompt Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| PRM001 | error | `name` is required, must be a string, must match `^[a-z][a-z0-9-]*$` |
+| PRM002 | error | `version` is required and must be `'flowmcp-prompt/1.0.0'` |
+| PRM003 | error | Exactly one of `namespace` or `agent` must be set (not both, not neither) |
+| PRM004 | error | `testedWith` is required when `agent` is set, forbidden when `namespace` is set |
+| PRM005 | error | `testedWith` value must contain `/` (OpenRouter model ID format) |
+| PRM006 | error | Each `dependsOn` entry must resolve to an existing tool in the catalog |
+| PRM007 | error | Each `references[]` entry must resolve to an existing prompt in the catalog |
+| PRM008 | error | Referenced prompts must not themselves have `references[]` (one level deep only) |
+| PRM009 | error | `[[...]]` references in `content` must resolve to registered primitives (see PH002) |
+| PRM010 | error | `content` is required and must be a non-empty string |
+
+See `12-prompt-architecture.md` for the complete prompt specification.
+
+---
+
+## Catalog Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| CAT001 | error | `registry.json` must exist in the catalog root directory |
+| CAT002 | error | `name` field must match the catalog directory name |
+| CAT003 | error | All `shared[].file` paths must resolve to existing files |
+| CAT004 | error | All `schemas[].file` paths must resolve to existing files |
+| CAT005 | error | All `agents[].manifest` paths must resolve to existing files |
+| CAT006 | warning | Orphaned files (exist in the catalog directory but are not listed in `registry.json`) should be reported |
+| CAT007 | error | `schemaSpec` must be a valid FlowMCP specification version |
+
+See `15-catalog.md` for the complete catalog specification.
+
+---
+
+## ID Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| ID001 | error | ID must contain at least one `/` separator |
+| ID002 | error | Namespace must match `^[a-z][a-z0-9-]*$` |
+| ID003 | error | ResourceType (if present) must be one of: `tool`, `resource`, `prompt`, `list` |
+| ID004 | error | Name must not be empty |
+| ID005 | warning | Short form should only be used in unambiguous contexts |
+| ID006 | error | Full form is required in `registry.json` and validation rules |
+
+See `16-id-schema.md` for the complete ID schema specification.
+
+---
+
+## Placeholder Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| PH001 | error | `[[]]` content must not be empty |
+| PH002 | error | References (content containing `/`) must resolve to a registered tool, resource, or prompt in the catalog |
+| PH003 | error | Parameter names (content without `/`) must match `^[a-zA-Z][a-zA-Z0-9]*$` |
+| PH004 | error | `[[...]]` placeholders are only valid in prompt `content` fields, not in schema `main` blocks |
+
+See `02-parameters.md` for the complete parameter and placeholder specification.
 
 ---
 
@@ -255,14 +322,19 @@ Async fields are reserved for future versions. If present, they are ignored by t
 
 | Code | Severity | Rule |
 |------|----------|------|
-| TST001 | error | Each tool must have at least 1 test. Each resource query must have at least 1 test. |
+| TST001 | error | Each tool must have at least 3 tests. Each resource query must have at least 3 tests. Each agent must have at least 3 tests. |
 | TST002 | error | Each test must have a `_description` field of type string |
 | TST003 | error | Each test must provide values for all required `{{USER_PARAM}}` parameters |
 | TST004 | error | Test parameter values must pass the corresponding `z` validation |
 | TST005 | error | Test objects must be JSON-serializable (no functions, no Date, no undefined) |
-| TST006 | error | Test objects must only contain keys matching `{{USER_PARAM}}` parameter keys or `_description` |
-| TST007 | warning | Routes with enum or chain parameters should have tests covering multiple enum values |
+| TST006 | error | Test objects must only contain keys that match `{{USER_PARAM}}` parameter keys or `_description` |
+| TST007 | warning | Tools/queries with enum or chain parameters should have tests covering multiple enum values |
 | TST008 | info | Consider adding tests that demonstrate optional parameter usage |
+| TST009 | error | Each agent test must have an `input` field of type string |
+| TST010 | error | Each agent test must have an `expectedTools` field as non-empty array |
+| TST011 | error | Each expectedTools entry must be a valid ID (contains `/`) |
+| TST012 | warning | Agent tests should cover different tool combinations |
+| TST013 | info | Consider adding expectedContent assertions for richer validation |
 
 See `10-tests.md` for the complete test specification including format, design principles, and the response capture lifecycle.
 

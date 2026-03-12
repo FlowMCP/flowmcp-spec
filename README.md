@@ -1,65 +1,84 @@
 # FlowMCP Specification
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-3.0.0-blue) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
-The FlowMCP Specification defines a **deterministic normalization layer** that converts heterogeneous web data sources into uniform, predictable AI tools. This repository contains the specification documents and reference examples — no executable code.
+FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels: **CLI** (direct access) and **MCP/A2A Server** (for agents and MCP clients). This repository contains the specification documents and reference examples — no executable code.
 
 ## Architecture
 
-FlowMCP sits between raw web data sources and AI clients, providing a deterministic translation layer:
+FlowMCP organizes its catalog in three levels:
 
 ```mermaid
-flowchart LR
-    A[Web Data Sources] --> B[FlowMCP Schemas]
-    B --> C[Core Runtime]
-    C --> D[MCP Server]
-    D --> E[AI Client]
+flowchart TD
+    R[Root Level — Shared]
+    R --> P[Provider Level]
+    R --> AG[Agent Level]
 
-    F[Shared Lists] --> C
-    G[Security Scan] --> B
+    subgraph Root
+        SL[Shared Lists]
+        SH[Shared Helpers]
+        REG[registry.json]
+    end
+
+    subgraph Providers
+        P1[etherscan/ — tools, resources, prompts]
+        P2[coingecko/ — tools, resources, prompts]
+    end
+
+    subgraph Agents
+        A1[crypto-research — manifest + prompts]
+        A2[defi-monitor — manifest + prompts]
+    end
+
+    R --> Root
+    P --> Providers
+    AG --> Agents
 ```
 
-**Key insight**: Web data sources (REST APIs, RSS feeds, HTML pages, legacy PHP endpoints) are organized by provider. AI agents need tools organized by application domain. FlowMCP bridges this gap with schemas that normalize any web-accessible source into a uniform format.
+**Root** holds shared lists, helpers, and the catalog manifest. **Providers** wrap APIs with deterministic tools. **Agents** compose tools from multiple providers for specific tasks.
 
-## What's New in v2.0.0
+## What's New in v3.0.0
 
 | Feature | Description |
 |---------|-------------|
-| **Two-export format** | `export const main` (hashable) + `export const handlers` (factory with dependency injection) |
-| **Dependency Injection** | Handlers receive `sharedLists` and `libraries` via factory — zero import statements |
-| **Shared Lists** | Reusable value lists with versioning, dependencies, and filtering |
-| **Output Schema** | Per-route output definitions with MIME-Type support |
-| **Security Model** | Zero-import policy, library allowlist, static scan |
-| **Cherry-Pick Groups** | Tool-level grouping with SHA-256 integrity hashes |
-| **Group Prompts** | Markdown workflows that guide AI agents through multi-step tool usage |
-| **Preload** | Schema initialization with startup data before first request |
-| **Route Tests** | Declarative test format with inline assertions |
+| **Agents** | Groups evolve into full agent manifests with model binding, system prompts, tests, and tool cherry-picking |
+| **Prompt Architecture** | Two-tier system: Provider-Prompts (model-neutral) + Agent-Prompts (model-specific with `testedWith`) |
+| **Catalog** | Named directory with `registry.json` manifest. Multiple catalogs coexist independently |
+| **ID Schema** | Unified `namespace/type/name` format for referencing tools, resources, and prompts |
+| **Placeholder Syntax** | `[[...]]` for prompt content — with `/` = reference, without `/` = parameter |
+| **Test Minimum** | Increased from 1 to 3 per tool, resource query, and agent |
+| **Agent Tests** | `expectedTools` (deterministic) + `expectedContent` (assertions) |
+| **Three-Level Architecture** | Root (shared) → Provider (one API per namespace) → Agent (compositions) |
 
 ## Quickstart
 
 ```bash
-git clone https://github.com/flowmcp/flowmcp-specification.git
-cd flowmcp-specification
+git clone https://github.com/flowmcp/flowmcp-spec.git
+cd flowmcp-spec
 ```
 
-A minimal v2.0.0 schema looks like this:
+A minimal v3.0.0 schema:
 
 ```javascript
-// Static, declarative, hashable — no imports needed
 export const main = {
     namespace: 'coingecko',
     name: 'Ping',
     description: 'Check CoinGecko API server status',
-    version: '2.0.0',
+    version: '3.0.0',
     root: 'https://api.coingecko.com/api/v3',
     requiredServerParams: [],
     requiredLibraries: [],
-    routes: {
+    tools: {
         ping: {
             method: 'GET',
             path: '/ping',
             description: 'Check if CoinGecko API is online',
             parameters: [],
+            tests: [
+                { _description: 'Basic health check', },
+                { _description: 'Verify response format', },
+                { _description: 'Confirm uptime', }
+            ],
             output: {
                 mimeType: 'application/json',
                 schema: {
@@ -72,44 +91,44 @@ export const main = {
         }
     }
 }
-
-// Optional: handlers factory for data transformation
-// export const handlers = ( { sharedLists, libraries } ) => ({...})
 ```
 
 ## Specification Documents
 
 | # | Document | Description |
 |---|----------|-------------|
-| 00 | [Overview](spec/v2.0.0/00-overview.md) | Problem, solution, positioning, terminology, design principles |
-| 01 | [Schema Format](spec/v2.0.0/01-schema-format.md) | `main` + `handlers` structure, required/optional fields, naming conventions |
-| 02 | [Parameters](spec/v2.0.0/02-parameters.md) | Input parameters, position/z blocks, shared list interpolation |
-| 03 | [Shared Lists](spec/v2.0.0/03-shared-lists.md) | Reusable value lists, dependencies, filtering, registry |
-| 04 | [Output Schema](spec/v2.0.0/04-output-schema.md) | Output definitions, MIME-Types, response envelope, JSON Schema subset |
-| 05 | [Security](spec/v2.0.0/05-security.md) | Trust boundary, static scan, forbidden patterns, threat model |
-| 06 | [Groups](spec/v2.0.0/06-groups.md) | Cherry-pick tool groups, hash calculation, verification |
-| 07 | [Tasks](spec/v2.0.0/07-tasks.md) | MCP Tasks async fields (reserved in v2.0.0) |
-| 08 | [Migration](spec/v2.0.0/08-migration.md) | v1.2.0 to v2.0.0 migration guide, backward compatibility |
-| 09 | [Validation Rules](spec/v2.0.0/09-validation-rules.md) | 79 validation rules across 12 categories |
-| 10 | [Route Tests](spec/v2.0.0/10-route-tests.md) | Test format, test execution, assertion rules |
-| 11 | [Preload](spec/v2.0.0/11-preload.md) | Schema preload initialization and startup data |
-| 12 | [Group Prompts](spec/v2.0.0/12-group-prompts.md) | LLM prompt workflows for tool groups |
+| 00 | [Overview](spec/v3.0.0/00-overview.md) | Vision, three-level architecture, LLM-First philosophy, terminology |
+| 01 | [Schema Format](spec/v3.0.0/01-schema-format.md) | `main` + `handlers` structure, tool definitions, naming conventions |
+| 02 | [Parameters](spec/v3.0.0/02-parameters.md) | Position/z blocks, shared list interpolation, `[[...]]` placeholder syntax |
+| 03 | [Shared Lists](spec/v3.0.0/03-shared-lists.md) | Reusable value lists, dependencies, filtering, registry |
+| 04 | [Output Schema](spec/v3.0.0/04-output-schema.md) | Output definitions, MIME-Types, response envelope |
+| 05 | [Security](spec/v3.0.0/05-security.md) | Zero-import policy, library allowlist, static scan |
+| 06 | [Agents](spec/v3.0.0/06-agents.md) | Agent manifests, model binding, system prompts, tool cherry-picking |
+| 07 | [Tasks](spec/v3.0.0/07-tasks.md) | MCP Tasks async fields (reserved) |
+| 08 | [Migration](spec/v3.0.0/08-migration.md) | v1.2.0 → v2.0.0 → v3.0.0 migration guides |
+| 09 | [Validation Rules](spec/v3.0.0/09-validation-rules.md) | Complete validation checklist across all categories |
+| 10 | [Tests](spec/v3.0.0/10-tests.md) | Tool tests, resource tests, agent tests, response capture |
+| 11 | [Preload](spec/v3.0.0/11-preload.md) | Schema initialization with startup data |
+| 12 | [Prompt Architecture](spec/v3.0.0/12-prompt-architecture.md) | Provider-Prompts, Agent-Prompts, composable references |
+| 13 | [Resources](spec/v3.0.0/13-resources.md) | SQLite resources, queries, parameter binding |
+| 14 | [Skills](spec/v3.0.0/14-skills.md) | Skill .mjs format, placeholders, versioning |
+| 15 | [Catalog](spec/v3.0.0/15-catalog.md) | Catalog manifest, registry.json, import flow |
+| 16 | [ID Schema](spec/v3.0.0/16-id-schema.md) | Unified `namespace/type/name` format |
 
 ## Examples
 
 | File | Description |
 |------|-------------|
-| [minimal-schema.mjs](examples/minimal-schema.mjs) | Simplest v2.0.0 schema (1 route, no handlers) |
-| [shared-list-schema.mjs](examples/shared-list-schema.mjs) | Schema with shared list reference and interpolation |
-| [multi-route-schema.mjs](examples/multi-route-schema.mjs) | 4 routes with pre/post handlers |
-| [async-schema.mjs](examples/async-schema.mjs) | Async reserved fields for MCP Tasks |
-| [shared-list-definition.mjs](examples/shared-list-definition.mjs) | Shared list with field definitions and entries |
+| [Agent Manifest](examples/v3.0.0/agents/crypto-research/manifest.json) | Complete agent with 5 tools, 3 tests, model binding |
+| [Agent-Prompt](examples/v3.0.0/agents/crypto-research/prompts/token-deep-dive.mjs) | Model-specific prompt with `testedWith` and `[[...]]` references |
+| [Provider-Prompt](examples/v3.0.0/providers/coingecko-com/prompts/price-comparison.mjs) | Model-neutral prompt scoped to one namespace |
+| [Registry](examples/v3.0.0/registry.json) | Sample catalog manifest with schemas and agents |
 
 ## Design Principles
 
 1. **Deterministic over clever** — Same input always produces same API call
 2. **Declare over code** — Maximize the `main` block, minimize handlers
-3. **Inject over import** — Schemas receive data through `context`, never import
+3. **Inject over import** — Schemas receive data through dependency injection, never import
 4. **Hash over trust** — Integrity verification through SHA-256 hashes
 5. **Constrain over permit** — Security by default, explicit opt-in for capabilities
 
@@ -117,9 +136,10 @@ export const main = {
 
 | Repository | Description |
 |------------|-------------|
-| [flowmcp-core](https://github.com/flowmcp/flowmcp-core) | Core runtime (schema loading, validation, execution) |
-| [flowmcp-cli](https://github.com/flowmcp/flowmcp-cli) | CLI tool (search, add, call, validate, migrate) |
-| [flowmcp-schemas](https://github.com/flowmcp/flowmcp-schemas) | 187+ API schema definitions |
+| [flowmcp-core](https://github.com/flowmcp/flowmcp-core) | Core framework — Schema validation, Agent manifest loading, Tool execution |
+| [flowmcp-cli](https://github.com/flowmcp/flowmcp-cli) | CLI — Search, activate, and run tools and agents |
+| [flowmcp-schemas](https://github.com/flowmcp/flowmcp-schemas) | Schema Library — 370+ API schemas, community catalog, agent definitions |
+| [mcp-agent-server](https://github.com/flowmcp/mcp-agent-server) | Agent Server — Deploy FlowMCP agents as MCP/A2A servers |
 
 ## Contributing
 

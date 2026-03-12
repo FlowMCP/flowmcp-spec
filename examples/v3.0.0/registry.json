@@ -1,0 +1,70 @@
+{
+    "name": "flowmcp-examples",
+    "version": "3.0.0",
+    "description": "FlowMCP v3.0.0 example catalog demonstrating agents, prompts, and provider schemas",
+    "schemaSpec": "3.0.0",
+
+    "shared": [
+        {
+            "file": "_lists/evm-chains.mjs",
+            "name": "evmChains"
+        }
+    ],
+
+    "schemas": [
+        {
+            "namespace": "coingecko-com",
+            "file": "providers/coingecko-com/simple-price.mjs",
+            "name": "CoinGecko Simple Price",
+            "requiredServerParams": [],
+            "hasHandlers": false,
+            "sharedLists": []
+        },
+        {
+            "namespace": "coingecko-com",
+            "file": "providers/coingecko-com/coin-markets.mjs",
+            "name": "CoinGecko Coin Markets",
+            "requiredServerParams": [],
+            "hasHandlers": false,
+            "sharedLists": []
+        },
+        {
+            "namespace": "etherscan-io",
+            "file": "providers/etherscan-io/contract-abi.mjs",
+            "name": "Etherscan Contract ABI",
+            "requiredServerParams": [
+                "ETHERSCAN_API_KEY"
+            ],
+            "hasHandlers": false,
+            "sharedLists": []
+        },
+        {
+            "namespace": "etherscan-io",
+            "file": "providers/etherscan-io/token-balances.mjs",
+            "name": "Etherscan Token Balances",
+            "requiredServerParams": [
+                "ETHERSCAN_API_KEY"
+            ],
+            "hasHandlers": false,
+            "sharedLists": [
+                "evmChains"
+            ]
+        },
+        {
+            "namespace": "defillama-com",
+            "file": "providers/defillama-com/protocol-tvl.mjs",
+            "name": "DeFi Llama Protocol TVL",
+            "requiredServerParams": [],
+            "hasHandlers": false,
+            "sharedLists": []
+        }
+    ],
+
+    "agents": [
+        {
+            "name": "crypto-research",
+            "description": "Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics",
+            "manifest": "agents/crypto-research/manifest.json"
+        }
+    ]
+}

@@ -253,6 +253,152 @@ Parameters are defined as an array, and the array order matters:
 
 ---
 
+## Prompt Placeholder Syntax
+
+FlowMCP uses two distinct placeholder systems for two distinct contexts. The `{{...}}` syntax described in previous sections is for **schema parameters** — it controls how values are placed into HTTP requests and SQL queries inside `main.tools` and `main.resources` definitions. The `[[...]]` syntax documented here is for **prompt content** — it appears in Provider-Prompts and Agent-Prompts to reference registered primitives and accept user input at runtime.
+
+These two systems do not overlap. `{{...}}` never appears in prompt content, and `[[...]]` never appears in schema `main` blocks.
+
+```mermaid
+flowchart LR
+    A["{{...}} Syntax"] --> B["Schema Parameters"]
+    B --> C["main.tools — HTTP requests"]
+    B --> D["main.resources — SQL queries"]
+
+    E["[[...]] Syntax"] --> F["Prompt Content"]
+    F --> G["Provider-Prompts — single namespace"]
+    F --> H["Agent-Prompts — multi-provider workflows"]
+```
+
+The diagram shows the strict separation: `{{...}}` belongs to schema definitions, `[[...]]` belongs to prompt content. They serve different layers of the architecture.
+
+### Two Categories
+
+The content inside `[[ ]]` determines whether the placeholder is a **reference** or a **parameter**. The rule is simple: if it contains a `/`, it is a reference. If it does not, it is a parameter.
+
+| Content Pattern | Category | Resolution |
+|-----------------|----------|------------|
+| Contains `/` | **Reference** | Resolved via ID Schema (see `16-id-schema.md`) to a registered tool, resource, or prompt |
+| No `/` | **Parameter** | Value provided by the user at runtime |
+
+### References (`[[namespace/name]]` and `[[namespace/type/name]]`)
+
+A placeholder containing a `/` is an **ID reference**. It points to a tool, resource, or prompt registered in the catalog. The runtime resolves the reference using the ID Schema resolution algorithm.
+
+Both short form and full form are valid:
+
+```
+[[coingecko/simplePrice]]              ← short form (type inferred)
+[[coingecko/tool/simplePrice]]         ← full form (type explicit)
+[[etherscan/getContractAbi]]           ← short form
+[[etherscan/resource/verifiedContracts]] ← full form
+[[crypto-research/prompt/token-deep-dive]] ← full form prompt reference
+```
+
+When the runtime encounters a reference placeholder, it:
+
+1. Parses the content as an ID (splitting on `/`)
+2. Resolves the ID to a registered primitive via the ID Schema
+3. Injects the primitive's description or metadata into the rendered prompt content
+
+This enables prompts to reference tools and resources across namespaces, creating cross-schema composition.
+
+### Parameters (`[[paramName]]`)
+
+A placeholder without a `/` is a **user-input parameter**. The value is provided by the user when the prompt is invoked. Parameter names follow camelCase conventions.
+
+```
+[[chainId]]       ← user provides a chain identifier
+[[address]]       ← user provides a contract address
+[[token]]         ← user provides a token symbol
+[[startDate]]     ← user provides a date
+```
+
+Parameters are runtime values — the prompt cannot render fully until the user supplies them. The MCP client collects parameter values and passes them to the runtime for substitution.
+
+### Side-by-Side Comparison
+
+```
+Analyze the token [[token]] on chain [[chainId]].
+
+First, fetch the current price using [[coingecko/simplePrice]].
+Then retrieve the contract ABI via [[etherscan/getContractAbi]].
+Compare the on-chain data with [[defilama/tvl/getProtocolTvl]].
+```
+
+In this example:
+- `[[token]]` and `[[chainId]]` are **parameters** — the user provides `"ETH"` and `"1"` at invocation
+- `[[coingecko/simplePrice]]`, `[[etherscan/getContractAbi]]`, and `[[defilama/tvl/getProtocolTvl]]` are **references** — resolved to registered tools
+
+### Composable References
+
+Prompts can include content from other prompts via the `references[]` array. This enables prompt composition — one prompt can incorporate another prompt's content without duplication.
+
+```javascript
+{
+    name: 'full-token-analysis',
+    content: `
+        Perform a complete token analysis for [[token]].
+
+        ## Price Data
+        Use [[coingecko/simplePrice]] to fetch current pricing.
+
+        ## On-Chain Metrics
+        Use [[etherscan/getContractAbi]] to inspect the contract.
+    `,
+    references: [
+        'coingecko/prompt/price-guide',
+        'etherscan/prompt/contract-patterns'
+    ]
+}
+```
+
+Referenced prompts are resolved by their ID using the ID Schema. The runtime loads each referenced prompt and makes its content available to the AI agent alongside the primary prompt. Referenced prompts are **not** inlined into the content — they are provided as additional context that the agent can draw from.
+
+### Integration with `{{...}}` Syntax
+
+The two placeholder systems serve distinct layers:
+
+| Aspect | `{{...}}` | `[[...]]` |
+|--------|-----------|-----------|
+| **Context** | Schema `main` blocks (`main.tools`, `main.resources`) | Prompt `content` fields |
+| **Purpose** | HTTP request construction, SQL parameter binding, shared list interpolation | Tool/resource references and user input in prompts |
+| **Variants** | `{{USER_PARAM}}`, `{{SERVER_PARAM:KEY}}`, `{{listName:fieldName}}` | `[[namespace/name]]`, `[[namespace/type/name]]`, `[[paramName]]` |
+| **Resolution time** | Load-time (shared lists) or call-time (user/server params) | Prompt render time |
+| **Appears in** | `position.value`, `z.primitive` | Provider-Prompt and Agent-Prompt `content` |
+
+A schema author uses `{{...}}` when defining how a tool's parameters map to API requests. A prompt author uses `[[...]]` when writing instructions that reference tools or accept user input.
+
+### Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| PH001 | error | `[[]]` content must not be empty |
+| PH002 | error | References (content containing `/`) must resolve to a registered tool, resource, or prompt in the catalog |
+| PH003 | error | Parameter names (content without `/`) must match `^[a-zA-Z][a-zA-Z0-9]*$` |
+| PH004 | error | `[[...]]` placeholders are only valid in prompt `content` fields, not in schema `main` blocks |
+
+#### Validation Examples
+
+```
+flowmcp validate prompt.mjs
+
+  PH001 error   Empty placeholder [[]] found at line 12
+  PH003 error   Parameter name "123abc" does not match ^[a-zA-Z][a-zA-Z0-9]*$
+
+  2 errors, 0 warnings
+```
+
+```
+flowmcp validate prompt.mjs
+
+  PH002 error   Reference [[unknown/nonExistent]] does not resolve to a registered primitive
+
+  1 error, 0 warnings
+```
+
+---
+
 ## Complete Examples
 
 ### Example 1: Simple Query Parameter with Length Validation

@@ -1,0 +1,71 @@
+{
+    "name": "crypto-research",
+    "description": "Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics for comprehensive token and portfolio research",
+    "version": "flowmcp/3.0.0",
+    "model": "anthropic/claude-sonnet-4-5-20250929",
+    "systemPrompt": "You are a crypto research agent specializing in token analysis, wallet forensics, and DeFi protocol comparison. Follow these guidelines:\n\n1. Always cite which data source provided each piece of information (CoinGecko, Etherscan, DeFi Llama).\n2. When comparing metrics across chains, normalize values to USD.\n3. Present comparative data in tables when three or more items are compared.\n4. If data is unavailable for a requested chain or token, state this explicitly rather than guessing.\n5. For wallet analysis, always check both token balances and current prices to show USD values.\n6. When analyzing DeFi protocols, include TVL trends and chain distribution where available.\n7. Flag potential risks: unverified contracts, low liquidity, unusual TVL changes.",
+    "tools": [
+        "coingecko-com/tool/simplePrice",
+        "coingecko-com/tool/getCoinMarkets",
+        "etherscan-io/tool/getContractAbi",
+        "etherscan-io/tool/getTokenBalances",
+        "defillama-com/tool/getProtocolTvl"
+    ],
+    "tests": [
+        {
+            "_description": "Basic token lookup — single tool, single provider",
+            "input": "What is the current price of Ethereum?",
+            "expectedTools": [
+                "coingecko-com/tool/simplePrice"
+            ],
+            "expectedContent": [
+                "current price",
+                "USD"
+            ]
+        },
+        {
+            "_description": "Cross-provider DeFi analysis — comparative query across chains",
+            "input": "Compare the TVL of Aave on Ethereum vs Arbitrum",
+            "expectedTools": [
+                "defillama-com/tool/getProtocolTvl"
+            ],
+            "expectedContent": [
+                "TVL",
+                "Ethereum",
+                "Arbitrum"
+            ]
+        },
+        {
+            "_description": "Multi-tool wallet analysis — combines on-chain data with pricing",
+            "input": "Show top token holdings in vitalik.eth",
+            "expectedTools": [
+                "etherscan-io/tool/getTokenBalances",
+                "coingecko-com/tool/simplePrice"
+            ],
+            "expectedContent": [
+                "token",
+                "balance"
+            ]
+        }
+    ],
+    "maxRounds": 5,
+    "maxTokens": 4096,
+    "prompts": [
+        "prompts/token-deep-dive.mjs"
+    ],
+    "sharedLists": [
+        "evmChains"
+    ],
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "Research question about tokens, wallets, or DeFi protocols"
+            }
+        },
+        "required": [
+            "query"
+        ]
+    }
+}

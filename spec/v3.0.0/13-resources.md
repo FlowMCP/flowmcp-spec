@@ -130,16 +130,17 @@ The `resources` field lives in the `main` block and is therefore part of the has
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `source` | `string` | Yes | Data source type. Must be `'sqlite'`. |
+| `source` | `string` | Yes | Data source type. Must be `'sqlite'`. See [Source Adapters](#source-adapters) for future extensions. |
+| `lifecycle` | `string` | No | Database connection lifecycle. `'persistent'` (default) or `'transient'`. See [Database Lifecycle](#database-lifecycle). |
 | `description` | `string` | Yes | What this resource provides. Appears in resource discovery. |
-| `database` | `string` | Yes | Relative path to the `.db` file. Must end with `.db`. |
-| `queries` | `object` | Yes | Query definitions. Keys are query names in camelCase. Maximum 4 queries per resource. |
+| `database` | `string` | Yes | Path to the `.db` file. Relative paths are resolved from the schema file location. Absolute paths and `~` home directory expansion are also supported for system-level databases. Must end with `.db`. |
+| `queries` | `object` | Yes | Query definitions. Keys are query names in camelCase. Maximum 6 queries per resource. |
 
 ### Field Details
 
 #### `source`
 
-Currently only `'sqlite'` is supported. This field exists to allow future extension to other embedded data sources without breaking the format.
+Currently only `'sqlite'` is supported. This field acts as a discriminator that determines which adapter handles the resource. See [Source Adapters](#source-adapters) for the extension roadmap.
 
 ```javascript
 // Valid
@@ -148,8 +149,41 @@ source: 'sqlite'
 // Invalid
 source: 'postgres'    // not supported
 source: 'mysql'       // not supported
-source: 'json'        // not supported
+source: 'json'        // reserved, not yet implemented
 ```
+
+#### `lifecycle`
+
+Controls how the database connection is managed at runtime. Defaults to `'persistent'` when omitted.
+
+| Value | Behavior | Use When |
+|-------|----------|----------|
+| `'persistent'` | Database is loaded **once** at schema load-time and kept in memory. All queries reuse the same connection. This is the default. | Most databases (< 100 MB). Fast query response, no per-query I/O. |
+| `'transient'` | Database connection is opened per query execution and closed immediately after. | Very large databases (> 100 MB) that should not remain in memory permanently. |
+
+```javascript
+// Default — persistent (can be omitted)
+resources: {
+    tokenLookup: {
+        source: 'sqlite',
+        lifecycle: 'persistent',
+        database: './data/tokens.db',
+        // ...
+    }
+}
+
+// Explicit transient — for large databases
+resources: {
+    largeRegistry: {
+        source: 'sqlite',
+        lifecycle: 'transient',
+        database: '~/.flowmcp/data/openregister.db',
+        // ...
+    }
+}
+```
+
+**Why expose this as a field?** The schema author knows the database size and access pattern. A 50 KB token lookup should stay in memory (persistent). A 2.5 GB company registry may not (transient). The runtime cannot make this decision — only the schema author can.
 
 #### `description`
 
@@ -167,24 +201,43 @@ description: 'Data lookup.'
 
 #### `database`
 
-Relative path from the schema file to the SQLite database. Must end with `.db`. The path must point to a file in the same directory or a subdirectory of the schema file — parent directory traversal is forbidden.
+Path to the SQLite database file. Must end with `.db`. Three path types are supported:
+
+**Relative paths** — resolved from the schema file's directory. Used for databases bundled with the schema.
+
+**Home directory paths** — paths starting with `~/` are expanded to the user's home directory. Used for system-level databases that are too large to bundle with the schema (e.g., downloaded open data sets).
+
+**Absolute paths** — full filesystem paths. Used for databases at known system locations.
 
 ```javascript
-// Valid
+// Valid — relative (bundled with schema)
 database: './data/tokens.db'
 database: './tokens.db'
-database: './db/chains/evm.db'
+
+// Valid — home directory (system-level database)
+database: '~/.flowmcp/data/openregister.db'
+database: '~/.flowmcp/data/ofac-sdn.db'
+
+// Valid — absolute path
+database: '/opt/data/gtfs-de.db'
 
 // Invalid
-database: '/absolute/path/tokens.db'     // must be relative
-database: '../other/tokens.db'           // parent traversal forbidden
 database: './data/tokens.sqlite'         // must end with .db
 database: './data/tokens'                // must end with .db
 ```
 
+**Bundled vs. System-Level Databases:**
+
+| Type | Path Style | Size | Distribution |
+|------|-----------|------|-------------|
+| Bundled | `'./data/tokens.db'` | < 50 MB | Ships with schema package |
+| System-level | `'~/.flowmcp/data/openregister.db'` | Any size | Downloaded separately, referenced by schema |
+
+System-level databases are not distributed with the schema. The schema author provides download instructions in the schema description or documentation. If the database file is missing at load-time, the runtime produces a warning (not an error) to allow schema validation without the database present.
+
 #### `queries`
 
-An object mapping query names to query definitions. Keys must be camelCase (`^[a-z][a-zA-Z0-9]*$`). Maximum 4 queries per resource — this keeps resources focused. If more queries are needed, split into separate resources.
+An object mapping query names to query definitions. Keys must be camelCase (`^[a-z][a-zA-Z0-9]*$`). Maximum 6 queries per resource — this allows domain-specific queries plus the recommended standard queries (`getSchema`, `freeQuery`). If more queries are needed, split into separate resources.
 
 ---
 
@@ -217,7 +270,7 @@ sql: 'SELECT * FROM tokens WHERE address = ? AND chain_id = ?'
 sql: 'SELECT DISTINCT chain_id, chain_name FROM tokens ORDER BY chain_id'
 ```
 
-Only `SELECT` statements are allowed. See [SQL Security](#sql-security) for the complete list of blocked patterns.
+Only `SELECT` statements are allowed. Common Table Expressions (CTEs) starting with `WITH` are also permitted, as they always resolve to a `SELECT`. See [SQL Security](#sql-security) for the complete list of blocked patterns.
 
 #### `description`
 
@@ -364,7 +417,7 @@ The following SQL patterns are forbidden. If a query's `sql` field matches any o
 
 ### Allowed Statements
 
-Only `SELECT` statements are allowed. The runtime verifies that the SQL statement begins with `SELECT` (after trimming whitespace) before accepting it.
+Only `SELECT` statements and `WITH` (CTE) expressions are allowed. The runtime verifies that the SQL statement begins with `SELECT` or `WITH` (after trimming whitespace) before accepting it. CTEs are useful when the same parameter value is needed in multiple places (e.g., UNION queries), since each `?` placeholder maps to a separate parameter.
 
 ```javascript
 // Valid
@@ -372,6 +425,7 @@ sql: 'SELECT * FROM tokens WHERE symbol = ?'
 sql: 'SELECT symbol, name, decimals FROM tokens WHERE chain_id = ? ORDER BY symbol'
 sql: 'SELECT DISTINCT chain_id FROM tokens'
 sql: 'SELECT t.symbol, c.name FROM tokens t JOIN chains c ON t.chain_id = c.id WHERE t.symbol = ?'
+sql: "WITH search AS (SELECT ? AS term) SELECT * FROM sdn, search WHERE sdn_name LIKE '%' || search.term || '%'"
 
 // Invalid — blocked patterns
 sql: 'INSERT INTO tokens (symbol) VALUES (?)'          // INSERT blocked
@@ -384,6 +438,133 @@ sql: "ATTACH DATABASE '/etc/passwd' AS leak"            // ATTACH blocked
 ### SQL Injection Prevention
 
 All user-provided values are bound via prepared statement `?` placeholders. The runtime never interpolates user input into SQL strings. This is enforced by design — there is no mechanism for string interpolation in the SQL field.
+
+### Dynamic SQL (`{{DYNAMIC_SQL}}`)
+
+For resources where the AI client needs to write its own SQL queries (e.g., exploratory data analysis), the special placeholder `{{DYNAMIC_SQL}}` signals that the SQL comes from the user at runtime rather than being declared in the schema.
+
+```javascript
+freeQuery: {
+    sql: '{{DYNAMIC_SQL}}',
+    description: 'Execute a custom read-only SQL query against the database.',
+    parameters: [
+        {
+            position: { key: 'sql', value: '{{USER_PARAM}}' },
+            z: { primitive: 'string()', options: [ 'min(6)' ] }
+        },
+        {
+            position: { key: 'limit', value: '{{USER_PARAM}}' },
+            z: { primitive: 'number()', options: [ 'optional()', 'default(100)', 'max(1000)' ] }
+        }
+    ],
+    output: {
+        mimeType: 'application/json',
+        schema: { type: 'array', items: { type: 'object' } }
+    },
+    tests: [
+        { _description: 'Count all rows', sql: 'SELECT COUNT(*) as count FROM tokens', limit: 1 }
+    ]
+}
+```
+
+#### `{{DYNAMIC_SQL}}` Rules
+
+1. **Runtime security checks** — the same blocked patterns apply at runtime (not just load-time). The user-provided SQL must start with `SELECT` and must not contain any blocked patterns.
+2. **No prepared statement binding** — because the SQL itself comes from the user, `?` placeholders are not used. The `parameters` array provides the SQL string and optional limit, not values to bind into the SQL.
+3. **Automatic LIMIT** — the runtime appends `LIMIT {n}` to the user's SQL if no LIMIT clause is present. Default: 100, maximum: 1000.
+4. **The `sql` parameter** — the first parameter must have `key: 'sql'` and provides the user's SQL query.
+5. **The `limit` parameter** — optional second parameter with `key: 'limit'` controls the automatic LIMIT.
+
+#### When to use `{{DYNAMIC_SQL}}`
+
+Use `{{DYNAMIC_SQL}}` when the database has a complex schema and the AI client benefits from writing its own queries. This is common for large open data databases where the schema author cannot anticipate all useful queries.
+
+**Always pair with `getSchema`** — provide a `getSchema` query so the AI client can discover the database structure before writing SQL.
+
+---
+
+## Recommended Standard Queries
+
+Every SQLite resource SHOULD (not MUST) provide two standard queries that enable AI-driven data exploration:
+
+### `getSchema` — Database Structure Discovery
+
+Returns the database schema so AI clients can understand what tables and columns are available.
+
+```javascript
+getSchema: {
+    sql: "SELECT name, sql FROM sqlite_master WHERE type='table' ORDER BY name",
+    description: 'Returns the database schema (table names and CREATE statements).',
+    parameters: [],
+    output: {
+        mimeType: 'application/json',
+        schema: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string', description: 'Table name' },
+                    sql: { type: 'string', description: 'CREATE TABLE statement' }
+                }
+            }
+        }
+    },
+    tests: [
+        { _description: 'Get all table definitions' }
+    ]
+}
+```
+
+**Why this matters:** Without `getSchema`, an AI client has no way to discover what data is available in the database. It must rely on the schema description and query descriptions alone. With `getSchema`, the AI can inspect table structures and write informed `freeQuery` SQL.
+
+### `freeQuery` — AI-Driven SQL Queries
+
+Allows the AI client to write custom read-only SQL queries against the database. See [Dynamic SQL](#dynamic-sql-dynamic_sql) for the `{{DYNAMIC_SQL}}` mechanism.
+
+### Standard Query Naming
+
+The names `getSchema` and `freeQuery` are reserved conventions. If a resource provides these queries, they MUST use exactly these names and follow the patterns shown above.
+
+---
+
+## Source Adapters
+
+The `source` field acts as a discriminator that determines which adapter handles the resource. v3.0.0 defines one adapter:
+
+| Source | Status | Adapter | Description |
+|--------|--------|---------|-------------|
+| `sqlite` | v3.0.0 | SQLiteAdapter | Local SQLite database, sql.js or better-sqlite3 runtime |
+| `csv` | Reserved | — | CSV files with header-based column mapping |
+| `json` | Reserved | — | Static JSON files with JSONPath queries |
+| `parquet` | Reserved | — | Apache Parquet via DuckDB or Arrow |
+
+Reserved source values are not yet implemented. Using a reserved value produces a validation error in v3.0.0. They are listed here to guide future extension design.
+
+### Adapter Interface
+
+Every source adapter must implement the following operations:
+
+```
+interface ResourceAdapter {
+    load( { databasePath } ) → instance
+    execute( { instance, sql, parameters } ) → rows[]
+    close( { instance } ) → void
+    getSchema( { instance } ) → tableDefinitions[]
+}
+```
+
+The `load` method is called once at schema load-time for `lifecycle: 'persistent'` resources, or per-query for `lifecycle: 'transient'` resources. The `close` method is called when the runtime shuts down (persistent) or after each query (transient).
+
+### SQLite Adapter Details
+
+The SQLite adapter supports two runtime implementations:
+
+| Implementation | Use Case | Trade-off |
+|----------------|----------|-----------|
+| `sql.js` | Cross-platform, no native compilation | WASM-based, loads entire DB into memory buffer |
+| `better-sqlite3` | Node.js server environments | Native C++ bindings, memory-mapped I/O, handles large DBs |
+
+The runtime selects the appropriate implementation based on the environment. Schema authors do not need to specify which implementation to use — the `source: 'sqlite'` declaration is sufficient.
 
 ---
 
@@ -473,10 +654,9 @@ The runtime resolves the `database` path relative to the directory containing th
 
 | Constraint | Example Valid | Example Invalid |
 |------------|-------------|-----------------|
-| Must be relative | `'./data/tokens.db'` | `'/abs/path/tokens.db'` |
-| Must end with `.db` | `'./tokens.db'` | `'./tokens.sqlite'` |
-| No parent traversal | `'./data/tokens.db'` | `'../shared/tokens.db'` |
-| Must be within schema directory tree | `'./sub/dir/tokens.db'` | `'../../other/tokens.db'` |
+| Must end with `.db` | `'./tokens.db'`, `'~/.flowmcp/data/tokens.db'` | `'./tokens.sqlite'` |
+| Relative: no parent traversal | `'./data/tokens.db'` | `'../shared/tokens.db'` |
+| Home dir: must start with `~/` | `'~/.flowmcp/data/tokens.db'` | `'~/../../etc/passwd.db'` |
 
 ### Database Requirements
 
@@ -500,47 +680,80 @@ The schema author is responsible for:
 
 ## Runtime
 
-### sql.js — Pure JavaScript SQLite
+### SQLite Runtime
 
-Resources use [sql.js](https://github.com/sql-js/sql.js), a pure JavaScript/WASM compilation of SQLite. This choice has specific implications:
+Resources use a SQLite adapter to execute queries against local databases. Two runtime implementations are supported:
 
-| Property | Description |
-|----------|-------------|
-| No native compilation | Works on any platform where Node.js runs. No `node-gyp`, no C compiler needed. |
-| WASM-based | Uses WebAssembly for performance. Falls back to pure JS if WASM is unavailable. |
-| In-memory operation | The `.db` file is read into memory as a `Uint8Array`. All queries run against the in-memory copy. |
-| Read-only by design | The in-memory buffer is never written back to disk. Mutations via SQL are blocked by the security layer, but even if bypassed, changes would not persist. |
+| Implementation | Environment | Description |
+|----------------|-------------|-------------|
+| [sql.js](https://github.com/sql-js/sql.js) | Cross-platform | Pure JavaScript/WASM SQLite. No native compilation. Reads entire DB into WASM memory buffer. |
+| [better-sqlite3](https://github.com/JoshuaWise/better-sqlite3) | Node.js | Native C++ bindings. Memory-mapped I/O. Handles large databases efficiently. |
+
+The runtime selects the appropriate implementation automatically. Schema authors use `source: 'sqlite'` regardless of which implementation is used.
 
 ### Execution Flow
 
 ```mermaid
 flowchart TD
-    A[Read .db file as Buffer] --> B[Load into sql.js as read-only]
-    B --> C[Receive query with bound parameters]
-    C --> D[Execute prepared statement]
-    D --> E[Return result rows as objects]
-    E --> F{Handler exists?}
-    F -->|Yes| G[postRequest transforms rows]
-    F -->|No| H[Return rows directly]
-    G --> I[Wrap in response envelope]
-    H --> I
+    A[Schema Load] --> B{lifecycle?}
+    B -->|persistent| C[Load DB into memory once]
+    B -->|transient| D[Skip — load per query]
+    C --> E[Receive query request]
+    D --> E
+    E --> F{DYNAMIC_SQL?}
+    F -->|Yes| G[Runtime security check on user SQL]
+    F -->|No| H[Execute prepared statement with ? binding]
+    G --> H2[Execute user SQL with automatic LIMIT]
+    H --> I[Return result rows as objects]
+    H2 --> I
+    I --> J{Handler exists?}
+    J -->|Yes| K[postRequest transforms rows]
+    J -->|No| L[Return rows directly]
+    K --> M[Wrap in response envelope]
+    L --> M
 ```
-
-The diagram shows the execution flow from reading the database file through query execution and optional handler transformation to the final response envelope.
 
 ### Step-by-step
 
-1. **Read file** — the `.db` file is read as a `Buffer` from disk.
-2. **Load into sql.js** — the buffer is loaded into an sql.js `Database` instance. The database is opened in read-only mode.
-3. **Receive query** — the runtime receives a resource query request with validated user parameters.
-4. **Execute prepared statement** — the SQL is executed as a prepared statement with bound parameters. No string interpolation.
+1. **Load database** — for `lifecycle: 'persistent'`, the database is loaded once at schema load-time and kept in memory. For `lifecycle: 'transient'`, loading is deferred to step 3.
+2. **Receive query** — the runtime receives a resource query request with validated user parameters.
+3. **Open connection (transient only)** — if the lifecycle is `transient`, a new database connection is opened now.
+4. **Execute query** — for standard queries, the SQL is executed as a prepared statement with bound `?` parameters. For `{{DYNAMIC_SQL}}` queries, the user-provided SQL is security-checked and executed with an automatic LIMIT.
 5. **Return rows** — query results are returned as an array of plain objects with column names as keys.
 6. **Handler (optional)** — if a `postRequest` handler exists for this query, the rows are passed through it.
 7. **Envelope** — the result is wrapped in the standard response envelope (`{ status, messages, data }`).
+8. **Close connection (transient only)** — if the lifecycle is `transient`, the database connection is closed now.
 
 ### Database Lifecycle
 
-The database is loaded **once** at schema load-time and kept in memory for the lifetime of the runtime process. Multiple queries against the same resource reuse the same in-memory database instance. The `.db` file on disk is not accessed after initial load.
+The `lifecycle` field controls database connection management:
+
+#### Persistent (default)
+
+The database is loaded **once** at schema load-time and kept in memory for the lifetime of the runtime process. Multiple queries against the same resource reuse the same database instance. The `.db` file on disk is not accessed after initial load.
+
+This follows the same caching pattern as shared lists: loaded once, kept in memory, reused across all requests.
+
+```mermaid
+flowchart LR
+    A[Schema Load] --> B[Open DB Connection]
+    B --> C[Query 1 — reuse connection]
+    C --> D[Query 2 — reuse connection]
+    D --> E[Query N — reuse connection]
+    E --> F[Process Shutdown → Close]
+```
+
+#### Transient
+
+The database connection is opened per query execution and closed immediately after. This is suitable for very large databases (> 100 MB) that should not remain in memory permanently.
+
+```mermaid
+flowchart LR
+    A[Query Request] --> B[Open DB Connection]
+    B --> C[Execute Query]
+    C --> D[Close DB Connection]
+    D --> E[Return Results]
+```
 
 ---
 
@@ -610,14 +823,17 @@ Minimum: 1 test per query is required. A query without tests is a validation err
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
 | Max resources per schema | 2 | Keeps schemas focused. Resources should be tightly scoped to one data domain. |
-| Max queries per resource | 4 | Prevents resource bloat. If more queries are needed, consider splitting into separate resources. |
+| Max queries per resource | 6 | Allows up to 4 domain queries + `getSchema` + `freeQuery` standard queries. |
 | Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with route names. |
 | Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with route names. |
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
-| Database path traversal | No `..` segments | Prevents accessing files outside the schema directory tree. |
+| Database path traversal | No `..` in relative paths | Prevents accessing files outside the schema directory tree. |
 | SQL statement type | `SELECT` only | Read-only access. All write operations are blocked. |
-| Parameter count match | Must equal `?` count | Number of parameters must match number of SQL placeholders. |
-| `source` value | `'sqlite'` only | Only SQLite is supported in v3.0.0. |
+| SQL for `{{DYNAMIC_SQL}}` | Runtime security check | Same blocked patterns enforced at runtime, not just load-time. |
+| Parameter count match | Must equal `?` count | Number of parameters must match number of SQL placeholders. Does not apply to `{{DYNAMIC_SQL}}` queries. |
+| `source` value | `'sqlite'` only | Only SQLite is supported in v3.0.0. Other values are reserved. |
+| `lifecycle` value | `'persistent'` or `'transient'` | Controls database connection management. Default: `'persistent'`. |
+| `freeQuery` LIMIT | Default 100, max 1000 | Prevents unbounded result sets from `{{DYNAMIC_SQL}}` queries. |
 
 ---
 
@@ -726,15 +942,15 @@ The following rules are enforced when validating resource definitions:
 | RES001 | error | `source` must be `'sqlite'`. No other values are accepted. |
 | RES002 | error | `description` must be a non-empty string. |
 | RES003 | error | `database` must be a relative path ending with `.db`. |
-| RES004 | error | `database` path must not contain `..` segments. |
+| RES004 | error | `database` relative path must not contain `..` segments. |
 | RES005 | error | Maximum 2 resources per schema. |
-| RES006 | error | Maximum 4 queries per resource. |
+| RES006 | error | Maximum 6 queries per resource. |
 | RES007 | error | Each query must have a `sql` field of type string. |
 | RES008 | error | Each query must have a `description` field of type string. |
 | RES009 | error | Each query must have a `parameters` array. |
 | RES010 | error | Each query must have an `output` object with `mimeType` and `schema`. |
 | RES011 | error | Each query must have at least 1 test. |
-| RES012 | error | SQL statement must begin with `SELECT` (case-insensitive, after whitespace trim). |
+| RES012 | error | SQL statement must begin with `SELECT` or `WITH` (CTE) (case-insensitive, after whitespace trim). |
 | RES013 | error | SQL statement must not contain blocked patterns: `ATTACH DATABASE`, `LOAD_EXTENSION`, `PRAGMA`, `CREATE`, `ALTER`, `DROP`, `INSERT`, `UPDATE`, `DELETE`, `REPLACE`, `TRUNCATE`. |
 | RES014 | error | Number of parameters must match number of `?` placeholders in the SQL statement. |
 | RES015 | error | Resource parameters must not have a `location` field in `position`. |
@@ -746,6 +962,12 @@ The following rules are enforced when validating resource definitions:
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. Queries always return zero or more rows. |
 | RES022 | error | Test parameter values must pass the corresponding `z` validation. |
 | RES023 | error | Test objects must be JSON-serializable. |
+| RES024 | error | `lifecycle` must be `'persistent'` or `'transient'` if present. |
+| RES025 | error | `{{DYNAMIC_SQL}}` query must have a `sql` parameter with `key: 'sql'`. |
+| RES026 | error | `{{DYNAMIC_SQL}}` query must not have `?` placeholders in the sql field (the SQL comes from the user). |
+| RES027 | warning | Resource should include a `getSchema` query for database structure discovery. |
+| RES028 | error | `{{DYNAMIC_SQL}}` test SQL must pass all runtime security checks (SELECT only, no blocked patterns). |
+| RES029 | error | `source` must not be a reserved but unimplemented value (`csv`, `json`, `parquet`). |
 
 ---
 

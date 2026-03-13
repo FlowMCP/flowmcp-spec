@@ -1,243 +1,641 @@
 # FlowMCP Specification v3.0.0 — Resources
 
-Resources provide deterministic, read-only data access via SQLite databases. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, query definitions, parameter binding, SQL security constraints, handler integration, database bundling, and validation rules.
+Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
 
 ---
 
 ## Purpose
 
-Tools fetch data from external APIs over the network — they depend on third-party availability, rate limits, and response format stability. Some use cases require data that is **local, deterministic, and always available**: token metadata lookups, chain ID mappings, contract registries, country code tables.
+Tools fetch data from external APIs over the network — they depend on third-party availability, rate limits, and response format stability. Some use cases require data that is **local, deterministic, and always available**: token metadata lookups, chain ID mappings, contract registries, country code tables. Other use cases require **persistent local storage** for agent-generated data: analysis results, collected metrics, scraping output.
 
-Resources solve this by embedding SQLite databases directly in the schema package. The schema author provides a pre-built `.db` file, and the runtime executes parameterized queries against it. No network calls, no API keys, no rate limits.
+Resources solve both by providing two SQLite modes and a Markdown document type:
 
 ```mermaid
 flowchart LR
     A[Schema Definition] --> B[Resource Declaration]
-    B --> C[SQLite Database File]
-    C --> D[sql.js Runtime]
-    D --> E[Query Results]
-    E --> F[MCP Resource Response]
+    B --> C{"source?"}
+    C -->|sqlite| D{"mode?"}
+    C -->|markdown| E[Markdown File]
+    D -->|in-memory| F["better-sqlite3\nreadonly: true"]
+    D -->|file-based| G["better-sqlite3\nWAL mode"]
+    F --> H[Query Results]
+    G --> H
+    E --> I[Text Content]
+    H --> J[MCP Resource Response]
+    I --> J
 ```
 
-The diagram shows the data flow from the schema's resource declaration through the bundled SQLite database into query results exposed as MCP resources.
+The diagram shows the data flow from the schema's resource declaration through either SQLite (two modes) or Markdown into MCP resource responses.
 
 ### When to Use Resources
 
 | Use Case | Mechanism | Example |
 |----------|-----------|---------|
-| Live API data | Tool (route) | Current token price from CoinGecko |
-| Static reference data | Resource | Token metadata by symbol or contract address |
-| Chain configuration | Resource | EVM chain IDs, RPC URLs, explorer URLs |
-| Code lookups | Resource | Country codes, currency codes, standard identifiers |
-
-Resources are for **read-only, bundled datasets** that the schema author controls. If the data comes from an external API at call-time, use a tool (route). If the data is static or slow-changing and ships with the schema, use a resource.
+| Live API data | Tool | Current token price from CoinGecko |
+| Static reference data | Resource (SQLite in-memory) | Token metadata by symbol or contract address |
+| Agent-generated data | Resource (SQLite file-based) | PageSpeed analysis results, collected metrics |
+| API documentation | Resource (Markdown) | DuneSQL syntax reference, API field descriptions |
 
 ---
 
-## Resource Definition
+## Resource Types
 
-Resources are defined in the `resources` field of the `main` export. Each key is a resource name in camelCase:
+FlowMCP supports two resource types, identified by the `source` field:
 
-```javascript
-export const main = {
-    namespace: 'tokens',
-    name: 'TokenRegistry',
-    description: 'Token metadata lookup from local database',
-    version: '3.0.0',
-    resources: {
-        tokenLookup: {
-            source: 'sqlite',
-            description: 'Token metadata lookup by symbol or contract address.',
-            database: './data/tokens.db',
-            queries: {
-                bySymbol: {
-                    sql: 'SELECT * FROM tokens WHERE symbol = ? COLLATE NOCASE',
-                    description: 'Find tokens by ticker symbol (case-insensitive)',
-                    parameters: [
-                        {
-                            position: { key: 'symbol', value: '{{USER_PARAM}}' },
-                            z: { primitive: 'string()', options: [ 'min(1)' ] }
-                        }
-                    ],
-                    output: {
-                        mimeType: 'application/json',
-                        schema: {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    symbol: { type: 'string', description: 'Token ticker symbol' },
-                                    name: { type: 'string', description: 'Full token name' },
-                                    address: { type: 'string', description: 'Contract address' },
-                                    chainId: { type: 'number', description: 'Chain identifier' },
-                                    decimals: { type: 'number', description: 'Token decimals' }
-                                }
-                            }
-                        }
-                    },
-                    tests: [
-                        { _description: 'Find USDC token entries', symbol: 'USDC' }
-                    ]
-                },
-                byAddress: {
-                    sql: 'SELECT * FROM tokens WHERE address = ? AND chain_id = ?',
-                    description: 'Find token by contract address and chain',
-                    parameters: [
-                        {
-                            position: { key: 'address', value: '{{USER_PARAM}}' },
-                            z: { primitive: 'string()', options: [ 'min(42)', 'max(42)' ] }
-                        },
-                        {
-                            position: { key: 'chainId', value: '{{USER_PARAM}}' },
-                            z: { primitive: 'number()', options: [ 'min(1)' ] }
-                        }
-                    ],
-                    output: {
-                        mimeType: 'application/json',
-                        schema: {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    symbol: { type: 'string', description: 'Token ticker symbol' },
-                                    name: { type: 'string', description: 'Full token name' },
-                                    address: { type: 'string', description: 'Contract address' },
-                                    chainId: { type: 'number', description: 'Chain identifier' },
-                                    decimals: { type: 'number', description: 'Token decimals' }
-                                }
-                            }
-                        }
-                    },
-                    tests: [
-                        {
-                            _description: 'USDC on Ethereum mainnet',
-                            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-                            chainId: 1
-                        }
-                    ]
-                }
-            }
-        }
-    }
-}
+```mermaid
+flowchart TD
+    R[main.resources] --> S["source: 'sqlite'"]
+    R --> D["source: 'markdown'"]
+
+    S --> SM["mode: 'in-memory'"]
+    S --> SF["mode: 'file-based'"]
+
+    SM --> SM1["Buffer copy in RAM\nSELECT only\nFile unchanged"]
+    SF --> SF1["Direct file operations\nAll SQL statements\nChanges persistent"]
+
+    D --> D1["Markdown file\nText loaded as string\nParameter-based access"]
 ```
 
-The `resources` field lives in the `main` block and is therefore part of the hashable, JSON-serializable schema surface. It must not contain functions or dynamic expressions.
+| Source | Mode | Description |
+|--------|------|-------------|
+| `sqlite` | `in-memory` | DB opened with `readonly: true`. SELECT only. File remains unchanged. |
+| `sqlite` | `file-based` | DB opened with WAL mode. All SQL statements. Changes persistent on disk. |
+| `markdown` | — | Markdown file loaded as string. Parameter-based access (section, lines, search). |
 
 ---
 
-## Resource Fields
+## SQLite Resources
+
+### Resource Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `source` | `string` | Yes | Data source type. Must be `'sqlite'`. See [Source Adapters](#source-adapters) for future extensions. |
-| `lifecycle` | `string` | No | Database connection lifecycle. `'persistent'` (default) or `'transient'`. See [Database Lifecycle](#database-lifecycle). |
+| `source` | `'sqlite'` | Yes | Resource type. Must be `'sqlite'` for SQLite resources. |
+| `mode` | `'in-memory'` or `'file-based'` | Yes | Access mode. Determines readonly vs. writable. |
+| `origin` | `'global'`, `'project'`, or `'inline'` | Yes | Storage location. See [Origin System](#origin-system). |
+| `name` | `string` | Yes | Filename with extension. Must end with `.db`. Convention: `{namespace}-{descriptive-name}.db`. |
 | `description` | `string` | Yes | What this resource provides. Appears in resource discovery. |
-| `database` | `string` | Yes | Path to the `.db` file. Relative paths are resolved from the schema file location. Absolute paths and `~` home directory expansion are also supported for system-level databases. Must end with `.db`. |
-| `queries` | `object` | Yes | Query definitions. Keys are query names in camelCase. Maximum 6 queries per resource. |
+| `queries` | `object` | Yes | Query definitions. Must include `getSchema`. Maximum 7 schema-defined queries. |
 
-### Field Details
+All fields are required. There are no defaults and no optional fields.
 
-#### `source`
+### Mode: `in-memory`
 
-Currently only `'sqlite'` is supported. This field acts as a discriminator that determines which adapter handles the resource. See [Source Adapters](#source-adapters) for the extension roadmap.
-
-```javascript
-// Valid
-source: 'sqlite'
-
-// Invalid
-source: 'postgres'    // not supported
-source: 'mysql'       // not supported
-source: 'json'        // reserved, not yet implemented
-```
-
-#### `lifecycle`
-
-Controls how the database connection is managed at runtime. Defaults to `'persistent'` when omitted.
-
-| Value | Behavior | Use When |
-|-------|----------|----------|
-| `'persistent'` | Database is loaded **once** at schema load-time and kept in memory. All queries reuse the same connection. This is the default. | Most databases (< 100 MB). Fast query response, no per-query I/O. |
-| `'transient'` | Database connection is opened per query execution and closed immediately after. | Very large databases (> 100 MB) that should not remain in memory permanently. |
+The database is opened with `better-sqlite3` using `readonly: true`. Only SELECT statements are allowed. The file on disk is never modified.
 
 ```javascript
-// Default — persistent (can be omitted)
 resources: {
-    tokenLookup: {
+    rankingDb: {
         source: 'sqlite',
-        lifecycle: 'persistent',
-        database: './data/tokens.db',
-        // ...
+        mode: 'in-memory',
+        origin: 'global',
+        name: 'tranco-ranking.db',
+        description: 'Top 1M domain rankings from Tranco List',
+        queries: {
+            getSchema: {
+                sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
+                description: 'Returns the database schema (tables and their CREATE statements)',
+                parameters: [],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string', description: 'Table name' },
+                                sql: { type: 'string', description: 'CREATE TABLE statement' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Get all table definitions' }
+                ]
+            },
+            lookupDomain: {
+                sql: 'SELECT rank, domain FROM rankings WHERE domain = ?',
+                description: 'Look up the rank of a specific domain',
+                parameters: [
+                    {
+                        position: { key: 'domain', value: '{{USER_PARAM}}' },
+                        z: { primitive: 'string()', options: [ 'min(3)' ] }
+                    }
+                ],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                rank: { type: 'number', description: 'Domain rank' },
+                                domain: { type: 'string', description: 'Domain name' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Look up google.com', domain: 'google.com' },
+                    { _description: 'Look up amazon.de', domain: 'amazon.de' },
+                    { _description: 'Look up zalando.de', domain: 'zalando.de' }
+                ]
+            }
+        }
+        // freeQuery (SELECT only) is auto-injected by the runtime
     }
 }
+```
 
-// Explicit transient — for large databases
+| Aspect | Value |
+|--------|-------|
+| **Runtime** | `better-sqlite3` with `readonly: true` |
+| **Allowed statements** | SELECT only |
+| **File changes** | Never — readonly flag on DB level |
+| **Allowed origins** | `global` (recommended) or `project` |
+| **Use case** | Reference data, lookups, open data |
+| **getSchema** | **MUST** — defined by schema author in `queries` |
+| **freeQuery** | Auto-injected by runtime (SELECT only) |
+
+### Mode: `file-based`
+
+The database is opened with `better-sqlite3` using WAL mode. All SQL statements are allowed. Changes are persistent on disk. Only `origin: 'project'` is allowed.
+
+```javascript
 resources: {
-    largeRegistry: {
+    analysisDb: {
         source: 'sqlite',
-        lifecycle: 'transient',
-        database: '~/.flowmcp/data/openregister.db',
-        // ...
+        mode: 'file-based',
+        origin: 'project',
+        name: 'pagespeed-results.db',
+        description: 'PageSpeed analysis results collected by the agent',
+        queries: {
+            getSchema: {
+                sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
+                description: 'Returns the database schema (tables and their CREATE statements)',
+                parameters: [],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string', description: 'Table name' },
+                                sql: { type: 'string', description: 'CREATE TABLE statement' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Get all table definitions' }
+                ]
+            },
+            getLatestResults: {
+                sql: 'SELECT domain, score, created_at FROM results ORDER BY created_at DESC LIMIT ?',
+                description: 'Get the most recent analysis results',
+                parameters: [
+                    {
+                        position: { key: 'limit', value: '{{USER_PARAM}}' },
+                        z: { primitive: 'number()', options: [ 'min(1)', 'max(100)' ] }
+                    }
+                ],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                domain: { type: 'string', description: 'Analyzed domain' },
+                                score: { type: 'number', description: 'Performance score' },
+                                created_at: { type: 'string', description: 'Analysis timestamp' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Get last 10 results', limit: 10 }
+                ]
+            }
+        }
+        // freeQuery (all statements) is auto-injected by the runtime
     }
 }
 ```
 
-**Why expose this as a field?** The schema author knows the database size and access pattern. A 50 KB token lookup should stay in memory (persistent). A 2.5 GB company registry may not (transient). The runtime cannot make this decision — only the schema author can.
+| Aspect | Value |
+|--------|-------|
+| **Runtime** | `better-sqlite3` with WAL mode |
+| **Allowed statements** | All — SELECT, INSERT, UPDATE, DELETE, CREATE TABLE, DROP |
+| **File changes** | Yes — persistent on disk |
+| **Only allowed origin** | `project` |
+| **Use case** | Analysis results, agent memory, data collection |
+| **getSchema** | **MUST** — defined by schema author. CLI derives CREATE TABLE from return value. |
+| **freeQuery** | Auto-injected by runtime (all statements) |
+| **DB does not exist** | CLI creates DB based on getSchema |
+| **Backup** | Automatic `.bak` copy before first write per session |
+| **Concurrent writes** | Supported via WAL mode |
 
-#### `description`
+### Mode Comparison
 
-Describes the resource's purpose. This appears in MCP resource discovery and helps AI clients understand what data is available without inspecting individual queries.
+| Aspect | `in-memory` | `file-based` |
+|--------|------------|-------------|
+| Runtime flag | `readonly: true` | WAL mode |
+| SELECT | Yes | Yes |
+| INSERT/UPDATE/DELETE | No | **Yes** |
+| CREATE/DROP TABLE | No | **Yes** |
+| Changes persistent | No | **Yes** |
+| Allowed origins | `global`, `project` | Only `project` |
+| DB must exist | Yes (warning if missing) | No (CLI creates via getSchema) |
+| getSchema | **MUST** (schema-defined) | **MUST** (schema-defined) |
+| Backup | Not needed | `.bak` before first write |
+| Concurrent access | Yes (readonly) | Yes (WAL mode) |
 
-```javascript
-// Good — explains what data is available
-description: 'Token metadata lookup by symbol or contract address.'
-description: 'EVM chain configuration including RPC endpoints and explorer URLs.'
+### Why Only Two Modes
 
-// Bad — too vague
-description: 'Database queries.'
-description: 'Data lookup.'
+Only two modes exist. Either completely readonly (safe) or completely on disk (free). Clear separation:
+
+- **In-memory** = `better-sqlite3` with `readonly: true` — no write operations possible at all
+- **File-based** = `better-sqlite3` with WAL mode — full access, but only on project level
+
+Intermediate modes (append-only, insert-but-no-delete) are intentionally omitted:
+
+1. **Hard to enforce** — SQL is too flexible for reliable pattern matching
+2. **Misleading** — they suggest safety that cannot be guaranteed
+3. **Counterproductive** — they create problems without solving real ones
+
+---
+
+## Origin System
+
+### Three Locations, Explicitly Defined
+
+Instead of pseudo-paths (`~/.flowmcp/data/`, `./data/`), resources use an `origin` + `name` system. The origin determines where the file lives. The name determines the filename.
+
+The **base folder** is configurable. Default: `flowmcp`. Changeable via CLI flag.
+
+```mermaid
+flowchart TD
+    subgraph "origin: 'inline'"
+        A["In schema directory\nproviders/{namespace}/resources/\ntranco-ranking.db"]
+    end
+
+    subgraph "origin: 'project'"
+        B["In workspace\n.{base}/resources/\ntranco-ranking.db"]
+    end
+
+    subgraph "origin: 'global'"
+        C["In user home\n~/.{base}/resources/\ntranco-ranking.db"]
+    end
 ```
 
-#### `database`
+### Path Resolution
 
-Path to the SQLite database file. Must end with `.db`. Three path types are supported:
+| Origin | Resolved Path | Who Creates | Description |
+|--------|---------------|-------------|-------------|
+| `inline` | `{schema-dir}/resources/{name}` | Schema author | Ships with the schema. Committed to repo. |
+| `project` | `.{base}/resources/{name}` | User or CLI | Project-local. Not committed. |
+| `global` | `~/.{base}/resources/{name}` | User (download) | System-level. Shared across projects. |
 
-**Relative paths** — resolved from the schema file's directory. Used for databases bundled with the schema.
+### Base Folder
 
-**Home directory paths** — paths starting with `~/` are expanded to the user's home directory. Used for system-level databases that are too large to bundle with the schema (e.g., downloaded open data sets).
+| Aspect | Value |
+|--------|-------|
+| **Default** | `flowmcp` |
+| **Configurable** | Yes, via CLI flag |
+| **Affects** | `project` and `global` origins |
+| **Example default** | `~/.flowmcp/resources/`, `.flowmcp/resources/` |
+| **Example custom** | `~/.myagent/resources/`, `.myagent/resources/` |
 
-**Absolute paths** — full filesystem paths. Used for databases at known system locations.
+### Origin Rules per Resource Type
+
+| Origin | SQLite in-memory | SQLite file-based | Markdown |
+|--------|-----------------|-------------------|----------|
+| `inline` | **Not recommended** (data privacy) | **Not allowed** | **Yes** (recommended) |
+| `project` | Yes | **Yes** (only allowed origin) | Yes |
+| `global` | Yes (recommended) | **Not allowed** | Yes |
+
+**Why SQLite inline is not recommended:** SQLite databases may contain personal data, proprietary datasets, or large binary files. Committing them to a schema repository exposes data to all users of the catalog. Markdown documents are text, typically documentation, and safe to commit.
+
+**Why file-based is project-only:** Writable databases must be isolated to a single project. A writable global database could be corrupted by concurrent use from multiple projects.
+
+### Name Field
+
+The `name` field contains the **complete filename including extension**:
 
 ```javascript
-// Valid — relative (bundled with schema)
-database: './data/tokens.db'
-database: './tokens.db'
+// SQLite
+name: 'tranco-ranking.db'
+name: 'ofacsdn-sanctions.db'
+name: 'pagespeed-results.db'
 
-// Valid — home directory (system-level database)
-database: '~/.flowmcp/data/openregister.db'
-database: '~/.flowmcp/data/ofac-sdn.db'
-
-// Valid — absolute path
-database: '/opt/data/gtfs-de.db'
-
-// Invalid
-database: './data/tokens.sqlite'         // must end with .db
-database: './data/tokens'                // must end with .db
+// Markdown
+name: 'duneanalytics-sql-reference.md'
 ```
 
-**Bundled vs. System-Level Databases:**
+| Part | Rule | Example |
+|------|------|---------|
+| Prefix | Namespace of the schema | `tranco` |
+| Separator | Hyphen | `-` |
+| Description | Kebab-case | `ranking` |
+| Extension | `.db` or `.md` | `.db` |
+| **Complete** | | `tranco-ranking.db` |
 
-| Type | Path Style | Size | Distribution |
-|------|-----------|------|-------------|
-| Bundled | `'./data/tokens.db'` | < 50 MB | Ships with schema package |
-| System-level | `'~/.flowmcp/data/openregister.db'` | Any size | Downloaded separately, referenced by schema |
+The folder is always named `resources/` (not `data/`).
 
-System-level databases are not distributed with the schema. The schema author provides download instructions in the schema description or documentation. If the database file is missing at load-time, the runtime produces a warning (not an error) to allow schema validation without the database present.
+---
 
-#### `queries`
+## Standard Queries
 
-An object mapping query names to query definitions. Keys must be camelCase (`^[a-z][a-zA-Z0-9]*$`). Maximum 6 queries per resource — this allows domain-specific queries plus the recommended standard queries (`getSchema`, `freeQuery`). If more queries are needed, split into separate resources.
+### `getSchema` — MUST (Schema-Defined)
+
+`getSchema` is **required** for both modes. The schema author defines it in the `queries` object. It is NOT auto-injected — it must be explicitly written in the schema.
+
+**Why MUST for both modes:**
+
+- **In-memory:** The agent needs the DB structure to formulate meaningful queries via freeQuery
+- **File-based:** The CLI needs the structure to create the DB and tables when the file does not exist
+
+**getSchema and CREATE TABLE:** The CLI can derive CREATE TABLE statements from the getSchema return value (table names, column names, column types). No separate `createSchema` query is needed.
+
+```javascript
+getSchema: {
+    sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
+    description: 'Returns the database schema (tables and their CREATE statements)',
+    parameters: [],
+    output: {
+        mimeType: 'application/json',
+        schema: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string', description: 'Table name' },
+                    sql: { type: 'string', description: 'CREATE TABLE statement' }
+                }
+            }
+        }
+    },
+    tests: [
+        { _description: 'Get all table definitions' }
+    ]
+}
+```
+
+### `freeQuery` — Auto-Injected by Runtime
+
+`freeQuery` is automatically added by the runtime. Schema authors do **not** define it manually.
+
+| Aspect | in-memory | file-based |
+|--------|----------|-----------|
+| SELECT | Yes | Yes |
+| INSERT | No | Yes |
+| UPDATE | No | Yes |
+| DELETE | No | Yes |
+| CREATE TABLE | No | Yes |
+| DROP TABLE | No | Yes |
+| LIMIT default | 100 (max 1000) | 100 (max 1000) |
+
+For `in-memory`, the auto-injected freeQuery enforces SELECT-only via runtime checks. For `file-based`, all SQL statements are allowed.
+
+### Query Limits
+
+| Type | Count |
+|------|-------|
+| Auto-injected | 1 (freeQuery) |
+| Schema-defined (including getSchema) | Max 7 |
+| **Total** | **Max 8** |
+
+### Summary Table
+
+| Query | in-memory | file-based |
+|-------|----------|-----------|
+| `getSchema` | **MUST** (schema-defined) | **MUST** (schema-defined) |
+| `freeQuery` | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| Domain queries | Schema-defined | Schema-defined |
+
+---
+
+## Markdown Resources
+
+### `source: 'markdown'`
+
+Markdown resources provide text documents as MCP resources. They are intended for API documentation, syntax references, and other text content that an agent needs alongside tools.
+
+```javascript
+resources: {
+    sqlReference: {
+        source: 'markdown',
+        origin: 'inline',
+        name: 'duneanalytics-sql-reference.md',
+        description: 'Complete DuneSQL syntax reference — functions, datatypes, table catalog'
+    }
+}
+```
+
+### Markdown Resource Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `source` | `'markdown'` | Yes | Resource type. Must be `'markdown'`. |
+| `origin` | `'global'`, `'project'`, or `'inline'` | Yes | Storage location. `inline` recommended. |
+| `name` | `string` | Yes | Filename with `.md` extension. |
+| `description` | `string` | Yes | What this document contains. |
+
+All fields are required. There is no `mode` field (Markdown is always read-only) and no `queries` field.
+
+### Parameter-Based Access
+
+Markdown resources support parameter-based access for large documents. The runtime auto-injects access functions similar to how it auto-injects `freeQuery` for SQLite resources.
+
+```mermaid
+flowchart LR
+    A[Markdown Resource] --> B{"Size?"}
+    B -->|"Small (< 100 KB)"| C["Load full document\n(default behavior)"]
+    B -->|"Large (> 100 KB)"| D["Use access parameters"]
+    D --> D1["section: '## Functions'"]
+    D --> D2["lines: '11-33'"]
+    D --> D3["search: 'CREATE TABLE'"]
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| *(none)* | — | Full document as string (default) |
+| `section` | `string` | Markdown heading name (e.g. `'## Functions'`) |
+| `lines` | `string` | Line range as `'from-to'` (e.g. `'11-33'`) |
+| `search` | `string` | Text search, returns matches with context lines |
+
+These access parameters are auto-injected by the runtime. Schema authors do not define them.
+
+### Markdown Constraints
+
+| Aspect | Value |
+|--------|-------|
+| **File format** | Only `.md` (Markdown) |
+| **Max size** | ~2 MB (recommendation) |
+| **Behavior** | File is read, content returned as string |
+| **Recommended origin** | `inline` (committed with schema) |
+| **No queries field** | Text is loaded directly |
+| **Referenceable** | `[[namespace/resource/name]]` from prompts |
+
+### Why Only Markdown
+
+- **Uniform format** — no parser variety needed
+- **AI-friendly** — Markdown is the most natural format for LLMs
+- **Renderable** — can be displayed in documentation
+- **No ambiguity** — JSON/YAML would raise questions (parse or treat as text?)
+
+### Resolved Path Example
+
+```
+{schema-dir}/resources/duneanalytics-sql-reference.md
+```
+
+---
+
+## Security Model
+
+### In-Memory: Safe by Architecture
+
+| Layer | What Happens |
+|-------|-------------|
+| DB opened with `readonly: true` | `better-sqlite3` enforces read-only at DB level |
+| Only SELECT in freeQuery | Runtime enforces SELECT-only |
+| File unchanged | No write operations possible at all |
+
+No block patterns needed. `better-sqlite3` with `readonly: true` prevents all write operations at the database level. This is more reliable than pattern-matching on SQL strings.
+
+### File-Based: Conscious Decision
+
+| Layer | What Happens |
+|-------|-------------|
+| Only project-level | No access to global or inline DBs |
+| All statements allowed | User has consciously chosen file-based |
+| CLI asks on creation | User must confirm |
+| Backup before first write | `.bak` copy as safety net |
+| WAL mode | Concurrent access safely possible |
+| Changes persistent | Intended — that is the purpose |
+
+No block patterns. Schema authors who choose `file-based` want to write. Restrictions would only suggest safety that cannot be guaranteed.
+
+### Summary
+
+```mermaid
+flowchart LR
+    subgraph "in-memory"
+        A["better-sqlite3\nreadonly: true"] --> B[SELECT only]
+        B --> C[File unchanged]
+    end
+
+    subgraph "file-based"
+        D["better-sqlite3\nWAL mode"] --> E[All statements]
+        E --> F[Changes persistent]
+    end
+
+    subgraph "Protection"
+        G["in-memory: DB-level readonly"]
+        H["file-based: project-only + backup"]
+    end
+```
+
+---
+
+## CLI: Database Creation
+
+### Problem
+
+For `file-based` databases at project level, the DB must exist before the agent can write. But who creates it?
+
+### Solution: CLI Creates on Demand
+
+```mermaid
+flowchart TD
+    A[Agent wants to write to DB] --> B{"DB exists?"}
+    B -->|Yes| C[Write]
+    B -->|No| D[Error returned to agent]
+    D --> E[Agent calls CLI]
+    E --> F{"Resource defined?\nsource: sqlite\nmode: file-based"}
+    F -->|Yes| G["CLI asks user:\nCreate database {name}?"]
+    G -->|"User: Yes"| H["Create DB + tables\nderived from getSchema"]
+    G -->|"User: No"| I[Abort]
+    F -->|No| J["Error: No writable resource defined"]
+```
+
+### Rules
+
+| Rule | Value |
+|------|-------|
+| CLI creates DB | Only when `source: 'sqlite'` + `mode: 'file-based'` + DB missing |
+| User confirmation | **Required** — CLI always asks |
+| Path | Always `project`: `.{base}/resources/{name}` |
+| getSchema | **MUST** for file-based — CLI derives table structure from it |
+| Backup | `.bak` copy before first write (for existing DB) |
+
+### Backup Strategy
+
+Before the first write operation per session, the runtime automatically creates a `.bak` copy:
+
+```
+.flowmcp/resources/pagespeed-results.db      <- active DB
+.flowmcp/resources/pagespeed-results.db.bak  <- backup before first write
+```
+
+| Aspect | Value |
+|--------|-------|
+| **When** | Before the first write statement per session |
+| **Where** | Same directory, `.bak` extension |
+| **Overwrite** | Yes — always the latest backup |
+| **Deletable** | Yes — `.bak` file can be deleted anytime |
+| **Recovery** | Rename `.bak` to `.db` |
+
+---
+
+## Runtime: better-sqlite3
+
+### One Runtime for Both Modes
+
+`better-sqlite3` is the unified runtime for all SQLite resources, replacing `sql.js`:
+
+| Aspect | sql.js (v3.0.0) | better-sqlite3 (v3.1.0) |
+|--------|-----------------|------------------------|
+| **In-memory** | `readFileSync` -> Buffer -> `new SQL.Database(buffer)` | `new Database(path, { readonly: true })` |
+| **File-based** | Not possible (RAM only) | `new Database(path)` + `pragma journal_mode = WAL` |
+| **Readonly** | No native support | `readonly: true` flag |
+| **WAL mode** | Not supported | Natively supported |
+| **Concurrent access** | No | Yes (with WAL mode) |
+| **Performance** | Slower (WebAssembly) | Faster (native C binding) |
+| **Installation** | Pure JS (no build needed) | Requires native build (node-gyp) |
+
+### Why One Runtime
+
+- **No feature split** — no "this only works in this mode because different library" problems
+- **WAL mode** — concurrent writes only possible with `better-sqlite3`
+- **Real readonly** — `readonly: true` at DB level instead of pattern matching on SQL strings
+- **Performance** — native C binding instead of WebAssembly
+
+### Trade-off: Native Build
+
+`better-sqlite3` requires `node-gyp` (C compiler). This is a trade-off:
+
+- **Pro:** Performance, WAL, real readonly, one runtime for everything
+- **Contra:** Native build needed, can cause issues on some systems
+
+Decision: The advantages outweigh the disadvantages. `node-gyp` is standard in Node.js projects. `better-sqlite3` is a core dependency (not optional).
+
+### Code Examples
+
+```javascript
+// in-memory
+import Database from 'better-sqlite3'
+const db = new Database( path, { readonly: true } )
+const rows = db.prepare( 'SELECT * FROM rankings WHERE domain = ?' ).all( 'google.com' )
+
+// file-based
+const db = new Database( path )
+db.pragma( 'journal_mode = WAL' )
+db.prepare( 'INSERT INTO results (domain, score) VALUES (?, ?)' ).run( 'google.com', 95 )
+```
 
 ---
 
@@ -250,14 +648,12 @@ Each query defines a SQL prepared statement, its parameters, output schema, and 
 | `sql` | `string` | Yes | SQL prepared statement with `?` placeholders for parameter binding. |
 | `description` | `string` | Yes | What this query does. Appears in the MCP resource description. |
 | `parameters` | `array` | Yes | Parameter definitions using the `position` + `z` system. Can be empty `[]` for no-parameter queries. |
-| `output` | `object` | Yes | Output schema declaring expected result shape. Uses the same format as route output schemas (see `04-output-schema.md`). |
+| `output` | `object` | Yes | Output schema declaring expected result shape. Uses the same format as tool output schemas (see `04-output-schema.md`). |
 | `tests` | `array` | Yes | Executable test cases. At least 1 per query. |
 
-### Query Field Details
+### SQL Field
 
-#### `sql`
-
-A SQL prepared statement using `?` as the placeholder for bound parameters. Parameters are bound in the order they appear in the `parameters` array — the first parameter binds to the first `?`, the second to the second `?`, and so on.
+A SQL prepared statement using `?` as the placeholder for bound parameters. Parameters are bound in the order they appear in the `parameters` array.
 
 ```javascript
 // Single parameter
@@ -270,45 +666,20 @@ sql: 'SELECT * FROM tokens WHERE address = ? AND chain_id = ?'
 sql: 'SELECT DISTINCT chain_id, chain_name FROM tokens ORDER BY chain_id'
 ```
 
-Only `SELECT` statements are allowed. Common Table Expressions (CTEs) starting with `WITH` are also permitted, as they always resolve to a `SELECT`. See [SQL Security](#sql-security) for the complete list of blocked patterns.
+For `in-memory` resources, only `SELECT` statements and `WITH` (CTE) expressions are allowed in schema-defined queries. For `file-based` resources, all SQL statements are allowed.
 
-#### `description`
+### Dynamic SQL (`{{DYNAMIC_SQL}}`)
 
-Describes what this specific query does — not what the resource provides (that is the resource's `description`), but what this particular query returns.
+For resources where the AI client needs to write its own SQL queries (e.g., exploratory data analysis), the special placeholder `{{DYNAMIC_SQL}}` signals that the SQL comes from the user at runtime.
 
-```javascript
-// Good — explains the specific query
-description: 'Find tokens by ticker symbol (case-insensitive)'
-description: 'Find token by contract address and chain'
-description: 'List all distinct chains that have token entries'
+This is used by the auto-injected `freeQuery`. Schema authors do not normally need to use `{{DYNAMIC_SQL}}` directly — it is documented here for completeness.
 
-// Bad — generic
-description: 'Query tokens'
-description: 'Database lookup'
-```
+#### `{{DYNAMIC_SQL}}` Rules
 
-#### `output`
-
-Output schema for query results. Uses the same format defined in `04-output-schema.md`. Resource queries always return arrays (zero or more matching rows), so the top-level `schema.type` is always `'array'`.
-
-```javascript
-output: {
-    mimeType: 'application/json',
-    schema: {
-        type: 'array',
-        items: {
-            type: 'object',
-            properties: {
-                symbol: { type: 'string', description: 'Token ticker symbol' },
-                name: { type: 'string', description: 'Full token name' },
-                decimals: { type: 'number', description: 'Token decimals' }
-            }
-        }
-    }
-}
-```
-
-The `output` field is required for every query. Unlike tool routes where `output` is optional (see `04-output-schema.md`), resource queries always have a known, stable schema because the database structure is controlled by the schema author.
+1. **Runtime security checks** — for `in-memory`, user SQL must start with `SELECT` and must not contain write operations. For `file-based`, all statements are allowed.
+2. **Automatic LIMIT** — the runtime appends `LIMIT {n}` to SELECT queries if no LIMIT clause is present. Default: 100, maximum: 1000.
+3. **The `sql` parameter** — provides the user's SQL query.
+4. **The `limit` parameter** — optional, controls the automatic LIMIT.
 
 ---
 
@@ -359,18 +730,9 @@ parameters: [
 
 The number of parameters must match the number of `?` placeholders in the SQL statement. A mismatch is a validation error.
 
-### Value Types
-
-| Value Pattern | Description | Visible to User |
-|---------------|-------------|-----------------|
-| `{{USER_PARAM}}` | Value provided by the user at call-time | Yes |
-| Any other string | Fixed value, bound automatically | No |
-
-Resource parameters do not support `{{SERVER_PARAM:...}}` injection. SQL queries operate on local data and do not require API keys or server secrets.
-
 ### Supported Primitives
 
-Resource parameters support the same Zod primitives as tool parameters:
+Resource parameters support scalar Zod primitives only:
 
 | Primitive | Description | Example |
 |-----------|-------------|---------|
@@ -380,191 +742,6 @@ Resource parameters support the same Zod primitives as tool parameters:
 | `enum(A,B,C)` | One of the listed values | `'enum(ethereum,polygon,arbitrum)'` |
 
 The `array()` and `object()` primitives are not supported for resource parameters — SQL parameter binding accepts only scalar values.
-
-### Supported Options
-
-| Option | Description | Example |
-|--------|-------------|---------|
-| `min(n)` | Minimum value/length | `'min(1)'` |
-| `max(n)` | Maximum value/length | `'max(100)'` |
-| `length(n)` | Exact length | `'length(42)'` |
-| `optional()` | Parameter is not required | `'optional()'` |
-| `default(value)` | Default value when omitted | `'default(1)'` |
-
----
-
-## SQL Security
-
-Resource queries execute SQL against a local database. To prevent misuse, the runtime enforces strict SQL security constraints. All checks are case-insensitive and applied at load-time before any query is executed.
-
-### Blocked Patterns
-
-The following SQL patterns are forbidden. If a query's `sql` field matches any of these patterns (case-insensitive), the schema is rejected at load-time:
-
-| Pattern | Reason |
-|---------|--------|
-| `ATTACH DATABASE` | Prevents accessing external database files |
-| `LOAD_EXTENSION` | Prevents loading native code extensions |
-| `PRAGMA` | Prevents modifying database configuration |
-| `CREATE` | No DDL — database is read-only |
-| `ALTER` | No DDL — database is read-only |
-| `DROP` | No DDL — database is read-only |
-| `INSERT` | No DML writes — database is read-only |
-| `UPDATE` | No DML writes — database is read-only |
-| `DELETE` | No DML writes — database is read-only |
-| `REPLACE` | No DML writes — database is read-only |
-| `TRUNCATE` | No DML writes — database is read-only |
-
-### Allowed Statements
-
-Only `SELECT` statements and `WITH` (CTE) expressions are allowed. The runtime verifies that the SQL statement begins with `SELECT` or `WITH` (after trimming whitespace) before accepting it. CTEs are useful when the same parameter value is needed in multiple places (e.g., UNION queries), since each `?` placeholder maps to a separate parameter.
-
-```javascript
-// Valid
-sql: 'SELECT * FROM tokens WHERE symbol = ?'
-sql: 'SELECT symbol, name, decimals FROM tokens WHERE chain_id = ? ORDER BY symbol'
-sql: 'SELECT DISTINCT chain_id FROM tokens'
-sql: 'SELECT t.symbol, c.name FROM tokens t JOIN chains c ON t.chain_id = c.id WHERE t.symbol = ?'
-sql: "WITH search AS (SELECT ? AS term) SELECT * FROM sdn, search WHERE sdn_name LIKE '%' || search.term || '%'"
-
-// Invalid — blocked patterns
-sql: 'INSERT INTO tokens (symbol) VALUES (?)'          // INSERT blocked
-sql: 'DROP TABLE tokens'                                // DROP blocked
-sql: 'PRAGMA table_info(tokens)'                        // PRAGMA blocked
-sql: 'SELECT * FROM tokens; DROP TABLE tokens'          // DROP blocked (multi-statement)
-sql: "ATTACH DATABASE '/etc/passwd' AS leak"            // ATTACH blocked
-```
-
-### SQL Injection Prevention
-
-All user-provided values are bound via prepared statement `?` placeholders. The runtime never interpolates user input into SQL strings. This is enforced by design — there is no mechanism for string interpolation in the SQL field.
-
-### Dynamic SQL (`{{DYNAMIC_SQL}}`)
-
-For resources where the AI client needs to write its own SQL queries (e.g., exploratory data analysis), the special placeholder `{{DYNAMIC_SQL}}` signals that the SQL comes from the user at runtime rather than being declared in the schema.
-
-```javascript
-freeQuery: {
-    sql: '{{DYNAMIC_SQL}}',
-    description: 'Execute a custom read-only SQL query against the database.',
-    parameters: [
-        {
-            position: { key: 'sql', value: '{{USER_PARAM}}' },
-            z: { primitive: 'string()', options: [ 'min(6)' ] }
-        },
-        {
-            position: { key: 'limit', value: '{{USER_PARAM}}' },
-            z: { primitive: 'number()', options: [ 'optional()', 'default(100)', 'max(1000)' ] }
-        }
-    ],
-    output: {
-        mimeType: 'application/json',
-        schema: { type: 'array', items: { type: 'object' } }
-    },
-    tests: [
-        { _description: 'Count all rows', sql: 'SELECT COUNT(*) as count FROM tokens', limit: 1 }
-    ]
-}
-```
-
-#### `{{DYNAMIC_SQL}}` Rules
-
-1. **Runtime security checks** — the same blocked patterns apply at runtime (not just load-time). The user-provided SQL must start with `SELECT` and must not contain any blocked patterns.
-2. **No prepared statement binding** — because the SQL itself comes from the user, `?` placeholders are not used. The `parameters` array provides the SQL string and optional limit, not values to bind into the SQL.
-3. **Automatic LIMIT** — the runtime appends `LIMIT {n}` to the user's SQL if no LIMIT clause is present. Default: 100, maximum: 1000.
-4. **The `sql` parameter** — the first parameter must have `key: 'sql'` and provides the user's SQL query.
-5. **The `limit` parameter** — optional second parameter with `key: 'limit'` controls the automatic LIMIT.
-
-#### When to use `{{DYNAMIC_SQL}}`
-
-Use `{{DYNAMIC_SQL}}` when the database has a complex schema and the AI client benefits from writing its own queries. This is common for large open data databases where the schema author cannot anticipate all useful queries.
-
-**Always pair with `getSchema`** — provide a `getSchema` query so the AI client can discover the database structure before writing SQL.
-
----
-
-## Recommended Standard Queries
-
-Every SQLite resource SHOULD (not MUST) provide two standard queries that enable AI-driven data exploration:
-
-### `getSchema` — Database Structure Discovery
-
-Returns the database schema so AI clients can understand what tables and columns are available.
-
-```javascript
-getSchema: {
-    sql: "SELECT name, sql FROM sqlite_master WHERE type='table' ORDER BY name",
-    description: 'Returns the database schema (table names and CREATE statements).',
-    parameters: [],
-    output: {
-        mimeType: 'application/json',
-        schema: {
-            type: 'array',
-            items: {
-                type: 'object',
-                properties: {
-                    name: { type: 'string', description: 'Table name' },
-                    sql: { type: 'string', description: 'CREATE TABLE statement' }
-                }
-            }
-        }
-    },
-    tests: [
-        { _description: 'Get all table definitions' }
-    ]
-}
-```
-
-**Why this matters:** Without `getSchema`, an AI client has no way to discover what data is available in the database. It must rely on the schema description and query descriptions alone. With `getSchema`, the AI can inspect table structures and write informed `freeQuery` SQL.
-
-### `freeQuery` — AI-Driven SQL Queries
-
-Allows the AI client to write custom read-only SQL queries against the database. See [Dynamic SQL](#dynamic-sql-dynamic_sql) for the `{{DYNAMIC_SQL}}` mechanism.
-
-### Standard Query Naming
-
-The names `getSchema` and `freeQuery` are reserved conventions. If a resource provides these queries, they MUST use exactly these names and follow the patterns shown above.
-
----
-
-## Source Adapters
-
-The `source` field acts as a discriminator that determines which adapter handles the resource. v3.0.0 defines one adapter:
-
-| Source | Status | Adapter | Description |
-|--------|--------|---------|-------------|
-| `sqlite` | v3.0.0 | SQLiteAdapter | Local SQLite database, sql.js or better-sqlite3 runtime |
-| `csv` | Reserved | — | CSV files with header-based column mapping |
-| `json` | Reserved | — | Static JSON files with JSONPath queries |
-| `parquet` | Reserved | — | Apache Parquet via DuckDB or Arrow |
-
-Reserved source values are not yet implemented. Using a reserved value produces a validation error in v3.0.0. They are listed here to guide future extension design.
-
-### Adapter Interface
-
-Every source adapter must implement the following operations:
-
-```
-interface ResourceAdapter {
-    load( { databasePath } ) → instance
-    execute( { instance, sql, parameters } ) → rows[]
-    close( { instance } ) → void
-    getSchema( { instance } ) → tableDefinitions[]
-}
-```
-
-The `load` method is called once at schema load-time for `lifecycle: 'persistent'` resources, or per-query for `lifecycle: 'transient'` resources. The `close` method is called when the runtime shuts down (persistent) or after each query (transient).
-
-### SQLite Adapter Details
-
-The SQLite adapter supports two runtime implementations:
-
-| Implementation | Use Case | Trade-off |
-|----------------|----------|-----------|
-| `sql.js` | Cross-platform, no native compilation | WASM-based, loads entire DB into memory buffer |
-| `better-sqlite3` | Node.js server environments | Native C++ bindings, memory-mapped I/O, handles large DBs |
-
-The runtime selects the appropriate implementation based on the environment. Schema authors do not need to specify which implementation to use — the `source: 'sqlite'` declaration is sufficient.
 
 ---
 
@@ -578,10 +755,12 @@ export const handlers = ( { sharedLists, libraries } ) => ( {
         bySymbol: {
             postRequest: async ( { response, struct, payload } ) => {
                 const enriched = response
-                    .map( ( row ) => ( {
-                        ...row,
-                        explorerUrl: `https://etherscan.io/token/${row.address}`
-                    } ) )
+                    .map( ( row ) => {
+                        const { address, chain_id } = row
+                        const explorerUrl = `https://etherscan.io/token/${address}`
+
+                        return { ...row, explorerUrl }
+                    } )
 
                 return { response: enriched }
             }
@@ -596,9 +775,9 @@ Resource handlers are nested one level deeper than tool handlers:
 
 ```
 handlers
-  └── {resourceName}          (tool handlers are at this level)
-       └── {queryName}
-            └── postRequest   (same signature as tool postRequest)
+  +-- {resourceName}          (tool handlers are at this level)
+       +-- {queryName}
+            +-- postRequest   (same signature as tool postRequest)
 ```
 
 ### Handler Type
@@ -609,177 +788,25 @@ handlers
 
 Resource handlers only support `postRequest`. There is no `preRequest` for resources because there is no HTTP request to modify — the query is executed directly against the local database.
 
-### Handler Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `response` | `array` | Array of row objects returned by the SQL query. Each row is a plain object with column names as keys. |
-| `struct` | `object` | The query metadata: resource name, query name, SQL statement, bound parameters. Read-only. |
-| `payload` | `object` | The user's validated input parameters as key-value pairs. |
-
 ### Handler Rules
 
 1. **Handlers are optional.** Queries without handlers return the raw SQL result rows directly.
 2. **Only `postRequest` is supported.** Resource handlers transform query results, not query construction.
 3. **Same security restrictions apply.** Resource handlers follow the same rules as tool handlers: no imports, no restricted globals, pure transformations only. See `05-security.md`.
-4. **Return shape must match.** `postRequest` must return `{ response }`. The returned `response` is wrapped in the standard envelope (see `04-output-schema.md`).
-5. **Output schema describes post-handler shape.** If a handler transforms the query results, the `output.schema` must describe the shape after transformation — not the raw SQL rows.
-
----
-
-## Database Bundling
-
-### File Location
-
-The SQLite database file is bundled alongside the schema `.mjs` file. The `database` path is relative to the schema file location.
-
-```
-schemas/v3.0.0/tokens/
-├── TokenRegistry.mjs          # Schema file
-└── data/
-    └── tokens.db              # SQLite database
-```
-
-### Path Resolution
-
-The runtime resolves the `database` path relative to the directory containing the schema file:
-
-```javascript
-// Schema at: schemas/v3.0.0/tokens/TokenRegistry.mjs
-// database: './data/tokens.db'
-// Resolved: schemas/v3.0.0/tokens/data/tokens.db
-```
-
-### Path Constraints
-
-| Constraint | Example Valid | Example Invalid |
-|------------|-------------|-----------------|
-| Must end with `.db` | `'./tokens.db'`, `'~/.flowmcp/data/tokens.db'` | `'./tokens.sqlite'` |
-| Relative: no parent traversal | `'./data/tokens.db'` | `'../shared/tokens.db'` |
-| Home dir: must start with `~/` | `'~/.flowmcp/data/tokens.db'` | `'~/../../etc/passwd.db'` |
-
-### Database Requirements
-
-| Requirement | Description |
-|-------------|-------------|
-| Format | SQLite 3 database file |
-| Size | No hard limit, but databases should be reasonably sized for distribution. Recommended maximum: 50 MB. |
-| Content | Schema author's responsibility. The runtime does not validate database contents at load-time. |
-| Read-only | The runtime opens the database as a read-only in-memory buffer. No writes are possible. |
-
-### Author Responsibility
-
-The schema author is responsible for:
-
-1. **Creating the database** with appropriate tables and indices
-2. **Populating the data** from authoritative sources
-3. **Keeping the data current** by releasing updated schema versions with refreshed databases
-4. **Ensuring data quality** — the runtime does not validate data correctness
-
----
-
-## Runtime
-
-### SQLite Runtime
-
-Resources use a SQLite adapter to execute queries against local databases. Two runtime implementations are supported:
-
-| Implementation | Environment | Description |
-|----------------|-------------|-------------|
-| [sql.js](https://github.com/sql-js/sql.js) | Cross-platform | Pure JavaScript/WASM SQLite. No native compilation. Reads entire DB into WASM memory buffer. |
-| [better-sqlite3](https://github.com/JoshuaWise/better-sqlite3) | Node.js | Native C++ bindings. Memory-mapped I/O. Handles large databases efficiently. |
-
-The runtime selects the appropriate implementation automatically. Schema authors use `source: 'sqlite'` regardless of which implementation is used.
-
-### Execution Flow
-
-```mermaid
-flowchart TD
-    A[Schema Load] --> B{lifecycle?}
-    B -->|persistent| C[Load DB into memory once]
-    B -->|transient| D[Skip — load per query]
-    C --> E[Receive query request]
-    D --> E
-    E --> F{DYNAMIC_SQL?}
-    F -->|Yes| G[Runtime security check on user SQL]
-    F -->|No| H[Execute prepared statement with ? binding]
-    G --> H2[Execute user SQL with automatic LIMIT]
-    H --> I[Return result rows as objects]
-    H2 --> I
-    I --> J{Handler exists?}
-    J -->|Yes| K[postRequest transforms rows]
-    J -->|No| L[Return rows directly]
-    K --> M[Wrap in response envelope]
-    L --> M
-```
-
-### Step-by-step
-
-1. **Load database** — for `lifecycle: 'persistent'`, the database is loaded once at schema load-time and kept in memory. For `lifecycle: 'transient'`, loading is deferred to step 3.
-2. **Receive query** — the runtime receives a resource query request with validated user parameters.
-3. **Open connection (transient only)** — if the lifecycle is `transient`, a new database connection is opened now.
-4. **Execute query** — for standard queries, the SQL is executed as a prepared statement with bound `?` parameters. For `{{DYNAMIC_SQL}}` queries, the user-provided SQL is security-checked and executed with an automatic LIMIT.
-5. **Return rows** — query results are returned as an array of plain objects with column names as keys.
-6. **Handler (optional)** — if a `postRequest` handler exists for this query, the rows are passed through it.
-7. **Envelope** — the result is wrapped in the standard response envelope (`{ status, messages, data }`).
-8. **Close connection (transient only)** — if the lifecycle is `transient`, the database connection is closed now.
-
-### Database Lifecycle
-
-The `lifecycle` field controls database connection management:
-
-#### Persistent (default)
-
-The database is loaded **once** at schema load-time and kept in memory for the lifetime of the runtime process. Multiple queries against the same resource reuse the same database instance. The `.db` file on disk is not accessed after initial load.
-
-This follows the same caching pattern as shared lists: loaded once, kept in memory, reused across all requests.
-
-```mermaid
-flowchart LR
-    A[Schema Load] --> B[Open DB Connection]
-    B --> C[Query 1 — reuse connection]
-    C --> D[Query 2 — reuse connection]
-    D --> E[Query N — reuse connection]
-    E --> F[Process Shutdown → Close]
-```
-
-#### Transient
-
-The database connection is opened per query execution and closed immediately after. This is suitable for very large databases (> 100 MB) that should not remain in memory permanently.
-
-```mermaid
-flowchart LR
-    A[Query Request] --> B[Open DB Connection]
-    B --> C[Execute Query]
-    C --> D[Close DB Connection]
-    D --> E[Return Results]
-```
+4. **Return shape must match.** `postRequest` must return `{ response }`.
 
 ---
 
 ## Tests
 
-Resource queries use the same test format as tool routes (see `10-route-tests.md`). Each test provides parameter values for a query execution against the bundled database.
+Resource queries use the same test format as tool tests (see `10-tests.md`). Each test provides parameter values for a query execution against the database.
 
 ```javascript
-queries: {
-    bySymbol: {
-        sql: 'SELECT * FROM tokens WHERE symbol = ? COLLATE NOCASE',
-        description: 'Find tokens by ticker symbol',
-        parameters: [
-            {
-                position: { key: 'symbol', value: '{{USER_PARAM}}' },
-                z: { primitive: 'string()', options: [ 'min(1)' ] }
-            }
-        ],
-        output: { /* ... */ },
-        tests: [
-            { _description: 'Well-known stablecoin (USDC)', symbol: 'USDC' },
-            { _description: 'Major L1 token (ETH)', symbol: 'ETH' },
-            { _description: 'Case-insensitive match (lowercase)', symbol: 'wbtc' }
-        ]
-    }
-}
+tests: [
+    { _description: 'Well-known stablecoin (USDC)', symbol: 'USDC' },
+    { _description: 'Major L1 token (ETH)', symbol: 'ETH' },
+    { _description: 'Case-insensitive match (lowercase)', symbol: 'wbtc' }
+]
 ```
 
 ### Test Fields
@@ -788,23 +815,6 @@ queries: {
 |-------|------|----------|-------------|
 | `_description` | `string` | Yes | What this test demonstrates |
 | `{paramKey}` | matches parameter type | Yes (per required param) | Value for each `{{USER_PARAM}}` parameter |
-
-### Test Design Principles
-
-The same design principles from `10-route-tests.md` apply:
-
-1. **Express the breadth** — test different parameter values that exercise different database rows
-2. **Teach through examples** — each test should demonstrate a different lookup scenario
-3. **No personal data** — use well-known, publicly verifiable values
-4. **Reproducible results** — tests run against the bundled database, so results are always deterministic
-
-### Test Execution
-
-Unlike tool route tests (which call external APIs), resource tests execute against the local database file. This means:
-
-- Tests are always executable without API keys or network access
-- Results are deterministic — the same test always produces the same output
-- Tests serve as documentation of what data the database contains
 
 ### Test Count
 
@@ -818,22 +828,97 @@ Minimum: 1 test per query is required. A query without tests is a validation err
 
 ---
 
+## Execution Flow
+
+```mermaid
+flowchart TD
+    A[Schema Load] --> B{"source?"}
+    B -->|sqlite| C{"mode?"}
+    B -->|markdown| D[Read file as string]
+    C -->|in-memory| E["Open DB with readonly: true"]
+    C -->|file-based| F{"DB exists?"}
+    F -->|Yes| G["Open DB with WAL mode"]
+    F -->|No| H["CLI creates DB via getSchema"]
+    H --> G
+    E --> I[Receive query request]
+    G --> I
+    I --> J{"DYNAMIC_SQL?"}
+    J -->|Yes| K[Runtime security check]
+    J -->|No| L[Execute prepared statement]
+    K --> M[Execute user SQL with LIMIT]
+    L --> N[Return result rows]
+    M --> N
+    N --> O{"Handler exists?"}
+    O -->|Yes| P[postRequest transforms rows]
+    O -->|No| Q[Return rows directly]
+    P --> R[Wrap in response envelope]
+    Q --> R
+    D --> S[Return text content]
+```
+
+---
+
+## Coexistence with Tools
+
+A schema can define both `tools` and `resources` in the same `main` export:
+
+```javascript
+export const main = {
+    namespace: 'tokens',
+    name: 'TokenExplorer',
+    description: 'Token data from API and local database',
+    version: '3.0.0',
+    root: 'https://api.coingecko.com/api/v3',
+    tools: {
+        getPrice: {
+            method: 'GET',
+            path: '/simple/price',
+            description: 'Get current token price from CoinGecko API',
+            parameters: [ /* ... */ ],
+            tests: [ /* ... */ ]
+        }
+    },
+    resources: {
+        tokenMetadata: {
+            source: 'sqlite',
+            mode: 'in-memory',
+            origin: 'global',
+            name: 'tokens-metadata.db',
+            description: 'Token metadata from local database',
+            queries: {
+                getSchema: { /* ... */ },
+                bySymbol: { /* ... */ }
+            }
+        }
+    }
+}
+```
+
+### Coexistence Rules
+
+1. **`tools` and `resources` are independent.** A schema can have tools only, resources only, or both.
+2. **Limits are separate.** The 8-tool limit and 2-resource limit are independent constraints.
+3. **Handlers are namespaced.** Tool handlers are keyed by tool name, resource handlers are keyed by resource name then query name. There is no collision because resource handlers are nested one level deeper.
+4. **`root` is not required when a schema has only resources.** The `root` field provides the base URL for HTTP tools. A resource-only schema does not make HTTP calls and may omit `root`.
+
+---
+
 ## Limits
 
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
 | Max resources per schema | 2 | Keeps schemas focused. Resources should be tightly scoped to one data domain. |
-| Max queries per resource | 6 | Allows up to 4 domain queries + `getSchema` + `freeQuery` standard queries. |
-| Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with route names. |
-| Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with route names. |
+| Max schema-defined queries per resource | 7 | Including getSchema. Plus 1 auto-injected freeQuery = 8 total. |
+| Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
+| Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
-| Database path traversal | No `..` in relative paths | Prevents accessing files outside the schema directory tree. |
-| SQL statement type | `SELECT` only | Read-only access. All write operations are blocked. |
-| SQL for `{{DYNAMIC_SQL}}` | Runtime security check | Same blocked patterns enforced at runtime, not just load-time. |
-| Parameter count match | Must equal `?` count | Number of parameters must match number of SQL placeholders. Does not apply to `{{DYNAMIC_SQL}}` queries. |
-| `source` value | `'sqlite'` only | Only SQLite is supported in v3.0.0. Other values are reserved. |
-| `lifecycle` value | `'persistent'` or `'transient'` | Controls database connection management. Default: `'persistent'`. |
-| `freeQuery` LIMIT | Default 100, max 1000 | Prevents unbounded result sets from `{{DYNAMIC_SQL}}` queries. |
+| Markdown file extension | `.md` | Standardized file extension for Markdown documents. |
+| Resource folder name | `resources/` | Standardized folder name (not `data/`). |
+| `source` value | `'sqlite'` or `'markdown'` | Only these two types are supported. |
+| `mode` value (sqlite only) | `'in-memory'` or `'file-based'` | Two explicit modes. |
+| `origin` value | `'global'`, `'project'`, or `'inline'` | Three storage locations. |
+| `freeQuery` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
+| All fields | Required | No defaults, no optional fields. |
 
 ---
 
@@ -846,90 +931,30 @@ Resource definitions participate in schema hash calculation with specific inclus
 The following fields are part of the `main` export and therefore included in the schema hash (via `JSON.stringify()`):
 
 - Resource name (object key)
-- `source`
+- `source`, `mode`, `origin`, `name`
 - `description`
-- `database` (the path string, not the file contents)
 - Query definitions (`sql`, `description`, `parameters`, `output`, `tests`)
 
 ### Excluded from Hash
 
 | Excluded | Reason |
 |----------|--------|
-| Database file contents | Data updates should not invalidate the schema hash. The schema structure is what matters for integrity — data is the author's responsibility. |
+| Database file contents | Data updates should not invalidate the schema hash. |
+| Markdown file contents | Same reasoning as database contents. |
 | Handler code | Consistent with tool handler exclusion. Handler functions are in the `handlers` export, not in `main`. |
-
-### Rationale
-
-This approach is consistent with how tools handle hashing:
-
-- **Tool route definitions** (in `main`) are included in the hash
-- **Tool handler code** (in `handlers`) is excluded from the hash
-- **Resource definitions** (in `main`) are included in the hash
-- **Resource handler code** (in `handlers`) is excluded from the hash
-- **Database file contents** are excluded — similar to how external API response data is not part of a tool's hash
-
-A schema author can update the database contents (refresh token data, add new entries) without changing the schema hash. If the schema structure changes (new queries, modified SQL, changed parameters), the hash changes and signals that review is needed.
 
 ---
 
 ## Naming Conventions
 
-Resources follow the same naming conventions as other schema elements (see `01-schema-format.md`):
-
 | Element | Convention | Pattern | Example |
 |---------|-----------|---------|---------|
 | Resource name | camelCase | `^[a-z][a-zA-Z0-9]*$` | `tokenLookup`, `chainConfig` |
-| Query name | camelCase | `^[a-z][a-zA-Z0-9]*$` | `bySymbol`, `byAddress`, `listAll` |
+| Query name | camelCase | `^[a-z][a-zA-Z0-9]*$` | `bySymbol`, `byAddress`, `getSchema` |
 | Parameter key | camelCase | `^[a-z][a-zA-Z0-9]*$` | `symbol`, `chainId` |
-| Database filename | lowercase with hyphens | `^[a-z][a-z0-9-]*\.db$` | `tokens.db`, `evm-chains.db` |
-
----
-
-## Coexistence with Tools
-
-A schema can define both `routes` (tools) and `resources` in the same `main` export:
-
-```javascript
-export const main = {
-    namespace: 'tokens',
-    name: 'TokenExplorer',
-    description: 'Token data from API and local database',
-    version: '3.0.0',
-    root: 'https://api.coingecko.com/api/v3',
-    routes: {
-        getPrice: {
-            method: 'GET',
-            path: '/simple/price',
-            description: 'Get current token price from CoinGecko API',
-            parameters: [ /* ... */ ],
-            tests: [ /* ... */ ]
-        }
-    },
-    resources: {
-        tokenMetadata: {
-            source: 'sqlite',
-            description: 'Token metadata from local database',
-            database: './data/tokens.db',
-            queries: {
-                bySymbol: {
-                    sql: 'SELECT * FROM tokens WHERE symbol = ? COLLATE NOCASE',
-                    description: 'Find tokens by symbol',
-                    parameters: [ /* ... */ ],
-                    output: { /* ... */ },
-                    tests: [ /* ... */ ]
-                }
-            }
-        }
-    }
-}
-```
-
-### Coexistence Rules
-
-1. **`routes` and `resources` are independent.** A schema can have routes only, resources only, or both.
-2. **Limits are separate.** The 8-route limit and 2-resource limit are independent constraints.
-3. **Handlers are namespaced.** Tool handlers are keyed by route name, resource handlers are keyed by resource name then query name. There is no collision because resource handlers are nested one level deeper.
-4. **`root` is not required when a schema has only resources.** The `root` field provides the base URL for HTTP routes. A resource-only schema does not make HTTP calls and may omit `root`.
+| Database filename | kebab-case with namespace prefix | `^[a-z][a-z0-9-]*\.db$` | `tranco-ranking.db`, `ofacsdn-sanctions.db` |
+| Markdown filename | kebab-case with namespace prefix | `^[a-z][a-z0-9-]*\.md$` | `duneanalytics-sql-reference.md` |
+| Resource folder | `resources/` | Fixed | Not `data/` |
 
 ---
 
@@ -939,61 +964,96 @@ The following rules are enforced when validating resource definitions:
 
 | Code | Severity | Rule |
 |------|----------|------|
-| RES001 | error | `source` must be `'sqlite'`. No other values are accepted. |
+| RES001 | error | `source` must be `'sqlite'` or `'markdown'`. |
 | RES002 | error | `description` must be a non-empty string. |
-| RES003 | error | `database` must be a relative path ending with `.db`. |
-| RES004 | error | `database` relative path must not contain `..` segments. |
-| RES005 | error | Maximum 2 resources per schema. |
-| RES006 | error | Maximum 6 queries per resource. |
-| RES007 | error | Each query must have a `sql` field of type string. |
-| RES008 | error | Each query must have a `description` field of type string. |
-| RES009 | error | Each query must have a `parameters` array. |
-| RES010 | error | Each query must have an `output` object with `mimeType` and `schema`. |
-| RES011 | error | Each query must have at least 1 test. |
-| RES012 | error | SQL statement must begin with `SELECT` or `WITH` (CTE) (case-insensitive, after whitespace trim). |
-| RES013 | error | SQL statement must not contain blocked patterns: `ATTACH DATABASE`, `LOAD_EXTENSION`, `PRAGMA`, `CREATE`, `ALTER`, `DROP`, `INSERT`, `UPDATE`, `DELETE`, `REPLACE`, `TRUNCATE`. |
+| RES003 | error | `mode` is required for `source: 'sqlite'` and must be `'in-memory'` or `'file-based'`. |
+| RES004 | error | `origin` is required and must be `'global'`, `'project'`, or `'inline'`. |
+| RES005 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
+| RES006 | error | Maximum 2 resources per schema. |
+| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (8 total with auto-injected freeQuery). |
+| RES008 | error | Each query must have a `sql` field of type string. |
+| RES009 | error | Each query must have a `description` field of type string. |
+| RES010 | error | Each query must have a `parameters` array. |
+| RES011 | error | Each query must have an `output` object with `mimeType` and `schema`. |
+| RES012 | error | Each query must have at least 1 test. |
+| RES013 | error | For `mode: 'in-memory'`, schema-defined SQL must begin with `SELECT` or `WITH` (CTE). |
 | RES014 | error | Number of parameters must match number of `?` placeholders in the SQL statement. |
 | RES015 | error | Resource parameters must not have a `location` field in `position`. |
 | RES016 | error | Resource parameters must not use `{{SERVER_PARAM:...}}` values. |
 | RES017 | error | Resource name must match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
 | RES018 | error | Query name must match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
-| RES019 | error | Resource parameter primitives must be scalar: `string()`, `number()`, `boolean()`, or `enum()`. No `array()` or `object()`. |
-| RES020 | warning | Database file should exist at validation time. Missing file produces a warning, not an error, to allow schema validation before database creation. |
-| RES021 | error | `output.schema.type` must be `'array'` for resource queries. Queries always return zero or more rows. |
+| RES019 | error | Resource parameter primitives must be scalar: `string()`, `number()`, `boolean()`, or `enum()`. |
+| RES020 | warning | Database file should exist at validation time. Missing file produces a warning. |
+| RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values must pass the corresponding `z` validation. |
 | RES023 | error | Test objects must be JSON-serializable. |
-| RES024 | error | `lifecycle` must be `'persistent'` or `'transient'` if present. |
-| RES025 | error | `{{DYNAMIC_SQL}}` query must have a `sql` parameter with `key: 'sql'`. |
-| RES026 | error | `{{DYNAMIC_SQL}}` query must not have `?` placeholders in the sql field (the SQL comes from the user). |
-| RES027 | warning | Resource should include a `getSchema` query for database structure discovery. |
-| RES028 | error | `{{DYNAMIC_SQL}}` test SQL must pass all runtime security checks (SELECT only, no blocked patterns). |
-| RES029 | error | `source` must not be a reserved but unimplemented value (`csv`, `json`, `parquet`). |
+| RES024 | error | SQLite resources must include a `getSchema` query. |
+| RES025 | error | `mode: 'file-based'` requires `origin: 'project'`. |
+| RES026 | error | `source: 'markdown'` must not have a `mode` field. |
+| RES027 | error | `source: 'markdown'` must not have a `queries` field. |
+| RES028 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
+| RES029 | error | All resource fields are required. No field may be omitted. |
 
 ---
 
 ## Complete Example
 
-A full schema with one resource containing two queries and a `postRequest` handler:
+A full schema combining SQLite in-memory, SQLite file-based, and Markdown resources with tools and prompts:
 
 ```javascript
 export const main = {
-    namespace: 'tokens',
-    name: 'TokenRegistry',
-    description: 'Lookup token metadata from a local SQLite database',
+    namespace: 'duneanalytics',
+    name: 'Dune Analytics',
+    description: 'Query blockchain data with DuneSQL',
     version: '3.0.0',
-    tags: [ 'tokens', 'metadata', 'evm' ],
+
+    tools: {
+        executeQuery: { method: 'POST', path: '/api/v1/query', /* ... */ },
+        getExecutionResults: { method: 'GET', path: '/api/v1/execution/:id/results', /* ... */ },
+        getLatestResults: { method: 'GET', path: '/api/v1/query/:id/results', /* ... */ }
+    },
+
     resources: {
-        tokenLookup: {
+        sqlReference: {
+            source: 'markdown',
+            origin: 'inline',
+            name: 'duneanalytics-sql-reference.md',
+            description: 'DuneSQL syntax — functions, datatypes, tables'
+        },
+        queryTemplates: {
             source: 'sqlite',
-            description: 'Token metadata lookup by symbol or contract address.',
-            database: './data/tokens.db',
+            mode: 'in-memory',
+            origin: 'global',
+            name: 'duneanalytics-templates.db',
+            description: 'Pre-built query templates for common blockchain analytics',
             queries: {
-                bySymbol: {
-                    sql: 'SELECT symbol, name, address, chain_id, decimals FROM tokens WHERE symbol = ? COLLATE NOCASE',
-                    description: 'Find tokens by ticker symbol (case-insensitive)',
+                getSchema: {
+                    sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
+                    description: 'Returns the database schema',
+                    parameters: [],
+                    output: {
+                        mimeType: 'application/json',
+                        schema: {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    name: { type: 'string', description: 'Table name' },
+                                    sql: { type: 'string', description: 'CREATE TABLE statement' }
+                                }
+                            }
+                        }
+                    },
+                    tests: [
+                        { _description: 'Get all table definitions' }
+                    ]
+                },
+                searchTemplates: {
+                    sql: 'SELECT name, description, sql FROM templates WHERE category = ?',
+                    description: 'Search query templates by category',
                     parameters: [
                         {
-                            position: { key: 'symbol', value: '{{USER_PARAM}}' },
+                            position: { key: 'category', value: '{{USER_PARAM}}' },
                             z: { primitive: 'string()', options: [ 'min(1)' ] }
                         }
                     ],
@@ -1004,100 +1064,46 @@ export const main = {
                             items: {
                                 type: 'object',
                                 properties: {
-                                    symbol: { type: 'string', description: 'Token ticker symbol' },
-                                    name: { type: 'string', description: 'Full token name' },
-                                    address: { type: 'string', description: 'Contract address' },
-                                    chainId: { type: 'number', description: 'Chain identifier' },
-                                    decimals: { type: 'number', description: 'Token decimals' },
-                                    explorerUrl: { type: 'string', description: 'Block explorer URL for the token' }
+                                    name: { type: 'string', description: 'Template name' },
+                                    description: { type: 'string', description: 'Template description' },
+                                    sql: { type: 'string', description: 'SQL query template' }
                                 }
                             }
                         }
                     },
                     tests: [
-                        { _description: 'Well-known stablecoin (USDC)', symbol: 'USDC' },
-                        { _description: 'Major DeFi token (UNI)', symbol: 'UNI' },
-                        { _description: 'Case-insensitive match (lowercase)', symbol: 'weth' }
-                    ]
-                },
-                byAddress: {
-                    sql: 'SELECT symbol, name, address, chain_id, decimals FROM tokens WHERE address = ? AND chain_id = ?',
-                    description: 'Find token by contract address and chain ID',
-                    parameters: [
-                        {
-                            position: { key: 'address', value: '{{USER_PARAM}}' },
-                            z: { primitive: 'string()', options: [ 'min(42)', 'max(42)' ] }
-                        },
-                        {
-                            position: { key: 'chainId', value: '{{USER_PARAM}}' },
-                            z: { primitive: 'number()', options: [ 'min(1)' ] }
-                        }
-                    ],
-                    output: {
-                        mimeType: 'application/json',
-                        schema: {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    symbol: { type: 'string', description: 'Token ticker symbol' },
-                                    name: { type: 'string', description: 'Full token name' },
-                                    address: { type: 'string', description: 'Contract address' },
-                                    chainId: { type: 'number', description: 'Chain identifier' },
-                                    decimals: { type: 'number', description: 'Token decimals' }
-                                }
-                            }
-                        }
-                    },
-                    tests: [
-                        {
-                            _description: 'USDC on Ethereum mainnet',
-                            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-                            chainId: 1
-                        },
-                        {
-                            _description: 'USDC on Polygon',
-                            address: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
-                            chainId: 137
-                        }
+                        { _description: 'Find DeFi templates', category: 'defi' },
+                        { _description: 'Find NFT templates', category: 'nft' }
                     ]
                 }
             }
         }
-    }
-}
+    },
 
-
-export const handlers = ( { sharedLists, libraries } ) => ( {
-    tokenLookup: {
-        bySymbol: {
-            postRequest: async ( { response, struct, payload } ) => {
-                const enriched = response
-                    .map( ( row ) => {
-                        const { address, chain_id } = row
-                        const explorerUrl = chain_id === 1
-                            ? `https://etherscan.io/token/${address}`
-                            : `https://blockscan.com/token/${address}`
-
-                        return { ...row, chainId: chain_id, explorerUrl }
-                    } )
-
-                return { response: enriched }
-            }
+    prompts: {
+        about: {
+            name: 'about',
+            version: 'flowmcp-prompt/1.0.0',
+            namespace: 'duneanalytics',
+            description: 'Overview of Dune Analytics — tools, resources, DuneSQL workflow',
+            dependsOn: [ 'executeQuery', 'getExecutionResults', 'getLatestResults' ],
+            references: [],
+            contentFile: './prompts/about.mjs'
         }
     }
-} )
+}
 ```
 
-### What this example demonstrates
+### Directory Structure
 
-1. **Resource-only schema** — no `routes`, no `root`. The schema provides only local database lookups.
-2. **Two queries** (`bySymbol`, `byAddress`) offering different lookup strategies for the same data.
-3. **Parameter binding** — `bySymbol` has one `?` placeholder and one parameter; `byAddress` has two `?` placeholders and two parameters in matching order.
-4. **Case-insensitive search** — the `bySymbol` SQL uses `COLLATE NOCASE`, and the tests demonstrate this with a lowercase test value.
-5. **A `postRequest` handler** on `bySymbol` that enriches query results with a computed `explorerUrl` field.
-6. **No handler** on `byAddress` — the raw SQL result rows are returned directly.
-7. **Output schema describes post-handler shape** — the `bySymbol` output includes `explorerUrl` (added by the handler), while `byAddress` output matches the raw SQL columns.
-8. **Tests with well-known values** — USDC, UNI, WETH are publicly known tokens. Contract addresses are public.
-9. **Zero import statements** — dependencies (`sharedLists`, `libraries`) are injected through the factory function.
-10. **Database path** — `./data/tokens.db` is relative to the schema file, within the same directory tree.
+```
+providers/
++-- duneanalytics/
+    +-- analytics.mjs                        # Schema (main export)
+    +-- prompts/
+    |   +-- about.mjs                        # Content for about prompt
+    +-- resources/
+        +-- duneanalytics-sql-reference.md   # Markdown resource (inline)
+```
+
+The SQLite database `duneanalytics-templates.db` is not in the schema directory — its `origin: 'global'` places it at `~/.flowmcp/resources/duneanalytics-templates.db`.

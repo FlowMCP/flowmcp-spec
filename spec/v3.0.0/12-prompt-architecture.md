@@ -1,6 +1,6 @@
 # FlowMCP Specification v3.0.0 — Prompt Architecture
 
-FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types are `.mjs` files with `export const prompt = { ... }` and use the `[[...]]` placeholder syntax for references and parameters.
+FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `[[...]]` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
 ---
 
@@ -48,32 +48,21 @@ The two prompt types serve different purposes and operate at different levels of
 
 ---
 
-## Prompt File Format
+## Provider-Prompt vs Agent-Prompt: Structural Difference
 
-Both Provider-Prompts and Agent-Prompts use the same `.mjs` file format with `export const prompt`. The `content` field is defined as a separate variable by convention, keeping instructions visually separated from metadata.
+Provider-Prompts and Agent-Prompts differ structurally in how they handle content:
 
-```javascript
-const content = `
-Use [[coingecko/tool/simplePrice]] to fetch current prices.
-Then compare with [[coingecko/tool/coinMarkets]] for market cap data.
+| Aspect | Provider-Prompt | Agent-Prompt |
+|--------|----------------|--------------|
+| **Definition location** | In `main.prompts` (schema file) | Standalone `.mjs` file |
+| **Content location** | External file via `contentFile` | Inline in the file (`content` field) |
+| **Export** | Part of `main` export | `export const prompt = { ... }` |
 
-Analyze the metrics for [[token]] in [[currency]].
-`
-
-
-export const prompt = {
-    name: 'price-comparison',
-    version: 'flowmcp-prompt/1.0.0',
-    namespace: 'coingecko',
-    description: 'Compare prices across multiple coins using CoinGecko data',
-    dependsOn: [ 'simplePrice', 'coinMarkets' ],
-    content
-}
-```
+**Why the split?** Provider-Prompt definitions are compact metadata that belongs in the schema's `main` block (hashable, JSON-serializable). The actual prompt content is long text that would clutter the schema — so it lives in a separate file. Agent-Prompts are already standalone files, so content stays inline.
 
 ### Why `.mjs` Files
 
-Prompt files use the same `.mjs` format as schema and skill files for three reasons:
+Prompt files (both content files and Agent-Prompt files) use the same `.mjs` format as schema and skill files for three reasons:
 
 1. **Consistent loading.** The runtime loads prompts via `import()` — the same mechanism used for schemas and skills. No separate parser needed.
 2. **Static security scanning.** The same `SecurityScanner` that checks schema files also checks prompt files. The zero-import policy applies uniformly.
@@ -83,10 +72,37 @@ Prompt files use the same `.mjs` format as schema and skill files for three reas
 
 ## Provider-Prompt Format
 
-A Provider-Prompt is scoped to a single namespace. It describes how to use that provider's tools effectively, without assuming any specific LLM model.
+A Provider-Prompt is scoped to a single namespace. It describes how to use that provider's tools effectively, without assuming any specific LLM model. The definition lives in `main.prompts`, and the content is loaded from an external file via `contentFile`.
+
+### Definition in `main.prompts`
 
 ```javascript
-const content = `
+export const main = {
+    namespace: 'coingecko',
+    tools: { /* ... */ },
+    resources: { /* ... */ },
+    prompts: {
+        priceComparison: {
+            name: 'price-comparison',
+            version: 'flowmcp-prompt/1.0.0',
+            namespace: 'coingecko',
+            description: 'Compare prices across multiple coins using CoinGecko data',
+            dependsOn: [ 'simplePrice', 'coinMarkets' ],
+            references: [],
+            contentFile: './prompts/price-comparison.mjs'
+        }
+    }
+}
+```
+
+### Content File
+
+The `contentFile` field points to a separate `.mjs` file that exports the prompt content:
+
+```javascript
+// prompts/price-comparison.mjs
+
+export const content = `
 Use [[coingecko/tool/simplePrice]] to fetch current prices for the requested coins.
 Then use [[coingecko/tool/coinMarkets]] to get market cap data.
 
@@ -98,25 +114,24 @@ Compare the following metrics for [[coins]]:
 If the user asks for historical data, note that simplePrice only returns current
 prices. Suggest using coinMarkets with the order parameter for trending analysis.
 `
-
-
-export const prompt = {
-    name: 'price-comparison',
-    version: 'flowmcp-prompt/1.0.0',
-    namespace: 'coingecko',
-    description: 'Compare prices across multiple coins',
-    dependsOn: [ 'simplePrice', 'coinMarkets' ],
-    content
-}
 ```
+
+**Content file rules:**
+
+- Export must be `export const content` (not `export const prompt`)
+- No imports allowed (zero-import policy)
+- `[[...]]` placeholder syntax for references and parameters
+- Content must not be empty
 
 ### Provider-Prompt Characteristics
 
 - **`namespace` field** identifies the provider. Must match the provider's namespace in the catalog.
 - **`dependsOn` uses bare tool names** — since the scope is a single namespace, fully qualified IDs are unnecessary. `'simplePrice'` is sufficient because it can only refer to `coingecko/tool/simplePrice`.
+- **`references` array** lists other prompts to compose. Empty array when none. Required field.
+- **`contentFile` field** is a relative path to the `.mjs` file containing the prompt content.
 - **No `testedWith` field** — Provider-Prompts are model-neutral. Any LLM can benefit from them.
 - **No `agent` field** — the `namespace` field indicates this is a Provider-Prompt.
-- **`[[...]]` references** in `content` may use full form (`[[coingecko/tool/simplePrice]]`) or short form (`[[coingecko/simplePrice]]`), but must reference tools within the same namespace.
+- **`[[...]]` references** in content may use full form (`[[coingecko/tool/simplePrice]]`) or short form (`[[coingecko/simplePrice]]`), but must reference tools within the same namespace.
 
 ---
 
@@ -182,8 +197,11 @@ The `export const prompt` object contains all metadata and instructions. Some fi
 | `description` | `string` | Required | Required | What the prompt teaches. Maximum 1024 characters. |
 | `testedWith` | `string` | Forbidden | Required | OpenRouter model ID (must contain `/`). |
 | `dependsOn` | `string[]` | Required | Required | Tool dependencies. Bare names for Provider-Prompts, full IDs for Agent-Prompts. |
-| `references` | `string[]` | Optional | Optional | Other prompts to compose. Full ID format. |
-| `content` | `string` | Required | Required | Prompt instructions with `[[...]]` placeholders. Must not be empty. |
+| `references` | `string[]` | Required | Required | Other prompts to compose. Full ID format. Empty array `[]` when none. |
+| `contentFile` | `string` | Required | Forbidden | Relative path to the content `.mjs` file. |
+| `content` | `string` | Forbidden | Required | Prompt instructions with `[[...]]` placeholders. Must not be empty. |
+
+**Key structural difference:** Provider-Prompts use `contentFile` (content in external file), Agent-Prompts use `content` (content inline). These fields are mutually exclusive — a prompt has either `contentFile` or `content`, never both.
 
 ### Field Details
 
@@ -273,16 +291,35 @@ dependsOn: [
 
 #### `references`
 
-An optional array of prompt IDs that this prompt composes. See [Composable Prompts](#composable-prompts) for full details.
+A required array of prompt IDs that this prompt composes. Use an empty array `[]` when the prompt does not reference other prompts. See [Composable Prompts](#composable-prompts) for full details.
 
 ```javascript
+// No references
+references: []
+
 // Agent-Prompt referencing a Provider-Prompt
 references: [ 'coingecko/prompt/price-comparison' ]
 ```
 
-#### `content`
+#### `contentFile` (Provider-Prompt only)
 
-The prompt instructions that the AI agent follows. Contains `[[...]]` placeholders for tool references and user parameters. Must not be empty. See [Placeholder Syntax](#placeholder-syntax) for the full reference.
+A relative path to the `.mjs` file containing the prompt content. Required for Provider-Prompts, forbidden for Agent-Prompts. The file must export `export const content = '...'`.
+
+```javascript
+// Valid
+contentFile: './prompts/price-comparison.mjs'
+contentFile: './prompts/about.mjs'
+
+// Invalid
+contentFile: './prompts/about.js'     // must be .mjs
+contentFile: '/absolute/path.mjs'     // must be relative
+```
+
+The content file is loaded via `import()` at schema load-time. The runtime reads the `content` named export from the file.
+
+#### `content` (Agent-Prompt only)
+
+The prompt instructions that the AI agent follows. Contains `[[...]]` placeholders for tool references and user parameters. Must not be empty. Required for Agent-Prompts, forbidden for Provider-Prompts. See [Placeholder Syntax](#placeholder-syntax) for the full reference.
 
 ---
 
@@ -483,33 +520,91 @@ organization/model-name
 
 ## Directory Structure
 
-Prompts are stored in `prompts/` subdirectories at the provider and agent levels:
+Provider-Prompt content files are stored in `prompts/` subdirectories alongside their provider's schema files. Agent-Prompt files are stored alongside their agent's manifest.
 
 ```
 providers/
-└── coingecko/
-    ├── simple-price.mjs              # Schema with tools
-    ├── coin-markets.mjs              # Schema with tools
-    └── prompts/
-        └── price-comparison.mjs       # Provider-Prompt
++-- coingecko/
+    +-- simple-price.mjs              # Schema with tools + prompt definitions in main.prompts
+    +-- coin-markets.mjs              # Schema with tools
+    +-- prompts/
+    |   +-- about.mjs                 # Content file for main.prompts.about
+    |   +-- price-comparison.mjs      # Content file for main.prompts.priceComparison
+    +-- resources/
+        +-- coingecko-metadata.md     # Markdown resource (inline)
 
 agents/
-└── crypto-research/
-    ├── manifest.json                  # Agent manifest
-    └── prompts/
-        └── token-deep-dive.mjs        # Agent-Prompt
++-- crypto-research/
+    +-- manifest.json                  # Agent manifest (with about definition)
+    +-- prompts/
+        +-- token-deep-dive.mjs        # Agent-Prompt (definition + content in one file)
 ```
 
 ### File Organization Rules
 
 | Level | Directory | Contains |
 |-------|-----------|----------|
-| Provider | `providers/{namespace}/prompts/` | Provider-Prompts scoped to the namespace |
-| Agent | `agents/{agent-name}/prompts/` | Agent-Prompts scoped to the agent |
+| Provider | `providers/{namespace}/prompts/` | Content files for Provider-Prompts (referenced via `contentFile`) |
+| Agent | `agents/{agent-name}/prompts/` | Agent-Prompt files (standalone, definition + content) |
 
-- Prompt filenames use kebab-case and match the prompt's `name` field: `price-comparison.mjs` contains `name: 'price-comparison'`.
-- Provider-Prompts live alongside their provider's schema files.
-- Agent-Prompts live alongside their agent's manifest.
+- Provider-Prompt content filenames use kebab-case and match the prompt's `name` field: `price-comparison.mjs` contains the content for `name: 'price-comparison'`.
+- Provider-Prompt definitions live in the schema's `main.prompts`. Content files live in `prompts/`.
+- Agent-Prompts are standalone files with both definition and content.
+
+---
+
+## The `about` Convention
+
+### Reserved Prompt Name
+
+`about` is a **reserved prompt name** as a convention (SHOULD, not MUST) for both Provider-Prompts and Agent-Prompts. It serves as the entry point to a namespace or agent — what it offers, how its tools relate, what resources are available.
+
+| Aspect | Provider-Schema | Agent-Manifest |
+|--------|----------------|----------------|
+| **Name** | `about` — reserved | `about` — reserved |
+| **Requirement** | SHOULD | SHOULD |
+| **Where** | `main.prompts.about` | In the agent manifest |
+| **When loaded** | Only on request | Only on request |
+| **Purpose** | Entry point to the namespace | Entry point to the agent |
+
+### Provider `about`
+
+```javascript
+// In main.prompts
+about: {
+    name: 'about',
+    version: 'flowmcp-prompt/1.0.0',
+    namespace: 'pagespeed',
+    description: 'Overview of PageSpeed Insights — tools, resources, workflows',
+    dependsOn: [ 'runPagespeedAnalysis', 'getCoreWebVitals' ],
+    references: [],
+    contentFile: './prompts/about.mjs'
+}
+```
+
+### Agent `about`
+
+```javascript
+// In agent manifest or as separate file
+about: {
+    name: 'about',
+    version: 'flowmcp-prompt/1.0.0',
+    agent: 'competitive-analysis',
+    description: 'Overview of Competitive Analysis Agent — what it does, which providers it uses',
+    testedWith: 'anthropic/claude-opus-4-6',
+    dependsOn: [ 'tranco/resource/rankingDb', 'pagespeed/tool/runPagespeedAnalysis' ],
+    references: [],
+    content: '...'
+}
+```
+
+### What `about` Is NOT
+
+- **Not a repetition** — does not restate tool descriptions that are already available
+- **Not a tutorial** — not a step-by-step guide for beginners
+- **Not API documentation** — that is what Markdown resources are for
+
+`about` is like an **index file**: entry point, context, relationships. What can this namespace/agent do? How do the tools relate? Are there resources?
 
 ---
 
@@ -548,8 +643,11 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 | PRM006 | error | Each `dependsOn` entry must resolve to an existing tool in the catalog |
 | PRM007 | error | Each `references[]` entry must resolve to an existing prompt in the catalog |
 | PRM008 | error | Referenced prompts must not themselves have `references[]` (one level deep only) |
-| PRM009 | error | `[[...]]` references in `content` must resolve to registered primitives (see PH002 in `02-parameters.md`) |
-| PRM010 | error | `content` is required and must be a non-empty string |
+| PRM009 | error | `[[...]]` references in prompt content must resolve to registered primitives (see PH002 in `02-parameters.md`) |
+| PRM010 | error | Agent-Prompts: `content` is required and must be a non-empty string. Provider-Prompts: `content` is forbidden. |
+| PRM011 | error | Provider-Prompts: `contentFile` is required, must be a relative path ending with `.mjs`. Agent-Prompts: `contentFile` is forbidden. |
+| PRM012 | error | Content file must export `export const content` (not `export const prompt`). |
+| PRM013 | error | `references` is required and must be an array (empty `[]` when no references). |
 
 ### Rule Details
 
@@ -571,7 +669,13 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 
 **PRM009** — All `[[...]]` reference placeholders (those containing `/`) in the `content` field must resolve to registered tools, resources, or prompts. Parameter placeholders (no `/`) are not validated against the catalog — they are user inputs.
 
-**PRM010** — A prompt without content has no purpose.
+**PRM010** — Agent-Prompts need inline content. Provider-Prompts get their content from an external file via `contentFile`.
+
+**PRM011** — Provider-Prompts must declare where their content lives via `contentFile`. The file must be a relative `.mjs` path. Agent-Prompts must not have `contentFile` because their content is inline.
+
+**PRM012** — Content files must use `export const content` as the named export. Using `export const prompt` would create ambiguity with the Agent-Prompt export pattern.
+
+**PRM013** — The `references` field is always required. When a prompt does not compose other prompts, an empty array `[]` must be provided. This makes the absence of references explicit rather than ambiguous.
 
 ### Validation Output Examples
 
@@ -612,23 +716,34 @@ Prompts are loaded as part of the catalog loading sequence. Provider-Prompts are
 
 ```mermaid
 flowchart TD
-    A[Scan prompts/ directory] --> B[Read each .mjs file as string]
-    B --> C[Static security scan per file]
-    C --> D{Security violations?}
-    D -->|Yes| E[Reject file with SEC error]
-    D -->|No| F["Dynamic import()"]
-    F --> G[Extract prompt export]
-    G --> H[Validate prompt fields — PRM001-PRM010]
-    H --> I{Provider or Agent?}
-    I -->|Provider| J[Validate dependsOn against namespace tools]
-    I -->|Agent| K[Validate dependsOn against catalog tools]
-    J --> L[Validate references against catalog prompts]
-    K --> L
-    L --> M[Validate placeholder references in content]
-    M --> N[Register as MCP prompt]
+    A{Prompt type?} -->|Provider| B["Read main.prompts definitions"]
+    A -->|Agent| C["Scan agents/{name}/prompts/ directory"]
+
+    B --> D["Validate fields — PRM001-PRM013"]
+    C --> E["Read each .mjs file as string"]
+    E --> F[Static security scan]
+    F --> G{"Security violations?"}
+    G -->|Yes| H[Reject with SEC error]
+    G -->|No| I["Dynamic import()"]
+    I --> J[Extract prompt export]
+    J --> D
+
+    D --> K{"Has contentFile?"}
+    K -->|Yes| L["Load content file via import()"]
+    L --> M["Extract content export"]
+    K -->|No| N["Use inline content"]
+
+    M --> O{Provider or Agent?}
+    N --> O
+    O -->|Provider| P[Validate dependsOn against namespace tools]
+    O -->|Agent| Q[Validate dependsOn against catalog tools]
+    P --> R[Validate references against catalog prompts]
+    Q --> R
+    R --> S[Validate placeholder references in content]
+    S --> T[Register as MCP prompt]
 ```
 
-The diagram shows how prompt loading integrates into the catalog loading pipeline. Security scanning happens before any code execution, followed by field validation and reference resolution.
+The diagram shows how prompt loading works for both types. Provider-Prompts are loaded from `main.prompts` definitions with content from external files. Agent-Prompts are loaded from standalone files. Both go through field validation and reference resolution.
 
 ### Security
 
@@ -652,10 +767,30 @@ const lib = require( 'lib' )
 
 ### Provider-Prompt: CoinGecko Price Comparison
 
-**File:** `providers/coingecko/prompts/price-comparison.mjs`
+**Schema definition** (in `providers/coingecko/simple-price.mjs`):
 
 ```javascript
-const content = `
+export const main = {
+    namespace: 'coingecko',
+    tools: { /* ... */ },
+    prompts: {
+        priceComparison: {
+            name: 'price-comparison',
+            version: 'flowmcp-prompt/1.0.0',
+            namespace: 'coingecko',
+            description: 'Compare prices, market caps, and volumes across multiple coins using CoinGecko data',
+            dependsOn: [ 'simplePrice', 'coinMarkets' ],
+            references: [],
+            contentFile: './prompts/price-comparison.mjs'
+        }
+    }
+}
+```
+
+**Content file** (`providers/coingecko/prompts/price-comparison.mjs`):
+
+```javascript
+export const content = `
 Use [[coingecko/tool/simplePrice]] to fetch current prices for the requested coins.
 Pass the coin IDs as a comma-separated string in the "ids" parameter and the target
 currency in the "vs_currencies" parameter.
@@ -676,16 +811,6 @@ coins with unusual 24h volume relative to market cap.
 If simplePrice returns a coin ID that coinMarkets does not recognize, skip that
 coin in the comparison table and note it at the bottom of the report.
 `
-
-
-export const prompt = {
-    name: 'price-comparison',
-    version: 'flowmcp-prompt/1.0.0',
-    namespace: 'coingecko',
-    description: 'Compare prices, market caps, and volumes across multiple coins using CoinGecko data',
-    dependsOn: [ 'simplePrice', 'coinMarkets' ],
-    content
-}
 ```
 
 ### Agent-Prompt: Cross-Provider Token Analysis
@@ -740,28 +865,29 @@ export const prompt = {
 
 ### What These Examples Demonstrate
 
-1. **Provider-Prompt** — `price-comparison` is scoped to `coingecko`, uses bare tool names in `dependsOn`, has no `testedWith` or `agent` field.
-2. **Agent-Prompt** — `token-deep-dive` is scoped to `crypto-research`, uses full IDs in `dependsOn`, requires `testedWith`.
+1. **Provider-Prompt** — `price-comparison` definition lives in `main.prompts`, content in an external file via `contentFile`. Scoped to `coingecko`, uses bare tool names in `dependsOn`.
+2. **Agent-Prompt** — `token-deep-dive` is a standalone file with inline `content`. Scoped to `crypto-research`, uses full IDs in `dependsOn`, requires `testedWith`.
 3. **Placeholder syntax** — `[[coingecko/tool/simplePrice]]` is a reference (contains `/`), `[[token]]` is a parameter (no `/`).
 4. **Composable prompts** — `token-deep-dive` references `coingecko/prompt/price-comparison` via the `references` array.
 5. **Tool combinatorics** — both prompts describe call order, result passing, and fallback strategies.
 6. **Fallback instructions** — both prompts handle edge cases (unrecognized coin IDs, unverified contracts).
-7. **Content variable pattern** — the `content` variable is defined above the export and referenced by name.
-8. **Zero imports** — neither file contains import statements.
+7. **Content separation** — Provider-Prompt uses `export const content` in a separate file. Agent-Prompt defines `content` inline above the export.
+8. **Zero imports** — no file contains import statements.
+9. **`references` always present** — Provider-Prompt has `references: []`, Agent-Prompt has `references: [ 'coingecko/prompt/price-comparison' ]`.
 
 ### File Structure
 
 ```
 providers/
-└── coingecko/
-    ├── simple-price.mjs
-    ├── coin-markets.mjs
-    └── prompts/
-        └── price-comparison.mjs       # Provider-Prompt
++-- coingecko/
+    +-- simple-price.mjs              # Schema with main.prompts definitions
+    +-- coin-markets.mjs
+    +-- prompts/
+        +-- price-comparison.mjs       # Content file (export const content)
 
 agents/
-└── crypto-research/
-    ├── manifest.json
-    └── prompts/
-        └── token-deep-dive.mjs        # Agent-Prompt
++-- crypto-research/
+    +-- manifest.json
+    +-- prompts/
+        +-- token-deep-dive.mjs        # Agent-Prompt (export const prompt)
 ```

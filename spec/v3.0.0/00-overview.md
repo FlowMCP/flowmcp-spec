@@ -34,7 +34,7 @@ flowchart TD
     A --> C[Non-Deterministic]
 
     B --> D[Tools — API endpoint wrappers]
-    B --> E[Resources — Local SQLite data]
+    B --> E[Resources — Local SQLite + Markdown data]
 
     C --> F[Provider-Prompts — Single-namespace guidance]
     C --> G[Agent-Prompts — Multi-provider workflows]
@@ -189,7 +189,7 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Schema** | A `.mjs` file with two named exports: `main` (static) and optionally `handlers` (factory function). Defines tools, resources, and/or prompts. |
 | **Tool** | A single API endpoint within a schema (formerly called "Route" in v2). Maps to the MCP `server.tool` primitive. Each tool has parameters, a method, a path, and optional handlers. Defined in `main.tools`. |
 | **Route** | Deprecated alias for Tool. `main.routes` is accepted in v3.0.0 with a deprecation warning but will be removed in v3.2.0. Schemas must not define both `tools` and `routes`. |
-| **Resource** | Embedded, read-only data access via SQLite databases. Maps to the MCP `server.resource` primitive. Defined in `main.resources`. See `13-resources.md`. |
+| **Resource** | Local data access via SQLite databases (in-memory or file-based) and Markdown documents. Maps to the MCP `server.resource` primitive. Defined in `main.resources`. See `13-resources.md`. |
 | **Provider-Prompt** | A model-neutral prompt explaining a single namespace. Describes how to use one provider's tools effectively without assuming a specific LLM model. |
 | **Agent-Prompt** | A model-specific prompt tested against a specific LLM model. Contains tool combinatorics, chaining instructions, and fallback strategies. |
 | **Prompt Placeholder** | `[[...]]` syntax for dynamic content in prompts. With `/` prefix = reference to a tool or resource (e.g. `[[etherscan/getContractAbi]]`). Without `/` = parameter (e.g. `[[chainId]]`). |
@@ -260,6 +260,35 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 | 2.0.0 | — | 2026-02 | Two-export format (`main` + `handlers` factory). Dependency injection via allowlist. Shared lists for reusable values. Output schema declarations. Zero-import security model. Groups with integrity hashes. Maximum routes reduced from 10 to 8. |
 | 3.0.0 | 1.0 | 2026-03 | Three MCP primitives: Tools (renamed from Routes), Resources (SQLite), Skills (.mjs format). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
 | 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with manifest format. Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `[[...]]`. ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
+| 3.1.0 | 1.0 | 2026-03 | Resources: Two SQLite modes (`in-memory` with `readonly: true`, `file-based` with WAL). Origin system (`global`, `project`, `inline`) replaces pseudo-paths. `better-sqlite3` replaces `sql.js`. `getSchema` MUST for both modes. `freeQuery` auto-injected. Max queries increased to 8. Block patterns removed. `source: 'markdown'` resource type with parameter-based access. Folder renamed `data/` to `resources/`. All fields required. Prompts: `contentFile` field for Provider-Prompts (content in external file). `references` field required (empty array when none). `about` convention (SHOULD) for Provider-Schemas and Agent-Manifests. |
+
+---
+
+## What Changed in v3.1.0
+
+The v3.1.0 release enhances Resources and Prompts with production-ready features:
+
+### Resources
+
+- **Two SQLite modes** — `mode: 'in-memory'` (readonly via `better-sqlite3` `readonly: true`) and `mode: 'file-based'` (writable via WAL mode). Clear separation instead of implicit read-only.
+- **Origin system** — `origin: 'global'`, `origin: 'project'`, `origin: 'inline'` replace pseudo-paths (`~/.flowmcp/data/`, `./data/`). Explicit storage locations with clear resolution rules.
+- **`better-sqlite3` runtime** — Replaces `sql.js` as the unified SQLite runtime. Native C bindings, real `readonly: true` flag, WAL mode for concurrent writes.
+- **`getSchema` is MUST** — Required for both modes (previously SHOULD). Schema authors must define it. CLI uses it to create databases for `file-based` mode.
+- **`freeQuery` auto-injected** — Runtime automatically adds freeQuery. SELECT-only for in-memory, all statements for file-based.
+- **Max queries increased to 8** — 7 schema-defined (including getSchema) + 1 auto-injected freeQuery.
+- **Block patterns removed** — `readonly: true` handles in-memory security at DB level. No more SQL pattern matching.
+- **Markdown resources** — `source: 'markdown'` with parameter-based access (section, lines, search). Intended for API documentation shipped with schemas.
+- **Folder renamed** — `resources/` replaces `data/`.
+- **All fields required** — No defaults, no optional fields.
+- **Backup strategy** — Automatic `.bak` copy before first write for file-based databases.
+
+### Prompts
+
+- **`contentFile` for Provider-Prompts** — Provider-Prompt definitions live in `main.prompts`. Content is loaded from external `.mjs` files via the new `contentFile` field. Content files export `export const content`.
+- **`references` required** — The `references` field is now required for both prompt types. Empty array `[]` when no references.
+- **`about` convention** — Reserved prompt name (SHOULD) for both Provider-Schemas and Agent-Manifests. Entry point to a namespace or agent.
+
+The migration path for existing resources is documented in the schema migration notes. Existing schemas using `database` paths and `data/` folders need to adopt the origin system.
 
 ---
 

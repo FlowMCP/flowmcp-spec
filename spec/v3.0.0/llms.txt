@@ -1,6 +1,6 @@
 # FlowMCP Specification v3.0.0
 > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
-> 
+>
 > This file concatenates all 17 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 
@@ -9117,3 +9117,5 @@ The ID schema unifies several existing identification mechanisms:
 | Shared list `ref` field | `shared/list/name` | Wrap in `shared/list/` prefix |
 
 The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see `08-migration.md`.
+
+---

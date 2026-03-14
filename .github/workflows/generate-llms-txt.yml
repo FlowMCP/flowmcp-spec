@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'spec/v3.0.0/*.md'
+  workflow_dispatch:
 
 permissions:
   contents: write

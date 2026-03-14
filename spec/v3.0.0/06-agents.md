@@ -1,6 +1,6 @@
 # FlowMCP Specification v3.0.0 — Agents
 
-An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, and optional prompts. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
+An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, prompts, skills, and optional resources. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
 
 ---
 
@@ -10,74 +10,85 @@ A typical FlowMCP catalog contains hundreds of tools across dozens of providers.
 
 ```mermaid
 flowchart LR
-    A[Agent Manifest] --> B[Tool Selection]
+    A[agent.mjs] --> B[Tool Selection]
     A --> C[Model Binding]
     A --> D[System Prompt]
     A --> E[Tests]
     A --> F[Prompts]
+    A --> G[Skills]
+    A --> H[Resources]
 
-    B --> G["coingecko-com/tool/simplePrice"]
-    B --> H["etherscan-io/tool/getContractAbi"]
-    B --> I["defillama-com/tool/getProtocolTvl"]
+    B --> I["coingecko-com/tool/simplePrice"]
+    B --> J["etherscan-io/tool/getContractAbi"]
+    B --> K["defillama-com/tool/getProtocolTvl"]
 
-    C --> J["anthropic/claude-sonnet-4-5-20250929"]
-    D --> K[Persona + behavioral instructions]
-    E --> L["3+ end-to-end test cases"]
-    F --> M[Model-specific workflow guidance]
+    C --> L["anthropic/claude-sonnet-4-5-20250929"]
+    D --> M[Persona + behavioral instructions]
+    E --> N["3+ end-to-end test cases"]
+    F --> O[Explanatory namespace descriptions]
+    G --> P[Instructional multi-step workflows]
+    H --> Q[Own SQLite databases]
 ```
 
-The diagram shows how an agent manifest connects five concerns: which tools to use, which model to target, how the model should behave, how to verify the composition, and what workflow guidance to provide.
+The diagram shows how an agent manifest connects seven concerns: which tools to use, which model to target, how the model should behave, how to verify the composition, what explanatory prompts to provide, what instructional skills to include, and what own resources to bring.
 
 ---
 
 ## Agent Manifest Format
 
-Each agent is defined by a `manifest.json` file inside its own directory under `agents/`. The manifest is a JSON file containing all metadata, tool references, configuration, and tests.
+Each agent is defined by an `agent.mjs` file inside its own directory under `agents/`. The manifest is an ES module exporting `export const main` containing all metadata, tool references, configuration, and tests. This follows the same style as provider schemas.
 
-```json
-{
-    "name": "crypto-research",
-    "description": "Cross-provider crypto analysis agent",
-    "version": "flowmcp/3.0.0",
-    "model": "anthropic/claude-sonnet-4-5-20250929",
-    "systemPrompt": "You are a crypto research agent. You analyze token prices, on-chain data, and DeFi protocol metrics. Always provide sources for your data. When comparing across chains, normalize values to USD.",
-    "tools": [
-        "coingecko-com/tool/simplePrice",
-        "coingecko-com/tool/getCoinMarkets",
-        "etherscan-io/tool/getContractAbi",
-        "etherscan-io/tool/getTokenBalances",
-        "defillama-com/tool/getProtocolTvl"
+```javascript
+export const main = {
+    name: 'crypto-research',
+    description: 'Cross-provider crypto analysis agent',
+    version: 'flowmcp/3.0.0',
+    model: 'anthropic/claude-sonnet-4-5-20250929',
+    systemPrompt: 'You are a crypto research agent. You analyze token prices, on-chain data, and DeFi protocol metrics. Always provide sources for your data. When comparing across chains, normalize values to USD.',
+    tools: [
+        'coingecko-com/tool/simplePrice',
+        'coingecko-com/tool/getCoinMarkets',
+        'etherscan-io/tool/getContractAbi',
+        'etherscan-io/tool/getTokenBalances',
+        'defillama-com/tool/getProtocolTvl'
     ],
-    "tests": [
+    resources: {},
+    prompts: {
+        'about': { file: './prompts/about.mjs' }
+    },
+    skills: {
+        'token-deep-dive': { file: './skills/token-deep-dive.mjs' },
+        'portfolio-analysis': { file: './skills/portfolio-analysis.mjs' }
+    },
+    tests: [
         {
-            "_description": "Basic token lookup",
-            "input": "What is the current price of Ethereum?",
-            "expectedTools": ["coingecko-com/tool/simplePrice"],
-            "expectedContent": ["current price", "USD"]
+            _description: 'Basic token lookup',
+            input: 'What is the current price of Ethereum?',
+            expectedTools: ['coingecko-com/tool/simplePrice'],
+            expectedContent: ['current price', 'USD']
         },
         {
-            "_description": "Cross-provider analysis",
-            "input": "Compare TVL of Aave on Ethereum vs Arbitrum",
-            "expectedTools": ["defillama-com/tool/getProtocolTvl"],
-            "expectedContent": ["TVL", "Ethereum", "Arbitrum"]
+            _description: 'Cross-provider analysis',
+            input: 'Compare TVL of Aave on Ethereum vs Arbitrum',
+            expectedTools: ['defillama-com/tool/getProtocolTvl'],
+            expectedContent: ['TVL', 'Ethereum', 'Arbitrum']
         },
         {
-            "_description": "Multi-tool wallet analysis",
-            "input": "Show top token holdings in vitalik.eth",
-            "expectedTools": ["etherscan-io/tool/getTokenBalances", "coingecko-com/tool/simplePrice"],
-            "expectedContent": ["token", "balance"]
+            _description: 'Multi-tool wallet analysis',
+            input: 'Show top token holdings in vitalik.eth',
+            expectedTools: ['etherscan-io/tool/getTokenBalances', 'coingecko-com/tool/simplePrice'],
+            expectedContent: ['token', 'balance']
         }
     ],
-    "maxRounds": 5,
-    "maxTokens": 4096,
-    "prompts": ["prompts/token-deep-dive.mjs"],
-    "sharedLists": ["evmChains"],
-    "inputSchema": {
-        "type": "object",
-        "properties": {
-            "query": { "type": "string", "description": "Research question" }
+    maxRounds: 5,
+    maxTokens: 4096,
+    sharedLists: ['evmChains'],
+    inputSchema: {
+        type: 'object',
+        properties: {
+            query: { type: 'string', description: 'Research question' }
         },
-        "required": ["query"]
+        required: ['query']
     }
 }
 ```
@@ -97,7 +108,9 @@ Each agent is defined by a `manifest.json` file inside its own directory under `
 | `tests` | `array` | Yes | Minimum 3 agent tests. See [Agent Tests](#agent-tests). |
 | `maxRounds` | `number` | No | Maximum tool-call rounds per conversation. Default: `10`. |
 | `maxTokens` | `number` | No | Maximum tokens per LLM response. Default: `4096`. |
-| `prompts` | `string[]` | No | Relative paths to prompt files within the agent directory. |
+| `prompts` | `object` | No | Explanatory prompts, inline declared with `{ file: './...' }`. Each value must have a `file` key pointing to an `.mjs` file that exports `export const content`. |
+| `skills` | `object` | No | Instructional skills, inline declared with `{ file: './...' }`. Each value must have a `file` key pointing to an `.mjs` file that exports `export const skill`. |
+| `resources` | `object` | No | Own resources (SQLite databases). Same structure as `main.resources` in provider schemas. |
 | `sharedLists` | `string[]` | No | Names of shared lists the agent needs. Resolved from the catalog's `_lists/` directory. |
 | `inputSchema` | `object` | No | JSON Schema defining the agent's input format. |
 
@@ -127,7 +140,7 @@ flowmcp/2.0.0            <- INVALID (agents are a v3 concept)
 
 #### `model`
 
-The model field uses OpenRouter syntax: `provider/model-name`. The `/` separator is required and distinguishes the model provider from the model identifier. The model determines which LLM the agent is tested with and optimized for. Agent prompts are model-specific — a prompt tuned for Claude may not work well with GPT-4o and vice versa.
+The model field uses OpenRouter syntax: `provider/model-name`. The `/` separator is required and distinguishes the model provider from the model identifier. The model determines which LLM the agent is tested with and optimized for. Agent prompts and skills are model-specific — a prompt tuned for Claude may not work well with GPT-4o and vice versa.
 
 ```
 anthropic/claude-sonnet-4-5-20250929     <- valid
@@ -145,9 +158,9 @@ The system prompt contains the agent's persona and behavioral instructions. It i
 - Specify how to handle edge cases
 - Reference the available tools by describing capabilities, not by listing tool names
 
-```json
-{
-    "systemPrompt": "You are a crypto research agent specializing in token analysis and DeFi protocol comparison. Always cite data sources. When comparing metrics across chains, normalize to USD. If data is unavailable for a chain, state this explicitly rather than guessing."
+```javascript
+export const main = {
+    systemPrompt: 'You are a crypto research agent specializing in token analysis and DeFi protocol comparison. Always cite data sources. When comparing metrics across chains, normalize to USD. If data is unavailable for a chain, state this explicitly rather than guessing.'
 }
 ```
 
@@ -155,12 +168,12 @@ The system prompt contains the agent's persona and behavioral instructions. It i
 
 Tools are referenced using the ID schema from `16-id-schema.md`. Each entry is a full-form ID: `namespace/type/name`. The agent cherry-picks specific tools from multiple providers — it does not activate entire schemas.
 
-```json
-{
-    "tools": [
-        "coingecko-com/tool/simplePrice",
-        "etherscan-io/tool/getContractAbi",
-        "defillama-com/tool/getProtocolTvl"
+```javascript
+export const main = {
+    tools: [
+        'coingecko-com/tool/simplePrice',
+        'etherscan-io/tool/getContractAbi',
+        'defillama-com/tool/getProtocolTvl'
     ]
 }
 ```
@@ -177,18 +190,75 @@ The maximum number of tokens the LLM may generate per response. Default is `4096
 
 #### `prompts`
 
-Relative paths to prompt files within the agent directory. Agent-level prompts are **model-specific** — they are written and tested for the LLM specified in `model`. They describe tool combinatorics, chaining strategies, and fallback logic.
+Explanatory prompts declared as an object. Each key is the prompt name, each value must have a `file` key pointing to an `.mjs` file. Prompt files export `export const content` — a string containing the explanatory text.
 
-```json
-{
-    "prompts": [
-        "prompts/token-deep-dive.mjs",
-        "prompts/portfolio-analysis.mjs"
-    ]
+Agent-level prompts describe what the agent does and how its providers work together. The `about` prompt is a convention (SHOULD) that explains the agent's capabilities.
+
+```javascript
+export const main = {
+    prompts: {
+        'about': { file: './prompts/about.mjs' }
+    }
 }
 ```
 
-Prompt files follow the format defined in `12-prompt-architecture.md` and use the `[[...]]` placeholder syntax for dynamic content.
+Prompt files follow the format defined in `12-prompt-architecture.md` and use the `{{...}}` placeholder syntax for dynamic content.
+
+#### `skills`
+
+Instructional skills declared as an object. Each key is the skill name, each value must have a `file` key pointing to an `.mjs` file. Skill files export `export const skill` — an object containing the skill definition with content, input parameters, output description, and optionally external requirements.
+
+Agent-level skills are **model-specific** — they are written and tested for the LLM specified in `model`. They describe multi-step workflows, tool chaining strategies, and fallback logic.
+
+```javascript
+export const main = {
+    skills: {
+        'token-deep-dive': { file: './skills/token-deep-dive.mjs' },
+        'portfolio-analysis': { file: './skills/portfolio-analysis.mjs' }
+    }
+}
+```
+
+Skill files follow the format defined in `14-skills.md`.
+
+#### systemPrompt vs prompts vs skills
+
+The three content layers serve different purposes:
+
+| Field | Type | Purpose | Example |
+|-------|------|---------|---------|
+| `systemPrompt` | String | **Persona** — who the agent is and how it behaves | "You are a crypto research agent. Always cite sources." |
+| `prompts` | Object | **Explanatory** — what the agent can do, how providers relate | `about`: "This agent combines CoinGecko for prices, Etherscan for on-chain data, and DeFi Llama for TVL." |
+| `skills` | Object | **Instructional** — step-by-step workflows the agent follows | `token-deep-dive`: "1) Get price, 2) Check on-chain activity, 3) Check DeFi exposure, 4) Generate report" |
+
+At runtime, `systemPrompt` is always included as the system message. Prompts and skills are loaded and made available via MCP `server.prompt` — the LLM accesses them on demand.
+
+#### `resources`
+
+Own resources the agent brings — typically SQLite databases with curated context data. The structure follows the same format as `main.resources` in provider schemas.
+
+Resource paths resolve across three levels:
+
+| Level | Path | Use Case |
+|-------|------|----------|
+| **Global** | `~/.flowmcp/` | Shared databases for all projects |
+| **Project** | `.flowmcp/` | Project-specific databases |
+| **Inline** | Relative to agent directory | Database bundled with the agent |
+
+```javascript
+export const main = {
+    resources: {
+        'token-metadata': {
+            source: { type: 'sqlite', path: 'token-metadata.db' },
+            queries: {
+                'search-tokens': {
+                    sql: "SELECT * FROM tokens WHERE symbol LIKE '%' || {{input:query}} || '%'"
+                }
+            }
+        }
+    }
+}
+```
 
 #### `sharedLists`
 
@@ -208,7 +278,7 @@ Agents select specific tools from multiple providers. This is the key difference
 
 ```mermaid
 flowchart TD
-    A["Read manifest.tools[]"] --> B["For each tool ID"]
+    A["Read agent.mjs tools[]"] --> B["For each tool ID"]
     B --> C["Parse ID: namespace/type/name"]
     C --> D["Look up namespace in catalog registry"]
     D --> E{Namespace found?}
@@ -234,15 +304,15 @@ The diagram shows how each tool reference in the manifest is resolved against th
 
 An agent can combine tools from any number of providers:
 
-```json
-{
-    "tools": [
-        "coingecko-com/tool/simplePrice",
-        "coingecko-com/tool/getCoinMarkets",
-        "etherscan-io/tool/getContractAbi",
-        "etherscan-io/tool/getTokenBalances",
-        "defillama-com/tool/getProtocolTvl",
-        "defillama-com/tool/getProtocolChainTvl"
+```javascript
+export const main = {
+    tools: [
+        'coingecko-com/tool/simplePrice',
+        'coingecko-com/tool/getCoinMarkets',
+        'etherscan-io/tool/getContractAbi',
+        'etherscan-io/tool/getTokenBalances',
+        'defillama-com/tool/getProtocolTvl',
+        'defillama-com/tool/getProtocolChainTvl'
     ]
 }
 ```
@@ -275,9 +345,9 @@ The `model` field binds the agent to a specific LLM. This binding has three impl
 
 Agent tests are executed against the specified model. The `expectedTools` and `expectedContent` assertions are validated using the bound model's behavior. A test suite that passes with `anthropic/claude-sonnet-4-5-20250929` may fail with `openai/gpt-4o` because different models make different tool selection decisions.
 
-### 2. Prompt Optimization
+### 2. Prompt and Skill Optimization
 
-Agent-level prompts (in the `prompts/` directory) are written for the specific model. They leverage the model's strengths and work around its weaknesses. A prompt that works well with Claude's structured thinking may not translate to GPT-4o's different reasoning style.
+Agent-level prompts (in the `prompts/` directory) and skills (in the `skills/` directory) are written for the specific model. They leverage the model's strengths and work around its weaknesses. A skill that works well with Claude's structured thinking may not translate to GPT-4o's different reasoning style.
 
 ### 3. Runtime Model Selection
 
@@ -317,36 +387,36 @@ The `systemPrompt` field is the agent's core behavioral definition. It is sent a
 - **Tool names or IDs** — the LLM discovers available tools through the MCP tool list, not the system prompt
 - **API-specific details** — tool descriptions handle this
 - **Shared list values** — these are injected at runtime
-- **Prompt content** — prompts are separate files with their own lifecycle
+- **Prompt or skill content** — prompts and skills are separate files with their own lifecycle
 
-### System Prompt and Provider-Prompts
+### System Prompt, Prompts, and Skills
 
-The system prompt works alongside provider-prompts and agent-prompts but serves a different purpose:
+The system prompt works alongside prompts and skills but serves a different purpose:
 
 | Layer | Scope | Model-specific? | Content |
 |-------|-------|-----------------|---------|
 | System Prompt | Agent-wide | Yes | Persona, behavior, format |
-| Provider-Prompts | Single namespace | No | How to use one provider's tools |
-| Agent-Prompts | Cross-provider | Yes | Tool combinatorics, chaining |
+| Prompts | Explanatory | No | How providers and agent work |
+| Skills | Instructional | Yes | Tool combinatorics, chaining, workflows |
 
-At runtime, the system prompt is always included. Provider-prompts and agent-prompts are included based on context — see `12-prompt-architecture.md`.
+At runtime, the system prompt is always included. Prompts and skills are loaded and made available via MCP — see `12-prompt-architecture.md` and `14-skills.md`.
 
 ---
 
 ## Agent Tests
 
-Agent tests validate end-to-end behavior: given a natural language input, does the agent invoke the correct tools and produce a response containing the expected content? Tests are defined in the manifest's `tests` array.
+Agent tests validate end-to-end behavior: given a natural language input, does the agent invoke the correct tools and produce a response containing the expected content? Tests are defined inline in the manifest's `tests` array.
 
 ### Test Format
 
-```json
-{
-    "tests": [
+```javascript
+export const main = {
+    tests: [
         {
-            "_description": "Basic token lookup",
-            "input": "What is the current price of Ethereum?",
-            "expectedTools": ["coingecko-com/tool/simplePrice"],
-            "expectedContent": ["current price", "USD"]
+            _description: 'Basic token lookup',
+            input: 'What is the current price of Ethereum?',
+            expectedTools: ['coingecko-com/tool/simplePrice'],
+            expectedContent: ['current price', 'USD']
         }
     ]
 }
@@ -462,28 +532,28 @@ Sorting ensures deterministic output regardless of the order tools appear in the
 
 The agent hash is stored in the manifest alongside the tool list:
 
-```json
-{
-    "name": "crypto-research",
-    "tools": [
-        "coingecko-com/tool/simplePrice",
-        "etherscan-io/tool/getContractAbi"
+```javascript
+export const main = {
+    name: 'crypto-research',
+    tools: [
+        'coingecko-com/tool/simplePrice',
+        'etherscan-io/tool/getContractAbi'
     ],
-    "hash": "sha256:a1b2c3d4e5f6..."
+    hash: 'sha256:a1b2c3d4e5f6...'
 }
 ```
 
-The `hash` field is optional in the manifest file. When present, the runtime verifies it on activation. When absent, the runtime calculates and stores it on first activation.
+The `hash` field is optional in the manifest. When present, the runtime verifies it on activation. When absent, the runtime calculates and stores it on first activation.
 
 ### Verification Flow
 
 ```mermaid
 flowchart TD
-    A[Activate agent] --> B[Read manifest.tools]
+    A[Activate agent] --> B[Read agent.mjs]
     B --> C[Resolve each tool reference]
     C --> D[Calculate per-tool hashes]
     D --> E[Calculate agent hash]
-    E --> F{manifest.hash present?}
+    E --> F{hash field present?}
     F -->|No| G[Store calculated hash in manifest]
     F -->|Yes| H{Hashes match?}
     H -->|Yes| I[Agent activated — integrity verified]
@@ -526,31 +596,35 @@ Each agent lives in its own directory under `agents/` in the catalog:
 ```
 agents/
 └── crypto-research/
-    ├── manifest.json
-    └── prompts/
-        ├── token-deep-dive.mjs
-        └── portfolio-analysis.mjs
+    ├── agent.mjs                    ← export const main
+    ├── prompts/
+    │   └── about.mjs                ← export const content
+    └── skills/
+        ├── token-deep-dive.mjs      ← export const skill
+        └── portfolio-analysis.mjs   ← export const skill
 ```
 
 ### Directory Rules
 
-- The directory name must match `manifest.name`
-- `manifest.json` is required — it is the agent's entry point
-- `prompts/` is optional — only needed if the agent defines model-specific prompts
-- Prompt file paths in `manifest.prompts` are relative to the agent directory
-- No other files or subdirectories are expected
+- The directory name must match `main.name`
+- `agent.mjs` is required — it is the agent's entry point
+- `prompts/` is optional — only needed if the agent defines prompts
+- `skills/` is optional — only needed if the agent defines skills
+- Prompt file paths in `main.prompts` are relative to the agent directory
+- Skill file paths in `main.skills` are relative to the agent directory
+- No other files or subdirectories are expected (except resource files like `.db`)
 
 ### Relationship to Catalog
 
 The catalog's `registry.json` references each agent by its manifest path:
 
-```json
+```javascript
 {
     "agents": [
         {
             "name": "crypto-research",
             "description": "Cross-provider crypto analysis agent",
-            "manifest": "agents/crypto-research/manifest.json"
+            "manifest": "agents/crypto-research/agent.mjs"
         }
     ]
 }
@@ -568,12 +642,15 @@ Agents replace Groups from FlowMCP v2. The migration is conceptual — agents ar
 
 | Aspect | Group (v2) | Agent (v3) |
 |--------|-----------|------------|
-| Definition file | `.flowmcp/groups.json` | `agents/{name}/manifest.json` |
+| Definition file | `.flowmcp/groups.json` | `agents/{name}/agent.mjs` |
+| Format | JSON | `.mjs` with `export const main` |
 | Purpose | Tool list for activation | Complete agent definition |
 | Model binding | None | Required (`model` field) |
 | System prompt | None | Required (`systemPrompt` field) |
 | Tests | None | Required (minimum 3) |
-| Prompts | Optional schema-level | Model-specific agent-level |
+| Resources | None | Optional (own SQLite databases) |
+| Prompts | None | Optional (explanatory, as object) |
+| Skills | None | Optional (instructional, as object) |
 | Tool references | `namespace/file::tool` | `namespace/type/name` (ID schema) |
 | Location | Local to project (`.flowmcp/`) | Part of catalog (`agents/`) |
 | Sharing | Export/import JSON | Distributed via catalog registry |
@@ -583,13 +660,15 @@ Agents replace Groups from FlowMCP v2. The migration is conceptual — agents ar
 Groups cannot be automatically converted to agents because agents require fields that groups do not have (model, systemPrompt, tests). The migration is manual:
 
 1. **Create agent directory** — `agents/{group-name}/`
-2. **Create manifest.json** — use the group's tool list as a starting point
+2. **Create agent.mjs** — use the group's tool list as a starting point for `export const main`
 3. **Convert tool references** — from `namespace/file::tool` to `namespace/type/name` format
 4. **Add model** — choose the target LLM
 5. **Add systemPrompt** — define the agent's persona
 6. **Add tests** — write at least 3 agent tests
-7. **Add prompts** — optionally create model-specific prompts
-8. **Register in catalog** — add the agent to `registry.json`
+7. **Add prompts** — optionally create explanatory prompts (as object with `{ file: './...' }`)
+8. **Add skills** — optionally create instructional skills (as object with `{ file: './...' }`)
+9. **Add resources** — optionally add own SQLite databases
+10. **Register in catalog** — add the agent to `registry.json`
 
 See `08-migration.md` for the complete v2-to-v3 migration guide.
 
@@ -601,7 +680,7 @@ When an agent is activated, the runtime performs these steps:
 
 ```mermaid
 flowchart TD
-    A[Activate agent] --> B[Read manifest.json]
+    A[Activate agent] --> B[Read agent.mjs]
     B --> C[Validate manifest fields]
     C --> D[Resolve tool references]
     D --> E[Load provider schemas]
@@ -611,28 +690,36 @@ flowchart TD
     H -->|No| I[Error: missing server params]
     H -->|Yes| J[Resolve shared lists]
     J --> K[Verify integrity hashes]
-    K --> L[Load agent prompts]
-    L --> M[Register tools as MCP tools]
-    M --> N[Register prompts as MCP prompts]
-    N --> O[Agent ready]
+    K --> L[Load agent resources]
+    L --> M[Load agent prompts]
+    M --> N[Load agent skills]
+    N --> O[Register tools as MCP tools]
+    O --> P[Register prompts as MCP prompts]
+    P --> Q[Register skills as MCP prompts]
+    Q --> R[Register resources as MCP resources]
+    R --> S[Agent ready]
 ```
 
 The diagram shows the full activation lifecycle from reading the manifest to the agent being ready for invocations.
 
 ### Activation Steps
 
-1. **Read manifest** — parse `manifest.json` from the agent directory
+1. **Read manifest** — import `agent.mjs` from the agent directory, access `export const main`
 2. **Validate** — check all required fields, format constraints, and version compatibility
 3. **Resolve tools** — parse each tool ID and locate the corresponding provider schema
 4. **Load schemas** — import the `.mjs` schema files for all referenced tools
 5. **Security scan** — run the static security scanner on each loaded schema
 6. **Collect params** — gather all `requiredServerParams` from all involved schemas
 7. **Check env** — verify all required API keys are available in the environment
-8. **Resolve lists** — load shared lists declared in `manifest.sharedLists`
+8. **Resolve lists** — load shared lists declared in `main.sharedLists`
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
-10. **Load prompts** — load prompt files from `manifest.prompts`
-11. **Register tools** — expose the agent's tools via MCP `server.tool`
-12. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
+10. **Load resources** — initialize agent-owned resources (SQLite databases) from `main.resources`
+11. **Load prompts** — import prompt files from `main.prompts`, each must export `export const content`
+12. **Load skills** — import skill files from `main.skills`, each must export `export const skill`
+13. **Register tools** — expose the agent's tools via MCP `server.tool`
+14. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
+15. **Register skills** — expose the agent's skills via MCP `server.prompt`
+16. **Register resources** — expose the agent's resources via MCP `server.resource`
 
 ---
 
@@ -652,6 +739,12 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 | AGT010 | error | Each test must have an `expectedTools` field as a non-empty array |
 | AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
 | AGT012 | warning | Tests should cover different tool combinations |
+| AGT013 | error | `prompts` if present must be an object, each value must have a `file` key |
+| AGT014 | error | `skills` if present must be an object, each value must have a `file` key |
+| AGT015 | error | `resources` if present must be an object, follows schema resource rules |
+| AGT016 | error | Referenced prompt and skill files must exist and have `.mjs` extension |
+| AGT017 | error | Prompt files must export `export const content` |
+| AGT018 | error | Skill files must export `export const skill` |
 
 ### Rule Details
 
@@ -674,6 +767,18 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 **AGT009–AGT011** — These rules validate individual test fields. They correspond to the agent test validation rules TST009–TST011 defined in `10-tests.md`. Every test must have a natural language input and at least one expected tool call.
 
 **AGT012** — Tests should demonstrate breadth. If all three tests expect the same single tool, the test suite does not validate the agent's multi-tool orchestration capability. This is a warning, not an error, because some agents genuinely use only one tool.
+
+**AGT013** — The `prompts` field must be an object where each key is the prompt name and each value is an object with a `file` key. Array syntax is not supported — use `{ 'name': { file: './path.mjs' } }` instead.
+
+**AGT014** — The `skills` field follows the same structure as `prompts`. Each key is the skill name, each value must have a `file` key pointing to a skill file.
+
+**AGT015** — The `resources` field must follow the same structure as `main.resources` in provider schemas. Each resource must have a valid `source` definition and optional `queries`.
+
+**AGT016** — All files referenced in `prompts` and `skills` must exist on disk and must have the `.mjs` extension. Missing files prevent activation.
+
+**AGT017** — Prompt files must export a named constant `content` (`export const content`). This is a string containing the explanatory text, optionally with `{{...}}` placeholders.
+
+**AGT018** — Skill files must export a named constant `skill` (`export const skill`). This is an object containing the skill definition as specified in `14-skills.md`.
 
 ### Validation Command
 
@@ -700,6 +805,12 @@ flowmcp validate-agent agents/crypto-research/
   AGT010  pass    all tests have expectedTools field
   AGT011  pass    all expectedTools entries are valid IDs
   AGT012  pass    tests cover 4 different tool combinations
+  AGT013  pass    prompts is valid object with file keys
+  AGT014  pass    skills is valid object with file keys
+  AGT015  skip    resources is empty
+  AGT016  pass    all referenced files exist and are .mjs
+  AGT017  pass    all prompt files export content
+  AGT018  pass    all skill files export skill
 
   0 errors, 0 warnings
   Agent is valid
@@ -716,65 +827,71 @@ A fully specified agent manifest with directory structure:
 ```
 agents/
 └── crypto-research/
-    ├── manifest.json
-    └── prompts/
-        ├── token-deep-dive.mjs
-        └── portfolio-analysis.mjs
+    ├── agent.mjs                    ← export const main
+    ├── prompts/
+    │   └── about.mjs                ← export const content
+    └── skills/
+        ├── token-deep-dive.mjs      ← export const skill
+        └── portfolio-analysis.mjs   ← export const skill
 ```
 
-### manifest.json
+### agent.mjs
 
-```json
-{
-    "name": "crypto-research",
-    "description": "Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics for comprehensive token and portfolio research",
-    "version": "flowmcp/3.0.0",
-    "model": "anthropic/claude-sonnet-4-5-20250929",
-    "systemPrompt": "You are a crypto research agent specializing in token analysis, wallet forensics, and DeFi protocol comparison. Follow these guidelines:\n\n1. Always cite which data source provided each piece of information.\n2. When comparing metrics across chains, normalize values to USD.\n3. Present comparative data in tables when three or more items are compared.\n4. If data is unavailable for a requested chain or token, state this explicitly rather than guessing.\n5. For wallet analysis, always check both token balances and current prices to show USD values.",
-    "tools": [
-        "coingecko-com/tool/simplePrice",
-        "coingecko-com/tool/getCoinMarkets",
-        "etherscan-io/tool/getContractAbi",
-        "etherscan-io/tool/getTokenBalances",
-        "defillama-com/tool/getProtocolTvl"
+```javascript
+export const main = {
+    name: 'crypto-research',
+    description: 'Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics for comprehensive token and portfolio research',
+    version: 'flowmcp/3.0.0',
+    model: 'anthropic/claude-sonnet-4-5-20250929',
+    systemPrompt: 'You are a crypto research agent specializing in token analysis, wallet forensics, and DeFi protocol comparison. Follow these guidelines:\n\n1. Always cite which data source provided each piece of information.\n2. When comparing metrics across chains, normalize values to USD.\n3. Present comparative data in tables when three or more items are compared.\n4. If data is unavailable for a requested chain or token, state this explicitly rather than guessing.\n5. For wallet analysis, always check both token balances and current prices to show USD values.',
+    tools: [
+        'coingecko-com/tool/simplePrice',
+        'coingecko-com/tool/getCoinMarkets',
+        'etherscan-io/tool/getContractAbi',
+        'etherscan-io/tool/getTokenBalances',
+        'defillama-com/tool/getProtocolTvl'
     ],
-    "tests": [
+    resources: {},
+    prompts: {
+        'about': { file: './prompts/about.mjs' }
+    },
+    skills: {
+        'token-deep-dive': { file: './skills/token-deep-dive.mjs' },
+        'portfolio-analysis': { file: './skills/portfolio-analysis.mjs' }
+    },
+    tests: [
         {
-            "_description": "Basic token lookup — single tool, single provider",
-            "input": "What is the current price of Ethereum?",
-            "expectedTools": ["coingecko-com/tool/simplePrice"],
-            "expectedContent": ["current price", "USD"]
+            _description: 'Basic token lookup — single tool, single provider',
+            input: 'What is the current price of Ethereum?',
+            expectedTools: ['coingecko-com/tool/simplePrice'],
+            expectedContent: ['current price', 'USD']
         },
         {
-            "_description": "Cross-provider DeFi analysis — comparative query across chains",
-            "input": "Compare the TVL of Aave on Ethereum vs Arbitrum",
-            "expectedTools": ["defillama-com/tool/getProtocolTvl"],
-            "expectedContent": ["TVL", "Ethereum", "Arbitrum"]
+            _description: 'Cross-provider DeFi analysis — comparative query across chains',
+            input: 'Compare the TVL of Aave on Ethereum vs Arbitrum',
+            expectedTools: ['defillama-com/tool/getProtocolTvl'],
+            expectedContent: ['TVL', 'Ethereum', 'Arbitrum']
         },
         {
-            "_description": "Multi-tool wallet analysis — combines on-chain data with pricing",
-            "input": "Show top token holdings in vitalik.eth",
-            "expectedTools": ["etherscan-io/tool/getTokenBalances", "coingecko-com/tool/simplePrice"],
-            "expectedContent": ["token", "balance"]
+            _description: 'Multi-tool wallet analysis — combines on-chain data with pricing',
+            input: 'Show top token holdings in vitalik.eth',
+            expectedTools: ['etherscan-io/tool/getTokenBalances', 'coingecko-com/tool/simplePrice'],
+            expectedContent: ['token', 'balance']
         }
     ],
-    "maxRounds": 5,
-    "maxTokens": 4096,
-    "prompts": [
-        "prompts/token-deep-dive.mjs",
-        "prompts/portfolio-analysis.mjs"
-    ],
-    "sharedLists": ["evmChains"],
-    "inputSchema": {
-        "type": "object",
-        "properties": {
-            "query": {
-                "type": "string",
-                "description": "Research question about tokens, wallets, or DeFi protocols"
+    maxRounds: 5,
+    maxTokens: 4096,
+    sharedLists: ['evmChains'],
+    inputSchema: {
+        type: 'object',
+        properties: {
+            query: {
+                type: 'string',
+                description: 'Research question about tokens, wallets, or DeFi protocols'
             }
         },
-        "required": ["query"]
+        required: ['query']
     },
-    "hash": "sha256:a1b2c3d4e5f6789..."
+    hash: 'sha256:a1b2c3d4e5f6789...'
 }
 ```

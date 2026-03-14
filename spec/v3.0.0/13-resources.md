@@ -477,7 +477,7 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 | **Behavior** | File is read, content returned as string |
 | **Recommended origin** | `inline` (committed with schema) |
 | **No queries field** | Text is loaded directly |
-| **Referenceable** | `[[namespace/resource/name]]` from prompts |
+| **Referenceable** | `{{resource:namespace/name}}` from prompts and skills |
 
 ### Why Only Markdown
 

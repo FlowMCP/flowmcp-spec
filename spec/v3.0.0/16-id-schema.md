@@ -114,7 +114,7 @@ coingecko/price-comparison     ← prompt (when in prompt context)
 |---------|-------------|---------|
 | `manifest.tools[]` | `tool` | `coingecko/simplePrice` |
 | CLI `flowmcp call` | `tool` | `flowmcp call coingecko/simplePrice` |
-| `[[...]]` placeholder in skill content | Inferred from target | `[[coingecko/simplePrice]]` resolves to tool |
+| `{{type:name}}` placeholder in skill content | Determined by type prefix | `{{tool:simplePrice}}` resolves to tool |
 | Validation rules | Full form required | `coingecko/tool/simplePrice` |
 | `registry.json` | Full form required | `coingecko/tool/simplePrice` |
 | Group definitions | Full form required | `coingecko/tool/simplePrice` |
@@ -122,7 +122,7 @@ coingecko/price-comparison     ← prompt (when in prompt context)
 ### When Short Form Is Allowed
 
 - In tool contexts (`manifest.tools[]`, CLI call commands), the default type is `tool`
-- In prompt content (`[[...]]` references), the type is inferred from the target by looking up the name in the loaded registry
+- In prompt content (`{{type:name}}` references), the type is determined by the placeholder prefix (`tool:`, `resource:`, `skill:`, `input:`)
 - Short form is a convenience — it does not change the canonical ID
 
 ### When Full Form Is Required
@@ -174,7 +174,7 @@ The resolution context determines how short-form IDs are expanded:
 | Caller | Context | Short Form Expansion |
 |--------|---------|---------------------|
 | CLI (`flowmcp call`) | Tool execution | `namespace/name` becomes `namespace/tool/name` |
-| Skill placeholder (`[[...]]`) | Content rendering | Type inferred by looking up name across all types in namespace |
+| Skill placeholder (`{{type:name}}`) | Content rendering | Type determined by placeholder prefix (`tool:`, `resource:`, `skill:`, `input:`) |
 | Group definition | Group loading | Full form required — no expansion |
 | Validator | Schema validation | Full form required — no expansion |
 
@@ -182,24 +182,24 @@ The resolution context determines how short-form IDs are expanded:
 
 ## Usage in Placeholders
 
-The ID schema connects to the `[[...]]` placeholder syntax used in skill content (see `14-skills.md`). A placeholder containing a `/` is treated as an ID reference. A placeholder without a `/` is treated as a parameter reference.
+The ID schema connects to the `{{type:name}}` placeholder syntax used in skill content (see `14-skills.md`). Skill content uses typed placeholders with a `type:` prefix to reference tools, resources, skills, and input parameters.
 
 | Placeholder | Interpretation |
 |-------------|---------------|
-| `[[coingecko/simplePrice]]` | ID reference — resolved via ID schema |
-| `[[coingecko/tool/simplePrice]]` | ID reference — full form |
-| `[[token]]` | Parameter reference — NOT an ID (no `/`) |
-| `[[input:address]]` | Input parameter — standard skill placeholder syntax |
+| `{{tool:getContractAbi}}` | Tool reference — resolved to a tool in the same schema's `main.tools` |
+| `{{resource:verifiedContracts}}` | Resource reference — resolved to a resource in the same schema's `main.resources` |
+| `{{skill:quick-summary}}` | Skill reference — resolved to a skill in the same schema's `main.skills` |
+| `{{input:address}}` | Input parameter — value provided by the user at runtime |
 
 ### Resolution in Skills
 
-When a skill's `content` field contains `[[namespace/name]]` or `[[namespace/type/name]]`, the runtime:
+When a skill's `content` field contains `{{tool:name}}`, `{{resource:name}}`, or `{{skill:name}}` placeholders, the runtime:
 
-1. Parses the placeholder as an ID
-2. Resolves the ID to a registered primitive
+1. Parses the placeholder type prefix to determine the primitive kind
+2. Resolves the name to a registered primitive within the same schema
 3. Injects the primitive's description or metadata into the rendered content
 
-This allows skills to reference tools and resources from other schemas by their canonical ID, enabling cross-schema composition.
+The ID schema provides the canonical identifier format (`namespace/type/name`) used in registries, group definitions, and cross-schema references. Within skill content, the `{{type:name}}` syntax references primitives scoped to the same schema.
 
 ---
 

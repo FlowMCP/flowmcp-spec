@@ -1,6 +1,6 @@
 # FlowMCP Specification v3.0.0 — Prompt Architecture
 
-FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `[[...]]` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
+FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
 ---
 
@@ -103,11 +103,11 @@ The `contentFile` field points to a separate `.mjs` file that exports the prompt
 // prompts/price-comparison.mjs
 
 export const content = `
-Use [[coingecko/tool/simplePrice]] to fetch current prices for the requested coins.
-Then use [[coingecko/tool/coinMarkets]] to get market cap data.
+Use {{tool:coingecko/simplePrice}} to fetch current prices for the requested coins.
+Then use {{tool:coingecko/coinMarkets}} to get market cap data.
 
-Compare the following metrics for [[coins]]:
-- Current price in [[currency]]
+Compare the following metrics for {{input:coins}}:
+- Current price in {{input:currency}}
 - 24h price change
 - Market cap ranking
 
@@ -120,7 +120,7 @@ prices. Suggest using coinMarkets with the order parameter for trending analysis
 
 - Export must be `export const content` (not `export const prompt`)
 - No imports allowed (zero-import policy)
-- `[[...]]` placeholder syntax for references and parameters
+- `{{type:name}}` placeholder syntax for references and parameters
 - Content must not be empty
 
 ### Provider-Prompt Characteristics
@@ -131,7 +131,7 @@ prices. Suggest using coinMarkets with the order parameter for trending analysis
 - **`contentFile` field** is a relative path to the `.mjs` file containing the prompt content.
 - **No `testedWith` field** — Provider-Prompts are model-neutral. Any LLM can benefit from them.
 - **No `agent` field** — the `namespace` field indicates this is a Provider-Prompt.
-- **`[[...]]` references** in content may use full form (`[[coingecko/tool/simplePrice]]`) or short form (`[[coingecko/simplePrice]]`), but must reference tools within the same namespace.
+- **`{{type:name}}` references** in content use the type prefix to distinguish tool references (`{{tool:coingecko/simplePrice}}`), resource references (`{{resource:name}}`), and input parameters (`{{input:coins}}`). References must target tools within the same namespace.
 
 ---
 
@@ -141,18 +141,18 @@ An Agent-Prompt is scoped to an agent. It describes multi-provider workflows and
 
 ```javascript
 const content = `
-First, get the contract details using [[etherscan/tool/getContractAbi]] for address [[address]].
-Then fetch pricing data using [[coingecko/tool/simplePrice]].
+First, get the contract details using {{tool:etherscan/getContractAbi}} for address {{input:address}}.
+Then fetch pricing data using {{tool:coingecko/simplePrice}}.
 
-For price comparison context, follow the approach in [[coingecko/prompt/price-comparison]].
+For price comparison context, follow the approach in {{prompt:coingecko/price-comparison}}.
 
-Analyze the [[token]] considering:
+Analyze the {{input:token}} considering:
 - Contract verification status
 - Current price and volume
 - Historical price trends
 
 If Etherscan returns an unverified contract, skip the ABI analysis and focus on
-the pricing data. Use [[coingecko/tool/coinMarkets]] as a fallback for additional
+the pricing data. Use {{tool:coingecko/coinMarkets}} as a fallback for additional
 market context.
 `
 
@@ -180,7 +180,7 @@ export const prompt = {
 - **`testedWith` is required** — documents which LLM model the prompt was tested and optimized for.
 - **No `namespace` field** — the `agent` field indicates this is an Agent-Prompt.
 - **`references` array** allows including content from other prompts (see [Composable Prompts](#composable-prompts)).
-- **`[[...]]` references** in `content` use full form IDs to reference tools across namespaces.
+- **`{{type:name}}` references** in `content` use type-prefixed placeholders to reference tools (`{{tool:...}}`), prompts (`{{prompt:...}}`), and parameters (`{{input:...}}`) across namespaces.
 
 ---
 
@@ -199,7 +199,7 @@ The `export const prompt` object contains all metadata and instructions. Some fi
 | `dependsOn` | `string[]` | Required | Required | Tool dependencies. Bare names for Provider-Prompts, full IDs for Agent-Prompts. |
 | `references` | `string[]` | Required | Required | Other prompts to compose. Full ID format. Empty array `[]` when none. |
 | `contentFile` | `string` | Required | Forbidden | Relative path to the content `.mjs` file. |
-| `content` | `string` | Forbidden | Required | Prompt instructions with `[[...]]` placeholders. Must not be empty. |
+| `content` | `string` | Forbidden | Required | Prompt instructions with `{{type:name}}` placeholders. Must not be empty. |
 
 **Key structural difference:** Provider-Prompts use `contentFile` (content in external file), Agent-Prompts use `content` (content inline). These fields are mutually exclusive — a prompt has either `contentFile` or `content`, never both.
 
@@ -207,7 +207,7 @@ The `export const prompt` object contains all metadata and instructions. Some fi
 
 #### `name`
 
-The prompt name is the primary identifier. It is used in the catalog, in `[[...]]` placeholder references, and in MCP prompt registration. Only lowercase letters, numbers, and hyphens are allowed.
+The prompt name is the primary identifier. It is used in the catalog, in `{{prompt:name}}` placeholder references, and in MCP prompt registration. Only lowercase letters, numbers, and hyphens are allowed.
 
 ```javascript
 // Valid
@@ -268,7 +268,7 @@ The `testedWith` field documents which model the prompt was optimized for. Other
 
 #### `dependsOn`
 
-Lists the tools that the prompt references. Every tool mentioned in the prompt's `content` via `[[...]]` placeholders should appear in `dependsOn`. This enables validation — the runtime checks that all declared dependencies resolve to existing tools.
+Lists the tools that the prompt references. Every tool mentioned in the prompt's `content` via `{{tool:...}}` placeholders should appear in `dependsOn`. This enables validation — the runtime checks that all declared dependencies resolve to existing tools.
 
 **Provider-Prompts** use bare tool names (same namespace is implied):
 
@@ -319,65 +319,76 @@ The content file is loaded via `import()` at schema load-time. The runtime reads
 
 #### `content` (Agent-Prompt only)
 
-The prompt instructions that the AI agent follows. Contains `[[...]]` placeholders for tool references and user parameters. Must not be empty. Required for Agent-Prompts, forbidden for Provider-Prompts. See [Placeholder Syntax](#placeholder-syntax) for the full reference.
+The prompt instructions that the AI agent follows. Contains `{{type:name}}` placeholders for tool references and user parameters. Must not be empty. Required for Agent-Prompts, forbidden for Provider-Prompts. See [Placeholder Syntax](#placeholder-syntax) for the full reference.
 
 ---
 
 ## Placeholder Syntax
 
-Prompts use the `[[...]]` placeholder syntax defined in `02-parameters.md`. This section summarizes the key rules — see `02-parameters.md` for the complete specification including validation rules PH001-PH004.
+Prompt content uses the `{{type:name}}` placeholder syntax. The **type prefix** (before the colon) determines the category, and the **name** (after the colon) identifies the target. This is the same syntax used in Skills (`14-skills.md`), providing a unified placeholder system across all FlowMCP content primitives.
 
 ### Two Categories
 
-The content inside `[[ ]]` determines whether the placeholder is a **reference** or a **parameter**. The rule is simple: if it contains a `/`, it is a reference. If it does not, it is a parameter.
+Placeholders fall into two categories based on their type prefix:
 
-| Content Pattern | Category | Resolution |
-|-----------------|----------|------------|
-| Contains `/` | **Reference** | Resolved via ID Schema (`16-id-schema.md`) to a registered tool, resource, or prompt |
-| No `/` | **Parameter** | Value provided by the user at runtime |
+| Category | Type Prefixes | Purpose |
+|----------|---------------|---------|
+| **References** | `tool:`, `resource:`, `prompt:` | Resolved at load-time against the catalog to a registered tool, resource, or prompt |
+| **Parameters** | `input:` | Value provided by the user at runtime |
 
-### References
+### Reference Placeholders
 
-A placeholder containing a `/` points to a registered primitive in the catalog:
+Reference placeholders point to registered primitives in the catalog:
+
+| Placeholder | Example | Meaning |
+|-------------|---------|---------|
+| `{{tool:name}}` | `{{tool:simplePrice}}` | Tool in the same namespace/agent |
+| `{{tool:namespace/name}}` | `{{tool:coingecko/simplePrice}}` | Tool in an explicit namespace |
+| `{{resource:name}}` | `{{resource:placesDb}}` | Resource in the same namespace/agent |
+| `{{resource:namespace/name}}` | `{{resource:etherscan/verifiedContracts}}` | Resource in an explicit namespace |
+| `{{prompt:name}}` | `{{prompt:about}}` | Prompt in the same namespace/agent |
+| `{{prompt:namespace/name}}` | `{{prompt:coingecko/price-comparison}}` | Prompt in an explicit namespace |
+
+**Namespace rule:** Without `/` after the type prefix, the reference targets the own schema or agent. With `/`, the reference targets an explicit namespace.
+
+### Parameter Placeholders
+
+Parameter placeholders represent user-input values:
 
 ```
-[[coingecko/simplePrice]]                    <- short form (type inferred)
-[[coingecko/tool/simplePrice]]               <- full form (type explicit)
-[[etherscan/resource/verifiedContracts]]      <- resource reference
-[[coingecko/prompt/price-comparison]]         <- prompt reference
-```
-
-### Parameters
-
-A placeholder without a `/` is a user-input parameter:
-
-```
-[[token]]         <- user provides a token symbol
-[[address]]       <- user provides a contract address
-[[currency]]      <- user provides a currency code
+{{input:token}}            <- user provides a token symbol
+{{input:address}}          <- user provides a contract address
+{{input:currency}}         <- user provides a currency code
+{{input:timeframeDays}}    <- user provides a number of days
 ```
 
 ### Example
 
 ```
-Analyze the token [[token]] on chain [[chainId]].
+Analyze the token {{input:token}} on chain {{input:chainId}}.
 
-First, fetch the current price using [[coingecko/tool/simplePrice]].
-Then retrieve the contract ABI via [[etherscan/tool/getContractAbi]].
+First, fetch the current price using {{tool:coingecko/simplePrice}}.
+Then retrieve the contract ABI via {{tool:etherscan/getContractAbi}}.
 ```
 
-In this example, `[[token]]` and `[[chainId]]` are parameters (no `/`). `[[coingecko/tool/simplePrice]]` and `[[etherscan/tool/getContractAbi]]` are references (contain `/`).
+In this example, `{{input:token}}` and `{{input:chainId}}` are parameters (type prefix `input:`). `{{tool:coingecko/simplePrice}}` and `{{tool:etherscan/getContractAbi}}` are references (type prefix `tool:`).
 
-### Relationship to `{{...}}` Syntax
+### Edge Case: Schema Parameter Placeholders
 
-The `[[...]]` and `{{...}}` placeholder systems serve different layers and never overlap:
+The `{{type:name}}` content placeholder syntax coexists with schema parameter placeholders like `{{USER_PARAM}}` or `{{DYNAMIC_SQL}}` used in `main.tools` and `main.resources` blocks. There is no conflict because the content renderer only matches patterns with a **colon** (`:`):
 
-| Syntax | Context | Purpose |
-|--------|---------|---------|
-| `{{...}}` | Schema `main` blocks (`main.tools`, `main.resources`) | HTTP request construction, SQL parameter binding, shared list interpolation |
-| `[[...]]` | Prompt `content` fields | Tool/resource/prompt references and user input in prompts |
+| Syntax | Context | Matched by Content Renderer? |
+|--------|---------|------------------------------|
+| `{{tool:simplePrice}}` | Prompt/Skill `content` | Yes — has colon |
+| `{{input:token}}` | Prompt/Skill `content` | Yes — has colon |
+| `{{USER_PARAM}}` | Schema `main` blocks | No — no colon, UPPER_CASE |
+| `{{DYNAMIC_SQL}}` | Schema `main` blocks | No — no colon, UPPER_CASE |
 
-`{{...}}` never appears in prompt content. `[[...]]` never appears in schema `main` blocks.
+**Regex for Content Renderer:** `\{\{(tool|resource|skill|prompt|input):([a-zA-Z/]+)\}\}`
+
+### Migration Note
+
+Earlier versions of this specification used `[[...]]` bracket syntax for prompt placeholders (e.g., `[[coingecko/tool/simplePrice]]`, `[[token]]`). This has been replaced with the unified `{{type:name}}` syntax to align prompts with the same placeholder system used in Skills (`14-skills.md`).
 
 ---
 
@@ -390,8 +401,8 @@ The primary purpose of prompts is teaching LLMs **tool combinatorics** — the k
 Which tools to call first, second, third. Some tools depend on output from previous calls:
 
 ```
-First call [[coingecko/tool/simplePrice]] to get the current price.
-Use the coin ID from the response to call [[coingecko/tool/coinMarkets]]
+First call {{tool:coingecko/simplePrice}} to get the current price.
+Use the coin ID from the response to call {{tool:coingecko/coinMarkets}}
 for detailed market data.
 ```
 
@@ -400,8 +411,8 @@ for detailed market data.
 How to extract values from one tool's response and pass them to the next:
 
 ```
-Extract the "id" field from [[coingecko/tool/coinList]] response.
-Pass that ID as the "ids" parameter to [[coingecko/tool/simplePrice]].
+Extract the "id" field from {{tool:coingecko/coinList}} response.
+Pass that ID as the "ids" parameter to {{tool:coingecko/simplePrice}}.
 ```
 
 ### Fallback Strategies
@@ -409,8 +420,8 @@ Pass that ID as the "ids" parameter to [[coingecko/tool/simplePrice]].
 What to do when a tool fails or returns incomplete data:
 
 ```
-If [[etherscan/tool/getContractAbi]] returns "Contract source code not verified",
-skip the ABI analysis and use [[etherscan/tool/getContractCreation]] instead
+If {{tool:etherscan/getContractAbi}} returns "Contract source code not verified",
+skip the ABI analysis and use {{tool:etherscan/getContractCreation}} instead
 to get basic contract metadata.
 ```
 
@@ -419,9 +430,9 @@ to get basic contract metadata.
 How to combine data from different providers for richer analysis:
 
 ```
-Get the token price from [[coingecko/tool/simplePrice]].
-Get the contract details from [[etherscan/tool/getContractAbi]].
-Get the protocol TVL from [[defillama/tool/getTvlProtocol]].
+Get the token price from {{tool:coingecko/simplePrice}}.
+Get the contract details from {{tool:etherscan/getContractAbi}}.
+Get the protocol TVL from {{tool:defillama/getTvlProtocol}}.
 
 Cross-reference: if the token has high TVL but low price, it may indicate
 a yield farming opportunity. If the contract is unverified but has high
@@ -447,11 +458,11 @@ export const prompt = {
     // ...
     references: [ 'coingecko/prompt/price-comparison' ],
     content: `
-Perform a deep analysis of [[token]].
+Perform a deep analysis of {{input:token}}.
 
-For price comparison methodology, follow [[coingecko/prompt/price-comparison]].
+For price comparison methodology, follow {{prompt:coingecko/price-comparison}}.
 
-Then add on-chain analysis using [[etherscan/tool/getContractAbi]].
+Then add on-chain analysis using {{tool:etherscan/getContractAbi}}.
 `
 }
 ```
@@ -535,7 +546,7 @@ providers/
 
 agents/
 +-- crypto-research/
-    +-- manifest.json                  # Agent manifest (with about definition)
+    +-- agent.mjs                      # Agent manifest (with about definition)
     +-- prompts/
         +-- token-deep-dive.mjs        # Agent-Prompt (definition + content in one file)
 ```
@@ -617,9 +628,9 @@ Prompts and Skills are both non-deterministic guidance for AI agents, but they s
 | Export | `export const prompt` | `export const skill` |
 | Version prefix | `flowmcp-prompt/1.0.0` | `flowmcp-skill/1.0.0` |
 | Scope | Provider-level or Agent-level | Schema-level |
-| Placeholder syntax | `[[...]]` (double bracket) | `{{tool:name}}`, `{{input:key}}` (double brace) |
-| Tool references | Via ID Schema (`[[namespace/tool/name]]`) | Bare names within same schema (`{{tool:name}}`) |
-| Input declaration | Parameters as `[[paramName]]` in content | Typed `input` array with key, type, description, required |
+| Placeholder syntax | `{{type:name}}` (unified syntax) | `{{type:name}}` (unified syntax) |
+| Tool references | `{{tool:namespace/name}}` or `{{tool:name}}` | `{{tool:name}}` (bare names within same schema) |
+| Input declaration | Parameters as `{{input:paramName}}` in content | Typed `input` array with key, type, description, required |
 | Cross-provider | Agent-Prompts can span providers | Not directly (only via group-level skills) |
 | Model binding | Agent-Prompts require `testedWith` | No model binding |
 | Composition | `references[]` array | `{{skill:name}}` placeholder |
@@ -643,7 +654,7 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 | PRM006 | error | Each `dependsOn` entry must resolve to an existing tool in the catalog |
 | PRM007 | error | Each `references[]` entry must resolve to an existing prompt in the catalog |
 | PRM008 | error | Referenced prompts must not themselves have `references[]` (one level deep only) |
-| PRM009 | error | `[[...]]` references in prompt content must resolve to registered primitives (see PH002 in `02-parameters.md`) |
+| PRM009 | error | `{{type:name}}` reference placeholders in prompt content must resolve to registered primitives |
 | PRM010 | error | Agent-Prompts: `content` is required and must be a non-empty string. Provider-Prompts: `content` is forbidden. |
 | PRM011 | error | Provider-Prompts: `contentFile` is required, must be a relative path ending with `.mjs`. Agent-Prompts: `contentFile` is forbidden. |
 | PRM012 | error | Content file must export `export const content` (not `export const prompt`). |
@@ -667,7 +678,7 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 
 **PRM008** — If prompt A references prompt B, prompt B must not have its own `references[]` array. This enforces one-level-deep composition.
 
-**PRM009** — All `[[...]]` reference placeholders (those containing `/`) in the `content` field must resolve to registered tools, resources, or prompts. Parameter placeholders (no `/`) are not validated against the catalog — they are user inputs.
+**PRM009** — All `{{tool:...}}`, `{{resource:...}}`, and `{{prompt:...}}` reference placeholders in the `content` field must resolve to registered tools, resources, or prompts. Parameter placeholders (`{{input:...}}`) are not validated against the catalog — they are user inputs.
 
 **PRM010** — Agent-Prompts need inline content. Provider-Prompts get their content from an external file via `contentFile`.
 
@@ -751,7 +762,7 @@ Prompt files are subject to the same zero-import security model as schema and sk
 
 ```javascript
 // Allowed
-const content = `Instructions with [[coingecko/tool/simplePrice]]...`
+const content = `Instructions with {{tool:coingecko/simplePrice}}...`
 export const prompt = { /* metadata */ }
 
 // Forbidden — import statement (SEC001)
@@ -791,15 +802,15 @@ export const main = {
 
 ```javascript
 export const content = `
-Use [[coingecko/tool/simplePrice]] to fetch current prices for the requested coins.
+Use {{tool:coingecko/simplePrice}} to fetch current prices for the requested coins.
 Pass the coin IDs as a comma-separated string in the "ids" parameter and the target
 currency in the "vs_currencies" parameter.
 
-Then use [[coingecko/tool/coinMarkets]] to get detailed market data. Pass the same
+Then use {{tool:coingecko/coinMarkets}} to get detailed market data. Pass the same
 currency as "vs_currency" and set "order" to "market_cap_desc" for ranked results.
 
-Compare the following metrics for [[coins]]:
-- Current price in [[currency]]
+Compare the following metrics for {{input:coins}}:
+- Current price in {{input:currency}}
 - 24h price change percentage
 - Market cap ranking
 - 24h trading volume
@@ -819,26 +830,26 @@ coin in the comparison table and note it at the bottom of the report.
 
 ```javascript
 const content = `
-First, get the contract details using [[etherscan/tool/getContractAbi]] for address [[address]].
+First, get the contract details using {{tool:etherscan/getContractAbi}} for address {{input:address}}.
 If the contract is verified, parse the ABI to identify the token standard (ERC-20, ERC-721, etc.)
 and extract key function signatures.
 
-Then fetch pricing data using [[coingecko/tool/simplePrice]] with the token's CoinGecko ID.
+Then fetch pricing data using {{tool:coingecko/simplePrice}} with the token's CoinGecko ID.
 If the token ID is unknown, try searching with the contract address or token symbol.
 
-For price comparison context, follow the approach in [[coingecko/prompt/price-comparison]].
+For price comparison context, follow the approach in {{prompt:coingecko/price-comparison}}.
 Compare the target token against the top 3 tokens in the same category.
 
-Use [[coingecko/tool/coinMarkets]] to get 24h volume and market cap data for broader context.
+Use {{tool:coingecko/coinMarkets}} to get 24h volume and market cap data for broader context.
 
-Analyze [[token]] considering:
+Analyze {{input:token}} considering:
 - Contract verification status (from Etherscan)
 - Token standard and key functions (from ABI)
 - Current price and 24h change (from CoinGecko)
 - Trading volume relative to market cap
 - Market cap ranking in category
 
-If [[etherscan/tool/getContractAbi]] returns "Contract source code not verified",
+If {{tool:etherscan/getContractAbi}} returns "Contract source code not verified",
 note this as a risk factor but continue with the price analysis. Unverified contracts
 are not necessarily malicious but warrant caution.
 
@@ -867,7 +878,7 @@ export const prompt = {
 
 1. **Provider-Prompt** — `price-comparison` definition lives in `main.prompts`, content in an external file via `contentFile`. Scoped to `coingecko`, uses bare tool names in `dependsOn`.
 2. **Agent-Prompt** — `token-deep-dive` is a standalone file with inline `content`. Scoped to `crypto-research`, uses full IDs in `dependsOn`, requires `testedWith`.
-3. **Placeholder syntax** — `[[coingecko/tool/simplePrice]]` is a reference (contains `/`), `[[token]]` is a parameter (no `/`).
+3. **Placeholder syntax** — `{{tool:coingecko/simplePrice}}` is a tool reference (type prefix `tool:`), `{{input:token}}` is a parameter (type prefix `input:`).
 4. **Composable prompts** — `token-deep-dive` references `coingecko/prompt/price-comparison` via the `references` array.
 5. **Tool combinatorics** — both prompts describe call order, result passing, and fallback strategies.
 6. **Fallback instructions** — both prompts handle edge cases (unrecognized coin IDs, unverified contracts).
@@ -887,7 +898,7 @@ providers/
 
 agents/
 +-- crypto-research/
-    +-- manifest.json
+    +-- agent.mjs
     +-- prompts/
         +-- token-deep-dive.mjs        # Agent-Prompt (export const prompt)
 ```

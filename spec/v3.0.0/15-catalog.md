@@ -52,11 +52,17 @@ schemas/v3.0.0/
     │   └── ...
     └── agents/                      <- Agent definitions
         ├── crypto-research/
-        │   ├── manifest.json
-        │   └── prompts/             <- Agent prompts (model-specific)
+        │   ├── agent.mjs            <- Agent manifest (export const main)
+        │   ├── prompts/             <- Agent-specific prompts
+        │   │   └── prompt-name.mjs
+        │   ├── skills/              <- Agent-specific skills
+        │   │   └── skill-name.mjs
+        │   └── resources/           <- Agent-specific resources (optional)
         └── defi-monitor/
-            ├── manifest.json
-            └── prompts/
+            ├── agent.mjs
+            ├── prompts/
+            ├── skills/
+            └── resources/
 ```
 
 ### Directory Conventions
@@ -69,8 +75,10 @@ schemas/v3.0.0/
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |
-| `agents/{agent-name}/` | Agent | Agent manifest and prompts |
-| `agents/{agent-name}/prompts/` | Agent | Model-specific prompts for the agent |
+| `agents/{agent-name}/` | Agent | Agent manifest, prompts, skills, and resources |
+| `agents/{agent-name}/prompts/` | Agent | Agent-specific prompts |
+| `agents/{agent-name}/skills/` | Agent | Agent-specific skills |
+| `agents/{agent-name}/resources/` | Agent | Agent-specific resources (optional) |
 
 ### Naming Rules
 
@@ -135,7 +143,7 @@ The `registry.json` file is the entry point for a catalog. It declares identity 
         {
             "name": "crypto-research",
             "description": "Cross-provider crypto analysis agent",
-            "manifest": "agents/crypto-research/manifest.json"
+            "manifest": "agents/crypto-research/agent.mjs"
         }
     ]
 }
@@ -189,7 +197,10 @@ Each object in the `agents` array describes one agent definition.
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | Agent name (kebab-case). Must match the agent directory name. |
 | `description` | `string` | Yes | Human-readable description of the agent's purpose. |
-| `manifest` | `string` | Yes | Relative path from catalog root to the agent's `manifest.json` file. |
+| `manifest` | `string` | Yes | Relative path from catalog root to the agent's `agent.mjs` file. |
+| `prompts` | `Object` | No | Agent-specific prompts exported by the agent. |
+| `skills` | `Object` | No | Agent-specific skills exported by the agent. |
+| `resources` | `Object` | No | Agent-specific resources exported by the agent. |
 
 ---
 
@@ -216,12 +227,12 @@ The diagram shows the two-phase import process: `import-registry` downloads the 
 2. **Validate manifest** — check required fields, verify `schemaSpec` compatibility.
 3. **Download shared lists** — resolve each `shared[].file` path and download the `.mjs` files.
 4. **Download provider schemas** — resolve each `schemas[].file` path and download the `.mjs` files.
-5. **Download agent manifests** — resolve each `agents[].manifest` path and download the `manifest.json` files (and associated prompt files).
+5. **Download agent manifests** — resolve each `agents[].manifest` path and download the `agent.mjs` files (and associated prompt, skill, and resource files).
 6. **Store locally** — write all downloaded files into the local catalog directory.
 
 ### Phase 2: Agent Activation (`import-agent`)
 
-1. **Read agent manifest** — parse the locally stored `manifest.json` for the named agent.
+1. **Read agent manifest** — parse the locally stored `agent.mjs` for the named agent.
 2. **Resolve tool dependencies** — identify which provider schemas the agent requires.
 3. **Activate tools** — add the agent's required tools to the local project configuration.
 4. **Register prompts** — make the agent's prompts available as MCP prompts.
@@ -286,8 +297,10 @@ Each agent directory contains a manifest and prompts for a pre-built tool compos
 
 | Content | Description |
 |---------|-------------|
-| `manifest.json` | Agent metadata, tool dependencies, configuration |
-| `prompts/` directory | Model-specific prompts for the agent's workflows |
+| `agent.mjs` | Agent manifest (`export const main`), metadata, tool dependencies, configuration |
+| `prompts/` directory | Agent-specific prompts |
+| `skills/` directory | Agent-specific skills |
+| `resources/` directory | Agent-specific resources (optional) |
 
 Agents reference tools from providers and shared lists from root. Like providers, agents never define their own shared lists.
 
@@ -325,7 +338,7 @@ The following rules are enforced when loading and validating a catalog.
 
 **CAT004** — Every schema declared in `schemas[]` must have a corresponding `.mjs` file at the declared path. The validator checks file existence, not schema validity — schema-level validation is handled by the rules in `01-schema-format.md` and `09-validation-rules.md`.
 
-**CAT005** — Every agent declared in `agents[]` must have a `manifest.json` at the declared path. Missing manifests prevent agent activation.
+**CAT005** — Every agent declared in `agents[]` must have an `agent.mjs` at the declared path. Missing manifests prevent agent activation.
 
 **CAT006** — Files that exist in the catalog directory tree but are not referenced in `registry.json` may indicate forgotten schemas or leftover files from development. The validator reports these as warnings to help catalog authors maintain a clean manifest.
 

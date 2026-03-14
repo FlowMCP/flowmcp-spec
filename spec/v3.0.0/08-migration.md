@@ -113,6 +113,102 @@ If the schema would benefit from local, deterministic data, add a `resources` fi
 
 If the schema has tools that compose well into multi-step workflows, add a `skills` field to `main` and create skill `.mjs` files. See `14-skills.md`.
 
+#### Step 6: Agent Migration: manifest.json → agent.mjs
+
+If you have agent definitions in `manifest.json` format, convert them to `agent.mjs` with `export const main = { ... }`.
+
+1. Create agent directory: `agents/{agent-name}/`
+2. Create `agent.mjs` with `export const main = { ... }` instead of `manifest.json`
+3. Fields mapping:
+
+| Field | v2.0.0 (manifest.json) | v3.0.0 (agent.mjs) |
+|-------|------------------------|---------------------|
+| `name` | Same | Same |
+| `description` | Same | Same |
+| `model` | Same | Same |
+| `systemPrompt` | Same | Same |
+| `version` | `'2.0.0'` | `'flowmcp/3.0.0'` |
+| `tools` | Array of tool IDs | Array of full tool IDs (`namespace/tool/name`) |
+| `prompts` | Array | Object: `{ 'prompt-name': { file: './prompts/prompt-name.mjs' } }` |
+| `skills` | Not available | NEW Object: `{ 'skill-name': { file: './skills/skill-name.mjs' } }` |
+| `resources` | Not available | NEW Object: `{ 'resource-name': { file: './resources/resource-name.db' } }` |
+| `tests` | Array (inline) | Array stays inline, min 3 tests required |
+| `sharedLists` | Array of list names | Array of list names (same as before) |
+
+**Before (v2.0.0 manifest.json):**
+
+```json
+{
+    "name": "crypto-analyst",
+    "description": "Analyzes crypto markets",
+    "model": "claude-sonnet-4-20250514",
+    "version": "2.0.0",
+    "systemPrompt": "You are a crypto analyst...",
+    "tools": [ "etherscan/getContractAbi" ],
+    "prompts": [
+        { "name": "market-summary", "file": "./prompts/market-summary.mjs" }
+    ],
+    "tests": [ "analyze BTC", "check ETH gas" ],
+    "sharedLists": [ "evmChains" ]
+}
+```
+
+**After (v3.0.0 agent.mjs):**
+
+```javascript
+export const main = {
+    name: 'crypto-analyst',
+    description: 'Analyzes crypto markets',
+    model: 'claude-sonnet-4-20250514',
+    version: 'flowmcp/3.0.0',
+    systemPrompt: 'You are a crypto analyst...',
+    tools: [ 'etherscan/SmartContractExplorer/getContractAbi' ],
+    prompts: {
+        'market-summary': { file: './prompts/market-summary.mjs' }
+    },
+    skills: {
+        'portfolio-check': { file: './skills/portfolio-check.mjs' }
+    },
+    resources: {
+        'token-list': { file: './resources/token-list.db' }
+    },
+    tests: [ 'analyze BTC', 'check ETH gas', 'compare SOL vs ETH' ],
+    sharedLists: [ 'evmChains' ]
+}
+```
+
+#### Step 7: Prompt Migration: `[[...]]` → `{{type:name}}`
+
+The placeholder syntax in prompt and skill content changes from double-bracket to typed mustache syntax.
+
+| Old Syntax (v2.0.0) | New Syntax (v3.0.0) | Type |
+|----------------------|---------------------|------|
+| `[[coingecko/simplePrice]]` | `{{tool:simplePrice}}` | `tool` — references a tool by name |
+| `[[tokenSymbol]]` | `{{input:tokenSymbol}}` | `input` — references a user input parameter |
+| — | `{{resource:token-list}}` | `resource` — references a resource |
+| — | `{{prompt:market-summary}}` | `prompt` — references another prompt |
+
+**Available types:**
+
+| Type | Description |
+|------|-------------|
+| `tool` | References a tool name for dynamic invocation |
+| `input` | References a user-provided input parameter |
+| `resource` | References a resource definition |
+| `prompt` | References another prompt for composition |
+
+**Before (v2.0.0):**
+
+```text
+Fetch the current price using [[coingecko/simplePrice]] for the token [[tokenSymbol]].
+```
+
+**After (v3.0.0):**
+
+```text
+Fetch the current price using {{tool:simplePrice}} for the token {{input:tokenSymbol}}.
+```
+
 ### Deprecation Timeline
 
 ```mermaid
@@ -147,6 +243,13 @@ Per schema:
 - [ ] Tests pass (`flowmcp test single`)
 - [ ] (Optional) Resources added if applicable
 - [ ] (Optional) Skills added if applicable
+
+Per agent:
+
+- [ ] Convert agent `manifest.json` to `agent.mjs`
+- [ ] Replace `[[...]]` placeholders with `{{type:name}}` in prompt/skill content
+- [ ] Convert agent prompts from Array to Object
+- [ ] Add `skills`/`resources` fields if needed
 
 ---
 

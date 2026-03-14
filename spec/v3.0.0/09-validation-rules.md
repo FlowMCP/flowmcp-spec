@@ -22,7 +22,7 @@ This document defines all validation rules enforced by `flowmcp validate`. Each 
 | VAL002 | error | `main` must be an object |
 | VAL003 | error | `main` must not contain unknown fields |
 | VAL004 | error | `handlers` (if exported) must be a function |
-| VAL005 | warning | `handlers` function must return an object with keys matching route names |
+| VAL005 | warning | `handlers` function must return an object with keys matching tool names |
 
 ---
 
@@ -250,6 +250,12 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT010 | error | Each test must have an `expectedTools` field as a non-empty array |
 | AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
 | AGT012 | warning | Tests should cover different tool combinations |
+| AGT013 | error | `prompts` (if present) must be an Object (not Array) |
+| AGT014 | error | `skills` (if present) must be an Object (not Array) |
+| AGT015 | error | `resources` (if present) must be an Object (not Array) |
+| AGT016 | error | Referenced prompt/skill files must exist and be `.mjs` files |
+| AGT017 | error | Prompt files must have `export const prompt` (with `content` or `contentFile`) |
+| AGT018 | error | Skill files must have `export const skill` (with `name`, `version`, `content`/`contentFile`, `requires`, `input`, `output`) |
 
 See `06-agents.md` for the complete agent specification.
 
@@ -267,8 +273,8 @@ See `06-agents.md` for the complete agent specification.
 | PRM006 | error | Each `dependsOn` entry must resolve to an existing tool in the catalog |
 | PRM007 | error | Each `references[]` entry must resolve to an existing prompt in the catalog |
 | PRM008 | error | Referenced prompts must not themselves have `references[]` (one level deep only) |
-| PRM009 | error | `[[...]]` references in `content` must resolve to registered primitives (see PH002) |
-| PRM010 | error | `content` is required and must be a non-empty string |
+| PRM009 | error | `{{type:name}}` references in `content` must resolve to registered primitives (see PH002) |
+| PRM010 | error | `content` OR `contentFile` must be present (XOR — exactly one must be set) |
 
 See `12-prompt-architecture.md` for the complete prompt specification.
 
@@ -309,10 +315,10 @@ See `16-id-schema.md` for the complete ID schema specification.
 
 | Code | Severity | Rule |
 |------|----------|------|
-| PH001 | error | `[[]]` content must not be empty |
+| PH001 | error | `{{type:name}}` content must not be empty |
 | PH002 | error | References (content containing `/`) must resolve to a registered tool, resource, or prompt in the catalog |
 | PH003 | error | Parameter names (content without `/`) must match `^[a-zA-Z][a-zA-Z0-9]*$` |
-| PH004 | error | `[[...]]` placeholders are only valid in prompt `content` fields, not in schema `main` blocks |
+| PH004 | error | `{{type:name}}` placeholders are only valid in prompt/skill `content` fields, not in schema `main` blocks |
 
 See `02-parameters.md` for the complete parameter and placeholder specification.
 

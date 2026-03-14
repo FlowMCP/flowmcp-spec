@@ -52,7 +52,7 @@ schemas/v3.0.0/
     │   └── ...
     └── agents/                      <- Agent definitions
         ├── crypto-research/
-        │   ├── agent.mjs            <- Agent manifest (export const main)
+        │   ├── agent.mjs            <- Agent manifest (export const agent)
         │   ├── prompts/             <- Agent-specific prompts
         │   │   └── prompt-name.mjs
         │   ├── skills/              <- Agent-specific skills
@@ -297,7 +297,7 @@ Each agent directory contains a manifest and prompts for a pre-built tool compos
 
 | Content | Description |
 |---------|-------------|
-| `agent.mjs` | Agent manifest (`export const main`), metadata, tool dependencies, configuration |
+| `agent.mjs` | Agent manifest (`export const agent`), metadata, tool dependencies, configuration |
 | `prompts/` directory | Agent-specific prompts |
 | `skills/` directory | Agent-specific skills |
 | `resources/` directory | Agent-specific resources (optional) |

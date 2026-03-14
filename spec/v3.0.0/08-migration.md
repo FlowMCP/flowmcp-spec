@@ -115,10 +115,10 @@ If the schema has tools that compose well into multi-step workflows, add a `skil
 
 #### Step 6: Agent Migration: manifest.json → agent.mjs
 
-If you have agent definitions in `manifest.json` format, convert them to `agent.mjs` with `export const main = { ... }`.
+If you have agent definitions in `manifest.json` format, convert them to `agent.mjs` with `export const agent = { ... }`.
 
 1. Create agent directory: `agents/{agent-name}/`
-2. Create `agent.mjs` with `export const main = { ... }` instead of `manifest.json`
+2. Create `agent.mjs` with `export const agent = { ... }` instead of `manifest.json`
 3. Fields mapping:
 
 | Field | v2.0.0 (manifest.json) | v3.0.0 (agent.mjs) |
@@ -128,7 +128,7 @@ If you have agent definitions in `manifest.json` format, convert them to `agent.
 | `model` | Same | Same |
 | `systemPrompt` | Same | Same |
 | `version` | `'2.0.0'` | `'flowmcp/3.0.0'` |
-| `tools` | Array of tool IDs | Array of full tool IDs (`namespace/tool/name`) |
+| `tools` | Array of tool IDs | Object with full tool IDs as keys (`{ 'namespace/tool/name': null }`) |
 | `prompts` | Array | Object: `{ 'prompt-name': { file: './prompts/prompt-name.mjs' } }` |
 | `skills` | Not available | NEW Object: `{ 'skill-name': { file: './skills/skill-name.mjs' } }` |
 | `resources` | Not available | NEW Object: `{ 'resource-name': { file: './resources/resource-name.db' } }` |
@@ -156,13 +156,15 @@ If you have agent definitions in `manifest.json` format, convert them to `agent.
 **After (v3.0.0 agent.mjs):**
 
 ```javascript
-export const main = {
+export const agent = {
     name: 'crypto-analyst',
     description: 'Analyzes crypto markets',
     model: 'claude-sonnet-4-20250514',
     version: 'flowmcp/3.0.0',
     systemPrompt: 'You are a crypto analyst...',
-    tools: [ 'etherscan/SmartContractExplorer/getContractAbi' ],
+    tools: {
+        'etherscan/SmartContractExplorer/getContractAbi': null
+    },
     prompts: {
         'market-summary': { file: './prompts/market-summary.mjs' }
     },

@@ -36,22 +36,22 @@ The diagram shows how an agent manifest connects seven concerns: which tools to 
 
 ## Agent Manifest Format
 
-Each agent is defined by an `agent.mjs` file inside its own directory under `agents/`. The manifest is an ES module exporting `export const main` containing all metadata, tool references, configuration, and tests. This follows the same style as provider schemas.
+Each agent is defined by an `agent.mjs` file inside its own directory under `agents/`. The manifest is an ES module exporting `export const agent` containing all metadata, tool references, configuration, and tests. Where provider schemas export `main`, agent manifests export `agent` to clearly distinguish the two.
 
 ```javascript
-export const main = {
+export const agent = {
     name: 'crypto-research',
     description: 'Cross-provider crypto analysis agent',
     version: 'flowmcp/3.0.0',
     model: 'anthropic/claude-sonnet-4-5-20250929',
     systemPrompt: 'You are a crypto research agent. You analyze token prices, on-chain data, and DeFi protocol metrics. Always provide sources for your data. When comparing across chains, normalize values to USD.',
-    tools: [
-        'coingecko-com/tool/simplePrice',
-        'coingecko-com/tool/getCoinMarkets',
-        'etherscan-io/tool/getContractAbi',
-        'etherscan-io/tool/getTokenBalances',
-        'defillama-com/tool/getProtocolTvl'
-    ],
+    tools: {
+        'coingecko-com/tool/simplePrice': null,
+        'coingecko-com/tool/getCoinMarkets': null,
+        'etherscan-io/tool/getContractAbi': null,
+        'etherscan-io/tool/getTokenBalances': null,
+        'defillama-com/tool/getProtocolTvl': null
+    },
     resources: {},
     prompts: {
         'about': { file: './prompts/about.mjs' }
@@ -104,13 +104,13 @@ export const main = {
 | `version` | `string` | Yes | Must be `flowmcp/3.0.0`. Declares which spec version this agent conforms to. |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
-| `tools` | `string[]` | Yes | Tool IDs in `namespace/type/name` format (see `16-id-schema.md`). Non-empty. |
+| `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
 | `tests` | `array` | Yes | Minimum 3 agent tests. See [Agent Tests](#agent-tests). |
 | `maxRounds` | `number` | No | Maximum tool-call rounds per conversation. Default: `10`. |
 | `maxTokens` | `number` | No | Maximum tokens per LLM response. Default: `4096`. |
-| `prompts` | `object` | No | Explanatory prompts, inline declared with `{ file: './...' }`. Each value must have a `file` key pointing to an `.mjs` file that exports `export const content`. |
-| `skills` | `object` | No | Instructional skills, inline declared with `{ file: './...' }`. Each value must have a `file` key pointing to an `.mjs` file that exports `export const skill`. |
-| `resources` | `object` | No | Own resources (SQLite databases). Same structure as `main.resources` in provider schemas. |
+| `prompts` | `object` | No | Explanatory prompts. Keys with `/` are external provider-prompt references (value must be `null`). Keys without `/` are inline declarations (value must have a `file` key pointing to an `.mjs` file that exports `export const content`). See [Slash Rule](#slash-rule). |
+| `skills` | `object` | No | Instructional skills. Keys must NOT contain `/` — skills are model-specific and cannot be externally referenced. Each value must have a `file` key pointing to an `.mjs` file that exports `export const skill`. |
+| `resources` | `object` | No | Own resources (SQLite databases). Keys with `/` are external provider-resource references (value must be `null`). Keys without `/` are inline resource definitions. See [Slash Rule](#slash-rule). |
 | `sharedLists` | `string[]` | No | Names of shared lists the agent needs. Resolved from the catalog's `_lists/` directory. |
 | `inputSchema` | `object` | No | JSON Schema defining the agent's input format. |
 
@@ -159,26 +159,35 @@ The system prompt contains the agent's persona and behavioral instructions. It i
 - Reference the available tools by describing capabilities, not by listing tool names
 
 ```javascript
-export const main = {
+export const agent = {
     systemPrompt: 'You are a crypto research agent specializing in token analysis and DeFi protocol comparison. Always cite data sources. When comparing metrics across chains, normalize to USD. If data is unavailable for a chain, state this explicitly rather than guessing.'
 }
 ```
 
 #### `tools`
 
-Tools are referenced using the ID schema from `16-id-schema.md`. Each entry is a full-form ID: `namespace/type/name`. The agent cherry-picks specific tools from multiple providers — it does not activate entire schemas.
+Tools are declared as an object. External tools from provider schemas use keys with `/` (value `null`). Inline tools defined by the agent use keys without `/` (value is the tool definition). See the [Slash Rule](#slash-rule) for details.
 
 ```javascript
-export const main = {
-    tools: [
-        'coingecko-com/tool/simplePrice',
-        'etherscan-io/tool/getContractAbi',
-        'defillama-com/tool/getProtocolTvl'
-    ]
+export const agent = {
+    tools: {
+        // External tools — referenced by full ID, value is null
+        'coingecko-com/tool/simplePrice': null,
+        'etherscan-io/tool/getContractAbi': null,
+        'defillama-com/tool/getProtocolTvl': null,
+
+        // Inline tool — no slashes in key, value is the definition
+        'customAnalysis': {
+            method: 'POST',
+            path: '/api/analyze',
+            description: 'Custom analysis endpoint owned by this agent',
+            parameters: []
+        }
+    }
 }
 ```
 
-See [Tool Cherry-Picking](#tool-cherry-picking) for resolution details.
+See [Tool Cherry-Picking](#tool-cherry-picking) for external tool resolution details.
 
 #### `maxRounds`
 
@@ -195,14 +204,18 @@ Explanatory prompts declared as an object. Each key is the prompt name, each val
 Agent-level prompts describe what the agent does and how its providers work together. The `about` prompt is a convention (SHOULD) that explains the agent's capabilities.
 
 ```javascript
-export const main = {
+export const agent = {
     prompts: {
-        'about': { file: './prompts/about.mjs' }
+        // External provider prompt — slash key, value null
+        'coingecko-com/prompt/about': null,
+
+        // Inline agent prompt — no slash, value has file key
+        'research-guide': { file: './prompts/research-guide.mjs' }
     }
 }
 ```
 
-Prompt files follow the format defined in `12-prompt-architecture.md` and use the `{{...}}` placeholder syntax for dynamic content.
+External prompt references (slash keys with `null` value) import prompts from provider schemas without copying them. Inline prompts use the format defined in `12-prompt-architecture.md` and use the `{{...}}` placeholder syntax for dynamic content.
 
 #### `skills`
 
@@ -211,15 +224,16 @@ Instructional skills declared as an object. Each key is the skill name, each val
 Agent-level skills are **model-specific** — they are written and tested for the LLM specified in `model`. They describe multi-step workflows, tool chaining strategies, and fallback logic.
 
 ```javascript
-export const main = {
+export const agent = {
     skills: {
+        // Skills are inline-only — no slash keys allowed (model-specific)
         'token-deep-dive': { file: './skills/token-deep-dive.mjs' },
         'portfolio-analysis': { file: './skills/portfolio-analysis.mjs' }
     }
 }
 ```
 
-Skill files follow the format defined in `14-skills.md`.
+Skills cannot be externally referenced because they are model-specific (`testedWith` required). A skill written for Claude may not work with GPT-4o. Skill files follow the format defined in `14-skills.md`.
 
 #### systemPrompt vs prompts vs skills
 
@@ -235,7 +249,7 @@ At runtime, `systemPrompt` is always included as the system message. Prompts and
 
 #### `resources`
 
-Own resources the agent brings — typically SQLite databases with curated context data. The structure follows the same format as `main.resources` in provider schemas.
+Own resources the agent brings — typically SQLite databases with curated context data. External resources from provider schemas can be referenced via slash keys (value `null`). Inline resources follow the same format as provider schema resources.
 
 Resource paths resolve across three levels:
 
@@ -246,8 +260,12 @@ Resource paths resolve across three levels:
 | **Inline** | Relative to agent directory | Database bundled with the agent |
 
 ```javascript
-export const main = {
+export const agent = {
     resources: {
+        // External provider resource — slash key, value null
+        'offeneregister/resource/companiesDb': null,
+
+        // Inline agent resource — no slash, value is the definition
         'token-metadata': {
             source: { type: 'sqlite', path: 'token-metadata.db' },
             queries: {
@@ -270,6 +288,38 @@ An optional JSON Schema that defines the expected input format when invoking the
 
 ---
 
+## Slash Rule
+
+The slash rule is a uniform convention across all four agent primitives (`tools`, `prompts`, `resources`, `skills`). It determines whether an entry is an external reference or an inline definition:
+
+```mermaid
+flowchart TD
+    A[Key in object] --> B{Contains slash?}
+    B -->|Yes| C["External reference — value MUST be null"]
+    B -->|No| D["Inline definition — value is the definition object"]
+    C --> E["'coingecko-com/tool/simplePrice': null"]
+    D --> F["'customAnalysis': { method: 'POST', ... }"]
+```
+
+| Key Pattern | Value | Meaning | Example |
+|-------------|-------|---------|---------|
+| Contains `/` | `null` | External reference to a provider primitive | `'coingecko-com/tool/simplePrice': null` |
+| Contains `/` | non-`null` | **ERROR** (AGT020) | `'coingecko-com/tool/simplePrice': { ... }` |
+| No `/` | object | Inline definition owned by the agent | `'customAnalysis': { method: 'POST', ... }` |
+
+### Per-Primitive Rules
+
+| Primitive | External (slash + null) | Inline (no slash) | Notes |
+|-----------|------------------------|-------------------|-------|
+| `tools` | Yes | Yes (tool definition object) | Most agents use external tools only |
+| `prompts` | Yes | Yes (`{ file: './...' }`) | Can reference provider prompts |
+| `resources` | Yes | Yes (resource definition) | Can reference provider resources |
+| `skills` | **No** (AGT014) | Yes (`{ file: './...' }`) | Model-specific, cannot be shared |
+
+Skills are the exception: they cannot have slash keys because they are model-specific (`testedWith` required). A skill written for Claude may produce incorrect results with GPT-4o.
+
+---
+
 ## Tool Cherry-Picking
 
 Agents select specific tools from multiple providers. This is the key difference from loading entire schemas — an agent includes only the tools it needs, reducing context size and improving LLM focus.
@@ -278,8 +328,8 @@ Agents select specific tools from multiple providers. This is the key difference
 
 ```mermaid
 flowchart TD
-    A["Read agent.mjs tools[]"] --> B["For each tool ID"]
-    B --> C["Parse ID: namespace/type/name"]
+    A["Read agent.mjs tools{}"] --> B["For each key where value is null"]
+    B --> C["Parse key: namespace/type/name"]
     C --> D["Look up namespace in catalog registry"]
     D --> E{Namespace found?}
     E -->|No| F["Error: AGT007 — namespace not registered"]
@@ -290,34 +340,36 @@ flowchart TD
     J --> K["Add to agent's active tools"]
 ```
 
-The diagram shows how each tool reference in the manifest is resolved against the catalog registry. The runtime parses the ID, looks up the namespace, finds the schema containing the tool, and loads the tool definition.
+The diagram shows how each external tool reference (slash key with `null` value) in the manifest is resolved against the catalog registry. The runtime parses the key, looks up the namespace, finds the schema containing the tool, and loads the tool definition. Inline tools (keys without slashes) are used directly from the manifest.
 
 ### Resolution Steps
 
-1. **Parse** — split the tool ID on `/` into namespace, type, and name (see `16-id-schema.md`)
-2. **Find namespace** — locate the provider namespace in the catalog's `registry.json`
-3. **Find schema** — within the namespace, find the schema file that contains the named tool
-4. **Load tool** — extract the tool definition from `main.tools[name]`
-5. **Register** — add the tool to the agent's active tool set
+1. **Partition** — separate tool keys into external (contains `/`, value is `null`) and inline (no `/`, value is object)
+2. **Parse external** — split each external key on `/` into namespace, type, and name (see `16-id-schema.md`)
+3. **Find namespace** — locate the provider namespace in the catalog's `registry.json`
+4. **Find schema** — within the namespace, find the schema file that contains the named tool
+5. **Load tool** — extract the tool definition from the provider schema's `main.tools[name]`
+6. **Register inline** — add inline tool definitions directly to the agent's active tool set
+7. **Register external** — add resolved external tools to the agent's active tool set
 
 ### Cross-Provider Composition
 
 An agent can combine tools from any number of providers:
 
 ```javascript
-export const main = {
-    tools: [
-        'coingecko-com/tool/simplePrice',
-        'coingecko-com/tool/getCoinMarkets',
-        'etherscan-io/tool/getContractAbi',
-        'etherscan-io/tool/getTokenBalances',
-        'defillama-com/tool/getProtocolTvl',
-        'defillama-com/tool/getProtocolChainTvl'
-    ]
+export const agent = {
+    tools: {
+        'coingecko-com/tool/simplePrice': null,
+        'coingecko-com/tool/getCoinMarkets': null,
+        'etherscan-io/tool/getContractAbi': null,
+        'etherscan-io/tool/getTokenBalances': null,
+        'defillama-com/tool/getProtocolTvl': null,
+        'defillama-com/tool/getProtocolChainTvl': null
+    }
 }
 ```
 
-This agent uses 6 tools from 3 providers. The runtime resolves each tool independently and collects `requiredServerParams` from all involved schemas.
+This agent uses 6 external tools from 3 providers. The runtime resolves each external tool key independently and collects `requiredServerParams` from all involved schemas.
 
 ### Server Params Collection
 
@@ -410,7 +462,7 @@ Agent tests validate end-to-end behavior: given a natural language input, does t
 ### Test Format
 
 ```javascript
-export const main = {
+export const agent = {
     tests: [
         {
             _description: 'Basic token lookup',
@@ -516,7 +568,8 @@ The agent hash is calculated from its sorted tool references and their individua
 
 ```
 agentHash = SHA-256( JSON.stringify(
-    tools
+    Object.keys( tools )
+        .filter( ( key ) => tools[ key ] === null )
         .sort()
         .map( ( toolId ) => {
             const hash = getToolHash( toolId )
@@ -533,12 +586,12 @@ Sorting ensures deterministic output regardless of the order tools appear in the
 The agent hash is stored in the manifest alongside the tool list:
 
 ```javascript
-export const main = {
+export const agent = {
     name: 'crypto-research',
-    tools: [
-        'coingecko-com/tool/simplePrice',
-        'etherscan-io/tool/getContractAbi'
-    ],
+    tools: {
+        'coingecko-com/tool/simplePrice': null,
+        'etherscan-io/tool/getContractAbi': null
+    },
     hash: 'sha256:a1b2c3d4e5f6...'
 }
 ```
@@ -596,7 +649,7 @@ Each agent lives in its own directory under `agents/` in the catalog:
 ```
 agents/
 └── crypto-research/
-    ├── agent.mjs                    ← export const main
+    ├── agent.mjs                    ← export const agent
     ├── prompts/
     │   └── about.mjs                ← export const content
     └── skills/
@@ -606,12 +659,12 @@ agents/
 
 ### Directory Rules
 
-- The directory name must match `main.name`
+- The directory name must match `agent.name`
 - `agent.mjs` is required — it is the agent's entry point
 - `prompts/` is optional — only needed if the agent defines prompts
 - `skills/` is optional — only needed if the agent defines skills
-- Prompt file paths in `main.prompts` are relative to the agent directory
-- Skill file paths in `main.skills` are relative to the agent directory
+- Prompt file paths in `agent.prompts` are relative to the agent directory
+- Skill file paths in `agent.skills` are relative to the agent directory
 - No other files or subdirectories are expected (except resource files like `.db`)
 
 ### Relationship to Catalog
@@ -643,7 +696,7 @@ Agents replace Groups from FlowMCP v2. The migration is conceptual — agents ar
 | Aspect | Group (v2) | Agent (v3) |
 |--------|-----------|------------|
 | Definition file | `.flowmcp/groups.json` | `agents/{name}/agent.mjs` |
-| Format | JSON | `.mjs` with `export const main` |
+| Format | JSON | `.mjs` with `export const agent` |
 | Purpose | Tool list for activation | Complete agent definition |
 | Model binding | None | Required (`model` field) |
 | System prompt | None | Required (`systemPrompt` field) |
@@ -660,7 +713,7 @@ Agents replace Groups from FlowMCP v2. The migration is conceptual — agents ar
 Groups cannot be automatically converted to agents because agents require fields that groups do not have (model, systemPrompt, tests). The migration is manual:
 
 1. **Create agent directory** — `agents/{group-name}/`
-2. **Create agent.mjs** — use the group's tool list as a starting point for `export const main`
+2. **Create agent.mjs** — use the group's tool list as a starting point for `export const agent`
 3. **Convert tool references** — from `namespace/file::tool` to `namespace/type/name` format
 4. **Add model** — choose the target LLM
 5. **Add systemPrompt** — define the agent's persona
@@ -704,16 +757,16 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 
 ### Activation Steps
 
-1. **Read manifest** — import `agent.mjs` from the agent directory, access `export const main`
+1. **Read manifest** — import `agent.mjs` from the agent directory, access `export const agent`
 2. **Validate** — check all required fields, format constraints, and version compatibility
 3. **Resolve tools** — parse each tool ID and locate the corresponding provider schema
 4. **Load schemas** — import the `.mjs` schema files for all referenced tools
 5. **Security scan** — run the static security scanner on each loaded schema
 6. **Collect params** — gather all `requiredServerParams` from all involved schemas
 7. **Check env** — verify all required API keys are available in the environment
-8. **Resolve lists** — load shared lists declared in `main.sharedLists`
+8. **Resolve lists** — load shared lists declared in `agent.sharedLists`
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
-10. **Load resources** — initialize agent-owned resources (SQLite databases) from `main.resources`
+10. **Load resources** — initialize agent-owned resources (SQLite databases) from `agent.resources`
 11. **Load prompts** — import prompt files from `main.prompts`, each must export `export const content`
 12. **Load skills** — import skill files from `main.skills`, each must export `export const skill`
 13. **Register tools** — expose the agent's tools via MCP `server.tool`
@@ -732,19 +785,21 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
 | AGT004 | error | `version` must be `flowmcp/3.0.0` |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
-| AGT006 | error | `tools[]` is required, must be a non-empty array |
-| AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
+| AGT006 | error | `tools` is required, must be a non-empty object |
+| AGT007 | error | Each tool key containing `/` must be a valid ID format (`namespace/type/name`) and its value must be `null` |
 | AGT008 | error | `tests[]` is required, minimum 3 tests |
 | AGT009 | error | Each test must have an `input` field of type string |
 | AGT010 | error | Each test must have an `expectedTools` field as a non-empty array |
 | AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
 | AGT012 | warning | Tests should cover different tool combinations |
-| AGT013 | error | `prompts` if present must be an object, each value must have a `file` key |
-| AGT014 | error | `skills` if present must be an object, each value must have a `file` key |
-| AGT015 | error | `resources` if present must be an object, follows schema resource rules |
+| AGT013 | error | `prompts` if present must be an object. Keys with `/`: value must be `null` (external). Keys without `/`: value must have a `file` key |
+| AGT014 | error | `skills` if present must be an object. Keys must NOT contain `/` (skills are model-specific, inline-only). Each value must have a `file` key |
+| AGT015 | error | `resources` if present must be an object. Keys with `/`: value must be `null` (external). Keys without `/`: follows schema resource rules |
 | AGT016 | error | Referenced prompt and skill files must exist and have `.mjs` extension |
 | AGT017 | error | Prompt files must export `export const content` |
 | AGT018 | error | Skill files must export `export const skill` |
+| AGT019 | error | Inline tool keys (without `/`) must have a valid tool definition object as value (with `method`, `path`, `description`) |
+| AGT020 | error | Keys containing `/` with a non-`null` value are forbidden (slash keys must always be `null`) |
 
 ### Rule Details
 
@@ -758,9 +813,9 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 
-**AGT006** — An agent without tools has nothing to execute. The tools array must contain at least one valid tool reference.
+**AGT006** — An agent without tools has nothing to execute. The tools object must contain at least one entry (external or inline).
 
-**AGT007** — Tool references must follow the ID schema from `16-id-schema.md`. The full form `namespace/type/name` is required in agent manifests to ensure unambiguous resolution.
+**AGT007** — External tool keys (containing `/`) must follow the ID schema from `16-id-schema.md`. The full form `namespace/type/name` is required to ensure unambiguous resolution. The value for external keys must be `null`.
 
 **AGT008** — Three tests is the minimum for meaningful coverage: one basic case, one edge case, one cross-cutting case. This matches the tool test minimum from `10-tests.md`.
 
@@ -768,11 +823,15 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 
 **AGT012** — Tests should demonstrate breadth. If all three tests expect the same single tool, the test suite does not validate the agent's multi-tool orchestration capability. This is a warning, not an error, because some agents genuinely use only one tool.
 
-**AGT013** — The `prompts` field must be an object where each key is the prompt name and each value is an object with a `file` key. Array syntax is not supported — use `{ 'name': { file: './path.mjs' } }` instead.
+**AGT013** — The `prompts` field must be an object. Keys containing `/` are external provider-prompt references — their value must be `null`. Keys without `/` are inline prompt declarations — their value must have a `file` key pointing to a `.mjs` file.
 
-**AGT014** — The `skills` field follows the same structure as `prompts`. Each key is the skill name, each value must have a `file` key pointing to a skill file.
+**AGT014** — The `skills` field must be an object. Keys must NOT contain `/` because skills are model-specific (`testedWith` required) and cannot be shared across agents targeting different models. Each value must have a `file` key pointing to a skill file.
 
-**AGT015** — The `resources` field must follow the same structure as `main.resources` in provider schemas. Each resource must have a valid `source` definition and optional `queries`.
+**AGT015** — The `resources` field must be an object. Keys containing `/` are external provider-resource references — their value must be `null`. Keys without `/` are inline resource definitions that must have a valid `source` and optional `queries`.
+
+**AGT019** — Inline tool keys (without `/`) must have a valid tool definition object as their value. The object must contain at minimum `method`, `path`, and `description` — the same fields required for tools in provider schemas.
+
+**AGT020** — A key containing `/` with a non-`null` value is always an error. This rule applies uniformly to `tools`, `prompts`, and `resources`. The slash in the key signals an external reference, which must have `null` as its value.
 
 **AGT016** — All files referenced in `prompts` and `skills` must exist on disk and must have the `.mjs` extension. Missing files prevent activation.
 
@@ -798,8 +857,8 @@ flowmcp validate-agent agents/crypto-research/
   AGT003  pass    model "anthropic/claude-sonnet-4-5-20250929" contains /
   AGT004  pass    version is flowmcp/3.0.0
   AGT005  pass    systemPrompt is non-empty
-  AGT006  pass    tools[] has 5 entries
-  AGT007  pass    all tool references are valid IDs
+  AGT006  pass    tools{} has 5 entries
+  AGT007  pass    all external tool keys are valid IDs with null values
   AGT008  pass    tests[] has 3 entries (minimum: 3)
   AGT009  pass    all tests have input field
   AGT010  pass    all tests have expectedTools field
@@ -811,6 +870,8 @@ flowmcp validate-agent agents/crypto-research/
   AGT016  pass    all referenced files exist and are .mjs
   AGT017  pass    all prompt files export content
   AGT018  pass    all skill files export skill
+  AGT019  skip    no inline tools defined
+  AGT020  pass    no slash keys with non-null values
 
   0 errors, 0 warnings
   Agent is valid
@@ -827,7 +888,7 @@ A fully specified agent manifest with directory structure:
 ```
 agents/
 └── crypto-research/
-    ├── agent.mjs                    ← export const main
+    ├── agent.mjs                    ← export const agent
     ├── prompts/
     │   └── about.mjs                ← export const content
     └── skills/
@@ -838,19 +899,19 @@ agents/
 ### agent.mjs
 
 ```javascript
-export const main = {
+export const agent = {
     name: 'crypto-research',
     description: 'Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics for comprehensive token and portfolio research',
     version: 'flowmcp/3.0.0',
     model: 'anthropic/claude-sonnet-4-5-20250929',
     systemPrompt: 'You are a crypto research agent specializing in token analysis, wallet forensics, and DeFi protocol comparison. Follow these guidelines:\n\n1. Always cite which data source provided each piece of information.\n2. When comparing metrics across chains, normalize values to USD.\n3. Present comparative data in tables when three or more items are compared.\n4. If data is unavailable for a requested chain or token, state this explicitly rather than guessing.\n5. For wallet analysis, always check both token balances and current prices to show USD values.',
-    tools: [
-        'coingecko-com/tool/simplePrice',
-        'coingecko-com/tool/getCoinMarkets',
-        'etherscan-io/tool/getContractAbi',
-        'etherscan-io/tool/getTokenBalances',
-        'defillama-com/tool/getProtocolTvl'
-    ],
+    tools: {
+        'coingecko-com/tool/simplePrice': null,
+        'coingecko-com/tool/getCoinMarkets': null,
+        'etherscan-io/tool/getContractAbi': null,
+        'etherscan-io/tool/getTokenBalances': null,
+        'defillama-com/tool/getProtocolTvl': null
+    },
     resources: {},
     prompts: {
         'about': { file: './prompts/about.mjs' }

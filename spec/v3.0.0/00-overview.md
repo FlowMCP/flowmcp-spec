@@ -56,7 +56,7 @@ Different primitives have different levels of validatability. FlowMCP embraces t
 | **Resources** | Completely | SQLite schema creation, query execution, parameter binding, result format |
 | **Prompts** | Partially | Tool references resolve, parameter syntax `{{type:name}}` is valid, `references` entries exist |
 | **Skills** | Partially | Placeholder syntax `{{type:name}}` is valid, `requires.tools` and `requires.resources` resolve, typed input/output structure |
-| **Agents** | Partially | Manifest structure (`agent.mjs` with `export const main`), tool references exist, `expectedTools` (deterministic), `expectedContent` (partially — LLM output varies) |
+| **Agents** | Partially | Manifest structure (`agent.mjs` with `export const agent`), tool references exist, `expectedTools` (deterministic), `expectedContent` (partially — LLM output varies) |
 
 This is a feature, not a limitation. Tools and Resources are the deterministic anchor. Prompts, Skills, and Agents build on that anchor but acknowledge that LLM behavior introduces variability.
 
@@ -200,9 +200,9 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Handler** | An async function returned by the `handlers` factory. Performs pre- or post-processing for a tool or resource query. Receives dependencies via injection. |
 | **Modifier** | Handler subtype: `preRequest` transforms input before the API call, `postRequest` transforms output after the API call (or after a resource query). |
 | **Shared List** | A reusable, versioned value list (e.g. EVM chain identifiers, country codes) referenced by schemas and injected at load-time. |
-| **Agent** | A complete, purpose-driven definition with tools, prompts, skills, model, and behavior. Defined as `agent.mjs` with `export const main` containing all metadata, tool references, model binding, system prompt, and tests. Bundles tools from multiple providers for a specific task. Replaces "Group" from v2. See `06-agents.md`. |
+| **Agent** | A complete, purpose-driven definition with tools, prompts, skills, model, and behavior. Defined as `agent.mjs` with `export const agent` containing all metadata, tool references, model binding, system prompt, and tests. Bundles tools from multiple providers for a specific task. Replaces "Group" from v2. See `06-agents.md`. |
 | **Catalog** | A named directory containing a `registry.json` manifest with shared lists, provider schemas, and agent definitions. The top-level organizational unit. |
-| **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `prompts`. Hashable for integrity verification. |
+| **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `prompts`. Hashable for integrity verification. Schemas use `export const main`; agents use `export const agent` (see Agent). |
 | **Handlers Export** | `export const handlers = ({ sharedLists, libraries }) => ({...})` — factory function receiving injected dependencies. Subject to security scanning. |
 
 ---
@@ -217,7 +217,7 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | `03-shared-lists.md` | Shared Lists | List format, versioning, field definitions, filtering, resolution lifecycle |
 | `04-output-schema.md` | Output Schema | Response type declarations, field mapping, flattening rules |
 | `05-security.md` | Security Model | Zero-import policy, library allowlist, static scan, dependency injection |
-| `06-agents.md` | Agents | Agent manifest format (`agent.mjs` with `export const main`), tool cherry-picking, model binding, system prompts, integrity verification |
+| `06-agents.md` | Agents | Agent manifest format (`agent.mjs` with `export const agent`), tool cherry-picking, model binding, system prompts, integrity verification |
 | `07-tasks.md` | Tasks | Deferred — MCP Tasks integration placeholder |
 | `08-migration.md` | Migration | v1.2.0 to v2.0.0 and v2.0.0 to v3.0.0 migration guides, backward compatibility |
 | `09-validation-rules.md` | Validation Rules | Complete validation checklist for schemas, lists, agents, resources, and prompts |
@@ -262,7 +262,7 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 | 1.2.0 | — | 2025-11 | Added handlers (preRequest/postRequest), Zod-based parameter validation, modifier pattern for input/output transformation. |
 | 2.0.0 | — | 2026-02 | Two-export format (`main` + `handlers` factory). Dependency injection via allowlist. Shared lists for reusable values. Output schema declarations. Zero-import security model. Groups with integrity hashes. Maximum routes reduced from 10 to 8. |
 | 3.0.0 | 1.0 | 2026-03 | Four primitives: Tools (renamed from Routes), Resources (SQLite), Prompts (model-neutral/model-specific guidance), Skills (`.mjs` instructional workflows). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
-| 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with `agent.mjs` manifest format (`export const main`). Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `{{type:name}}` (replaces deprecated `[[...]]`). ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
+| 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with `agent.mjs` manifest format (`export const agent`). Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `{{type:name}}` (replaces deprecated `[[...]]`). ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
 | 3.1.0 | 1.0 | 2026-03 | Resources: Two SQLite modes (`in-memory` with `readonly: true`, `file-based` with WAL). Origin system (`global`, `project`, `inline`) replaces pseudo-paths. `better-sqlite3` replaces `sql.js`. `getSchema` MUST for both modes. `freeQuery` auto-injected. Max queries increased to 8. Block patterns removed. `source: 'markdown'` resource type with parameter-based access. Folder renamed `data/` to `resources/`. All fields required. Prompts: `contentFile` field for Provider-Prompts (content in external file). `references` field required (empty array when none). `about` convention (SHOULD) for Provider-Schemas and Agent-Manifests. |
 
 ---
@@ -302,7 +302,7 @@ The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API kn
 - **Tools replace Routes** — `main.tools` is the primary key. `main.routes` is accepted as a deprecated alias with a warning (removed in v3.2.0). Schemas must not define both `tools` and `routes`.
 - **Resources** — Embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
 - **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. Schema-scoped, maps to MCP `server.prompt` primitive. See `14-skills.md`.
-- **Groups renamed to Agents** — Groups evolve into full agent manifests (`agent.mjs` with `export const main`) with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
+- **Groups renamed to Agents** — Groups evolve into full agent manifests (`agent.mjs` with `export const agent`) with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
 - **Prompt Architecture** — Two-tier prompt system: Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific, multi-provider workflows). Unified `{{type:name}}` placeholder syntax (replaces deprecated `[[...]]`). See `12-prompt-architecture.md`.
 - **Catalog with registry.json** — Named catalogs with a manifest file listing all providers, agents, and shared lists. Enables import and distribution. See `15-catalog.md`.
 - **ID Schema** — Unified `namespace/type/name` format for referencing tools, resources, prompts, and skills across the catalog. Short form for common cases. See `16-id-schema.md`.

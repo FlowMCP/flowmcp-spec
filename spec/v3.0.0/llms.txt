@@ -9180,3 +9180,5 @@ The ID schema unifies several existing identification mechanisms:
 | Shared list `ref` field | `shared/list/name` | Wrap in `shared/list/` prefix |
 
 The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see `08-migration.md`.
+
+---

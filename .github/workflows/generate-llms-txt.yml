@@ -1,0 +1,109 @@
+name: Generate llms.txt
+
+on:
+  push:
+    paths:
+      - 'spec/v3.0.0/*.md'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate llms.txt from spec files
+        run: |
+          SPEC_DIR="spec/v3.0.0"
+          OUTPUT="$SPEC_DIR/llms.txt"
+
+          TITLES=(
+            "Overview"
+            "Schema Format"
+            "Parameters"
+            "Shared Lists"
+            "Output Schema"
+            "Security Model"
+            "Agents"
+            "MCP Tasks"
+            "Migration Guide"
+            "Validation Rules"
+            "Tests"
+            "Preload & Caching"
+            "Prompt Architecture"
+            "Resources"
+            "Skills"
+            "Catalog"
+            "ID Schema"
+          )
+
+          FILES=(
+            "00-overview.md"
+            "01-schema-format.md"
+            "02-parameters.md"
+            "03-shared-lists.md"
+            "04-output-schema.md"
+            "05-security.md"
+            "06-agents.md"
+            "07-tasks.md"
+            "08-migration.md"
+            "09-validation-rules.md"
+            "10-tests.md"
+            "11-preload.md"
+            "12-prompt-architecture.md"
+            "13-resources.md"
+            "14-skills.md"
+            "15-catalog.md"
+            "16-id-schema.md"
+          )
+
+          # Header
+          cat > "$OUTPUT" << 'HEADER'
+          # FlowMCP Specification v3.0.0
+          > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
+          >
+          > This file concatenates all 17 specification documents into a single file for LLM consumption.
+          > Source: https://github.com/FlowMCP/flowmcp-spec
+
+          ## Table of Contents
+
+          HEADER
+
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' "$OUTPUT"
+
+          # Generate TOC
+          for i in "${!TITLES[@]}"; do
+            echo "$((i + 1)). ${TITLES[$i]}" >> "$OUTPUT"
+          done
+
+          echo "" >> "$OUTPUT"
+          echo "---" >> "$OUTPUT"
+
+          # Concatenate spec files
+          for i in "${!FILES[@]}"; do
+            FILE="$SPEC_DIR/${FILES[$i]}"
+            if [ -f "$FILE" ]; then
+              echo "" >> "$OUTPUT"
+              cat "$FILE" >> "$OUTPUT"
+              echo "" >> "$OUTPUT"
+              echo "---" >> "$OUTPUT"
+            fi
+          done
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet spec/v3.0.0/llms.txt || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add spec/v3.0.0/llms.txt
+          git commit -m "Auto-regenerate llms.txt from spec changes"
+          git push

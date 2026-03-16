@@ -1,3 +1,21 @@
+---
+name: create-flowmcp-agent
+description: >
+  Build a complete FlowMCP agent from scratch — structured 7-step process: define purpose,
+  find tools from the schema catalog, write skills (step-by-step workflows), create agent.mjs
+  manifest, test, and deploy as MCP server. Use this skill whenever the user wants to create,
+  build, design, scaffold, or plan a new FlowMCP agent, AI agent, MCP agent, or tool-using
+  agent — including when they describe what the agent should do without explicitly asking to
+  "create an agent". Triggers on: "I need an agent for X", "build an agent that...",
+  "erstelle einen Agent fuer...", "baue einen Agent der...", agent manifest questions,
+  agent.mjs structure, agent skill design, agent deployment with AgentToolsServer, or
+  combining multiple FlowMCP tools/schemas into an orchestrated workflow. Also triggers when
+  the user asks about the agent folder structure (agent.mjs + skills/ + prompts/), the
+  Slash Rule for tools, or how to write export const agent manifests. If the user mentions
+  wanting to combine multiple API providers or data sources into a single intelligent system,
+  this skill is the right starting point.
+---
+
 # Create FlowMCP Agent
 
 Build a complete FlowMCP agent from scratch. Guides through a structured 7-step process: define purpose, find tools, write skills, create manifest, test, and deploy.

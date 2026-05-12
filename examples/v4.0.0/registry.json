@@ -1,0 +1,18 @@
+{
+    "version": "4.0.0",
+    "providers": {
+        "etherscan-io": {
+            "schemas": [
+                {
+                    "id": "etherscan-io/contracts",
+                    "file": "providers/etherscan-io/contracts.mjs"
+                }
+            ]
+        }
+    },
+    "selections": {
+        "evm-research/selection/contract-analysis": {
+            "file": "selections/evm-research/contract-analysis.mjs"
+        }
+    }
+}

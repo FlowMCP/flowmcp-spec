@@ -1,5 +1,36 @@
 # Changelog
 
+## v4.0.0 — 2026-05-12
+
+Major release introducing Selection as the 5th primitive, MCP integration via meta blocks, and two-layer validation strategy.
+
+### Added
+
+- **Selection**: 5th primitive — named collections of Primitives for agent activation. `selections/` directory at root level. Validation rules SEL001–SEL003. See `17-selections.md`.
+- **Prefill & Placeholders**: Complete placeholder system (12 types) with pre-execution support. `prefill[]` array in skills. See `18-prefill.md`.
+- **MCP Integration**: `meta` block required per Tool (VAL100–VAL106). `alwaysLoad`, `searchHint`, `aliases` fields. MCP annotation translation. See `19-mcp-integration.md`.
+- **Validation Strategy**: Two-layer validation (deterministic + probabilistic). Grade system A–F. Grade Report with `schemaId` (Schema-File-ID), `primitives[]` array, `validatorVersion`. See `20-validation-strategy.md`.
+- **Schema Lifecycle**: 6-stage lifecycle from Research to Production. Partial Schema Policy: failing Primitives removed before deploy. Static schema auto-PASS. See `21-schema-lifecycle.md`.
+- **HTTP Resources**: `source: 'http'` for downloadable SQLite databases. Rule RES010 (HTTPS required). See `13-resources.md`.
+- **Schema-File-ID**: New ID type `namespace/schema-name` (1 slash) identifying the physical schema file. See `16-id-schema.md`.
+- **CLI-Adapter**: Internal MCP tool name mapping `name_namespace` documented. No Short Form rule. See `16-id-schema.md`.
+- **Agent Selections**: `agent.selections[]` field for loading Selections. Rule AGT010. See `06-agents.md`.
+- **Agent Elicitation**: `agent.elicitation` field (MCP Spec 2025-06-18). `requestedSchemas[]` with restricted JSON Schema. Rules AGT010–AGT011. See `06-agents.md`.
+- **One-Shot Skill Design**: Skills must be self-contained for single-pass execution. One-Shot test (probabilistic). See `14-skills.md`.
+
+### Changed
+
+- **`main.skills` removed**: Hard breaking change. Move skills to Selection or Agent Manifest.
+- **`meta` block required per Tool**: VAL100–VAL106 are errors.
+- **Namespace pattern**: `^[a-z]+$` → `^[a-z][a-z0-9-]*$` (allows digits and hyphens).
+- **Version pattern**: `^3\.\d+\.\d+$` → `^4\.\d+\.\d+$`.
+- **`executeRequest` handler documented**: Standard HTTP fetch replacement. See `01-schema-format.md`.
+- **VAL107**: Enums matching Shared List MUST use `{{listName:alias}}` interpolation.
+- **`03-shared-lists.md`**: Header corrected (was v2.0.0), Alias-Mapping Pattern section added.
+- **Skill fields**: `whenToUse`, `type`, `version` are required in v4. `prefill` optional.
+
+---
+
 ## v3.0.0 Revision 8.0 — 2026-03-12
 
 Three-level architecture, Agents, Prompt Architecture, Catalog, and ID Schema.

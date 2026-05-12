@@ -1,5 +1,5 @@
 ---
-name: create-flowmcp-agent
+name: flowmcp-create-agent
 description: >
   Build a complete FlowMCP agent from scratch — structured 7-step process: define purpose,
   find tools from the schema catalog, write skills (step-by-step workflows), create agent.mjs

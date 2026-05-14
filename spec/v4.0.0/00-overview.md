@@ -5,7 +5,7 @@ FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Bas
 1. **CLI** — Direct access to Tools, Resources, Prompts, and Skills
 2. **MCP/A2A Server** — Agents and MCP clients can use FlowMCP as a server (compatible with OpenClaw)
 
-This document provides the conceptual foundation, positioning, terminology, and document index for the v3.0.0 specification.
+This document provides the conceptual foundation, positioning, terminology, and document index for the v4.0.0 specification.
 
 ---
 
@@ -43,7 +43,7 @@ flowchart TD
     G --> H[Tool Combinatorics — How to chain tools across providers]
 ```
 
-FlowMCP provides **five primitives**: Tools, Resources, Prompts, Skills, and Selections. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
+FlowMCP provides **five primitives**: Tools, Resources, Prompts, Skills, and Selections. Tools, Resources, and Prompts are defined in `main.tools`, `main.resources`, and `main.prompts`. **Skills are a top-level entity** that lives outside `main` and is scoped to a namespace, selection, or agent — never `main.skills` (forbidden in v4.0.0, see Memo 022 REV-08 and VAL016). Selections are curated subsets that bundle tools/resources/prompts/skills for agent loading. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
 
 ---
 
@@ -196,7 +196,7 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Resource** | Local data access via SQLite databases (in-memory or file-based) and Markdown documents. Maps to the MCP `server.resource` primitive. Defined in `main.resources`. See `13-resources.md`. |
 | **Provider-Prompt** | A model-neutral prompt explaining a single namespace. Describes how to use one provider's tools effectively without assuming a specific LLM model. |
 | **Agent-Prompt** | A model-specific prompt tested against a specific LLM model. Contains tool combinatorics, chaining instructions, and fallback strategies. |
-| **Skill** | A self-contained instruction set for AI agents. Maps to the MCP `server.prompt` primitive. Defined as a `.mjs` file with `export const skill` containing typed metadata, input/output declarations, and Markdown instructions with `{{type:name}}` placeholders. Schema-scoped — references tools and resources within the same schema. See `14-skills.md`. |
+| **Skill** | A self-contained instruction set for AI agents. Maps to the MCP `server.prompt` primitive. Defined as a `.mjs` file with `export const skill` containing typed metadata (including `type: 'namespace' \| 'selection' \| 'agent'`), input/output declarations, and Markdown instructions with `{{type:name}}` placeholders. Lives in `providers/{ns}/skills/`, `selections/{name}/skills/`, or `agents/{name}/skills/` depending on `type`. **NOT defined under `main.skills`** (forbidden in v4.0.0). See `14-skills.md`. |
 | **Content Placeholder** | `{{type:name}}` syntax for dynamic content in prompts and skills. Types: `{{tool:name}}` references a tool, `{{resource:name}}` references a resource, `{{input:key}}` references an input parameter. Replaces the deprecated `[[...]]` syntax from earlier revisions. |
 | **Namespace** | Provider identifier, lowercase letters only (e.g. `etherscan`, `coingecko`). Groups schemas by data source. |
 | **Handler** | An async function returned by the `handlers` factory. Performs pre- or post-processing for a tool or resource query. Receives dependencies via injection. |
@@ -308,7 +308,7 @@ The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API kn
 
 - **Tools replace Routes** — `main.tools` is the primary key. `main.routes` is accepted as a deprecated alias with a warning (removed in v3.2.0). Schemas must not define both `tools` and `routes`.
 - **Resources** — Embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
-- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. Schema-scoped, maps to MCP `server.prompt` primitive. See `14-skills.md`.
+- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. In v3.0.0 Skills were schema-scoped via `main.skills`; in v4.0.0 they are namespace/selection/agent-scoped (see `14-skills.md` and Memo 022 REV-08).
 - **Groups renamed to Agents** — Groups evolve into full agent manifests (`agent.mjs` with `export const agent`) with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
 - **Prompt Architecture** — Two-tier prompt system: Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific, multi-provider workflows). Unified `{{type:name}}` placeholder syntax (replaces deprecated `[[...]]`). See `12-prompt-architecture.md`.
 - **Catalog with registry.json** — Named catalogs with a manifest file listing all providers, agents, and shared lists. Enables import and distribution. See `15-catalog.md`.

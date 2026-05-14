@@ -101,7 +101,7 @@ export const agent = {
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | Agent name. Must match `^[a-z][a-z0-9-]*$`. Must match the agent directory name. |
 | `description` | `string` | Yes | Human-readable description of the agent's purpose. |
-| `version` | `string` | Yes | Must be `flowmcp/3.0.0`. Declares which spec version this agent conforms to. |
+| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4). |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
 | `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
@@ -135,9 +135,10 @@ crypto research          <- INVALID (space)
 The version field uses the format `flowmcp/X.Y.Z` (not semver of the agent itself). It declares which FlowMCP specification the manifest conforms to. This allows the runtime to apply the correct validation rules.
 
 ```
-flowmcp/3.0.0            <- valid
-3.0.0                    <- INVALID (missing flowmcp/ prefix)
-flowmcp/2.0.0            <- INVALID (agents are a v3 concept)
+flowmcp/4.0.0            <- valid (current spec)
+flowmcp/3.0.0            <- DEPRECATED (v3 agent, accepted with warning during migration)
+4.0.0                    <- INVALID (missing flowmcp/ prefix)
+flowmcp/2.0.0            <- INVALID (agents are a v3+ concept)
 ```
 
 #### `model`
@@ -770,7 +771,7 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
 10. **Load resources** — initialize agent-owned resources (SQLite databases) from `agent.resources`
 11. **Load prompts** — import prompt files from `main.prompts`, each must export `export const content`
-12. **Load skills** — import skill files from `main.skills`, each must export `export const skill`
+12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each must export `export const skill`. `main.skills` is forbidden in v4.0.0.
 13. **Register tools** — expose the agent's tools via MCP `server.tool`
 14. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
 15. **Register skills** — expose the agent's skills via MCP `server.prompt`
@@ -905,7 +906,7 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 
 **AGT003** — The model field uses OpenRouter syntax where the `/` separates the provider from the model name. A model string without `/` cannot be routed to any provider. Examples: `anthropic/claude-sonnet-4-5-20250929`, `openai/gpt-4o`.
 
-**AGT004** — The version must be exactly `flowmcp/3.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to.
+**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4 — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string). The legacy `flowmcp/3.0.0` is accepted with a deprecation warning during migration.
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 
@@ -951,7 +952,7 @@ flowmcp validate-agent agents/crypto-research/
   AGT001  pass    name "crypto-research" matches pattern
   AGT002  pass    description is non-empty
   AGT003  pass    model "anthropic/claude-sonnet-4-5-20250929" contains /
-  AGT004  pass    version is flowmcp/3.0.0
+  AGT004  pass    version is flowmcp/4.0.0
   AGT005  pass    systemPrompt is non-empty
   AGT006  pass    tools{} has 5 entries
   AGT007  pass    all external tool keys are valid IDs with null values

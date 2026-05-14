@@ -2,6 +2,8 @@
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
+This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream memos (e.g. Memo 026 Validation Strategy) reference this registry but do not redefine codes.
+
 ---
 
 ## Severity Levels
@@ -36,7 +38,7 @@ This document defines all validation rules enforced by `flowmcp validate`. Each 
 | VAL013 | error | `main.description` is required and must be a string |
 | VAL014 | error | `main.version` is required and must match `^4\.\d+\.\d+$` (version `^3\.\d+\.\d+$` accepted with deprecation warning) |
 | VAL015 | error | `main.root` is required when `main.tools` is non-empty. Optional for resource-only or skill-only schemas. |
-| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` or `main.skills` is defined. |
+| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` is defined. `main.skills` is forbidden in v4.0.0 — skills are namespace-, selection-, or agent-scoped (see `14-skills.md`). |
 | VAL017 | error | Schema must not define both `main.tools` and `main.routes` simultaneously |
 | VAL018 | warning | `main.routes` is deprecated. Use `main.tools` instead. |
 
@@ -119,7 +121,7 @@ This document defines all validation rules enforced by `flowmcp validate`. Each 
 
 | Code | Severity | Rule |
 |------|----------|------|
-| RES001 | error | `source` must be `'sqlite'`. No other values are accepted. |
+| RES001 | error | `source` must be one of `'sqlite'`, `'markdown'`, or `'http'`. Other values are not accepted. See `13-resources.md` for the semantics of each source type. |
 | RES002 | error | `description` must be a non-empty string. |
 | RES003 | error | `database` must be a relative path ending with `.db`. |
 | RES004 | error | `database` path must not contain `..` segments. |
@@ -155,8 +157,8 @@ See `13-resources.md` for the complete resource specification.
 |------|----------|------|
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
-| SKL003 | error | `skill.name` must match the key in `main.skills` that references this file |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp-skill/1.0.0'` |
+| SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
+| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version per Memo 022 REV-08). |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
@@ -168,9 +170,9 @@ See `13-resources.md` for the complete resource specification.
 | SKL013 | error | `input[].type` must be one of: `string`, `number`, `boolean`, `enum` |
 | SKL014 | error | `input[].description` is required and must be a non-empty string |
 | SKL015 | error | `input[].required` must be a boolean |
-| SKL016 | error | `main.skills` entries: `file` must end with `.mjs` |
-| SKL017 | error | `main.skills` entries: referenced file must exist |
-| SKL018 | error | Maximum 4 skills per schema |
+| SKL016 | error | Skill registration entries (`selection.skills`, `agent.skills`): `file` must end with `.mjs` |
+| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file must exist |
+| SKL018 | error | Maximum 4 skills per registration scope (selection or agent) |
 
 ### Reference Rules (Cross-Validation)
 
@@ -178,7 +180,7 @@ See `13-resources.md` for the complete resource specification.
 |------|----------|------|
 | SKL020 | warning | `{{tool:name}}` placeholder in content references a tool not listed in `requires.tools` |
 | SKL021 | warning | `{{resource:name}}` placeholder in content references a resource not listed in `requires.resources` |
-| SKL022 | error | `{{skill:name}}` placeholder references a skill not in `main.skills` |
+| SKL022 | error | `{{skill:name}}` placeholder references a skill not registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace). |
 | SKL023 | error | `{{skill:name}}` target skill must not itself contain `{{skill:...}}` placeholders (1 level deep only) |
 | SKL024 | warning | Entry in `requires.tools` is not referenced via `{{tool:...}}` in content |
 | SKL025 | warning | Entry in `requires.resources` is not referenced via `{{resource:...}}` in content |
@@ -241,7 +243,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
 | AGT002 | error | `description` is required, must be a non-empty string |
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
-| AGT004 | error | `version` must be `flowmcp/3.0.0` |
+| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version per Memo 022 REV-08). |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools[]` is required, must be a non-empty array |
 | AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
@@ -251,7 +253,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
 | AGT012 | warning | Tests should cover different tool combinations |
 | AGT013 | error | `prompts` (if present) must be an Object (not Array) |
-| AGT014 | error | `skills` (if present) must be an Object (not Array) |
+| AGT014 | error | `agent.skills` (if present) must be an Object (not Array). Keys must NOT contain `/` (inline form), values are `{ file }` objects pointing to `agents/{name}/skills/*.mjs`. See VAL110 and `06-agents.md`. |
 | AGT015 | error | `resources` (if present) must be an Object (not Array) |
 | AGT016 | error | Referenced prompt/skill files must exist and be `.mjs` files |
 | AGT017 | error | Prompt files must have `export const prompt` (with `content` or `contentFile`) |
@@ -273,6 +275,7 @@ See `06-agents.md` for the complete agent specification.
 | VAL105 | error | `meta.aliases` is required and must be a string array |
 | VAL106 | error | `meta.alwaysLoad` is required and must be a boolean |
 | VAL107 | error | When enum values correspond to a Shared List, `{{listName:alias}}` MUST be used. Hardcoded enum values that duplicate a Shared List are forbidden. |
+| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See Memo 022 REV-08 Kap. 3.3 and `17-selections.md` for the full slash-rule matrix. |
 
 See `19-mcp-integration.md` for the complete meta block specification.
 

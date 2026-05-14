@@ -91,14 +91,17 @@ Namespace rules:
 
 #### Resource Type
 
-The resource type discriminates between the four kinds of addressable primitives:
+The resource type discriminates between the seven kinds of addressable primitives in v4.0.0:
 
 | Type | Maps To | Defined In |
 |------|---------|-----------|
 | `tool` | MCP `server.tool` | `main.tools` |
 | `resource` | MCP `server.resource` | `main.resources` |
-| `prompt` | MCP `server.prompt` | `main.skills` |
+| `prompt` | MCP `server.prompt` | `main.prompts` |
+| `skill` | MCP `server.prompt` (skill variant) | `providers/{ns}/skills/`, `selections/{name}/skills/`, or `agents/{name}/skills/` — never `main.skills` (forbidden) |
 | `list` | Shared list | `list.meta.name` |
+| `selection` | Selection | `selections/{name}/selection.mjs` |
+| `agent` | Agent | `agents/{name}/agent.mjs` |
 
 #### Name
 
@@ -212,7 +215,7 @@ The ID schema connects to the `{{type:name}}` placeholder syntax used in skill c
 |-------------|---------------|
 | `{{tool:getContractAbi}}` | Tool reference — resolved to a tool in the same schema's `main.tools` |
 | `{{resource:verifiedContracts}}` | Resource reference — resolved to a resource in the same schema's `main.resources` |
-| `{{skill:quick-summary}}` | Skill reference — resolved to a skill in the same schema's `main.skills` |
+| `{{skill:quick-summary}}` | Skill reference — resolved to a skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). `main.skills` is forbidden in v4.0.0. |
 | `{{input:address}}` | Input parameter — value provided by the user at runtime |
 
 ### Resolution in Skills

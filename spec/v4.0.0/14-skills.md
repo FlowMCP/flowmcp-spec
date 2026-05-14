@@ -66,7 +66,8 @@ Produce a Markdown report with:
 
 export const skill = {
     name: 'full-contract-audit',
-    version: 'flowmcp-skill/1.0.0',
+    version: 'flowmcp/4.0.0',
+    type: 'namespace',
     description: 'Retrieve ABI and source code for a smart contract audit.',
     requires: {
         tools: [ 'getContractAbi', 'getSourceCode' ],
@@ -128,7 +129,7 @@ The `export const skill` object contains all metadata and instructions for the s
 | `output` | `string` | Must not be empty | Description of what the skill produces as a final artifact. |
 | `content` | `string` | Must not be empty | Markdown instructions for the AI agent. Contains placeholders referencing tools, resources, and input parameters. |
 | `whenToUse` | `string` | Must not be empty | **New in v4.** When an AI agent should activate this skill. One sentence describing the trigger scenario. |
-| `type` | `string` | One of: `'namespace-skill'`, `'selection-skill'`, `'agent-skill'` | **New in v4.** Skill classification. See [Skill Types](#skill-types). |
+| `type` | `string` | One of: `'namespace'`, `'selection'`, `'agent'` | **New in v4.** Skill classification. See [Skill Types](#skill-types). |
 
 ### Optional Fields
 
@@ -143,19 +144,21 @@ The `export const skill` object contains all metadata and instructions for the s
 
 ### Skill Types (v4.0.0)
 
-The `type` field classifies the skill's intended scope:
+The `type` field classifies the skill's intended scope. Values follow Memo 022 REV-08 Kap. 5.1 — bare strings without `-skill` suffix.
 
-| Type | Description | Scope |
-|------|-------------|-------|
-| `'namespace-skill'` | General-purpose skill for any user of this namespace | Provider-level — available in any agent that includes this namespace |
-| `'selection-skill'` | Skill bound to a specific Selection (curated tool subset) | Selection-level — loaded as part of a Selection |
-| `'agent-skill'` | Agent-specific skill, tested with a specific LLM | Agent-level — only used within one agent manifest |
+| Type | Description | Location (file path) |
+|------|-------------|----------------------|
+| `'namespace'` | General-purpose skill for any user of this namespace | `providers/{namespace}/skills/{name}.mjs` |
+| `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
+| `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
+
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016 and Memo 022 REV-08).
 
 ### Field Details
 
 #### `name`
 
-The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and in `main.skills` entries. Only lowercase letters, numbers, and hyphens are allowed. The name must start with a letter.
+The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and as the key under which the skill is registered in `selection.skills` or `agent.skills` (or as the file basename in `providers/{ns}/skills/`). Only lowercase letters, numbers, and hyphens are allowed. The name must start with a letter.
 
 ```javascript
 // Valid
@@ -186,7 +189,7 @@ version: '1.0.0'               // missing prefix
 version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Why separate versioning: skill format changes (new fields, new placeholder types, new validation rules) happen independently of schema format changes. A skill at `flowmcp-skill/1.0.0` works with schemas at `3.0.0` or any future `3.x.x`. When the skill format changes in a breaking way, the version increments to `flowmcp-skill/2.0.0` — enabling validators to apply the correct rules and runtimes to support upgrade paths.
+Unified versioning in v4.0.0: per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. This replaces the v3 split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills). When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -317,7 +320,7 @@ The `content` field supports four placeholder types. Placeholders use the `{{typ
 |-------------|--------|-------------|---------|
 | Tool | `{{tool:name}}` | A tool in the same schema's `main.tools` | `{{tool:getContractAbi}}` |
 | Resource | `{{resource:name}}` | A resource in the same schema's `main.resources` | `{{resource:chainList}}` |
-| Skill | `{{skill:name}}` | Another skill in the same schema's `main.skills` | `{{skill:quick-check}}` |
+| Skill | `{{skill:name}}` | Another skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/` directory). `main.skills` is forbidden in v4.0.0. | `{{skill:quick-check}}` |
 | Input | `{{input:key}}` | An input parameter from the skill's `input` array | `{{input:address}}` |
 
 ### Placeholder Rules
@@ -326,7 +329,7 @@ The `content` field supports four placeholder types. Placeholders use the `{{typ
 
 2. **Resource placeholders** (`{{resource:name}}`) — the `name` must exist as a key in the same schema's `main.resources`. The validator checks this at load time (SKL006 via `requires.resources`). Every resource referenced via `{{resource:name}}` in content should be listed in `requires.resources`.
 
-3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a key in the same schema's `main.skills`. Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` must not itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
+3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a registered skill in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` must not itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
 
 4. **Input placeholders** (`{{input:key}}`) — the `key` must exist in the skill's own `input` array. The validator checks this at load time (SKL008).
 
@@ -361,70 +364,76 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ---
 
-## Schema Integration
+## Skill Registration (v4.0.0)
 
-Skills are declared in the `main` export of a schema file and loaded from separate `.mjs` files.
+Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016 and Memo 022 REV-08).
 
-### Declaration in `main.skills`
+### Three Registration Scopes
 
-The `main.skills` field is an optional object that maps skill names to file references:
+| Scope | Registered Via | File Location |
+|-------|----------------|---------------|
+| Namespace | Directory placement (no explicit registration) | `providers/{namespace}/skills/{skill-name}.mjs` |
+| Selection | `selection.skills` in `selections/{name}/selection.mjs` | `selections/{name}/skills/{skill-name}.mjs` |
+| Agent | `agent.skills` in `agents/{name}/agent.mjs` | `agents/{name}/skills/{skill-name}.mjs` |
+
+### Selection-Scoped Skill Registration
 
 ```javascript
-export const main = {
-    namespace: 'etherscan',
-    name: 'SmartContractExplorer',
-    description: 'Explore verified smart contracts on EVM-compatible chains',
-    version: '3.0.0',
-    root: 'https://api.etherscan.io',
-    tools: {
-        getContractAbi: { /* ... */ },
-        getSourceCode: { /* ... */ }
-    },
+// selections/evm-contract-research/selection.mjs
+export const selection = {
+    name: 'evm-contract-research',
+    version: '4.0.0',
+    // ...
     skills: {
-        'full-contract-audit': { file: './skills/full-contract-audit.mjs' },
-        'quick-summary': { file: './skills/quick-summary.mjs' }
+        'contract-deep-dive': { file: './skills/contract-deep-dive.mjs' }
     }
 }
 ```
 
-### `main.skills` Entry Fields
+### Agent-Scoped Skill Registration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| key (skill name) | `string` | Yes | Must match `^[a-z][a-z0-9-]{0,63}$`. Must match the `name` field inside the skill file. |
-| `file` | `string` | Yes | Relative path from the schema file to the skill `.mjs` file. Must end with `.mjs`. |
+```javascript
+// agents/crypto-auditor/agent.mjs
+export const agent = {
+    name: 'crypto-auditor',
+    version: 'flowmcp/4.0.0',
+    // ...
+    skills: {
+        'audit-report': { file: './skills/audit-report.mjs' }
+    }
+}
+```
 
-The key in `main.skills` must match the `name` field inside the referenced skill file. If they differ, the validator raises SKL003.
+### Namespace-Scoped Skill Discovery
 
-### File Organization
-
-Skills are stored in a `skills/` subdirectory relative to the schema file:
+Namespace-scoped skills are discovered by directory scan — no explicit registration object on the schema:
 
 ```
-etherscan/
-├── SmartContractExplorer.mjs
+providers/etherscan/
+├── tools/
+├── resources/
 └── skills/
     ├── full-contract-audit.mjs
     └── quick-summary.mjs
 ```
 
-The `file` path in `main.skills` is relative to the schema file location:
+### Registration Entry Fields (Selection / Agent)
 
-```javascript
-// Schema at: etherscan/SmartContractExplorer.mjs
-skills: {
-    'full-contract-audit': { file: './skills/full-contract-audit.mjs' }
-}
-// Resolves to: etherscan/skills/full-contract-audit.mjs
-```
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| key (skill name) | `string` | Yes | Must match `^[a-z][a-z0-9-]{0,63}$`. Must match the `name` field inside the skill file. Must NOT contain a `/` (see VAL110 Slash-Rule). |
+| `file` | `string` | Yes | Relative path from the parent manifest (selection.mjs or agent.mjs) to the skill `.mjs` file. Must end with `.mjs`. |
+
+If the key and the skill file's `name` field differ, the validator raises SKL003.
 
 ### MCP Registration
 
-Each skill is registered as an MCP prompt with the server. The fully qualified prompt name follows the pattern `namespace/schemaFile::skillName`:
+Each skill is registered as an MCP prompt with the server. The fully qualified prompt name follows the scope-aware pattern:
 
 ```
-etherscan/SmartContractExplorer::full-contract-audit
-etherscan/SmartContractExplorer::quick-summary
+etherscan/skill/full-contract-audit         (namespace-scoped)
+evm-contract-research/skill/contract-deep-dive (selection-scoped)
+crypto-auditor/skill/audit-report           (agent-scoped)
 ```
 
 The runtime maps skill fields to MCP prompt fields:
@@ -443,27 +452,27 @@ The runtime maps skill fields to MCP prompt fields:
 ### Format
 
 ```
-flowmcp-skill/1.0.0
+flowmcp/4.0.0
 ```
 
 The version string has two parts separated by `/`:
 
 | Part | Value | Description |
 |------|-------|-------------|
-| Prefix | `flowmcp-skill` | Fixed identifier for the skill format |
-| Version | `1.0.0` | Semver version of the skill specification |
+| Prefix | `flowmcp` | Unified FlowMCP specification identifier (shared across Schema, Selection, Agent, Skill, Prompt) |
+| Version | `4.0.0` | Semver version of the FlowMCP specification |
 
 ### Current Version
 
-The only valid version in this release is `flowmcp-skill/1.0.0`.
+The only valid version in this release is `flowmcp/4.0.0`. The legacy `flowmcp-skill/1.0.0` string from v3 is accepted with a deprecation warning during migration; new skills MUST use `flowmcp/4.0.0`.
 
-### Why Separate Versioning
+### Unified Versioning Rationale
 
-Skill format versioning is independent of schema format versioning (`3.x.x`) for three reasons:
+Per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
-1. **Independent evolution.** Skill fields, placeholder types, and validation rules change on a different cadence than schema fields. A new placeholder type does not require a schema version bump.
-2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A skill at `flowmcp-skill/1.0.0` is validated against the rules defined in this document. A future `flowmcp-skill/2.0.0` may add new required fields or placeholder types.
-3. **Upgrade paths.** When breaking changes are introduced, the version increment signals that existing skills need migration. Tools can detect the version and offer automated migration.
+1. **Single source of truth.** Schemas, Selections, Agents, Skills, and Prompts evolve as one specification. Mixing primitive versions inside one catalog is not supported.
+2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools should apply the new rules.
+3. **Upgrade paths.** A coordinated version bump signals that existing catalog content needs review and migration in lockstep.
 
 ---
 
@@ -477,7 +486,7 @@ These rules can be checked at load time by examining the skill file and the sche
 |------|----------|------|
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
-| SKL003 | error | `skill.name` must match the key in `main.skills` that references this file |
+| SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
 | SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'`. `'flowmcp-skill/1.0.0'` is accepted with a deprecation warning during migration. |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
@@ -490,9 +499,9 @@ These rules can be checked at load time by examining the skill file and the sche
 | SKL013 | error | `input[].type` must be one of: `string`, `number`, `boolean`, `enum` |
 | SKL014 | error | `input[].description` is required and must be a non-empty string |
 | SKL015 | error | `input[].required` must be a boolean |
-| SKL016 | error | `main.skills` entries: `file` must end with `.mjs` |
-| SKL017 | error | `main.skills` entries: referenced file must exist |
-| SKL018 | error | Maximum 4 skills per schema |
+| SKL016 | error | Skill registration entries (`selection.skills`, `agent.skills`): `file` must end with `.mjs` |
+| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file must exist |
+| SKL018 | error | Maximum 4 skills per registration scope (selection or agent) |
 
 ### Reference Rules (Cross-Validation)
 
@@ -502,7 +511,7 @@ These rules validate references between skills, tools, and resources within the 
 |------|----------|------|
 | SKL020 | warning | `{{tool:name}}` placeholder in content references a tool not listed in `requires.tools` |
 | SKL021 | warning | `{{resource:name}}` placeholder in content references a resource not listed in `requires.resources` |
-| SKL022 | error | `{{skill:name}}` placeholder references a skill not in `main.skills` |
+| SKL022 | error | `{{skill:name}}` placeholder references a skill not registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace). |
 | SKL023 | error | `{{skill:name}}` target skill must not itself contain `{{skill:...}}` placeholders (1 level deep only) |
 | SKL024 | warning | Entry in `requires.tools` is not referenced via `{{tool:...}}` in content |
 | SKL025 | warning | Entry in `requires.resources` is not referenced via `{{resource:...}}` in content |
@@ -729,7 +738,7 @@ SEC001 etherscan/skills/contract-audit.mjs: Forbidden pattern "import " found at
 
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
-| Max skills per schema | 4 | Keeps schemas focused. Skills that grow beyond 4 indicate the schema should be split. |
+| Max skills per registration scope | 4 | Keeps each Selection or Agent focused. Skills beyond 4 in one scope indicate the scope should be split. Namespace-scoped skills are bounded by directory contents, not by an explicit limit. |
 | Content must not be empty | Required | A skill without instructions has no purpose. |
 | Skill name max length | 64 characters | Prevents excessively long MCP prompt identifiers. |
 | Description max length | 1024 characters | Consistent with schema description limits. |
@@ -740,34 +749,37 @@ SEC001 etherscan/skills/contract-audit.mjs: Forbidden pattern "import " found at
 
 ## Loading
 
-Skills are loaded as part of the schema loading sequence defined in `01-schema-format.md`. The skill loading step occurs after the `main` block is validated and before tools are registered as MCP tools.
+Skills are loaded based on their registration scope. The pipeline collects skills from three sources: namespace `skills/` directories, `selection.skills` entries, and `agent.skills` entries. Each source uses the same per-file validation pipeline.
 
 ### Loading Sequence
 
 ```mermaid
 flowchart TD
-    A[Validate main block] --> B{main.skills exists?}
-    B -->|No| C[Skip skill loading]
-    B -->|Yes| D[Read each skill file as string]
+    A[Resolve active scope] --> B{Scope type?}
+    B -->|Namespace| C1[Scan providers/&#123;ns&#125;/skills/]
+    B -->|Selection| C2[Read selection.skills entries]
+    B -->|Agent| C3[Read agent.skills entries]
+    C1 --> D[Read each skill file as string]
+    C2 --> D
+    C3 --> D
     D --> E[Static security scan per file]
     E --> F["Dynamic import() per file"]
     F --> G[Extract skill export]
     G --> H[Validate skill fields]
-    H --> I[Validate requires.tools against main.tools]
-    I --> J[Validate requires.resources against main.resources]
+    H --> I[Validate requires.tools against catalog]
+    I --> J[Validate requires.resources against catalog]
     J --> K[Validate placeholders in content]
     K --> L[Check skill-to-skill depth limit]
     L --> M[Register as MCP prompts]
-    C --> N[Continue to tool registration]
-    M --> N
 ```
 
-The diagram shows how skill loading integrates into the existing schema loading pipeline. Skills are loaded after `main` validation and before tool registration.
+The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.0.0.
 
 ### Step-by-Step
 
-1. **Check `main.skills`** — if the field is absent or empty, skip skill loading entirely.
-2. **Read each skill file as string** — the raw source is read before any execution, same as schema files.
+1. **Resolve scope** — determine whether the active context is a namespace, a Selection, or an Agent.
+2. **Collect skill file paths** — from the namespace `skills/` directory, or from the parent manifest's `skills` field (Selection or Agent).
+3. **Read each skill file as string** — the raw source is read before any execution, same as schema files.
 3. **Static security scan** — the file string is scanned for forbidden patterns. If any match, the skill file is rejected.
 4. **Dynamic import** — the file is imported via `import()`.
 5. **Extract `skill` export** — the named `skill` export is read.
@@ -866,7 +878,8 @@ Produce a Markdown report with the following sections:
 
 export const skill = {
     name: 'full-contract-audit',
-    version: 'flowmcp-skill/1.0.0',
+    version: 'flowmcp/4.0.0',
+    type: 'namespace',
     description: 'Retrieve ABI and source code for a comprehensive smart contract audit report.',
     requires: {
         tools: [ 'getContractAbi', 'getSourceCode' ],

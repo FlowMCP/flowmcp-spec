@@ -282,7 +282,7 @@ The `type:` prefix determines what the placeholder references:
 |-------------|--------|-------------|---------|
 | Tool | `{{tool:name}}` | A tool in the same schema's `main.tools` | `{{tool:getContractAbi}}` |
 | Resource | `{{resource:name}}` | A resource in the same schema's `main.resources` | `{{resource:chainList}}` |
-| Skill | `{{skill:name}}` | Another skill in the same schema's `main.skills` | `{{skill:quick-check}}` |
+| Skill | `{{skill:name}}` | Another skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). `main.skills` is forbidden in v4.0.0. | `{{skill:quick-check}}` |
 | Input | `{{input:key}}` | An input parameter from the skill's `input` array | `{{input:address}}` |
 
 ### Tool References (`{{tool:name}}`)

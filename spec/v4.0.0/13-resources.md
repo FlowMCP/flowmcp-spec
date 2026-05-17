@@ -2,6 +2,8 @@
 
 Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
 
+> **v4.0.0 Naming Note (Spec-Breaking):** The previously named `freeQuery` auto-injected query has been renamed to `runSql`. In addition, `describeTables` is now auto-injected for AI-friendly schema discovery, and `getSchema` has been downgraded from MUST to OPTIONAL. No backward compatibility is provided — schemas that still reference the old `freeQuery` name will fail Auto-Inject. See PRD-009 / Memo 035.
+
 ---
 
 ## Purpose
@@ -78,7 +80,7 @@ flowchart TD
 | `origin` | `'global'`, `'project'`, or `'inline'` | Yes | Storage location. See [Origin System](#origin-system). |
 | `name` | `string` | Yes | Filename with extension. Must end with `.db`. Convention: `{namespace}-{descriptive-name}.db`. |
 | `description` | `string` | Yes | What this resource provides. Appears in resource discovery. |
-| `queries` | `object` | Yes | Query definitions. Must include `getSchema`. Maximum 7 schema-defined queries. |
+| `queries` | `object` | Yes | Query definitions. Maximum 7 schema-defined queries. `runSql` and `describeTables` are auto-injected by the runtime. |
 
 All fields are required. There are no defaults and no optional fields.
 
@@ -145,7 +147,7 @@ resources: {
                 ]
             }
         }
-        // freeQuery (SELECT only) is auto-injected by the runtime
+        // runSql + describeTables are auto-injected by the runtime
     }
 }
 ```
@@ -157,8 +159,9 @@ resources: {
 | **File changes** | Never — readonly flag on DB level |
 | **Allowed origins** | `global` (recommended) or `project` |
 | **Use case** | Reference data, lookups, open data |
-| **getSchema** | **MUST** — defined by schema author in `queries` |
-| **freeQuery** | Auto-injected by runtime (SELECT only) |
+| **getSchema** | **OPTIONAL** — prefer auto-injected describeTables |
+| **runSql** | Auto-injected by runtime (SELECT only) |
+| **describeTables** | Auto-injected by runtime (AI-friendly schema discovery) |
 
 ### Mode: `file-based`
 
@@ -222,7 +225,7 @@ resources: {
                 ]
             }
         }
-        // freeQuery (all statements) is auto-injected by the runtime
+        // runSql + describeTables are auto-injected by the runtime
     }
 }
 ```
@@ -234,9 +237,10 @@ resources: {
 | **File changes** | Yes — persistent on disk |
 | **Only allowed origin** | `project` |
 | **Use case** | Analysis results, agent memory, data collection |
-| **getSchema** | **MUST** — defined by schema author. CLI derives CREATE TABLE from return value. |
-| **freeQuery** | Auto-injected by runtime (all statements) |
-| **DB does not exist** | CLI creates DB based on getSchema |
+| **getSchema** | **OPTIONAL** — define only if CLI must bootstrap DB via CREATE TABLE |
+| **runSql** | Auto-injected by runtime (all statements) |
+| **describeTables** | Auto-injected by runtime (AI-friendly schema discovery) |
+| **DB does not exist** | CLI creates DB based on getSchema if defined, otherwise reports missing-DB warning |
 | **Backup** | Automatic `.bak` copy before first write per session |
 | **Concurrent writes** | Supported via WAL mode |
 
@@ -251,7 +255,9 @@ resources: {
 | Changes persistent | No | **Yes** |
 | Allowed origins | `global`, `project` | Only `project` |
 | DB must exist | Yes (warning if missing) | No (CLI creates via getSchema) |
-| getSchema | **MUST** (schema-defined) | **MUST** (schema-defined) |
+| getSchema | OPTIONAL (rarely needed) | OPTIONAL (only for CLI DB bootstrap) |
+| runSql | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| describeTables | Auto-injected (structured discovery) | Auto-injected (structured discovery) |
 | Backup | Not needed | `.bak` before first write |
 | Concurrent access | Yes (readonly) | Yes (WAL mode) |
 
@@ -351,21 +357,21 @@ The folder is always named `resources/` (not `data/`).
 
 ## Standard Queries
 
-### `getSchema` — MUST (Schema-Defined)
+### `getSchema` — OPTIONAL (Schema-Defined)
 
-`getSchema` is **required** for both modes. The schema author defines it in the `queries` object. It is NOT auto-injected — it must be explicitly written in the schema.
+Schema authors MAY define `getSchema` if they want to expose CREATE TABLE statements directly. For `in-memory` mode, `describeTables` provides AI-friendly structured discovery automatically (recommended). For `file-based` mode, `getSchema` is useful when CLI needs to construct the DB.
 
-**Why MUST for both modes:**
+**When to define `getSchema`:**
 
-- **In-memory:** The agent needs the DB structure to formulate meaningful queries via freeQuery
-- **File-based:** The CLI needs the structure to create the DB and tables when the file does not exist
+- `mode: 'file-based'`: Only when the CLI must create the database on first run. The CLI derives CREATE TABLE statements from the getSchema return value (table names, column names, column types).
+- `mode: 'in-memory'`: Almost never — `describeTables` is sufficient. Define `getSchema` only if a downstream consumer needs the CREATE TABLE text directly (e.g. dump/migration tooling).
 
-**getSchema and CREATE TABLE:** The CLI can derive CREATE TABLE statements from the getSchema return value (table names, column names, column types). No separate `createSchema` query is needed.
+**getSchema and CREATE TABLE:** When defined, the CLI can derive CREATE TABLE statements from the getSchema return value. No separate `createSchema` query is needed.
 
 ```javascript
 getSchema: {
     sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
-    description: 'Returns the database schema (tables and their CREATE statements)',
+    description: 'Returns CREATE TABLE statements for all tables (optional, for CLI bootstrap)',
     parameters: [],
     output: {
         mimeType: 'application/json',
@@ -386,9 +392,9 @@ getSchema: {
 }
 ```
 
-### `freeQuery` — Auto-Injected by Runtime
+### `runSql` — Auto-Injected by Runtime
 
-`freeQuery` is automatically added by the runtime. Schema authors do **not** define it manually.
+`runSql` is automatically added by the runtime. Schema authors do **not** define it manually. The SELECT-only enforcement for `in-memory` mode is unchanged — security comes from the `mode` field, not from the query name.
 
 | Aspect | in-memory | file-based |
 |--------|----------|-----------|
@@ -400,22 +406,68 @@ getSchema: {
 | DROP TABLE | No | Yes |
 | LIMIT default | 100 (max 1000) | 100 (max 1000) |
 
-For `in-memory`, the auto-injected freeQuery enforces SELECT-only via runtime checks. For `file-based`, all SQL statements are allowed.
+For `in-memory`, the auto-injected runSql enforces SELECT-only via runtime checks. For `file-based`, all SQL statements are allowed.
+
+### `describeTables` — Auto-Injected by Runtime
+
+`describeTables` is automatically added by the runtime alongside `runSql`. Schema authors do **not** define it manually. It returns the database structure as a flat row set, optimized for AI consumption (no CREATE TABLE parsing required).
+
+**Auto-Inject SQL:**
+
+```sql
+SELECT m.name as table_name, p.name as column, p.type
+FROM sqlite_master m JOIN pragma_table_info(m.name) p
+WHERE m.type = 'table'
+```
+
+**Return shape:**
+
+```javascript
+[
+    { table_name: 'pools', column: 'pool_address', type: 'TEXT' },
+    { table_name: 'pools', column: 'token0', type: 'TEXT' },
+    { table_name: 'pools', column: 'token1', type: 'TEXT' },
+    { table_name: 'tokens', column: 'symbol', type: 'TEXT' },
+    { table_name: 'tokens', column: 'decimals', type: 'INTEGER' }
+]
+```
+
+| Aspect | in-memory | file-based |
+|--------|----------|-----------|
+| Auto-injected | Yes | Yes |
+| Underlying SQL | `sqlite_master` JOIN `pragma_table_info` | identical |
+| Return format | Rows (table_name, column, type) | identical |
+| Use case | AI-friendly schema discovery | AI-friendly schema discovery |
+| Read-only safety | Yes (SQLite built-in metadata) | Yes (SQLite built-in metadata) |
+
+`describeTables` works in `readonly: true` mode because `sqlite_master` and `pragma_table_info` are read-only metadata functions baked into SQLite. They function identically with the `SQLITE_OPEN_READONLY` flag.
+
+**When to use `describeTables` vs `getSchema`:**
+
+| Aspect | `describeTables` (auto) | `getSchema` (optional, author-defined) |
+|--------|-----------------------|---------------------------------------|
+| Format | Structured rows | CREATE TABLE text |
+| Constraints (PRIMARY KEY, NOT NULL, FK) | Not included | Included |
+| AI-friendliness | High (immediate consumption) | Medium (regex parsing required) |
+| Use case | Default AI discovery | Author needs CREATE-text (e.g. CLI bootstraps file-based DB) |
+
+For `mode: 'in-memory'`, constraints are practically irrelevant — the agent only builds SELECTs. `describeTables` covers 100% of practical discovery use cases. For `mode: 'file-based'`, schema authors may still define `getSchema` if the CLI needs CREATE TABLE statements to bootstrap the database on first run.
 
 ### Query Limits
 
 | Type | Count |
 |------|-------|
-| Auto-injected | 1 (freeQuery) |
-| Schema-defined (including getSchema) | Max 7 |
-| **Total** | **Max 8** |
+| Auto-injected | 2 (runSql + describeTables) |
+| Schema-defined (getSchema is optional) | Max 7 |
+| **Total** | **Max 9** |
 
 ### Summary Table
 
 | Query | in-memory | file-based |
 |-------|----------|-----------|
-| `getSchema` | **MUST** (schema-defined) | **MUST** (schema-defined) |
-| `freeQuery` | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| `getSchema` | OPTIONAL (rarely needed) | OPTIONAL (only for CLI DB bootstrap) |
+| `runSql` | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| `describeTables` | Auto-injected (structured discovery) | Auto-injected (structured discovery) |
 | Domain queries | Schema-defined | Schema-defined |
 
 ---
@@ -450,7 +502,7 @@ All fields are required. There is no `mode` field (Markdown is always read-only)
 
 ### Parameter-Based Access
 
-Markdown resources support parameter-based access for large documents. The runtime auto-injects access functions similar to how it auto-injects `freeQuery` for SQLite resources.
+Markdown resources support parameter-based access for large documents. The runtime auto-injects access functions similar to how it auto-injects `runSql` for SQLite resources.
 
 ```mermaid
 flowchart LR
@@ -608,7 +660,7 @@ resources: {
 | Layer | What Happens |
 |-------|-------------|
 | DB opened with `readonly: true` | `better-sqlite3` enforces read-only at DB level |
-| Only SELECT in freeQuery | Runtime enforces SELECT-only |
+| Only SELECT in runSql | Runtime enforces SELECT-only |
 | File unchanged | No write operations possible at all |
 
 No block patterns needed. `better-sqlite3` with `readonly: true` prevents all write operations at the database level. This is more reliable than pattern-matching on SQL strings.
@@ -676,7 +728,7 @@ flowchart TD
 | CLI creates DB | Only when `source: 'sqlite'` + `mode: 'file-based'` + DB missing |
 | User confirmation | **Required** — CLI always asks |
 | Path | Always `project`: `.{base}/resources/{name}` |
-| getSchema | **MUST** for file-based — CLI derives table structure from it |
+| getSchema | OPTIONAL for file-based — required only when CLI must bootstrap the DB on first run (derives CREATE TABLE) |
 | Backup | `.bak` copy before first write (for existing DB) |
 
 ### Backup Strategy
@@ -779,7 +831,7 @@ For `in-memory` resources, only `SELECT` statements and `WITH` (CTE) expressions
 
 For resources where the AI client needs to write its own SQL queries (e.g., exploratory data analysis), the special placeholder `{{DYNAMIC_SQL}}` signals that the SQL comes from the user at runtime.
 
-This is used by the auto-injected `freeQuery`. Schema authors do not normally need to use `{{DYNAMIC_SQL}}` directly — it is documented here for completeness.
+This is used by the auto-injected `runSql`. Schema authors do not normally need to use `{{DYNAMIC_SQL}}` directly — it is documented here for completeness.
 
 #### `{{DYNAMIC_SQL}}` Rules
 
@@ -1015,7 +1067,7 @@ export const main = {
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
 | Max resources per schema | 2 | Keeps schemas focused. Resources should be tightly scoped to one data domain. |
-| Max schema-defined queries per resource | 7 | Including getSchema. Plus 1 auto-injected freeQuery = 8 total. |
+| Max schema-defined queries per resource | 7 | getSchema is optional. Plus 2 auto-injected (runSql + describeTables) = 9 total. |
 | Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
@@ -1024,7 +1076,7 @@ export const main = {
 | `source` value | `'sqlite'` or `'markdown'` | Only these two types are supported. |
 | `mode` value (sqlite only) | `'in-memory'` or `'file-based'` | Two explicit modes. |
 | `origin` value | `'global'`, `'project'`, or `'inline'` | Three storage locations. |
-| `freeQuery` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
+| `runSql` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
 | All fields | Required | No defaults, no optional fields. |
 
 ---
@@ -1077,7 +1129,7 @@ The following rules are enforced when validating resource definitions:
 | RES004 | error | `origin` is required and must be `'global'`, `'project'`, or `'inline'`. |
 | RES005 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
 | RES006 | error | Maximum 2 resources per schema. |
-| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (8 total with auto-injected freeQuery). |
+| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (9 total with auto-injected runSql + describeTables). |
 | RES008 | error | Each query must have a `sql` field of type string. |
 | RES009 | error | Each query must have a `description` field of type string. |
 | RES010 | error | Each query must have a `parameters` array. |
@@ -1094,7 +1146,7 @@ The following rules are enforced when validating resource definitions:
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values must pass the corresponding `z` validation. |
 | RES023 | error | Test objects must be JSON-serializable. |
-| RES024 | error | SQLite resources must include a `getSchema` query. |
+| RES024 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
 | RES025 | error | `mode: 'file-based'` requires `origin: 'project'`. |
 | RES026 | error | `source: 'markdown'` must not have a `mode` field. |
 | RES027 | error | `source: 'markdown'` must not have a `queries` field. |

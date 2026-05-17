@@ -71,6 +71,54 @@ Directory `selections/` is at root level, alongside `providers/` and `agents/`.
 | SEL002 | error | At least one array (tools/skills/resources/prompts) must be non-empty |
 | SEL003 | error | All referenced Primitive-IDs must be resolvable |
 
+## Selection as Test-Trigger
+
+A Selection-File can be used as a transitive test trigger via:
+
+```
+flowmcp dev test single <selection-file>
+```
+
+This:
+1. Loads the Selection.
+2. Resolves every member ID via the IdResolver (transitive).
+3. Recursively gathers tests from each member schema (Tools, Resources, Skills, Prompts).
+4. Executes all member tests and aggregates per-primitive PASS/FAIL counts.
+5. Reports an aggregate status: `M/N Members PASS`.
+
+**Important**: The Selection itself has no execution tests — it is a *grouping*. The test-trigger model uses Selections as **batch loaders** for transitive testing of their members.
+
+### Inline Skills
+
+When a Selection defines inline skills (`selection.skills[]` entries that are full Skill objects rather than ID references), each inline-skill is treated as a Skill-Test target:
+- Structural validation runs (placeholders resolvable, prefills declared)
+- The inline skill is then bound to the Selection's namespace for context
+
+### Output Format Example
+
+```
+┌─ Selection: defi-pools-toolkit
+│  ├─ SEL003: all member IDs resolvable  ✓
+│  │
+│  ├─ Tools (1)
+│  │   └─ dexscreener.searchPair        3/3 PASS
+│  │
+│  ├─ Resources (2)
+│  │   ├─ pools.searchPoolsByToken      3/3 PASS
+│  │   └─ tokens.getTokenBySymbol       3/3 PASS
+│  │
+│  └─ Skills (1)
+│      └─ analyze-token-pools
+│         ├─ Structural (Placeholder-Resolution)   ✓
+│         └─ Prefill executed (2 Resources)        ✓
+│
+└─ Selection Aggregat: 4/4 Members PASS
+```
+
+### New Validation Code: SEL004 (Inline-Skill Sanity)
+
+If a Selection includes inline-skill objects, the SelectionValidator additionally runs SkillValidator on each. This is recorded as SEL004 in the validation report. Optional — present only when inline skills exist.
+
 ## Runtime Behavior
 
 - If a referenced Primitive-ID is unresolvable, the Selection fails to load with a clear error message.

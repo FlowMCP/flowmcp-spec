@@ -1,0 +1,21 @@
+name: Notify Docs Site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'spec/v4.0.0/**'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger flowmcp.github.io rebuild
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: token ${{ secrets.DOCS_REPO_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Content-Type: application/json" \
+            https://api.github.com/repos/FlowMCP/flowmcp.github.io/dispatches \
+            -d '{"event_type":"spec-updated","client_payload":{"source":"flowmcp-spec","ref":"${{ github.ref }}","sha":"${{ github.sha }}"}}'
+          echo "Dispatch sent to flowmcp.github.io"

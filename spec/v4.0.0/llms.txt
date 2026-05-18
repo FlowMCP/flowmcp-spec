@@ -1,7 +1,7 @@
 # FlowMCP Specification v4.0.0
 > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
 >
-> This file concatenates all 21 specification documents into a single file for LLM consumption.
+> This file concatenates all 23 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 
 ## Table of Contents
@@ -24,10 +24,11 @@
 16. Catalog
 17. ID Schema
 18. Selections
-19. Prefill & Placeholders
+19. Prefill
 20. MCP Integration
 21. Validation Strategy
 22. Schema Lifecycle
+23. Scoring Protocol
 
 ---
 
@@ -38,7 +39,7 @@ FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Bas
 1. **CLI** — Direct access to Tools, Resources, Prompts, and Skills
 2. **MCP/A2A Server** — Agents and MCP clients can use FlowMCP as a server (compatible with OpenClaw)
 
-This document provides the conceptual foundation, positioning, terminology, and document index for the v3.0.0 specification.
+This document provides the conceptual foundation, positioning, terminology, and document index for the v4.0.0 specification.
 
 ---
 
@@ -71,11 +72,12 @@ flowchart TD
 
     C --> F[Prompts — Explanatory namespace descriptions]
     C --> G[Skills — Instructional multi-step workflows]
+    C --> I[Selections — Curated tool subsets for agent context]
 
     G --> H[Tool Combinatorics — How to chain tools across providers]
 ```
 
-FlowMCP provides **four primitives**: Tools, Resources, Prompts, and Skills. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
+FlowMCP provides **five primitives**: Tools, Resources, Prompts, Skills, and Selections. Tools, Resources, and Prompts are defined in `main.tools`, `main.resources`, and `main.prompts`. **Skills are a top-level entity** that lives outside `main` and is scoped to a namespace, selection, or agent — never `main.skills` (forbidden in v4.0.0, see Memo 022 REV-08 and VAL016). Selections are curated subsets that bundle tools/resources/prompts/skills for agent loading. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
 
 ---
 
@@ -89,6 +91,7 @@ Different primitives have different levels of validatability. FlowMCP embraces t
 | **Resources** | Completely | SQLite schema creation, query execution, parameter binding, result format |
 | **Prompts** | Partially | Tool references resolve, parameter syntax `{{type:name}}` is valid, `references` entries exist |
 | **Skills** | Partially | Placeholder syntax `{{type:name}}` is valid, `requires.tools` and `requires.resources` resolve, typed input/output structure |
+| **Selections** | Partially | Structure valid, all referenced Primitives resolvable (SEL001–SEL003) |
 | **Agents** | Partially | Manifest structure (`agent.mjs` with `export const agent`), tool references exist, `expectedTools` (deterministic), `expectedContent` (partially — LLM output varies) |
 
 This is a feature, not a limitation. Tools and Resources are the deterministic anchor. Prompts, Skills, and Agents build on that anchor but acknowledge that LLM behavior introduces variability.
@@ -173,9 +176,9 @@ flowchart TD
     end
 
     subgraph Providers
-        P1[etherscan/ — tools, resources, prompts]
-        P2[coingecko/ — tools, resources, prompts]
-        P3[defillama/ — tools, resources, prompts]
+        P1[etherscan/ — tools, resources, prompts, selections]
+        P2[coingecko/ — tools, resources, prompts, selections]
+        P3[defillama/ — tools, resources, prompts, selections]
     end
 
     subgraph Agents
@@ -227,7 +230,7 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Resource** | Local data access via SQLite databases (in-memory or file-based) and Markdown documents. Maps to the MCP `server.resource` primitive. Defined in `main.resources`. See `13-resources.md`. |
 | **Provider-Prompt** | A model-neutral prompt explaining a single namespace. Describes how to use one provider's tools effectively without assuming a specific LLM model. |
 | **Agent-Prompt** | A model-specific prompt tested against a specific LLM model. Contains tool combinatorics, chaining instructions, and fallback strategies. |
-| **Skill** | A self-contained instruction set for AI agents. Maps to the MCP `server.prompt` primitive. Defined as a `.mjs` file with `export const skill` containing typed metadata, input/output declarations, and Markdown instructions with `{{type:name}}` placeholders. Schema-scoped — references tools and resources within the same schema. See `14-skills.md`. |
+| **Skill** | A self-contained instruction set for AI agents. Maps to the MCP `server.prompt` primitive. Defined as a `.mjs` file with `export const skill` containing typed metadata (including `type: 'namespace' \| 'selection' \| 'agent'`), input/output declarations, and Markdown instructions with `{{type:name}}` placeholders. Lives in `providers/{ns}/skills/`, `selections/{name}/skills/`, or `agents/{name}/skills/` depending on `type`. **NOT defined under `main.skills`** (forbidden in v4.0.0). See `14-skills.md`. |
 | **Content Placeholder** | `{{type:name}}` syntax for dynamic content in prompts and skills. Types: `{{tool:name}}` references a tool, `{{resource:name}}` references a resource, `{{input:key}}` references an input parameter. Replaces the deprecated `[[...]]` syntax from earlier revisions. |
 | **Namespace** | Provider identifier, lowercase letters only (e.g. `etherscan`, `coingecko`). Groups schemas by data source. |
 | **Handler** | An async function returned by the `handlers` factory. Performs pre- or post-processing for a tool or resource query. Receives dependencies via injection. |
@@ -260,6 +263,11 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | `14-skills.md` | Skills | Skill `.mjs` format (`export const skill`), `{{type:name}}` placeholders, typed input/output, versioning, validation rules |
 | `15-catalog.md` | Catalog | Catalog manifest, registry.json, named catalogs, import flow |
 | `16-id-schema.md` | ID Schema | ID format `namespace/type/name`, short form, resolution rules |
+| `17-selections.md` | Selections | Curated tool subsets for agent loading — `whenToUse`, reference resolution, SEL validation rules |
+| `18-prefill.md` | Prefill | Pre-execute tools before delivering a Skill — prefill array, execution order, result injection |
+| `19-mcp-integration.md` | MCP Integration | `meta` block for Tools (isReadOnly, isConcurrencySafe, isDestructive, searchHint, aliases, alwaysLoad) |
+| `20-validation-strategy.md` | Validation Strategy | Validation pipeline, grade system, quality thresholds, CI integration |
+| `21-schema-lifecycle.md` | Schema Lifecycle | Six lifecycle stages, API-test special rule for static schemas, partial schema policy |
 
 ---
 
@@ -334,7 +342,7 @@ The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API kn
 
 - **Tools replace Routes** — `main.tools` is the primary key. `main.routes` is accepted as a deprecated alias with a warning (removed in v3.2.0). Schemas must not define both `tools` and `routes`.
 - **Resources** — Embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
-- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. Schema-scoped, maps to MCP `server.prompt` primitive. See `14-skills.md`.
+- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. In v3.0.0 Skills were schema-scoped via `main.skills`; in v4.0.0 they are namespace/selection/agent-scoped (see `14-skills.md` and Memo 022 REV-08).
 - **Groups renamed to Agents** — Groups evolve into full agent manifests (`agent.mjs` with `export const agent`) with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
 - **Prompt Architecture** — Two-tier prompt system: Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific, multi-provider workflows). Unified `{{type:name}}` placeholder syntax (replaces deprecated `[[...]]`). See `12-prompt-architecture.md`.
 - **Catalog with registry.json** — Named catalogs with a manifest file listing all providers, agents, and shared lists. Enables import and distribution. See `15-catalog.md`.
@@ -362,7 +370,7 @@ The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 
 ---
 
-# FlowMCP Specification v3.0.0 — Schema Format
+# FlowMCP Specification v4.0.0 — Schema Format
 
 This document defines the structure of a FlowMCP schema file, the two named exports (`main` and `handlers`), tool definitions, resource declarations, skill references, naming conventions, and constraints.
 
@@ -378,11 +386,10 @@ export const main = {
     namespace: 'provider',
     name: 'SchemaName',
     description: 'What this schema does',
-    version: '3.0.0',
+    version: '4.0.0',
     root: 'https://api.provider.com',
     tools: { /* ... */ },
-    resources: { /* optional, see 13-resources.md */ },
-    skills: { /* optional, see 14-skills.md */ }
+    resources: { /* optional, see 13-resources.md */ }
 }
 
 // 2. Factory function — receives injected dependencies, returns handler objects
@@ -408,7 +415,7 @@ export const main = {
     namespace: 'coingecko',
     name: 'SimplePrice',
     description: 'Get current price of coins in any supported currency',
-    version: '3.0.0',
+    version: '4.0.0',
     root: 'https://api.coingecko.com/api/v3',
     tools: { /* ... */ }
 }
@@ -430,10 +437,10 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `namespace` | `string` | Provider identifier, lowercase letters only (`/^[a-z]+$/`). Groups schemas by data source. |
+| `namespace` | `string` | Provider identifier, lowercase letters and hyphens (`/^[a-z][a-z0-9-]*$/`). Groups schemas by data source. |
 | `name` | `string` | Human-readable schema name in PascalCase (e.g. `SmartContractExplorer`). |
 | `description` | `string` | What this schema does, 1-2 sentences. Appears in tool discovery. |
-| `version` | `string` | Must match pattern `3.\d+.\d+` (semver, major must be `3`). Version `2.\d+.\d+` is accepted during migration. |
+| `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major must be `4`). Version `3.\d+.\d+` is accepted during migration. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
 
@@ -448,7 +455,7 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `headers` | `object` | `{}` | Default HTTP headers applied to all routes. Route-level headers override these. |
 | `sharedLists` | `object[]` | `[]` | Shared list references. See `03-shared-lists.md` for format. |
 | `resources` | `object` | `{}` | Resource definitions. Keys are resource names in camelCase. Maximum 2 resources. See `13-resources.md`. |
-| `skills` | `object` | `{}` | Skill references. Keys are skill names in lowercase-hyphen format. Maximum 4 skills. See `14-skills.md`. |
+| `meta` | `object` | — | **Required.** MCP integration metadata block for all tools. See `19-mcp-integration.md`. |
 
 ### Deprecated Fields
 
@@ -460,16 +467,17 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 
 #### `namespace`
 
-The namespace is the primary grouping mechanism. It identifies the API provider and is used in the fully qualified tool name (`namespace/schemaFile::routeName`). Only lowercase ASCII letters are allowed — no numbers, hyphens, or underscores.
+The namespace is the primary grouping mechanism. It identifies the API provider and is used in the fully qualified tool name (`namespace/schemaFile::routeName`). Lowercase ASCII letters, digits, and hyphens are allowed — no underscores or uppercase.
 
 ```javascript
 // Valid
 namespace: 'etherscan'
 namespace: 'coingecko'
 namespace: 'defillama'
+namespace: 'coingecko-com'
+namespace: 'etherscan-io'
 
 // Invalid
-namespace: 'defi-llama'    // hyphen not allowed
 namespace: 'CoinGecko'     // uppercase not allowed
 namespace: 'web3_data'     // underscore not allowed
 ```
@@ -671,10 +679,40 @@ export const handlers = ( { sharedLists, libraries } ) => {
 
 ### Handler Types
 
+| Handler | Purpose |
+|---------|---------|
+| `preRequest` | Transform request parameters before HTTP call |
+| `executeRequest` | Replace standard HTTP fetch entirely |
+| `postRequest` | Transform HTTP response after the call |
+
 | Handler | When | Input | Must Return |
 |---------|------|-------|-------------|
 | `preRequest` | Before the API call | `{ struct, payload }` | `{ struct, payload }` |
-| `postRequest` | After the API call | `{ response, struct, payload }` | `{ response }` |
+| `executeRequest` | Replaces the HTTP call entirely | `{ struct, payload }` | `{ response }` |
+| `postRequest` | After the API call (or after executeRequest) | `{ response, struct, payload }` | `{ response }` |
+
+#### `executeRequest` Semantics
+
+When `executeRequest` is defined for a tool, the runtime skips the standard HTTP fetch and calls the handler instead. The handler is responsible for producing a response. Common use cases include:
+
+- **XML/TRIAS APIs** that cannot be parsed with the standard JSON pipeline
+- **CSW/OGC endpoints** with non-standard response formats
+- **SQLite-backed schemas** that resolve queries locally without HTTP
+- **Composite calls** that must combine multiple upstream requests into one
+
+```javascript
+export const handlers = ( { sharedLists, libraries } ) => ({
+    getXmlData: {
+        executeRequest: async ( { struct, payload } ) => {
+            const { xml2js } = libraries
+            const rawResponse = await fetch( struct.url, { method: struct.method, headers: struct.headers } )
+            const text = await rawResponse.text()
+            const parsed = await xml2js.parseStringPromise( text )
+
+            return { response: parsed }
+        }
+    }
+})
 
 ### Handler Per-Call Parameters
 
@@ -712,7 +750,7 @@ Server parameters (`requiredServerParams`) are handled by the runtime during URL
 
 | Element | Convention | Pattern | Example |
 |---------|-----------|---------|---------|
-| Namespace | Lowercase letters only | `^[a-z]+$` | `etherscan`, `coingecko` |
+| Namespace | Lowercase letters, digits, hyphens | `^[a-z][a-z0-9-]*$` | `etherscan`, `coingecko`, `coingecko-com` |
 | Schema name | PascalCase | `^[A-Z][a-zA-Z0-9]*$` | `SmartContractExplorer` |
 | Schema filename | PascalCase `.mjs` | `^[A-Z][a-zA-Z0-9]*\.mjs$` | `SmartContractExplorer.mjs` |
 | Tool name | camelCase | `^[a-z][a-zA-Z0-9]*$` | `getContractAbi` |
@@ -730,10 +768,9 @@ Server parameters (`requiredServerParams`) are handled by the runtime during URL
 |------------|-------|-----------|
 | Max tools per schema | 8 | Keeps schemas focused. Split large APIs into multiple schemas. |
 | Max resources per schema | 2 | Keeps resource scope focused. See `13-resources.md`. |
-| Max skills per schema | 4 | Keeps skill count manageable. See `14-skills.md`. |
-| Version major | `3` | Must match `3.\d+.\d+`. Version `2.\d+.\d+` accepted during migration with warning. |
+| Version major | `4` | Must match `4.\d+.\d+`. Version `3.\d+.\d+` accepted during migration with warning. |
 | `tools` + `routes` simultaneously | Forbidden | A schema must use `tools` or `routes`, never both. Using both is a validation error. |
-| Namespace pattern | `^[a-z]+$` | Letters only. No numbers, hyphens, or underscores. |
+| Namespace pattern | `^[a-z][a-z0-9-]*$` | Lowercase letters, digits, hyphens. No underscores or uppercase. |
 | Tool name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, starts with lowercase letter. |
 | Root URL protocol | `https://` | HTTP is not allowed. All API calls go over TLS. |
 | Root URL requirement | Conditional | Required when `tools` are defined. Optional for resource-only or skill-only schemas. |
@@ -761,11 +798,7 @@ flowchart TD
     H -->|No| J[Direct API call mode]
     I --> K[Register tools as MCP tools]
     J --> K
-    K --> L{main.skills exists?}
-    L -->|Yes| M[Load and validate skill .mjs files]
-    L -->|No| N[Done]
-    M --> O[Register skills as MCP prompts]
-    O --> N
+    K --> N[Done]
 ```
 
 **Step-by-step:**
@@ -778,8 +811,7 @@ flowchart TD
 6. **Resolve `sharedLists`** — shared list references are resolved to data. Data is deep-frozen.
 7. **Load `requiredLibraries`** — each library is checked against the allowlist and loaded via `import()`. Unapproved libraries reject the schema.
 8. **Call `handlers()`** — if the `handlers` export exists, the factory function is called with `{ sharedLists, libraries }`. The returned handler objects are registered per tool (and per resource query, if applicable).
-9. **Register tools** — each tool is exposed as an MCP tool. Tools with handlers use pre/post processing; tools without handlers make direct API calls.
-10. **Load skills** — if `main.skills` is present, each referenced `.mjs` skill file is loaded via `import()`, validated, and registered as an MCP prompt. See `14-skills.md`.
+9. **Register tools** — each tool is exposed as an MCP tool. Tools with `executeRequest` handlers replace the HTTP call; tools with `preRequest`/`postRequest` handlers use pre/post processing; tools without handlers make direct API calls.
 
 ---
 
@@ -792,7 +824,7 @@ export const main = {
     namespace: 'etherscan',
     name: 'SmartContractExplorer',
     description: 'Explore verified smart contracts on EVM-compatible chains via Etherscan APIs',
-    version: '3.0.0',
+    version: '4.0.0',
     root: 'https://api.etherscan.io',
     docs: [
         'https://docs.etherscan.io/api-endpoints/contracts'
@@ -964,7 +996,7 @@ export const handlers = ( { sharedLists } ) => ({
 
 ---
 
-# FlowMCP Specification v3.0.0 — Parameters
+# FlowMCP Specification v4.0.0 — Parameters
 
 This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is validated (`z`). Resource parameters use the same `position` + `z` system but without a `location` field. Skill input uses a simpler format.
 
@@ -1248,7 +1280,7 @@ The `type:` prefix determines what the placeholder references:
 |-------------|--------|-------------|---------|
 | Tool | `{{tool:name}}` | A tool in the same schema's `main.tools` | `{{tool:getContractAbi}}` |
 | Resource | `{{resource:name}}` | A resource in the same schema's `main.resources` | `{{resource:chainList}}` |
-| Skill | `{{skill:name}}` | Another skill in the same schema's `main.skills` | `{{skill:quick-check}}` |
+| Skill | `{{skill:name}}` | Another skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). `main.skills` is forbidden in v4.0.0. | `{{skill:quick-check}}` |
 | Input | `{{input:key}}` | An input parameter from the skill's `input` array | `{{input:address}}` |
 
 ### Tool References (`{{tool:name}}`)
@@ -1345,6 +1377,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 | PH002 | error | Tool references (`{{tool:name}}`) must resolve to a tool in the same schema's `main.tools` |
 | PH003 | error | Input parameter keys (`{{input:key}}`) must match `^[a-zA-Z][a-zA-Z0-9]*$` and exist in the skill's `input` array |
 | PH004 | error | Prompt placeholders (`{{tool:...}}`, `{{resource:...}}`, `{{skill:...}}`, `{{input:...}}`) are only valid in prompt `content` fields, not in schema `main` blocks |
+| VAL107 | error | When enum values correspond to a Shared List, `{{listName:alias}}` MUST be used. Hardcoded enum values that duplicate a Shared List are forbidden. |
 
 #### Validation Examples
 
@@ -1591,7 +1624,7 @@ See `14-skills.md` for the complete skill specification.
 
 ---
 
-# FlowMCP Specification v2.0.0 — Shared Lists
+# FlowMCP Specification v4.0.0 — Shared Lists
 
 Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list. This document defines the list format, field definitions, dependency model, schema referencing, runtime injection, and validation rules.
 
@@ -1943,6 +1976,47 @@ At load-time, the runtime replaces `'{{evmChains:etherscanAlias}}'` with the arr
 
 ---
 
+## Alias-Mapping Pattern
+
+Shared Lists connect two worlds:
+- **User side**: readable aliases (e.g., `ethereum`, `polygon`, `bsc`)
+- **Provider side**: API-specific field values (e.g., `eth`, `0x89`, `56`)
+
+Schemas use Shared Lists not just for validation, but as a mapping layer:
+
+```javascript
+// Schema parameter (user side):
+{ name: 'chain', type: 'string', enum: '{{evmChains:alias}}' }
+
+// Handler (provider side):
+preRequest: ({ struct, payload }) => {
+    const chain = payload.userParams.chain
+    const moralisSlug = struct.sharedLists.evmChains.find(e => e.alias === chain)?.moralisChainSlug
+
+    return { ...payload, builtPayload: { chain: moralisSlug } }
+}
+```
+
+**Important:** Schemas that hardcode enums instead of using Shared Lists with handler mapping fail at VAL107 (Error). The Alias-Mapping Pattern is the correct implementation.
+
+### Why This Pattern Matters
+
+Without Alias-Mapping, every provider maintains its own chain list with provider-specific values. An LLM using multiple providers must know that `ethereum` for CoinGecko means `eth` for Moralis, `ETH` for Etherscan, and `Ethereum` for DeFi Llama. This knowledge cannot be embedded reliably in tool descriptions.
+
+With Alias-Mapping, every provider exposes the same canonical user-side alias (`ethereum`). The handler maps it to the provider-specific value at call time. The LLM only needs to know one alias per chain.
+
+### Canonical Alias Convention
+
+The `alias` field in a Shared List entry is the **canonical user-side value**. It is:
+
+- Lowercase
+- Human-readable (not a chain ID number)
+- Stable across Shared List versions (never renamed without a major version bump)
+
+All schemas in the community catalog MUST use the `alias` field as the user-facing enum value when referencing EVM chains.
+
+---
+
 ## Reverse-Lookup Index
 
 The core runtime builds a reverse index that maps each list and field combination to the schemas that reference it. This enables impact analysis when a list is updated.
@@ -2093,7 +2167,7 @@ Each `.mjs` file contains exactly one shared list. Combining multiple lists in a
 
 ---
 
-# FlowMCP Specification v2.0.0 — Output Schema
+# FlowMCP Specification v4.0.0 — Output Schema
 
 Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output declaration format, supported types, the response envelope, handler interaction, and validation rules.
 
@@ -2598,7 +2672,7 @@ The diagram shows the non-blocking validation flow: mismatches produce warnings 
 
 ---
 
-# FlowMCP Specification v2.0.0 — Security Model
+# FlowMCP Specification v4.0.0 — Security Model
 
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.
 
@@ -2932,7 +3006,7 @@ All violations in a single file are reported together (the scan does not stop at
 
 ---
 
-# FlowMCP Specification v3.0.0 — Agents
+# FlowMCP Specification v4.0.0 — Agents
 
 An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, prompts, skills, and optional resources. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
 
@@ -2976,7 +3050,7 @@ Each agent is defined by an `agent.mjs` file inside its own directory under `age
 export const agent = {
     name: 'crypto-research',
     description: 'Cross-provider crypto analysis agent',
-    version: 'flowmcp/3.0.0',
+    version: 'flowmcp/4.0.0',
     model: 'anthropic/claude-sonnet-4-5-20250929',
     systemPrompt: 'You are a crypto research agent. You analyze token prices, on-chain data, and DeFi protocol metrics. Always provide sources for your data. When comparing across chains, normalize values to USD.',
     tools: {
@@ -3035,7 +3109,7 @@ export const agent = {
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | Agent name. Must match `^[a-z][a-z0-9-]*$`. Must match the agent directory name. |
 | `description` | `string` | Yes | Human-readable description of the agent's purpose. |
-| `version` | `string` | Yes | Must be `flowmcp/3.0.0`. Declares which spec version this agent conforms to. |
+| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4). |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
 | `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
@@ -3047,6 +3121,8 @@ export const agent = {
 | `resources` | `object` | No | Own resources (SQLite databases). Keys with `/` are external provider-resource references (value must be `null`). Keys without `/` are inline resource definitions. See [Slash Rule](#slash-rule). |
 | `sharedLists` | `string[]` | No | Names of shared lists the agent needs. Resolved from the catalog's `_lists/` directory. |
 | `inputSchema` | `object` | No | JSON Schema defining the agent's input format. |
+| `selections` | `string[]` | No | Selection IDs to load when the agent starts. All referenced Selections must be resolvable. See [Selections](#selections). |
+| `elicitation` | `object` | No | MCP Elicitation configuration. See [Elicitation](#elicitation). |
 
 ### Field Details
 
@@ -3067,9 +3143,10 @@ crypto research          <- INVALID (space)
 The version field uses the format `flowmcp/X.Y.Z` (not semver of the agent itself). It declares which FlowMCP specification the manifest conforms to. This allows the runtime to apply the correct validation rules.
 
 ```
-flowmcp/3.0.0            <- valid
-3.0.0                    <- INVALID (missing flowmcp/ prefix)
-flowmcp/2.0.0            <- INVALID (agents are a v3 concept)
+flowmcp/4.0.0            <- valid (current spec)
+flowmcp/3.0.0            <- DEPRECATED (v3 agent, accepted with warning during migration)
+4.0.0                    <- INVALID (missing flowmcp/ prefix)
+flowmcp/2.0.0            <- INVALID (agents are a v3+ concept)
 ```
 
 #### `model`
@@ -3702,11 +3779,105 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
 10. **Load resources** — initialize agent-owned resources (SQLite databases) from `agent.resources`
 11. **Load prompts** — import prompt files from `main.prompts`, each must export `export const content`
-12. **Load skills** — import skill files from `main.skills`, each must export `export const skill`
+12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each must export `export const skill`. `main.skills` is forbidden in v4.0.0.
 13. **Register tools** — expose the agent's tools via MCP `server.tool`
 14. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
 15. **Register skills** — expose the agent's skills via MCP `server.prompt`
 16. **Register resources** — expose the agent's resources via MCP `server.resource`
+
+---
+
+## Selections
+
+The `agent.selections` field is an array of Selection IDs. When an agent loads, all referenced Selections are automatically loaded alongside the agent's tools and prompts.
+
+```javascript
+export const agent = {
+    name: 'evm-researcher',
+    // ... other fields ...
+    selections: [
+        'evm-research/selection/contract-analysis',
+        'defi-research/selection/tvl-monitor'
+    ]
+}
+```
+
+### Selection Loading Behavior
+
+- Each Selection ID must follow the `namespace/selection/name` format (see `17-selections.md`)
+- Selections are loaded at agent startup as part of the activation sequence
+- If a referenced Selection cannot be loaded (missing file, resolution error), agent startup fails with validation rule AGT030
+
+### Validation Rule
+
+**AGT030:** All IDs in `agent.selections` must be resolvable Selection IDs. An unresolvable Selection causes agent startup to fail with a clear error identifying which Selection could not be loaded.
+
+---
+
+## Elicitation
+
+Elicitation enables an agent to request additional input from the user during a conversation using the MCP Elicitation Protocol. The `agent.elicitation` field configures this behavior.
+
+```javascript
+export const agent = {
+    name: 'wallet-analyzer',
+    // ... other fields ...
+    elicitation: {
+        enabled: true,
+        maxRounds: 3,
+        requestedSchemas: [
+            {
+                message: 'Please provide your wallet address:',
+                requestedSchema: {
+                    type: 'object',
+                    properties: {
+                        address: {
+                            type: 'string',
+                            title: 'Wallet Address',
+                            description: 'Ethereum address (0x-prefixed, 42 chars)'
+                        }
+                    },
+                    required: [ 'address' ]
+                }
+            }
+        ]
+    }
+}
+```
+
+### MCP Elicitation Protocol
+
+Elicitation uses the MCP `elicitation/create` method to request input from the user through the MCP client:
+
+| Step | Direction | Payload |
+|------|-----------|---------|
+| 1. Request | Server → Client | `{ message: string, requestedSchema: JSONSchema }` |
+| 2. Response | Client → Server | `{ action: 'accept' \| 'decline' \| 'cancel', content: { ... } }` |
+
+**`requestedSchema` restrictions:** Only restricted JSON Schema is allowed — top-level properties only, no nesting beyond one level. Arrays and deeply nested objects are not permitted in the elicitation schema.
+
+**Client actions:**
+- `accept` — user provided the requested data; `content` contains the values
+- `decline` — user explicitly refused to provide the data
+- `cancel` — user cancelled the entire operation
+
+### Elicitation Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `enabled` | `boolean` | Yes | Whether elicitation is active for this agent |
+| `maxRounds` | `number` | Yes | Maximum number of elicitation rounds per conversation. Must be a positive integer (≥ 1). |
+| `requestedSchemas` | `array` | No | Pre-defined elicitation request templates the agent may use |
+
+### FlowMCP Policy
+
+The `maxRounds` field limits how many times the agent can request user input in a single conversation. After the limit is reached, the agent decides autonomously based on available information — it does not wait for additional user input.
+
+This prevents infinite elicitation loops and ensures that agents remain responsive even when users are unavailable.
+
+### Validation Rules
+
+**AGT031:** `elicitation.maxRounds` must be a positive integer (value ≥ 1). Zero, negative values, and non-integers are rejected.
 
 ---
 
@@ -3717,7 +3888,7 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 | AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
 | AGT002 | error | `description` is required, must be a non-empty string |
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
-| AGT004 | error | `version` must be `flowmcp/3.0.0` |
+| AGT004 | error | `version` must be `flowmcp/4.0.0` |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools` is required, must be a non-empty object |
 | AGT007 | error | Each tool key containing `/` must be a valid ID format (`namespace/type/name`) and its value must be `null` |
@@ -3743,7 +3914,7 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 
 **AGT003** — The model field uses OpenRouter syntax where the `/` separates the provider from the model name. A model string without `/` cannot be routed to any provider. Examples: `anthropic/claude-sonnet-4-5-20250929`, `openai/gpt-4o`.
 
-**AGT004** — The version must be exactly `flowmcp/3.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to.
+**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4 — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string). The legacy `flowmcp/3.0.0` is accepted with a deprecation warning during migration.
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 
@@ -3789,7 +3960,7 @@ flowmcp validate-agent agents/crypto-research/
   AGT001  pass    name "crypto-research" matches pattern
   AGT002  pass    description is non-empty
   AGT003  pass    model "anthropic/claude-sonnet-4-5-20250929" contains /
-  AGT004  pass    version is flowmcp/3.0.0
+  AGT004  pass    version is flowmcp/4.0.0
   AGT005  pass    systemPrompt is non-empty
   AGT006  pass    tools{} has 5 entries
   AGT007  pass    all external tool keys are valid IDs with null values
@@ -3836,7 +4007,7 @@ agents/
 export const agent = {
     name: 'crypto-research',
     description: 'Cross-provider crypto analysis agent combining price data, on-chain analytics, and DeFi protocol metrics for comprehensive token and portfolio research',
-    version: 'flowmcp/3.0.0',
+    version: 'flowmcp/4.0.0',
     model: 'anthropic/claude-sonnet-4-5-20250929',
     systemPrompt: 'You are a crypto research agent specializing in token analysis, wallet forensics, and DeFi protocol comparison. Follow these guidelines:\n\n1. Always cite which data source provided each piece of information.\n2. When comparing metrics across chains, normalize values to USD.\n3. Present comparative data in tables when three or more items are compared.\n4. If data is unavailable for a requested chain or token, state this explicitly rather than guessing.\n5. For wallet analysis, always check both token balances and current prices to show USD values.',
     tools: {
@@ -3893,7 +4064,7 @@ export const agent = {
 
 ---
 
-# FlowMCP Specification v2.0.0 — MCP Tasks
+# FlowMCP Specification v4.0.0 — MCP Tasks
 
 ## Status
 
@@ -3927,7 +4098,7 @@ Schema authors may include an `async` field in route definitions for forward com
 
 ---
 
-# FlowMCP Specification v3.0.0 — Migration Guide
+# FlowMCP Specification v4.0.0 — Migration Guide
 
 This guide covers migrating schemas between FlowMCP versions. Section 1 covers v2.0.0 to v3.0.0 migration. Section 2 preserves the v1.2.0 to v2.0.0 guide for reference.
 
@@ -4184,7 +4355,79 @@ Per agent:
 
 ---
 
-## Section 2: v1.2.0 to v2.0.0
+## Section 2: v3.0.0 to v4.0.0
+
+The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every Tool and removing `main.skills`. There is no automatic migration command — the changes require domain knowledge about each tool.
+
+### What Changes
+
+| Step | What | How |
+|------|------|-----|
+| 1 | Remove `main.skills` | Move skills into a Selection or Agent Manifest |
+| 2 | Add meta block per Tool | Set all 6 fields explicitly, `alwaysLoad: false` as default |
+| 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
+| 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
+| 5 | Validate | `flowmcp validate` → PASS |
+| 6 | API-Test | `flowmcp test single` → min. 1 response |
+
+### Breaking Changes
+
+- `main.skills` removal is a hard breaking change (no deprecation). Skills must be referenced via Selections or Agent Manifests.
+- `meta` block is required for every Tool (VAL100–VAL106). Missing `meta` is a validation error.
+
+### Why No Automatic Migration
+
+The v3→v4 migration is more complex than v2→v3. Adding `meta` blocks requires domain knowledge about each tool (Is it read-only? Is it safe to call concurrently? What are good search keywords?). An automatic migration would generate incorrect defaults. Therefore: manual process guided by this document.
+
+### Example: Before and After
+
+**Before (v3.0.0):**
+
+```javascript
+export const schema = {
+    main: {
+        namespace: 'etherscan-io',
+        name: 'contracts',
+        version: '3.0.0'
+    },
+    tools: {
+        getAbi: {
+            description: 'Get contract ABI',
+            parameters: { address: { type: 'string', description: 'Contract address' } }
+        }
+    }
+}
+```
+
+**After (v4.0.0):**
+
+```javascript
+export const schema = {
+    main: {
+        namespace: 'etherscan-io',
+        name: 'contracts',
+        version: '4.0.0'
+    },
+    tools: {
+        getAbi: {
+            description: 'Get contract ABI',
+            parameters: { address: { type: 'string', description: 'Contract address' } },
+            meta: {
+                isReadOnly: true,
+                isConcurrencySafe: true,
+                isDestructive: false,
+                searchHint: 'contract ABI ethereum smart contract',
+                aliases: [ 'getContractAbi' ],
+                alwaysLoad: false
+            }
+        }
+    }
+}
+```
+
+---
+
+## Section 3: v1.2.0 to v2.0.0
 
 This section preserves the original v1.2.0 to v2.0.0 migration guide. The FlowMCP core v2.0.0 supported both formats during a transition period. Legacy v1.2.0 format is no longer supported in v3.0.0.
 
@@ -4449,9 +4692,11 @@ Per schema:
 
 ---
 
-# FlowMCP Specification v3.0.0 — Validation Rules
+# FlowMCP Specification v4.0.0 — Validation Rules
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
+
+This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream memos (e.g. Memo 026 Validation Strategy) reference this registry but do not redefine codes.
 
 ---
 
@@ -4482,12 +4727,12 @@ This document defines all validation rules enforced by `flowmcp validate`. Each 
 | Code | Severity | Rule |
 |------|----------|------|
 | VAL010 | error | `main.namespace` is required and must be a string |
-| VAL011 | error | `main.namespace` must match `^[a-z]+$` |
+| VAL011 | error | `main.namespace` must match `^[a-z][a-z0-9-]*$` |
 | VAL012 | error | `main.name` is required and must be a string |
 | VAL013 | error | `main.description` is required and must be a string |
-| VAL014 | error | `main.version` is required and must match `^3\.\d+\.\d+$` (version `^2\.\d+\.\d+$` accepted with deprecation warning) |
+| VAL014 | error | `main.version` is required and must match `^4\.\d+\.\d+$` (version `^3\.\d+\.\d+$` accepted with deprecation warning) |
 | VAL015 | error | `main.root` is required when `main.tools` is non-empty. Optional for resource-only or skill-only schemas. |
-| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` or `main.skills` is defined. |
+| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` is defined. `main.skills` is forbidden in v4.0.0 — skills are namespace-, selection-, or agent-scoped (see `14-skills.md`). |
 | VAL017 | error | Schema must not define both `main.tools` and `main.routes` simultaneously |
 | VAL018 | warning | `main.routes` is deprecated. Use `main.tools` instead. |
 
@@ -4570,7 +4815,7 @@ This document defines all validation rules enforced by `flowmcp validate`. Each 
 
 | Code | Severity | Rule |
 |------|----------|------|
-| RES001 | error | `source` must be `'sqlite'`. No other values are accepted. |
+| RES001 | error | `source` must be one of `'sqlite'`, `'markdown'`, or `'http'`. Other values are not accepted. See `13-resources.md` for the semantics of each source type. |
 | RES002 | error | `description` must be a non-empty string. |
 | RES003 | error | `database` must be a relative path ending with `.db`. |
 | RES004 | error | `database` path must not contain `..` segments. |
@@ -4606,8 +4851,8 @@ See `13-resources.md` for the complete resource specification.
 |------|----------|------|
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
-| SKL003 | error | `skill.name` must match the key in `main.skills` that references this file |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp-skill/1.0.0'` |
+| SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
+| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version per Memo 022 REV-08). |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
@@ -4619,9 +4864,9 @@ See `13-resources.md` for the complete resource specification.
 | SKL013 | error | `input[].type` must be one of: `string`, `number`, `boolean`, `enum` |
 | SKL014 | error | `input[].description` is required and must be a non-empty string |
 | SKL015 | error | `input[].required` must be a boolean |
-| SKL016 | error | `main.skills` entries: `file` must end with `.mjs` |
-| SKL017 | error | `main.skills` entries: referenced file must exist |
-| SKL018 | error | Maximum 4 skills per schema |
+| SKL016 | error | Skill registration entries (`selection.skills`, `agent.skills`): `file` must end with `.mjs` |
+| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file must exist |
+| SKL018 | error | Maximum 4 skills per registration scope (selection or agent) |
 
 ### Reference Rules (Cross-Validation)
 
@@ -4629,7 +4874,7 @@ See `13-resources.md` for the complete resource specification.
 |------|----------|------|
 | SKL020 | warning | `{{tool:name}}` placeholder in content references a tool not listed in `requires.tools` |
 | SKL021 | warning | `{{resource:name}}` placeholder in content references a resource not listed in `requires.resources` |
-| SKL022 | error | `{{skill:name}}` placeholder references a skill not in `main.skills` |
+| SKL022 | error | `{{skill:name}}` placeholder references a skill not registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace). |
 | SKL023 | error | `{{skill:name}}` target skill must not itself contain `{{skill:...}}` placeholders (1 level deep only) |
 | SKL024 | warning | Entry in `requires.tools` is not referenced via `{{tool:...}}` in content |
 | SKL025 | warning | Entry in `requires.resources` is not referenced via `{{resource:...}}` in content |
@@ -4692,7 +4937,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
 | AGT002 | error | `description` is required, must be a non-empty string |
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
-| AGT004 | error | `version` must be `flowmcp/3.0.0` |
+| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version per Memo 022 REV-08). |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools[]` is required, must be a non-empty array |
 | AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
@@ -4702,13 +4947,62 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
 | AGT012 | warning | Tests should cover different tool combinations |
 | AGT013 | error | `prompts` (if present) must be an Object (not Array) |
-| AGT014 | error | `skills` (if present) must be an Object (not Array) |
+| AGT014 | error | `agent.skills` (if present) must be an Object (not Array). Keys must NOT contain `/` (inline form), values are `{ file }` objects pointing to `agents/{name}/skills/*.mjs`. See VAL110 and `06-agents.md`. |
 | AGT015 | error | `resources` (if present) must be an Object (not Array) |
 | AGT016 | error | Referenced prompt/skill files must exist and be `.mjs` files |
 | AGT017 | error | Prompt files must have `export const prompt` (with `content` or `contentFile`) |
 | AGT018 | error | Skill files must have `export const skill` (with `name`, `version`, `content`/`contentFile`, `requires`, `input`, `output`) |
 
 See `06-agents.md` for the complete agent specification.
+
+---
+
+## MCP Integration Meta Rules (v4.0.0)
+
+| Code | Severity | Rule |
+|------|----------|------|
+| VAL100 | error | Every Tool MUST have a `meta` block |
+| VAL101 | error | `meta.isReadOnly` is required and must be a boolean |
+| VAL102 | error | `meta.isConcurrencySafe` is required and must be a boolean |
+| VAL103 | error | `meta.isDestructive` is required and must be a boolean |
+| VAL104 | error | `meta.searchHint` is required and must be a non-empty string |
+| VAL105 | error | `meta.aliases` is required and must be a string array |
+| VAL106 | error | `meta.alwaysLoad` is required and must be a boolean |
+| VAL107 | error | When enum values correspond to a Shared List, `{{listName:alias}}` MUST be used. Hardcoded enum values that duplicate a Shared List are forbidden. |
+| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See Memo 022 REV-08 Kap. 3.3 and `17-selections.md` for the full slash-rule matrix. |
+
+See `19-mcp-integration.md` for the complete meta block specification.
+
+---
+
+## Selection Validation Rules (v4.0.0)
+
+| Code | Severity | Rule |
+|------|----------|------|
+| SEL001 | error | `selection.whenToUse` is required and must be a non-empty string |
+| SEL002 | error | A Selection must reference at least 1 Primitive (tool, resource, prompt, or skill) |
+| SEL003 | error | All Primitive references in a Selection must be resolvable within the catalog |
+
+See `17-selections.md` for the complete Selection specification.
+
+---
+
+## Extended Agent Validation Rules (v4.0.0)
+
+| Code | Severity | Rule |
+|------|----------|------|
+| AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs |
+| AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) |
+
+---
+
+## HTTP Resource Validation Rules (v4.0.0)
+
+| Code | Severity | Rule |
+|------|----------|------|
+| RES024 | error | `source: 'http'` requires a `url` field. The URL must use HTTPS. |
+
+See `13-resources.md` for the complete HTTP resource specification.
 
 ---
 
@@ -4804,7 +5098,7 @@ The CLI displays results grouped by severity with the rule code, severity, locat
 ```
 flowmcp validate etherscan/contracts.mjs
 
-  VAL014 error   main.version: Must match ^3\.\d+\.\d+$ (found "1.2.0")
+  VAL014 error   main.version: Must match ^4\.\d+\.\d+$ (found "1.2.0")
   VAL031 error   tools: Maximum 8 tools exceeded (found 10)
   VAL036 warning getContractAbi: output schema is recommended
   TST001 warning getContractAbi: No tests found
@@ -4836,7 +5130,7 @@ flowmcp validate --security etherscan/contracts.mjs
 
 ---
 
-# FlowMCP Specification v3.0.0 — Tests
+# FlowMCP Specification v4.0.0 — Tests
 
 Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
 
@@ -5426,6 +5720,70 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
+## Skill Tests (v4.0.0)
+
+Skills have two test types: structural and one-shot.
+
+### Primitive Test Overview
+
+| Primitive | Test Type | Minimum Count |
+|-----------|-----------|---------------|
+| Tools | Structural + API | 3 per tool |
+| Resources | Structural + Query | 3 per query |
+| Skills | Structural + One-Shot | 1 + 1 |
+| Agents | End-to-End | 3 |
+
+### Structural Test for Skills
+
+The structural test validates that all internal references in the skill are resolvable:
+
+- All `{{tool:name}}` references exist in `main.tools`
+- All `{{resource:name}}` references exist in `main.resources`
+- All `{{input:key}}` placeholders match the skill's `input` array
+- No unresolvable `{{skill:name}}` references
+
+This test is deterministic and runs during `flowmcp validate`.
+
+### One-Shot Test for Skills
+
+A Skill passes the **One-Shot Test** when an AI agent can execute the complete workflow described in the skill's `content` field without requiring additional ToolSearch roundtrips for disambiguation.
+
+**Definition:** The One-Shot Test is a probabilistic (LLM-eval) test. The skill is delivered to an AI agent as an MCP prompt. The agent executes it. If the agent can complete the workflow in one pass — calling the correct tools in the correct order, with correct parameters — the skill passes.
+
+**Empirical basis:** Testing in Memo 021 (Harness CLI, March 2026) showed:
+
+| Skill Type | 5-Run Success Rate |
+|------------|-------------------|
+| Enriched Skills (with embedded tool descriptions, parameter tables, example calls) | 5/5 (100%) |
+| Bare Skills (tool name only, no embedded metadata) | 0/5 (0%) |
+
+This demonstrates that One-Shot performance is directly correlated with information density in the skill's `content` field. A skill that only names tools without embedding their parameters forces the agent into a ToolSearch roundtrip and breaks the one-shot constraint.
+
+**Test format:**
+
+```javascript
+// Structural test: deterministic
+// 1. Validate all references resolve
+// 2. Run: flowmcp validate providers/{namespace}/skills/skill-name.mjs
+
+// One-Shot test: probabilistic (LLM-eval)
+// 1. Load skill as MCP prompt
+// 2. Send to agent with a representative input
+// 3. Evaluate: did the agent complete the workflow in one pass?
+// 4. Repeat 3-5 times, require ≥ 4/5 success rate for PASS
+```
+
+**Implication for skill authoring:** Skills MUST be self-contained. Each skill's `content` must embed:
+
+- Parameter tables for every referenced tool
+- Allowed enum values for enum parameters
+- Example tool calls with placeholder values
+- Expected output format
+
+See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
+
+---
+
 ## Validation Rules
 
 | Code | Severity | Rule |
@@ -5446,7 +5804,7 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
-# FlowMCP Specification v2.0.0 — Preload & Caching
+# FlowMCP Specification v4.0.0 — Preload & Caching
 
 This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime may cache the response locally.
 
@@ -5651,7 +6009,7 @@ The output schema (`04-output-schema.md`) describes the response shape regardles
 
 ---
 
-# FlowMCP Specification v3.0.0 — Prompt Architecture
+# FlowMCP Specification v4.0.0 — Prompt Architecture
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
@@ -6558,9 +6916,11 @@ agents/
 
 ---
 
-# FlowMCP Specification v3.0.0 — Resources
+# FlowMCP Specification v4.0.0 — Resources
 
 Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
+
+> **v4.0.0 Naming Note (Spec-Breaking):** The previously named `freeQuery` auto-injected query has been renamed to `runSql`. In addition, `describeTables` is now auto-injected for AI-friendly schema discovery, and `getSchema` has been downgraded from MUST to OPTIONAL. No backward compatibility is provided — schemas that still reference the old `freeQuery` name will fail Auto-Inject. See PRD-009 / Memo 035.
 
 ---
 
@@ -6606,6 +6966,7 @@ FlowMCP supports two resource types, identified by the `source` field:
 flowchart TD
     R[main.resources] --> S["source: 'sqlite'"]
     R --> D["source: 'markdown'"]
+    R --> H["source: 'http'"]
 
     S --> SM["mode: 'in-memory'"]
     S --> SF["mode: 'file-based'"]
@@ -6614,6 +6975,7 @@ flowchart TD
     SF --> SF1["Direct file operations\nAll SQL statements\nChanges persistent"]
 
     D --> D1["Markdown file\nText loaded as string\nParameter-based access"]
+    H --> H1["Remote file via HTTPS\nCached locally\nSame query interface as sqlite"]
 ```
 
 | Source | Mode | Description |
@@ -6621,6 +6983,7 @@ flowchart TD
 | `sqlite` | `in-memory` | DB opened with `readonly: true`. SELECT only. File remains unchanged. |
 | `sqlite` | `file-based` | DB opened with WAL mode. All SQL statements. Changes persistent on disk. |
 | `markdown` | — | Markdown file loaded as string. Parameter-based access (section, lines, search). |
+| `http` | — | Remote file fetched via HTTPS and cached locally. Same SQLite query interface as `sqlite` source. |
 
 ---
 
@@ -6635,7 +6998,7 @@ flowchart TD
 | `origin` | `'global'`, `'project'`, or `'inline'` | Yes | Storage location. See [Origin System](#origin-system). |
 | `name` | `string` | Yes | Filename with extension. Must end with `.db`. Convention: `{namespace}-{descriptive-name}.db`. |
 | `description` | `string` | Yes | What this resource provides. Appears in resource discovery. |
-| `queries` | `object` | Yes | Query definitions. Must include `getSchema`. Maximum 7 schema-defined queries. |
+| `queries` | `object` | Yes | Query definitions. Maximum 7 schema-defined queries. `runSql` and `describeTables` are auto-injected by the runtime. |
 
 All fields are required. There are no defaults and no optional fields.
 
@@ -6702,7 +7065,7 @@ resources: {
                 ]
             }
         }
-        // freeQuery (SELECT only) is auto-injected by the runtime
+        // runSql + describeTables are auto-injected by the runtime
     }
 }
 ```
@@ -6714,8 +7077,9 @@ resources: {
 | **File changes** | Never — readonly flag on DB level |
 | **Allowed origins** | `global` (recommended) or `project` |
 | **Use case** | Reference data, lookups, open data |
-| **getSchema** | **MUST** — defined by schema author in `queries` |
-| **freeQuery** | Auto-injected by runtime (SELECT only) |
+| **getSchema** | **OPTIONAL** — prefer auto-injected describeTables |
+| **runSql** | Auto-injected by runtime (SELECT only) |
+| **describeTables** | Auto-injected by runtime (AI-friendly schema discovery) |
 
 ### Mode: `file-based`
 
@@ -6779,7 +7143,7 @@ resources: {
                 ]
             }
         }
-        // freeQuery (all statements) is auto-injected by the runtime
+        // runSql + describeTables are auto-injected by the runtime
     }
 }
 ```
@@ -6791,9 +7155,10 @@ resources: {
 | **File changes** | Yes — persistent on disk |
 | **Only allowed origin** | `project` |
 | **Use case** | Analysis results, agent memory, data collection |
-| **getSchema** | **MUST** — defined by schema author. CLI derives CREATE TABLE from return value. |
-| **freeQuery** | Auto-injected by runtime (all statements) |
-| **DB does not exist** | CLI creates DB based on getSchema |
+| **getSchema** | **OPTIONAL** — define only if CLI must bootstrap DB via CREATE TABLE |
+| **runSql** | Auto-injected by runtime (all statements) |
+| **describeTables** | Auto-injected by runtime (AI-friendly schema discovery) |
+| **DB does not exist** | CLI creates DB based on getSchema if defined, otherwise reports missing-DB warning |
 | **Backup** | Automatic `.bak` copy before first write per session |
 | **Concurrent writes** | Supported via WAL mode |
 
@@ -6808,7 +7173,9 @@ resources: {
 | Changes persistent | No | **Yes** |
 | Allowed origins | `global`, `project` | Only `project` |
 | DB must exist | Yes (warning if missing) | No (CLI creates via getSchema) |
-| getSchema | **MUST** (schema-defined) | **MUST** (schema-defined) |
+| getSchema | OPTIONAL (rarely needed) | OPTIONAL (only for CLI DB bootstrap) |
+| runSql | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| describeTables | Auto-injected (structured discovery) | Auto-injected (structured discovery) |
 | Backup | Not needed | `.bak` before first write |
 | Concurrent access | Yes (readonly) | Yes (WAL mode) |
 
@@ -6908,21 +7275,21 @@ The folder is always named `resources/` (not `data/`).
 
 ## Standard Queries
 
-### `getSchema` — MUST (Schema-Defined)
+### `getSchema` — OPTIONAL (Schema-Defined)
 
-`getSchema` is **required** for both modes. The schema author defines it in the `queries` object. It is NOT auto-injected — it must be explicitly written in the schema.
+Schema authors MAY define `getSchema` if they want to expose CREATE TABLE statements directly. For `in-memory` mode, `describeTables` provides AI-friendly structured discovery automatically (recommended). For `file-based` mode, `getSchema` is useful when CLI needs to construct the DB.
 
-**Why MUST for both modes:**
+**When to define `getSchema`:**
 
-- **In-memory:** The agent needs the DB structure to formulate meaningful queries via freeQuery
-- **File-based:** The CLI needs the structure to create the DB and tables when the file does not exist
+- `mode: 'file-based'`: Only when the CLI must create the database on first run. The CLI derives CREATE TABLE statements from the getSchema return value (table names, column names, column types).
+- `mode: 'in-memory'`: Almost never — `describeTables` is sufficient. Define `getSchema` only if a downstream consumer needs the CREATE TABLE text directly (e.g. dump/migration tooling).
 
-**getSchema and CREATE TABLE:** The CLI can derive CREATE TABLE statements from the getSchema return value (table names, column names, column types). No separate `createSchema` query is needed.
+**getSchema and CREATE TABLE:** When defined, the CLI can derive CREATE TABLE statements from the getSchema return value. No separate `createSchema` query is needed.
 
 ```javascript
 getSchema: {
     sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
-    description: 'Returns the database schema (tables and their CREATE statements)',
+    description: 'Returns CREATE TABLE statements for all tables (optional, for CLI bootstrap)',
     parameters: [],
     output: {
         mimeType: 'application/json',
@@ -6943,9 +7310,9 @@ getSchema: {
 }
 ```
 
-### `freeQuery` — Auto-Injected by Runtime
+### `runSql` — Auto-Injected by Runtime
 
-`freeQuery` is automatically added by the runtime. Schema authors do **not** define it manually.
+`runSql` is automatically added by the runtime. Schema authors do **not** define it manually. The SELECT-only enforcement for `in-memory` mode is unchanged — security comes from the `mode` field, not from the query name.
 
 | Aspect | in-memory | file-based |
 |--------|----------|-----------|
@@ -6957,22 +7324,68 @@ getSchema: {
 | DROP TABLE | No | Yes |
 | LIMIT default | 100 (max 1000) | 100 (max 1000) |
 
-For `in-memory`, the auto-injected freeQuery enforces SELECT-only via runtime checks. For `file-based`, all SQL statements are allowed.
+For `in-memory`, the auto-injected runSql enforces SELECT-only via runtime checks. For `file-based`, all SQL statements are allowed.
+
+### `describeTables` — Auto-Injected by Runtime
+
+`describeTables` is automatically added by the runtime alongside `runSql`. Schema authors do **not** define it manually. It returns the database structure as a flat row set, optimized for AI consumption (no CREATE TABLE parsing required).
+
+**Auto-Inject SQL:**
+
+```sql
+SELECT m.name as table_name, p.name as column, p.type
+FROM sqlite_master m JOIN pragma_table_info(m.name) p
+WHERE m.type = 'table'
+```
+
+**Return shape:**
+
+```javascript
+[
+    { table_name: 'pools', column: 'pool_address', type: 'TEXT' },
+    { table_name: 'pools', column: 'token0', type: 'TEXT' },
+    { table_name: 'pools', column: 'token1', type: 'TEXT' },
+    { table_name: 'tokens', column: 'symbol', type: 'TEXT' },
+    { table_name: 'tokens', column: 'decimals', type: 'INTEGER' }
+]
+```
+
+| Aspect | in-memory | file-based |
+|--------|----------|-----------|
+| Auto-injected | Yes | Yes |
+| Underlying SQL | `sqlite_master` JOIN `pragma_table_info` | identical |
+| Return format | Rows (table_name, column, type) | identical |
+| Use case | AI-friendly schema discovery | AI-friendly schema discovery |
+| Read-only safety | Yes (SQLite built-in metadata) | Yes (SQLite built-in metadata) |
+
+`describeTables` works in `readonly: true` mode because `sqlite_master` and `pragma_table_info` are read-only metadata functions baked into SQLite. They function identically with the `SQLITE_OPEN_READONLY` flag.
+
+**When to use `describeTables` vs `getSchema`:**
+
+| Aspect | `describeTables` (auto) | `getSchema` (optional, author-defined) |
+|--------|-----------------------|---------------------------------------|
+| Format | Structured rows | CREATE TABLE text |
+| Constraints (PRIMARY KEY, NOT NULL, FK) | Not included | Included |
+| AI-friendliness | High (immediate consumption) | Medium (regex parsing required) |
+| Use case | Default AI discovery | Author needs CREATE-text (e.g. CLI bootstraps file-based DB) |
+
+For `mode: 'in-memory'`, constraints are practically irrelevant — the agent only builds SELECTs. `describeTables` covers 100% of practical discovery use cases. For `mode: 'file-based'`, schema authors may still define `getSchema` if the CLI needs CREATE TABLE statements to bootstrap the database on first run.
 
 ### Query Limits
 
 | Type | Count |
 |------|-------|
-| Auto-injected | 1 (freeQuery) |
-| Schema-defined (including getSchema) | Max 7 |
-| **Total** | **Max 8** |
+| Auto-injected | 2 (runSql + describeTables) |
+| Schema-defined (getSchema is optional) | Max 7 |
+| **Total** | **Max 9** |
 
 ### Summary Table
 
 | Query | in-memory | file-based |
 |-------|----------|-----------|
-| `getSchema` | **MUST** (schema-defined) | **MUST** (schema-defined) |
-| `freeQuery` | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| `getSchema` | OPTIONAL (rarely needed) | OPTIONAL (only for CLI DB bootstrap) |
+| `runSql` | Auto-injected (SELECT only) | Auto-injected (all statements) |
+| `describeTables` | Auto-injected (structured discovery) | Auto-injected (structured discovery) |
 | Domain queries | Schema-defined | Schema-defined |
 
 ---
@@ -7007,7 +7420,7 @@ All fields are required. There is no `mode` field (Markdown is always read-only)
 
 ### Parameter-Based Access
 
-Markdown resources support parameter-based access for large documents. The runtime auto-injects access functions similar to how it auto-injects `freeQuery` for SQLite resources.
+Markdown resources support parameter-based access for large documents. The runtime auto-injects access functions similar to how it auto-injects `runSql` for SQLite resources.
 
 ```mermaid
 flowchart LR
@@ -7054,6 +7467,110 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 
 ---
 
+## HTTP Resources (v4.0.0)
+
+HTTP Resources allow schemas to reference remote files (typically SQLite databases) that are fetched via HTTPS and cached locally. They combine the rich query interface of SQLite resources with the distribution flexibility of remote hosting.
+
+### Use Cases
+
+| Scenario | Example |
+|----------|---------|
+| Large reference databases too big for the repo | OFAC SDN sanctions list (SQLite, ~40 MB) |
+| Frequently updated datasets | Daily-updated government open data |
+| Externally maintained datasets | Third-party data providers |
+
+### HTTP Resource Fields
+
+```javascript
+resources: {
+    ofacList: {
+        source: 'http',
+        url: 'https://cdn.example.com/ofac-sdn.sqlite',
+        cacheTtl: 86400,
+        description: 'OFAC SDN List — updated daily',
+        queries: {
+            getSchema: {
+                sql: "SELECT name, sql FROM sqlite_master WHERE type='table'",
+                description: 'Returns the database schema',
+                parameters: [],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string', description: 'Table name' },
+                                sql: { type: 'string', description: 'CREATE TABLE statement' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Get all table definitions' }
+                ]
+            },
+            searchByName: {
+                sql: 'SELECT * FROM sdn_list WHERE name LIKE ? LIMIT 20',
+                description: 'Search the SDN list by name (partial match)',
+                parameters: [
+                    {
+                        position: { key: 'name', value: '{{USER_PARAM}}' },
+                        z: { primitive: 'string()', options: [ 'min(3)' ] }
+                    }
+                ],
+                output: {
+                    mimeType: 'application/json',
+                    schema: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                name: { type: 'string', description: 'Entity name' },
+                                type: { type: 'string', description: 'SDN type' },
+                                programs: { type: 'string', description: 'Sanctioned programs' }
+                            }
+                        }
+                    }
+                },
+                tests: [
+                    { _description: 'Search for common name', name: '%Khan%' },
+                    { _description: 'Search for organization', name: '%Corp%' },
+                    { _description: 'Search partial match', name: '%Ltd%' }
+                ]
+            }
+        }
+    }
+}
+```
+
+### HTTP Resource Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `source` | `'http'` | Yes | Resource type. Must be `'http'`. |
+| `url` | `string` | Yes | HTTPS URL of the remote file. Must use HTTPS (no HTTP). |
+| `cacheTtl` | `number` | Yes | Cache duration in seconds. The downloaded file is reused until TTL expires. |
+| `description` | `string` | Yes | What this resource provides. Appears in resource discovery. |
+| `queries` | `object` | Yes | Query definitions. Same structure as SQLite `in-memory` queries. |
+
+### Caching Behavior
+
+| Aspect | Behavior |
+|--------|----------|
+| **Cache location** | `.flowmcp/cache/resources/{hash}.db` |
+| **Cache key** | SHA-256 of the URL |
+| **TTL check** | On every schema load |
+| **Expired cache** | Re-fetch from URL |
+| **Fetch failure** | Use stale cache if available, error if no cache |
+| **SQL access** | `better-sqlite3` with `readonly: true` (same as `in-memory`) |
+
+### Validation Rule
+
+**RES010:** `source: 'http'` requires a `url` field. The URL must use HTTPS (`https://`). HTTP URLs are rejected to prevent insecure data transfer.
+
+---
+
 ## Security Model
 
 ### In-Memory: Safe by Architecture
@@ -7061,7 +7578,7 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 | Layer | What Happens |
 |-------|-------------|
 | DB opened with `readonly: true` | `better-sqlite3` enforces read-only at DB level |
-| Only SELECT in freeQuery | Runtime enforces SELECT-only |
+| Only SELECT in runSql | Runtime enforces SELECT-only |
 | File unchanged | No write operations possible at all |
 
 No block patterns needed. `better-sqlite3` with `readonly: true` prevents all write operations at the database level. This is more reliable than pattern-matching on SQL strings.
@@ -7129,7 +7646,7 @@ flowchart TD
 | CLI creates DB | Only when `source: 'sqlite'` + `mode: 'file-based'` + DB missing |
 | User confirmation | **Required** — CLI always asks |
 | Path | Always `project`: `.{base}/resources/{name}` |
-| getSchema | **MUST** for file-based — CLI derives table structure from it |
+| getSchema | OPTIONAL for file-based — required only when CLI must bootstrap the DB on first run (derives CREATE TABLE) |
 | Backup | `.bak` copy before first write (for existing DB) |
 
 ### Backup Strategy
@@ -7232,7 +7749,7 @@ For `in-memory` resources, only `SELECT` statements and `WITH` (CTE) expressions
 
 For resources where the AI client needs to write its own SQL queries (e.g., exploratory data analysis), the special placeholder `{{DYNAMIC_SQL}}` signals that the SQL comes from the user at runtime.
 
-This is used by the auto-injected `freeQuery`. Schema authors do not normally need to use `{{DYNAMIC_SQL}}` directly — it is documented here for completeness.
+This is used by the auto-injected `runSql`. Schema authors do not normally need to use `{{DYNAMIC_SQL}}` directly — it is documented here for completeness.
 
 #### `{{DYNAMIC_SQL}}` Rules
 
@@ -7468,7 +7985,7 @@ export const main = {
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
 | Max resources per schema | 2 | Keeps schemas focused. Resources should be tightly scoped to one data domain. |
-| Max schema-defined queries per resource | 7 | Including getSchema. Plus 1 auto-injected freeQuery = 8 total. |
+| Max schema-defined queries per resource | 7 | getSchema is optional. Plus 2 auto-injected (runSql + describeTables) = 9 total. |
 | Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
@@ -7477,7 +7994,7 @@ export const main = {
 | `source` value | `'sqlite'` or `'markdown'` | Only these two types are supported. |
 | `mode` value (sqlite only) | `'in-memory'` or `'file-based'` | Two explicit modes. |
 | `origin` value | `'global'`, `'project'`, or `'inline'` | Three storage locations. |
-| `freeQuery` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
+| `runSql` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
 | All fields | Required | No defaults, no optional fields. |
 
 ---
@@ -7530,7 +8047,7 @@ The following rules are enforced when validating resource definitions:
 | RES004 | error | `origin` is required and must be `'global'`, `'project'`, or `'inline'`. |
 | RES005 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
 | RES006 | error | Maximum 2 resources per schema. |
-| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (8 total with auto-injected freeQuery). |
+| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (9 total with auto-injected runSql + describeTables). |
 | RES008 | error | Each query must have a `sql` field of type string. |
 | RES009 | error | Each query must have a `description` field of type string. |
 | RES010 | error | Each query must have a `parameters` array. |
@@ -7547,7 +8064,7 @@ The following rules are enforced when validating resource definitions:
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values must pass the corresponding `z` validation. |
 | RES023 | error | Test objects must be JSON-serializable. |
-| RES024 | error | SQLite resources must include a `getSchema` query. |
+| RES024 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
 | RES025 | error | `mode: 'file-based'` requires `origin: 'project'`. |
 | RES026 | error | `source: 'markdown'` must not have a `mode` field. |
 | RES027 | error | `source: 'markdown'` must not have a `queries` field. |
@@ -7670,7 +8187,7 @@ The SQLite database `duneanalytics-templates.db` is not in the schema directory 
 
 ---
 
-# FlowMCP Specification v3.0.0 — Skills
+# FlowMCP Specification v4.0.0 — Skills
 
 Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown instructions with typed metadata. This document defines the skill file format, field specifications, placeholder syntax, schema integration, scope rules, security constraints, and validation rules.
 
@@ -7738,7 +8255,8 @@ Produce a Markdown report with:
 
 export const skill = {
     name: 'full-contract-audit',
-    version: 'flowmcp-skill/1.0.0',
+    version: 'flowmcp/4.0.0',
+    type: 'namespace',
     description: 'Retrieve ABI and source code for a smart contract audit.',
     requires: {
         tools: [ 'getContractAbi', 'getSourceCode' ],
@@ -7795,10 +8313,12 @@ The `export const skill` object contains all metadata and instructions for the s
 | Field | Type | Constraints | Description |
 |-------|------|-------------|-------------|
 | `name` | `string` | Must match `^[a-z][a-z0-9-]{0,63}$` | Unique identifier within the schema. Lowercase letters, numbers, and hyphens. Maximum 64 characters. |
-| `version` | `string` | Must be `'flowmcp-skill/1.0.0'` | Skill format version. See [Versioning](#versioning). |
+| `version` | `string` | Must be `'flowmcp/4.0.0'` | Skill format version. See [Versioning](#versioning). |
 | `description` | `string` | Maximum 1024 characters | Human-readable explanation of what the skill does. Appears in MCP prompt listings. |
 | `output` | `string` | Must not be empty | Description of what the skill produces as a final artifact. |
 | `content` | `string` | Must not be empty | Markdown instructions for the AI agent. Contains placeholders referencing tools, resources, and input parameters. |
+| `whenToUse` | `string` | Must not be empty | **New in v4.** When an AI agent should activate this skill. One sentence describing the trigger scenario. |
+| `type` | `string` | One of: `'namespace'`, `'selection'`, `'agent'` | **New in v4.** Skill classification. See [Skill Types](#skill-types). |
 
 ### Optional Fields
 
@@ -7809,12 +8329,25 @@ The `export const skill` object contains all metadata and instructions for the s
 | `requires.resources` | `string[]` | `[]` | Each must be a resource name in the same schema's `main.resources` | Resources the skill reads. |
 | `requires.external` | `string[]` | `[]` | Free-form strings | External capabilities the skill assumes (e.g. `'playwright'`, `'file-system'`). Informational — not validated against the runtime. |
 | `input` | `object[]` | `[]` | See below | Parameters the user provides when invoking the skill. |
+| `prefill` | `array` | `[]` | **New in v4.** Array of tool call specifications to execute before delivering the Skill. See `18-prefill.md`. |
+
+### Skill Types (v4.0.0)
+
+The `type` field classifies the skill's intended scope. Values follow Memo 022 REV-08 Kap. 5.1 — bare strings without `-skill` suffix.
+
+| Type | Description | Location (file path) |
+|------|-------------|----------------------|
+| `'namespace'` | General-purpose skill for any user of this namespace | `providers/{namespace}/skills/{name}.mjs` |
+| `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
+| `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
+
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016 and Memo 022 REV-08).
 
 ### Field Details
 
 #### `name`
 
-The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and in `main.skills` entries. Only lowercase letters, numbers, and hyphens are allowed. The name must start with a letter.
+The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and as the key under which the skill is registered in `selection.skills` or `agent.skills` (or as the file basename in `providers/{ns}/skills/`). Only lowercase letters, numbers, and hyphens are allowed. The name must start with a letter.
 
 ```javascript
 // Valid
@@ -7831,19 +8364,21 @@ name: ''                       // empty not allowed
 
 #### `version`
 
-The version string identifies the skill format specification. In this release, the only valid value is `'flowmcp-skill/1.0.0'`. The prefix `flowmcp-skill/` distinguishes skill versioning from schema versioning (`3.x.x`) and shared list versioning.
+The version string identifies the skill format specification. In v4, the valid value is `'flowmcp/4.0.0'`. The prefix `flowmcp/` aligns with the agent manifest versioning.
 
 ```javascript
 // Valid
+version: 'flowmcp/4.0.0'
+
+// Deprecated (v3 format — accepted with warning during migration)
 version: 'flowmcp-skill/1.0.0'
 
 // Invalid
 version: '1.0.0'               // missing prefix
-version: 'flowmcp-skill/2.0.0' // version 2.0.0 does not exist yet
-version: '3.0.0'               // this is a schema version, not a skill version
+version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Why separate versioning: skill format changes (new fields, new placeholder types, new validation rules) happen independently of schema format changes. A skill at `flowmcp-skill/1.0.0` works with schemas at `3.0.0` or any future `3.x.x`. When the skill format changes in a breaking way, the version increments to `flowmcp-skill/2.0.0` — enabling validators to apply the correct rules and runtimes to support upgrade paths.
+Unified versioning in v4.0.0: per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. This replaces the v3 split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills). When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -7974,7 +8509,7 @@ The `content` field supports four placeholder types. Placeholders use the `{{typ
 |-------------|--------|-------------|---------|
 | Tool | `{{tool:name}}` | A tool in the same schema's `main.tools` | `{{tool:getContractAbi}}` |
 | Resource | `{{resource:name}}` | A resource in the same schema's `main.resources` | `{{resource:chainList}}` |
-| Skill | `{{skill:name}}` | Another skill in the same schema's `main.skills` | `{{skill:quick-check}}` |
+| Skill | `{{skill:name}}` | Another skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/` directory). `main.skills` is forbidden in v4.0.0. | `{{skill:quick-check}}` |
 | Input | `{{input:key}}` | An input parameter from the skill's `input` array | `{{input:address}}` |
 
 ### Placeholder Rules
@@ -7983,7 +8518,7 @@ The `content` field supports four placeholder types. Placeholders use the `{{typ
 
 2. **Resource placeholders** (`{{resource:name}}`) — the `name` must exist as a key in the same schema's `main.resources`. The validator checks this at load time (SKL006 via `requires.resources`). Every resource referenced via `{{resource:name}}` in content should be listed in `requires.resources`.
 
-3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a key in the same schema's `main.skills`. Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` must not itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
+3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a registered skill in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` must not itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
 
 4. **Input placeholders** (`{{input:key}}`) — the `key` must exist in the skill's own `input` array. The validator checks this at load time (SKL008).
 
@@ -8018,70 +8553,76 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ---
 
-## Schema Integration
+## Skill Registration (v4.0.0)
 
-Skills are declared in the `main` export of a schema file and loaded from separate `.mjs` files.
+Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016 and Memo 022 REV-08).
 
-### Declaration in `main.skills`
+### Three Registration Scopes
 
-The `main.skills` field is an optional object that maps skill names to file references:
+| Scope | Registered Via | File Location |
+|-------|----------------|---------------|
+| Namespace | Directory placement (no explicit registration) | `providers/{namespace}/skills/{skill-name}.mjs` |
+| Selection | `selection.skills` in `selections/{name}/selection.mjs` | `selections/{name}/skills/{skill-name}.mjs` |
+| Agent | `agent.skills` in `agents/{name}/agent.mjs` | `agents/{name}/skills/{skill-name}.mjs` |
+
+### Selection-Scoped Skill Registration
 
 ```javascript
-export const main = {
-    namespace: 'etherscan',
-    name: 'SmartContractExplorer',
-    description: 'Explore verified smart contracts on EVM-compatible chains',
-    version: '3.0.0',
-    root: 'https://api.etherscan.io',
-    tools: {
-        getContractAbi: { /* ... */ },
-        getSourceCode: { /* ... */ }
-    },
+// selections/evm-contract-research/selection.mjs
+export const selection = {
+    name: 'evm-contract-research',
+    version: '4.0.0',
+    // ...
     skills: {
-        'full-contract-audit': { file: './skills/full-contract-audit.mjs' },
-        'quick-summary': { file: './skills/quick-summary.mjs' }
+        'contract-deep-dive': { file: './skills/contract-deep-dive.mjs' }
     }
 }
 ```
 
-### `main.skills` Entry Fields
+### Agent-Scoped Skill Registration
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| key (skill name) | `string` | Yes | Must match `^[a-z][a-z0-9-]{0,63}$`. Must match the `name` field inside the skill file. |
-| `file` | `string` | Yes | Relative path from the schema file to the skill `.mjs` file. Must end with `.mjs`. |
+```javascript
+// agents/crypto-auditor/agent.mjs
+export const agent = {
+    name: 'crypto-auditor',
+    version: 'flowmcp/4.0.0',
+    // ...
+    skills: {
+        'audit-report': { file: './skills/audit-report.mjs' }
+    }
+}
+```
 
-The key in `main.skills` must match the `name` field inside the referenced skill file. If they differ, the validator raises SKL003.
+### Namespace-Scoped Skill Discovery
 
-### File Organization
-
-Skills are stored in a `skills/` subdirectory relative to the schema file:
+Namespace-scoped skills are discovered by directory scan — no explicit registration object on the schema:
 
 ```
-etherscan/
-├── SmartContractExplorer.mjs
+providers/etherscan/
+├── tools/
+├── resources/
 └── skills/
     ├── full-contract-audit.mjs
     └── quick-summary.mjs
 ```
 
-The `file` path in `main.skills` is relative to the schema file location:
+### Registration Entry Fields (Selection / Agent)
 
-```javascript
-// Schema at: etherscan/SmartContractExplorer.mjs
-skills: {
-    'full-contract-audit': { file: './skills/full-contract-audit.mjs' }
-}
-// Resolves to: etherscan/skills/full-contract-audit.mjs
-```
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| key (skill name) | `string` | Yes | Must match `^[a-z][a-z0-9-]{0,63}$`. Must match the `name` field inside the skill file. Must NOT contain a `/` (see VAL110 Slash-Rule). |
+| `file` | `string` | Yes | Relative path from the parent manifest (selection.mjs or agent.mjs) to the skill `.mjs` file. Must end with `.mjs`. |
+
+If the key and the skill file's `name` field differ, the validator raises SKL003.
 
 ### MCP Registration
 
-Each skill is registered as an MCP prompt with the server. The fully qualified prompt name follows the pattern `namespace/schemaFile::skillName`:
+Each skill is registered as an MCP prompt with the server. The fully qualified prompt name follows the scope-aware pattern:
 
 ```
-etherscan/SmartContractExplorer::full-contract-audit
-etherscan/SmartContractExplorer::quick-summary
+etherscan/skill/full-contract-audit         (namespace-scoped)
+evm-contract-research/skill/contract-deep-dive (selection-scoped)
+crypto-auditor/skill/audit-report           (agent-scoped)
 ```
 
 The runtime maps skill fields to MCP prompt fields:
@@ -8100,27 +8641,27 @@ The runtime maps skill fields to MCP prompt fields:
 ### Format
 
 ```
-flowmcp-skill/1.0.0
+flowmcp/4.0.0
 ```
 
 The version string has two parts separated by `/`:
 
 | Part | Value | Description |
 |------|-------|-------------|
-| Prefix | `flowmcp-skill` | Fixed identifier for the skill format |
-| Version | `1.0.0` | Semver version of the skill specification |
+| Prefix | `flowmcp` | Unified FlowMCP specification identifier (shared across Schema, Selection, Agent, Skill, Prompt) |
+| Version | `4.0.0` | Semver version of the FlowMCP specification |
 
 ### Current Version
 
-The only valid version in this release is `flowmcp-skill/1.0.0`.
+The only valid version in this release is `flowmcp/4.0.0`. The legacy `flowmcp-skill/1.0.0` string from v3 is accepted with a deprecation warning during migration; new skills MUST use `flowmcp/4.0.0`.
 
-### Why Separate Versioning
+### Unified Versioning Rationale
 
-Skill format versioning is independent of schema format versioning (`3.x.x`) for three reasons:
+Per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
-1. **Independent evolution.** Skill fields, placeholder types, and validation rules change on a different cadence than schema fields. A new placeholder type does not require a schema version bump.
-2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A skill at `flowmcp-skill/1.0.0` is validated against the rules defined in this document. A future `flowmcp-skill/2.0.0` may add new required fields or placeholder types.
-3. **Upgrade paths.** When breaking changes are introduced, the version increment signals that existing skills need migration. Tools can detect the version and offer automated migration.
+1. **Single source of truth.** Schemas, Selections, Agents, Skills, and Prompts evolve as one specification. Mixing primitive versions inside one catalog is not supported.
+2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools should apply the new rules.
+3. **Upgrade paths.** A coordinated version bump signals that existing catalog content needs review and migration in lockstep.
 
 ---
 
@@ -8134,8 +8675,8 @@ These rules can be checked at load time by examining the skill file and the sche
 |------|----------|------|
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
-| SKL003 | error | `skill.name` must match the key in `main.skills` that references this file |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp-skill/1.0.0'` |
+| SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
+| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'`. `'flowmcp-skill/1.0.0'` is accepted with a deprecation warning during migration. |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
@@ -8147,9 +8688,9 @@ These rules can be checked at load time by examining the skill file and the sche
 | SKL013 | error | `input[].type` must be one of: `string`, `number`, `boolean`, `enum` |
 | SKL014 | error | `input[].description` is required and must be a non-empty string |
 | SKL015 | error | `input[].required` must be a boolean |
-| SKL016 | error | `main.skills` entries: `file` must end with `.mjs` |
-| SKL017 | error | `main.skills` entries: referenced file must exist |
-| SKL018 | error | Maximum 4 skills per schema |
+| SKL016 | error | Skill registration entries (`selection.skills`, `agent.skills`): `file` must end with `.mjs` |
+| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file must exist |
+| SKL018 | error | Maximum 4 skills per registration scope (selection or agent) |
 
 ### Reference Rules (Cross-Validation)
 
@@ -8159,7 +8700,7 @@ These rules validate references between skills, tools, and resources within the 
 |------|----------|------|
 | SKL020 | warning | `{{tool:name}}` placeholder in content references a tool not listed in `requires.tools` |
 | SKL021 | warning | `{{resource:name}}` placeholder in content references a resource not listed in `requires.resources` |
-| SKL022 | error | `{{skill:name}}` placeholder references a skill not in `main.skills` |
+| SKL022 | error | `{{skill:name}}` placeholder references a skill not registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace). |
 | SKL023 | error | `{{skill:name}}` target skill must not itself contain `{{skill:...}}` placeholders (1 level deep only) |
 | SKL024 | warning | Entry in `requires.tools` is not referenced via `{{tool:...}}` in content |
 | SKL025 | warning | Entry in `requires.resources` is not referenced via `{{resource:...}}` in content |
@@ -8175,6 +8716,92 @@ The following aspects cannot be checked by static validation. They depend on AI 
 | Output accuracy | Whether the described output matches what the agent produces depends on agent capability |
 | Input sufficiency | Whether the declared inputs are enough to complete the task is domain-specific |
 | External availability | Whether `requires.external` capabilities are present depends on the runtime environment |
+
+---
+
+## One-Shot Design Principle (v4.0.0)
+
+A Skill MUST be written so that an AI agent can execute the complete workflow in a single pass — without requiring additional ToolSearch roundtrips for disambiguation or parameter discovery.
+
+### Empirical Basis
+
+Testing conducted in Memo 021 (Harness CLI, March 2026):
+
+| Skill Version | Tool Descriptions | Parameter Tables | Example Calls | 5-Run Success Rate |
+|---------------|------------------|------------------|---------------|-------------------|
+| Enriched | Embedded | Embedded | Embedded | **5/5 (100%)** |
+| Bare | Tool name only | Missing | Missing | **0/5 (0%)** |
+
+The difference is unambiguous: when a Skill embeds all the information the agent needs, it succeeds every time. When it relies on the agent discovering parameters at runtime, it fails every time.
+
+### What "One-Shot" Means
+
+An agent executes a Skill in one shot when:
+
+1. The agent reads the Skill's `content` field
+2. The agent can identify which tools to call
+3. The agent can determine the correct parameters for each tool call
+4. The agent executes the workflow and produces the expected output
+5. No additional calls to ToolSearch or ToolDescription are required
+
+A Skill that causes the agent to call ToolSearch to discover a tool's parameters has **failed the one-shot constraint**.
+
+### Required Content Elements
+
+Every Skill `content` field MUST embed:
+
+| Element | Why Required | Format |
+|---------|-------------|--------|
+| Tool call description | Agent must know what tool to call | `## Step N: Call {{tool:toolName}}` |
+| Parameter table per tool | Agent must know which parameters exist | Markdown table with name, type, description, required |
+| Enum values | Agent must know valid values | Listed inline in the parameter table |
+| Example call | Agent must understand the pattern | Code block with placeholder values |
+| Expected output | Agent must know what to do with the result | One sentence per tool |
+
+### Non-Compliant Skill (Fails One-Shot)
+
+```javascript
+const content = `
+## Step 1: Get Token Price
+
+Call {{tool:getSimplePrice}} for the token {{input:tokenId}}.
+`
+// FAILS: No parameter table, no enum values, no example call
+// Agent must call ToolSearch to discover parameters → not one-shot
+```
+
+### Compliant Skill (Passes One-Shot)
+
+```javascript
+const content = `
+## Step 1: Get Token Price
+
+Call {{tool:getSimplePrice}} to retrieve the current price.
+
+**Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| ids | string | Yes | Token ID (e.g. \`bitcoin\`, \`ethereum\`, \`solana\`) |
+| vs_currencies | string | Yes | Currency code (e.g. \`usd\`, \`eur\`, \`gbp\`) |
+
+**Example:**
+
+\`\`\`
+ids: {{input:tokenId}}
+vs_currencies: usd
+\`\`\`
+
+**Output:** JSON object with token ID as key and price as value.
+`
+// PASSES: Parameter table embedded, example included → agent can proceed without ToolSearch
+```
+
+### Validation
+
+The one-shot constraint is **not statically verifiable** by `flowmcp validate` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
+
+See `10-tests.md` (One-Shot Test for Skills) for the test protocol.
 
 ---
 
@@ -8300,7 +8927,7 @@ SEC001 etherscan/skills/contract-audit.mjs: Forbidden pattern "import " found at
 
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
-| Max skills per schema | 4 | Keeps schemas focused. Skills that grow beyond 4 indicate the schema should be split. |
+| Max skills per registration scope | 4 | Keeps each Selection or Agent focused. Skills beyond 4 in one scope indicate the scope should be split. Namespace-scoped skills are bounded by directory contents, not by an explicit limit. |
 | Content must not be empty | Required | A skill without instructions has no purpose. |
 | Skill name max length | 64 characters | Prevents excessively long MCP prompt identifiers. |
 | Description max length | 1024 characters | Consistent with schema description limits. |
@@ -8311,34 +8938,37 @@ SEC001 etherscan/skills/contract-audit.mjs: Forbidden pattern "import " found at
 
 ## Loading
 
-Skills are loaded as part of the schema loading sequence defined in `01-schema-format.md`. The skill loading step occurs after the `main` block is validated and before tools are registered as MCP tools.
+Skills are loaded based on their registration scope. The pipeline collects skills from three sources: namespace `skills/` directories, `selection.skills` entries, and `agent.skills` entries. Each source uses the same per-file validation pipeline.
 
 ### Loading Sequence
 
 ```mermaid
 flowchart TD
-    A[Validate main block] --> B{main.skills exists?}
-    B -->|No| C[Skip skill loading]
-    B -->|Yes| D[Read each skill file as string]
+    A[Resolve active scope] --> B{Scope type?}
+    B -->|Namespace| C1[Scan providers/&#123;ns&#125;/skills/]
+    B -->|Selection| C2[Read selection.skills entries]
+    B -->|Agent| C3[Read agent.skills entries]
+    C1 --> D[Read each skill file as string]
+    C2 --> D
+    C3 --> D
     D --> E[Static security scan per file]
     E --> F["Dynamic import() per file"]
     F --> G[Extract skill export]
     G --> H[Validate skill fields]
-    H --> I[Validate requires.tools against main.tools]
-    I --> J[Validate requires.resources against main.resources]
+    H --> I[Validate requires.tools against catalog]
+    I --> J[Validate requires.resources against catalog]
     J --> K[Validate placeholders in content]
     K --> L[Check skill-to-skill depth limit]
     L --> M[Register as MCP prompts]
-    C --> N[Continue to tool registration]
-    M --> N
 ```
 
-The diagram shows how skill loading integrates into the existing schema loading pipeline. Skills are loaded after `main` validation and before tool registration.
+The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.0.0.
 
 ### Step-by-Step
 
-1. **Check `main.skills`** — if the field is absent or empty, skip skill loading entirely.
-2. **Read each skill file as string** — the raw source is read before any execution, same as schema files.
+1. **Resolve scope** — determine whether the active context is a namespace, a Selection, or an Agent.
+2. **Collect skill file paths** — from the namespace `skills/` directory, or from the parent manifest's `skills` field (Selection or Agent).
+3. **Read each skill file as string** — the raw source is read before any execution, same as schema files.
 3. **Static security scan** — the file string is scanned for forbidden patterns. If any match, the skill file is rejected.
 4. **Dynamic import** — the file is imported via `import()`.
 5. **Extract `skill` export** — the named `skill` export is read.
@@ -8437,7 +9067,8 @@ Produce a Markdown report with the following sections:
 
 export const skill = {
     name: 'full-contract-audit',
-    version: 'flowmcp-skill/1.0.0',
+    version: 'flowmcp/4.0.0',
+    type: 'namespace',
     description: 'Retrieve ABI and source code for a comprehensive smart contract audit report.',
     requires: {
         tools: [ 'getContractAbi', 'getSourceCode' ],
@@ -8481,7 +9112,7 @@ etherscan/
 
 ---
 
-# FlowMCP Specification v3.0.0 — Catalog
+# FlowMCP Specification v4.0.0 — Catalog
 
 A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
@@ -8533,6 +9164,11 @@ schemas/v3.0.0/
     │   │   ├── simple-price.mjs
     │   │   └── prompts/             <- Provider prompts (model-neutral)
     │   └── ...
+    ├── selections/                  <- Curated tool subsets (v4.0.0)
+    │   ├── evm-research/
+    │   │   └── selection.mjs
+    │   └── defi-monitor/
+    │       └── selection.mjs
     └── agents/                      <- Agent definitions
         ├── crypto-research/
         │   ├── agent.mjs            <- Agent manifest (export const agent)
@@ -8555,6 +9191,7 @@ schemas/v3.0.0/
 | `_lists/` | Root | Shared value lists consumed by all providers and agents |
 | `_shared/` | Root | Shared helper modules consumed by provider schemas |
 | `providers/` | Root | Provider schema directories, one per namespace |
+| `selections/` | Root | Curated tool subsets for agent context loading (v4.0.0). See `17-selections.md`. |
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |
@@ -8602,9 +9239,10 @@ The `registry.json` file is the entry point for a catalog. It declares identity 
 ```json
 {
     "name": "flowmcp-community",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "description": "Official FlowMCP community catalog",
-    "schemaSpec": "3.0.0",
+    "schemaSpec": "4.0.0",
+    "contentHash": "sha256:a1b2c3d4e5f6789abcdef01234567890abcdef01234567890abcdef01234567890",
 
     "shared": [
         { "file": "_lists/evm-chains.mjs", "name": "evmChains" },
@@ -8628,9 +9266,37 @@ The `registry.json` file is the entry point for a catalog. It declares identity 
             "description": "Cross-provider crypto analysis agent",
             "manifest": "agents/crypto-research/agent.mjs"
         }
+    ],
+
+    "selections": [
+        {
+            "name": "evm-research",
+            "description": "Tools for EVM contract and token research",
+            "file": "selections/evm-research/selection.mjs"
+        },
+        {
+            "name": "defi-monitor",
+            "description": "Tools for DeFi protocol monitoring",
+            "file": "selections/defi-monitor/selection.mjs"
+        }
     ]
 }
 ```
+
+### `contentHash` Field
+
+The `contentHash` field contains the **SHA-256 hash of the canonically serialized registry contents**. It provides integrity verification for the catalog.
+
+**Hash input:** The hash is computed over a canonical JSON serialization of all referenced Primitives (schemas, shared lists, agents, selections). The algorithm:
+
+1. Collect all file paths referenced in the registry (`shared[].file`, `schemas[].file`, `agents[].manifest`, `selections[].file`)
+2. For each file, read the raw content and sort by file path (alphabetical)
+3. Concatenate: `{filePath}:{fileContent}\n` for each file
+4. Compute SHA-256 of the concatenated string
+
+This ensures that any change to any referenced file invalidates the hash, signaling that the catalog needs re-validation.
+
+**Note:** The `contentHash` field is optional. When absent, the runtime skips integrity verification for the catalog.
 
 All file paths in `registry.json` are relative to the catalog root directory. Absolute paths and paths that escape the catalog directory (e.g. `../other-catalog/file.mjs`) are forbidden.
 
@@ -8837,9 +9503,9 @@ The command runs all CAT rules and reports errors and warnings. A catalog with a
 
 ---
 
-# FlowMCP Specification v3.0.0 — ID Schema
+# FlowMCP Specification v4.0.0 — ID Schema
 
-A unified ID system for referencing Tools, Resources, and Prompts across the FlowMCP ecosystem. IDs must be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, short form conventions, resolution algorithm, placeholder integration, namespace governance, and validation rules.
+A unified ID system for referencing all FlowMCP primitives. IDs must be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
 
 ---
 
@@ -8872,6 +9538,20 @@ The canonical ID format is a three-segment string separated by `/`:
 namespace/resourceType/name
 ```
 
+### Complete ID Types
+
+| Type | Format | Slashes | Example |
+|------|--------|---------|---------|
+| **Schema-File** | `namespace/schema-name` | **1** | `etherscan-io/contracts` |
+| Tool | `namespace/tool/name` | 2 | `etherscan-io/tool/getAbi` |
+| Resource | `namespace/resource/name` | 2 | `etherscan-io/resource/chainDb` |
+| Prompt | `namespace/prompt/name` | 2 | `etherscan-io/prompt/intro` |
+| Skill | `namespace/skill/name` | 2 | `etherscan-io/skill/audit` |
+| Selection | `namespace/selection/name` | 2 | `evm-research/selection/contract` |
+| Agent | `namespace/agent/name` | 2 | `crypto/agent/researcher` |
+
+**Distinguishing rule:** 1 Slash = Schema-File-ID (Container). 2 Slashes = Primitive-ID (Content).
+
 ### Full Form Examples
 
 | ID | Description |
@@ -8891,7 +9571,7 @@ Each segment serves a distinct purpose: the namespace identifies the owner, the 
 | Component | Pattern | Required | Description |
 |-----------|---------|----------|-------------|
 | namespace | `^[a-z][a-z0-9-]*$` | Yes | Provider or agent identifier. Lowercase letters, digits, and hyphens. Must start with a letter. |
-| resourceType | `tool`, `resource`, `prompt`, `list` | Context-dependent | Type discriminator. Required in full form. Omittable in short form when context is unambiguous (see [Short Form](#short-form)). |
+| resourceType | `tool`, `resource`, `prompt`, `list`, `skill`, `selection`, `agent` | Required | Type discriminator. Always required — Short Form is not supported in v4. |
 | name | `^[a-zA-Z][a-zA-Z0-9-]*$` | Yes | Resource name. camelCase for tools and resources, kebab-case for prompts. Must start with a letter. |
 
 ### Component Details
@@ -8916,14 +9596,17 @@ Namespace rules:
 
 #### Resource Type
 
-The resource type discriminates between the four kinds of addressable primitives:
+The resource type discriminates between the seven kinds of addressable primitives in v4.0.0:
 
 | Type | Maps To | Defined In |
 |------|---------|-----------|
 | `tool` | MCP `server.tool` | `main.tools` |
 | `resource` | MCP `server.resource` | `main.resources` |
-| `prompt` | MCP `server.prompt` | `main.skills` |
+| `prompt` | MCP `server.prompt` | `main.prompts` |
+| `skill` | MCP `server.prompt` (skill variant) | `providers/{ns}/skills/`, `selections/{name}/skills/`, or `agents/{name}/skills/` — never `main.skills` (forbidden) |
 | `list` | Shared list | `list.meta.name` |
+| `selection` | Selection | `selections/{name}/selection.mjs` |
+| `agent` | Agent | `agents/{name}/agent.mjs` |
 
 #### Name
 
@@ -8938,38 +9621,62 @@ The name identifies the specific primitive within its namespace and type. Naming
 
 ---
 
-## Short Form
+## Schema-File-ID
 
-When the resource type is unambiguous from context, the `resourceType` segment can be omitted:
+A schema is a `.mjs` file containing 1–8 Primitives. The Schema-File-ID identifies this file as a whole.
+
+**Format:** `namespace/schema-name` (1 slash)
 
 ```
-coingecko/simplePrice          ← tool (default in tool contexts)
-coingecko/price-comparison     ← prompt (when in prompt context)
+Schema-File-ID:  etherscan-io/contracts
+                 └── namespace: etherscan-io
+                 └── schema-name: contracts (equals filename without .mjs)
+
+Contains Primitive-IDs:
+  etherscan-io/tool/getAbi
+  etherscan-io/tool/getContractCreation
+  etherscan-io/resource/abiCache
 ```
 
-### Short Form Rules
+### Naming Rules for schema-name
 
-| Context | Default Type | Example |
-|---------|-------------|---------|
-| `manifest.tools[]` | `tool` | `coingecko/simplePrice` |
-| CLI `flowmcp call` | `tool` | `flowmcp call coingecko/simplePrice` |
-| `{{type:name}}` placeholder in skill content | Determined by type prefix | `{{tool:simplePrice}}` resolves to tool |
-| Validation rules | Full form required | `coingecko/tool/simplePrice` |
-| `registry.json` | Full form required | `coingecko/tool/simplePrice` |
-| Group definitions | Full form required | `coingecko/tool/simplePrice` |
+- Kebab-case, only lowercase letters and hyphens
+- Thematic, not technical (e.g., `contracts`, `nft`, `defi` — not `schema1`, `tools-v2`)
+- For providers with multiple schemas: topic prefix optional (`moralis-nft`, `moralis-defi`)
+- Matches exactly the filename without `.mjs`
 
-### When Short Form Is Allowed
+### Directory Mapping
 
-- In tool contexts (`manifest.tools[]`, CLI call commands), the default type is `tool`
-- In prompt content (`{{type:name}}` references), the type is determined by the placeholder prefix (`tool:`, `resource:`, `skill:`, `input:`)
-- Short form is a convenience — it does not change the canonical ID
+```
+schemas/v4.0.0/providers/etherscan-io/contracts.mjs
+                          └── namespace    └── schema-name.mjs
+→ Schema-File-ID: etherscan-io/contracts
+```
 
-### When Full Form Is Required
+---
 
-- In `registry.json` entries — the registry is the source of truth and must be unambiguous
-- In validation rules and error messages — precision matters for debugging
-- In group definitions — groups compose primitives across schemas and types
-- In any context where multiple types share the same namespace
+## CLI-Adapter
+
+The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to internal MCP tool names:
+
+| External Spec-ID | Internal MCP Tool Name |
+|------------------|------------------------|
+| `etherscan-io/tool/getAbi` | `getAbi_etherscan-io` |
+| `moralis/tool/getTokenBalance` | `getTokenBalance_moralis` |
+
+**Mapping Rule:** `routeName_namespace` (underscore separator, namespace at end). Implemented in `#buildToolName()` in the CLI.
+
+This mapping is internal. Users and agents always use full Spec-IDs.
+
+---
+
+## No Short Form
+
+Short Form is not supported in FlowMCP v4. `flowmcp add getTokenBalance` (without namespace/type) is not allowed.
+
+**Reason:** Ambiguity and hidden data provenance. `moralis/tool/getTokenBalance` is explicit — the namespace immediately shows the data source. For LLMs especially, full Spec-IDs are semantically unambiguous.
+
+All CLI commands use full Spec-IDs.
 
 ---
 
@@ -8984,10 +9691,7 @@ flowchart TD
     A["Receive ID string"] --> B["Split on /"]
     B --> C{Segment count?}
     C -->|3 segments| D["Full form: namespace / type / name"]
-    C -->|2 segments| E["Short form: namespace / name"]
-    C -->|1 or 0| F["Error: ID001"]
-    E --> G["Infer type from context"]
-    G --> D
+    C -->|2 or less| F["Error: ID001 — full form required"]
     D --> H["Look up namespace in registry"]
     H --> I{Namespace found?}
     I -->|No| J["Error: namespace not registered"]
@@ -9001,21 +9705,10 @@ The diagram shows the resolution flow from receiving an ID string through parsin
 
 ### Resolution Steps
 
-1. **Parse** — split the ID string on `/` to extract segments. If three segments: namespace, type, name. If two segments: namespace, name (type inferred from context). If fewer than two segments: validation error ID001.
+1. **Parse** — split the ID string on `/` to extract segments. Three segments required: namespace, type, name. Any other count: validation error ID001 (Short Form is not supported).
 2. **Find** — look up the namespace in the loaded registry or schema catalog. The registry maps namespaces to schema file locations.
 3. **Match** — within the namespace, find the schema, tool, resource, or prompt with the matching name and type.
 4. **Return** — produce the resolved reference: file path to the schema file and the internal key path (e.g., `main.tools.simplePrice`).
-
-### Resolution Context
-
-The resolution context determines how short-form IDs are expanded:
-
-| Caller | Context | Short Form Expansion |
-|--------|---------|---------------------|
-| CLI (`flowmcp call`) | Tool execution | `namespace/name` becomes `namespace/tool/name` |
-| Skill placeholder (`{{type:name}}`) | Content rendering | Type determined by placeholder prefix (`tool:`, `resource:`, `skill:`, `input:`) |
-| Group definition | Group loading | Full form required — no expansion |
-| Validator | Schema validation | Full form required — no expansion |
 
 ---
 
@@ -9027,7 +9720,7 @@ The ID schema connects to the `{{type:name}}` placeholder syntax used in skill c
 |-------------|---------------|
 | `{{tool:getContractAbi}}` | Tool reference — resolved to a tool in the same schema's `main.tools` |
 | `{{resource:verifiedContracts}}` | Resource reference — resolved to a resource in the same schema's `main.resources` |
-| `{{skill:quick-summary}}` | Skill reference — resolved to a skill in the same schema's `main.skills` |
+| `{{skill:quick-summary}}` | Skill reference — resolved to a skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). `main.skills` is forbidden in v4.0.0. |
 | `{{input:address}}` | Input parameter — value provided by the user at runtime |
 
 ### Resolution in Skills
@@ -9095,10 +9788,10 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 |------|----------|------|
 | ID001 | error | ID must contain at least one `/` separator |
 | ID002 | error | Namespace must match `^[a-z][a-z0-9-]*$` |
-| ID003 | error | ResourceType (if present) must be one of: `tool`, `resource`, `prompt`, `list` |
+| ID003 | error | ResourceType must be one of: `tool`, `resource`, `prompt`, `list`, `skill`, `selection`, `agent` |
 | ID004 | error | Name must not be empty |
-| ID005 | warning | Short form should only be used in unambiguous contexts |
-| ID006 | error | Full form is required in `registry.json` and validation rules |
+| ID005 | error | Short Form is not supported — full form (`namespace/type/name`) is always required |
+| ID006 | error | Full form is required everywhere — no context-based inference |
 
 ### Validation Output Examples
 
@@ -9185,5 +9878,755 @@ The ID schema unifies several existing identification mechanisms:
 | Shared list `ref` field | `shared/list/name` | Wrap in `shared/list/` prefix |
 
 The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see `08-migration.md`.
+
+---
+
+# FlowMCP Specification v4.0.0 — Selections
+
+**Version:** FlowMCP 4.0.0  
+**Status:** Active  
+**Primitive:** Selection (5th primitive)
+
+---
+
+## Overview
+
+A **Selection** is a named collection of Primitives (Tools, Resources, Prompts, Skills) that belong together thematically. Selections enable agents to activate a coherent set of capabilities with a single operation.
+
+---
+
+## Export Format
+
+```javascript
+export const selection = {
+    namespace: 'evm-research',
+    name: 'contract-analysis',
+    version: 'flowmcp/4.0.0',
+    description: 'Tools and Skills for Smart Contract analysis on EVM chains',
+    whenToUse: 'Activate this Selection when the user wants to analyze, debug, or inspect a smart contract.',
+    tools: [
+        'etherscan-io/tool/getSmartContractAbi',
+        'etherscan-io/tool/getContractCreation'
+    ],
+    skills: [ 'etherscan-io/skill/contract-deep-dive' ],
+    resources: [],
+    prompts: []
+}
+```
+
+## Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `namespace` | string | Namespace owning this selection |
+| `name` | string | Selection name (kebab-case) |
+| `version` | string | Must be `'flowmcp/4.0.0'` |
+| `description` | string | What this selection provides |
+| `whenToUse` | string | When an agent should activate this selection (SEL001) |
+| `tools` | string[] | Tool Primitive-IDs included |
+| `skills` | string[] | Skill Primitive-IDs included |
+| `resources` | string[] | Resource Primitive-IDs included |
+| `prompts` | string[] | Prompt Primitive-IDs included |
+
+At least one array must be non-empty (SEL002).
+
+## ID Format
+
+Selection ID: `namespace/selection/name` (2 slashes)
+
+Example: `evm-research/selection/contract-analysis`
+
+## File Location
+
+```
+schemas/v4.0.0/selections/
+  evm-research/
+    contract-analysis.mjs
+```
+
+Directory `selections/` is at root level, alongside `providers/` and `agents/`.
+
+## Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| SEL001 | error | `whenToUse` is required and must not be empty |
+| SEL002 | error | At least one array (tools/skills/resources/prompts) must be non-empty |
+| SEL003 | error | All referenced Primitive-IDs must be resolvable |
+
+## Selection as Test-Trigger
+
+A Selection-File can be used as a transitive test trigger via:
+
+```
+flowmcp dev test single <selection-file>
+```
+
+This:
+1. Loads the Selection.
+2. Resolves every member ID via the IdResolver (transitive).
+3. Recursively gathers tests from each member schema (Tools, Resources, Skills, Prompts).
+4. Executes all member tests and aggregates per-primitive PASS/FAIL counts.
+5. Reports an aggregate status: `M/N Members PASS`.
+
+**Important**: The Selection itself has no execution tests — it is a *grouping*. The test-trigger model uses Selections as **batch loaders** for transitive testing of their members.
+
+### Inline Skills
+
+When a Selection defines inline skills (`selection.skills[]` entries that are full Skill objects rather than ID references), each inline-skill is treated as a Skill-Test target:
+- Structural validation runs (placeholders resolvable, prefills declared)
+- The inline skill is then bound to the Selection's namespace for context
+
+### Output Format Example
+
+```
+┌─ Selection: defi-pools-toolkit
+│  ├─ SEL003: all member IDs resolvable  ✓
+│  │
+│  ├─ Tools (1)
+│  │   └─ dexscreener.searchPair        3/3 PASS
+│  │
+│  ├─ Resources (2)
+│  │   ├─ pools.searchPoolsByToken      3/3 PASS
+│  │   └─ tokens.getTokenBySymbol       3/3 PASS
+│  │
+│  └─ Skills (1)
+│      └─ analyze-token-pools
+│         ├─ Structural (Placeholder-Resolution)   ✓
+│         └─ Prefill executed (2 Resources)        ✓
+│
+└─ Selection Aggregat: 4/4 Members PASS
+```
+
+### New Validation Code: SEL004 (Inline-Skill Sanity)
+
+If a Selection includes inline-skill objects, the SelectionValidator additionally runs SkillValidator on each. This is recorded as SEL004 in the validation report. Optional — present only when inline skills exist.
+
+## Runtime Behavior
+
+- If a referenced Primitive-ID is unresolvable, the Selection fails to load with a clear error message.
+- Example: `"Selection evm-research/selection/contract-analysis: Reference 'etherscan-io/tool/getSmartContractAbi' not found"`
+- AGT030: Agent startup fails if a referenced Selection cannot be loaded.
+
+---
+
+# FlowMCP Specification v4.0.0 — Prefill and Placeholders
+
+**Version:** FlowMCP 4.0.0  
+**Status:** Active
+
+---
+
+## Overview
+
+**Placeholders** are template tokens embedded in Skill content that are resolved at runtime. **Prefill** is a mechanism to pre-execute a tool and embed its result into the Skill before delivery.
+
+---
+
+## Placeholder Syntax
+
+All placeholders use double-brace syntax: `{{type:reference}}` or `{{type:reference:field}}`.
+
+## Complete Placeholder Table
+
+| Syntax | Resolves To |
+|--------|------------|
+| `{{tool:ns/name}}` | Complete tool block (description + parameters) |
+| `{{tool:ns/name:description}}` | Tool description only |
+| `{{tool:ns/name:parameters}}` | Parameter table only |
+| `{{tool:ns/name:test}}` | First test case as example call |
+| `{{tool:ns/name:meta}}` | Meta flags (isReadOnly, isDestructive, etc.) |
+| `{{tool:ns/name:call}}` | Ready-to-use call command |
+| `{{resource:ns/name}}` | Resource reference |
+| `{{prompt:ns/name}}` | Prompt reference |
+| `{{skill:name}}` | Skill reference (1 level, no nesting) |
+| `{{input:key}}` | User input parameter |
+| `{{prefill:ns/tool/name}}` | Pre-executed tool result |
+| `{{listName:alias}}` | Shared List value via alias |
+
+## Prefill Declaration
+
+In a Skill, prefill is declared in the `prefill` array:
+
+```javascript
+export const skill = {
+    name: 'contract-analysis',
+    prefill: [
+        {
+            tool: 'etherscan-io/tool/getNetworkStatus',
+            params: { network: '{{input:chain}}' }
+        }
+    ],
+    content: `
+Network status: {{prefill:etherscan-io/tool/getNetworkStatus}}
+
+Now analyze contract at {{input:address}}...
+`
+}
+```
+
+## Resolution Flow (8 Steps)
+
+1. Skill is requested (with `input` parameters)
+2. `prefill[]` entries are executed in order
+3. Results are stored temporarily
+4. `{{input:key}}` tokens are replaced with user parameters
+5. `{{prefill:ns/tool/name}}` tokens are replaced with pre-executed results
+6. `{{tool:...}}`, `{{resource:...}}`, `{{prompt:...}}` tokens are resolved from catalog
+7. `{{listName:alias}}` tokens are resolved from Shared Lists
+8. Fully resolved Skill content is delivered to the agent
+
+## Error Handling
+
+**Principle:** Always deliver the Skill. Errors are visible in the placeholder, not silent.
+
+If a placeholder cannot be resolved, the error message replaces the placeholder:
+
+```
+{{tool:unknown/ns/missingTool}} → [ERROR: Tool 'unknown/ns/missingTool' not found]
+{{prefill:ns/tool/name}} → [ERROR: Prefill execution failed: HTTP 503]
+```
+
+This ensures the Skill is always delivered — even if some references are broken.
+
+---
+
+# FlowMCP Specification v4.0.0 — MCP Server Integration
+
+**Version:** FlowMCP 4.0.0  
+**Status:** Active
+
+---
+
+## Overview
+
+When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific metadata. The `meta` block in every Tool definition provides this metadata.
+
+---
+
+## Meta Block (Required per Tool)
+
+Every Tool in v4.0.0 MUST have a `meta` block:
+
+```javascript
+export const schema = {
+    main: { /* ... */ },
+    tools: {
+        getSmartContractAbi: {
+            description: 'Get the ABI for a verified smart contract',
+            parameters: { /* ... */ },
+            meta: {
+                isReadOnly: true,
+                isConcurrencySafe: true,
+                isDestructive: false,
+                searchHint: 'contract ABI ethereum smart contract',
+                aliases: [ 'getAbi' ],
+                alwaysLoad: false
+            }
+        }
+    }
+}
+```
+
+## Meta Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `isReadOnly` | boolean | Yes (VAL101) | Tool does not modify any state |
+| `isConcurrencySafe` | boolean | Yes (VAL102) | Safe to call concurrently |
+| `isDestructive` | boolean | Yes (VAL103) | Tool can cause irreversible changes |
+| `searchHint` | string | Yes (VAL104) | Keywords for ToolSearch (not empty) |
+| `aliases` | string[] | Yes (VAL105) | Alternative names for ToolSearch |
+| `alwaysLoad` | boolean | Yes (VAL106) | Always register with MCP (bypass lazy loading) |
+
+## MCP Translation
+
+When a Tool is registered with an MCP Server, `meta` fields are translated to MCP annotations:
+
+| FlowMCP Field | MCP Annotation |
+|---------------|----------------|
+| `meta.alwaysLoad` | `_meta['anthropic/alwaysLoad']` |
+| `meta.searchHint` | `_meta['anthropic/searchHint']` |
+
+This translation happens at registration time in the FlowMCP CLI/Core.
+
+## alwaysLoad Policy
+
+`alwaysLoad: true` should be used sparingly. Guidelines:
+
+- **true**: Tool is almost always needed in any session (e.g., a core utility tool)
+- **false** (default): Tool is loaded on demand via ToolSearch
+
+Excessive `alwaysLoad: true` pollutes the agent's active tool list and degrades performance.
+
+## aliases Field
+
+`aliases` enables ToolSearch to find a Tool by alternative names:
+
+If an agent searches for `getAbi`, ToolSearch finds `getSmartContractAbi` because `getAbi` is in its `aliases` array.
+
+Empty array `[]` is valid — means no aliases.
+
+## Validation Rules
+
+| Code | Severity | Rule |
+|------|----------|------|
+| VAL100 | error | Every Tool MUST have a `meta` block |
+| VAL101 | error | `meta.isReadOnly` required (boolean) |
+| VAL102 | error | `meta.isConcurrencySafe` required (boolean) |
+| VAL103 | error | `meta.isDestructive` required (boolean) |
+| VAL104 | error | `meta.searchHint` required (string, not empty) |
+| VAL105 | error | `meta.aliases` required (string[]) |
+| VAL106 | error | `meta.alwaysLoad` required (boolean) |
+
+---
+
+# FlowMCP Specification v4.0.0 — Validation Strategy
+
+**Version:** FlowMCP 4.0.0  
+**Status:** Active
+
+---
+
+## Overview
+
+FlowMCP v4.0.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+
+---
+
+## Grade System
+
+| Grade | Condition | Meaning |
+|-------|-----------|---------|
+| A | PASS + Score ≥ 4.0 | Production-ready |
+| B | PASS + Score ≥ 3.0 | Good, minor gaps |
+| C | PASS + Score ≥ 2.0 | Acceptable |
+| D | PASS + Score < 2.0 | Weak |
+| F | FAIL | Not loadable |
+
+**PASS** means the deterministic validator found no errors (warnings are allowed).
+
+## Grade Report Format
+
+```json
+{
+    "schemaId": "etherscan-io/contracts",
+    "validatorVersion": "validation/4.0",
+    "timestamp": "2026-05-11T09:00:00Z",
+    "deterministic": {
+        "status": "PASS",
+        "errors": [],
+        "warnings": []
+    },
+    "probabilistic": {
+        "score": 4.2
+    },
+    "primitives": [
+        "etherscan-io/tool/getAbi",
+        "etherscan-io/tool/getContractCreation"
+    ],
+    "grade": "A"
+}
+```
+
+### Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `schemaId` | string | Schema-File-ID (`namespace/schema-name`, 1 slash) — references the physical `.mjs` file |
+| `validatorVersion` | string | Validator version used (internal, not stored in schemas) |
+| `timestamp` | string | ISO 8601 when the report was generated |
+| `deterministic.status` | string | `PASS` or `FAIL` |
+| `deterministic.errors` | array | Validation errors (VAL codes) |
+| `deterministic.warnings` | array | Validation warnings |
+| `probabilistic.score` | number | LLM evaluation score (0.0–5.0) |
+| `primitives` | string[] | All Primitive-IDs active in this schema at validation time |
+| `grade` | string | Final grade: A, B, C, D, or F |
+
+## schemaId is Schema-File-ID
+
+`schemaId` MUST be the Schema-File-ID (`namespace/schema-name`, 1 slash) — not a Primitive-ID (2 slashes).
+
+**Correct:** `"schemaId": "etherscan-io/contracts"`  
+**Wrong:** `"schemaId": "etherscan-io/tool/getAbi"` ← This is a Primitive-ID
+
+The Schema-File-ID connects the report to the physical file on disk.
+
+## Validator Versioning
+
+Validator versions are internal and are NOT stored in schema files. They appear only in the Grade Report:
+
+- `validation/4.0` — initial v4 validator
+- `validation/4.1` — incremental update (backward compatible)
+
+This avoids `validationVersion` fields in schema files (anti-pattern — the Grade Report is the record).
+
+## Deterministic Validation
+
+Validates structural correctness:
+- Schema structure (`main`, `tools`, `resources`, etc.)
+- Required fields per primitive type
+- Validation rules VAL001–VAL107
+- SEL, AGT, RES rule sets
+
+## Probabilistic Validation
+
+LLM-based quality evaluation:
+- Description quality (clear, accurate, useful)
+- Parameter documentation completeness
+- Test case coverage
+- One-Shot completeness for Skills
+
+Score range: 0.0 (unusable) to 5.0 (excellent).
+
+## Partial Schema Policy
+
+Before Production deploy, all failing Primitives MUST be removed from the schema file.
+
+A Language Model calling `flowmcp add etherscan-io/contracts` receives the tool list and assumes all tools work. A failing tool in Production causes unpredictable errors.
+
+**Rule:** 1 failing primitive gets removed — regardless of how many others pass.
+
+---
+
+# FlowMCP Specification v4.0.0 — Schema Lifecycle
+
+**Version:** 4.0.0  
+**Status:** Active
+
+---
+
+## Overview
+
+Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas, and the policy for handling partially passing schemas.
+
+---
+
+## Lifecycle Stages
+
+| Stage | Label | Entry Condition | Exit Condition |
+|-------|-------|-----------------|----------------|
+| 1 | `stage:research` | API endpoint discovered | API reachable, schema creation is feasible |
+| 2 | `stage:creation` | Research complete | Schema file created in `tests/new-schemas/` |
+| 3 | `stage:api-test` | Schema created | `flowmcp test single` → min. 1 PASS (see Special Rule) |
+| 4 | `stage:validation` | API test passed | `flowmcp validate` → 0 errors |
+| 5 | `stage:grade` | Validation passed | Grade B or better |
+| 6 | `stage:production` | Grade B+ confirmed | Deployed to `providers/` in production catalog |
+
+### Stage Details
+
+**`stage:research`** — The API has been identified as a candidate. The developer verifies that the endpoint is reachable and that the schema design is feasible (authentication model, response format, parameter structure).
+
+**`stage:creation`** — The schema file is written and placed in `tests/new-schemas/{provider}/`. This stage covers the authoring process — defining tools, parameters, shared list references, handlers, and test cases.
+
+**`stage:api-test`** — The schema is tested against the live API using `flowmcp test single <path>`. At least one tool must return a PASS result. See the [API-Test Special Rule](#api-test-special-rule-for-static-schemas) below for schemas with no HTTP tools.
+
+**`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
+
+**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the schema quality standards for grading criteria.
+
+**`stage:production`** — The schema is moved from `tests/new-schemas/` to `providers/{namespace}/` in the production catalog and registered in `registry.json`.
+
+---
+
+## API-Test Special Rule for Static Schemas
+
+Not all schemas make HTTP calls. A schema is considered **static** when all of its primitives are non-HTTP:
+
+| Schema Type | Has HTTP? | API-Test Required? |
+|-------------|-----------|-------------------|
+| At least 1 Tool or HTTP-Resource | Yes | **Yes** — min. 1 PASS required |
+| Exclusively Prompts / static Skills | No | **Auto-PASS** — stage skipped |
+
+**Static schemas** — schemas that contain only Prompts and/or static Skills (no Tools, no HTTP-Resource) — receive an automatic PASS for `stage:api-test`. There is no live API to test against. The stage is considered complete and the schema proceeds directly to `stage:validation`.
+
+**Note:** In practice, static schemas are rare. The primary use case is future Prompt-only schemas or documentation-only namespaces. Most schemas in the community catalog contain at least one Tool.
+
+**Migration schemas** — schemas migrated from v3 that contain only static primitives also receive Auto-PASS. See [Migration Special Rule](#migration-special-rule).
+
+---
+
+## Migration Special Rule
+
+Schemas migrated from v3.0.0 to v4.0.0 do not need to repeat the full lifecycle from scratch:
+
+- Migrated schemas start at **`stage:api-test`** (not `stage:research`)
+- The research and creation stages are considered complete by virtue of the existing v3 schema
+- All subsequent stages (`stage:api-test` through `stage:production`) apply normally
+
+This shortens the migration path: a previously passing v3 schema that has been updated to v4 syntax needs only an API test, validation pass, and grade check before it can re-enter production.
+
+---
+
+## Partial Schema Policy
+
+### Core Rule
+
+All failing primitives **MUST** be removed before a schema is deployed to production. A schema with failing tools, resources, or skills cannot enter `stage:production`.
+
+**Rationale:** An LLM working with a schema assumes that every registered primitive is functional. If `getTokenPrice` is listed but always errors, the agent has no way to know — it will attempt the call, fail, and potentially produce incorrect results. Removing failing primitives eliminates silent failures at the cost of reduced coverage.
+
+### Example: Before and After
+
+```javascript
+// BEFORE — etherscan-io/contracts.mjs with 3 tools, 1 failing
+tools: {
+    getContractAbi: { /* ... */ },      // PASS — keep
+    getSourceCode: { /* ... */ },       // PASS — keep
+    getCreationCode: { /* ... */ }      // FAIL — remove before production
+}
+
+// AFTER — ready for production
+tools: {
+    getContractAbi: { /* ... */ },      // PASS
+    getSourceCode: { /* ... */ }        // PASS
+}
+// getCreationCode removed — tracked as separate sub-issue
+```
+
+### Threshold
+
+There is no percentage threshold. **Each failing primitive is evaluated individually:**
+
+- 1 of 8 tools failing → remove the 1 failing tool, deploy the 7 passing tools
+- 3 of 5 tools failing → remove 3 failing tools, deploy 2 passing tools
+- All tools failing → schema does not deploy (no primitives remain)
+
+The threshold-free policy prevents edge cases where a "60% pass rate" is considered acceptable. Either a primitive works or it does not.
+
+### What Happens to Removed Primitives
+
+Removed primitives are not abandoned — they are tracked for future resolution:
+
+1. **Sub-Issue created** — A GitHub issue is opened for each removed primitive. The issue is linked to the parent schema issue.
+2. **Backlog stage** — The removed primitive starts at `stage:research` (with the API reachability already known).
+3. **Resolution path** — When the underlying issue is fixed (changed API, missing auth, updated handler), the primitive is re-added to the schema and goes through `stage:api-test` → `stage:validation` → `stage:grade`.
+4. **Re-integration** — The fixed primitive is merged back into the production schema. A new grade check may be required if the primitive significantly changes the schema's scope.
+
+### What Counts as Failing
+
+A primitive fails the API test when:
+- The HTTP response is a non-2xx status code (authentication error, rate limit, deprecated endpoint)
+- The response does not match the declared `output.schema`
+- The handler throws an uncaught exception
+- The tool times out consistently (> 30 seconds)
+
+A primitive passes when at least one of its test cases returns a 2xx response with a parseable body that matches the declared output shape.
+
+---
+
+# Scoring Protocol v1
+
+Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
+
+---
+
+## Purpose
+
+The scoring protocol decouples three concerns:
+
+1. **Prompt generation** — done deterministically by `flowmcp-core/v4/GradeReporter.buildEvalPrompts`
+2. **Score production** — done by an external Grader (LLM-based)
+3. **Grade calculation** — done deterministically by `flowmcp-core/v4/GradeReporter.grade`
+
+CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via JSON files (`prompts.json`, `scores.json`).
+
+---
+
+## Protocol Version
+
+`scoringProtocol: "v1"`
+
+Versioning allows future changes without breaking existing graders. Implementations MUST check the version and fail gracefully on unknown values.
+
+---
+
+## Dimensions
+
+Each schema is evaluated on 2 dimensions:
+
+| Dimension | What is rated |
+|-----------|---------------|
+| `whenToUse` | Clarity and specificity of the schema description (does an LLM know when to use this schema?) |
+| `parameters` | How well the parameter descriptions enable correct tool invocation |
+
+Each dimension yields a score on a 1.0-5.0 scale (floating point).
+
+---
+
+## Grade Thresholds
+
+| Grade | Score Range | Action |
+|-------|-------------|--------|
+| A | >= 4.5 | Production-ready |
+| B | 3.5 <= s < 4.5 | Production-ready |
+| C | 2.5 <= s < 3.5 | Hold (improvement plan) |
+| D / F | < 2.5 | Blocked (no deploy) |
+
+Production-Gate (Memo 027): Score >= 3.5 required for deployment.
+
+---
+
+## File Formats
+
+### `prompts.json` — Emitted by CLI
+
+Written by `flowmcp dev grade <schema> --emit-prompts`. Read by Grader.
+
+```json
+{
+    "schemaId": "namespace/file-base",
+    "schemaIdSlug": "namespace_file-base",
+    "schemaPath": "/abs/path/to/schema.mjs",
+    "scoringProtocol": "v1",
+    "scoringInstructions": "Du bist ein Schema-Bewerter. Bewerte unabhaengig basierend nur auf den unten gelieferten Informationen. Antworte als JSON-Array: [ { \"dimension\": \"...\", \"score\": <1.0-5.0>, \"reasoning\": \"...\" }, ... ]. Keine externen Annahmen, keine Kontext-Vermutungen.",
+    "prompts": [
+        {
+            "dimension": "whenToUse",
+            "prompt": "Rate the clarity and specificity of the following Schema description on a scale 1.0-5.0. Schema description: \"...\""
+        },
+        {
+            "dimension": "parameters",
+            "prompt": "Rate how well the parameter descriptions in the following schema enable an LLM to call the tools correctly on a scale 1.0-5.0. Schema: {...}"
+        }
+    ]
+}
+```
+
+### `scores.json` — Written by Grader
+
+Read by `flowmcp dev grade <schema> --consume-scores <path>`.
+
+```json
+{
+    "schemaIdSlug": "namespace_file-base",
+    "scoringProtocol": "v1",
+    "creator": {
+        "skill": "grade-score-single",
+        "skillVersion": "1.0.0",
+        "session": "claude-code-2026-05-18-03-15"
+    },
+    "harness": {
+        "name": "claude-code",
+        "version": "1.0.0",
+        "model": "claude-opus-4-7",
+        "modelContext": "1M"
+    },
+    "timestamp": "2026-05-18T03:15:00Z",
+    "scores": [
+        {
+            "dimension": "whenToUse",
+            "score": 4.0,
+            "reasoning": "Description is clear and specific..."
+        },
+        {
+            "dimension": "parameters",
+            "score": 3.5,
+            "reasoning": "Tools have descriptive names..."
+        }
+    ]
+}
+```
+
+### Grade Report — Written by CLI
+
+`flowmcp dev grade <schema> --consume-scores <path>` writes the final report:
+
+```json
+{
+    "schemaId": "namespace/file-base",
+    "schemaIdSlug": "namespace_file-base",
+    "schemaPath": "/abs/path/to/schema.mjs",
+    "schemaHash": "sha256:abc...",
+    "date": "2026-05-18",
+    "grade": "B",
+    "score": 3.75,
+    "scoringProtocol": "v1",
+    "creator": { ... },
+    "harness": { ... },
+    "timestamps": {
+        "startedAt": "2026-05-18T03:00:00Z",
+        "scoredAt": "2026-05-18T03:15:00Z",
+        "gradedAt": "2026-05-18T03:16:00Z",
+        "reportedAt": "2026-05-18T03:16:00Z"
+    },
+    "dimensions": [ ... ],
+    "validationPassed": true,
+    "validationErrors": []
+}
+```
+
+---
+
+## Reproducibility Guarantees
+
+The protocol provides **statistical reproducibility** (not bitwise):
+
+| Guarantee | How |
+|-----------|-----|
+| Same schema | `schemaHash` (sha256) in report |
+| Same prompt template | `scoringProtocol: "v1"` in scores + report |
+| Same LLM | `harness.model` in scores + report |
+| Same scoring context | Grader MUST use isolated context (no session-state) |
+| Same output format | JSON-Schema for scores |
+
+Expectation: same inputs → same score within ±0.2 on the 1.0-5.0 scale.
+
+---
+
+## Schema ID Slug Convention
+
+Schema IDs follow the `<namespace>/<file-base>` pattern (e.g. `mudab/marine-data`).
+
+For use in file paths, the `/` is replaced with `_`:
+
+```
+mudab/marine-data → mudab_marine-data
+coingecko-com/search-ohlc → coingecko-com_search-ohlc
+```
+
+Reference implementation: `flowmcp-core/v4/GradeReporter._formatSuggestedFileName`.
+
+---
+
+## Grader Implementation Requirements
+
+A Grader MUST:
+
+1. Read `prompts.json`, parse `scoringProtocol` field
+2. Reject unknown protocol versions
+3. Score each prompt independently in an isolated context (no shared state between prompts of the same schema)
+4. Return scores in the same order as input prompts (or include `dimension` field for matching)
+5. Set `creator`, `harness`, `timestamp` metadata
+6. Write `scores.json` atomically (write-temp + rename)
+
+A Grader MUST NOT:
+
+- Use external context beyond what's in `prompts.json`
+- Use tools or external lookups
+- Embed scores from previous sessions
+- Modify the `scoringProtocol` value
+
+---
+
+## Reference Implementations
+
+| Implementation | Type | Location |
+|----------------|------|----------|
+| `grade-score-single` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-single/SKILL.md` |
+| `grade-score-batch` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-batch/SKILL.md` |
+| `flowmcp dev grade` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs:grade()` |
+| `GradeReporter` | Core Module | `flowmcp-core/src/v4/task/GradeReporter.mjs` |
+
+---
+
+## References
+
+- Memo 029 PRD F2 (`flowmcp dev grade` original design — superseded by Memo 036)
+- Memo 036 (LLM-Integration-Pattern, REV-06)
+- Memo 026 REV-09 (Grade-Schwellen)
+- Memo 027 REV-07 (Production-Gate)
+- Spec 20 (`20-validation-strategy.md` — overall validation strategy)
+- Spec 21 (`21-schema-lifecycle.md` — when grading happens in the lifecycle)
 
 ---

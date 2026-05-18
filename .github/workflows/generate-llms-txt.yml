@@ -3,7 +3,7 @@ name: Generate llms.txt
 on:
   push:
     paths:
-      - 'spec/v3.0.0/*.md'
+      - 'spec/v4.0.0/*.md'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Generate llms.txt from spec files
         run: |
-          SPEC_DIR="spec/v3.0.0"
+          SPEC_DIR="spec/v4.0.0"
           OUTPUT="$SPEC_DIR/llms.txt"
 
           TITLES=(
@@ -39,6 +39,12 @@ jobs:
             "Skills"
             "Catalog"
             "ID Schema"
+            "Selections"
+            "Prefill"
+            "MCP Integration"
+            "Validation Strategy"
+            "Schema Lifecycle"
+            "Scoring Protocol"
           )
 
           FILES=(
@@ -59,14 +65,20 @@ jobs:
             "14-skills.md"
             "15-catalog.md"
             "16-id-schema.md"
+            "17-selections.md"
+            "18-prefill.md"
+            "19-mcp-integration.md"
+            "20-validation-strategy.md"
+            "21-schema-lifecycle.md"
+            "22-scoring-protocol.md"
           )
 
           # Header
           cat > "$OUTPUT" << 'HEADER'
-          # FlowMCP Specification v3.0.0
+          # FlowMCP Specification v4.0.0
           > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
           >
-          > This file concatenates all 17 specification documents into a single file for LLM consumption.
+          > This file concatenates all 23 specification documents into a single file for LLM consumption.
           > Source: https://github.com/FlowMCP/flowmcp-spec
 
           ## Table of Contents
@@ -98,13 +110,13 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet spec/v3.0.0/llms.txt || echo "changed=true" >> "$GITHUB_OUTPUT"
+          git diff --quiet spec/v4.0.0/llms.txt || echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add spec/v3.0.0/llms.txt
+          git add spec/v4.0.0/llms.txt
           git commit -m "Auto-regenerate llms.txt from spec changes"
           git push

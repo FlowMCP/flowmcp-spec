@@ -2,8 +2,6 @@
 
 Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
 
-> **v4.0.0 Naming Note (Spec-Breaking):** The previously named `freeQuery` auto-injected query has been renamed to `runSql`. In addition, `describeTables` is now auto-injected for AI-friendly schema discovery, and `getSchema` has been downgraded from MUST to OPTIONAL. No backward compatibility is provided — schemas that still reference the old `freeQuery` name will fail Auto-Inject. See PRD-009 / Memo 035.
-
 ---
 
 ## Purpose

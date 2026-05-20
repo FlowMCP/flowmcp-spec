@@ -270,7 +270,7 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 | 2.0.0 | — | 2026-02 | Two-export format (`main` + `handlers` factory). Dependency injection via allowlist. Shared lists for reusable values. Output schema declarations. Zero-import security model. Groups with integrity hashes. Maximum routes reduced from 10 to 8. |
 | 3.0.0 | 1.0 | 2026-03 | Four primitives: Tools (renamed from Routes), Resources (SQLite), Prompts (model-neutral/model-specific guidance), Skills (`.mjs` instructional workflows). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
 | 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with `agent.mjs` manifest format (`export const agent`). Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `{{type:name}}` (replaces deprecated `[[...]]`). ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
-| 3.1.0 | 1.0 | 2026-03 | Resources: Two SQLite modes (`in-memory` with `readonly: true`, `file-based` with WAL). Origin system (`global`, `project`, `inline`) replaces pseudo-paths. `better-sqlite3` replaces `sql.js`. `getSchema` MUST for both modes. `freeQuery` auto-injected. Max queries increased to 8. Block patterns removed. `source: 'markdown'` resource type with parameter-based access. Folder renamed `data/` to `resources/`. All fields required. Prompts: `contentFile` field for Provider-Prompts (content in external file). `references` field required (empty array when none). `about` convention (SHOULD) for Provider-Schemas and Agent-Manifests. |
+| 3.1.0 | 1.0 | 2026-03 | Resources: Two SQLite modes (`in-memory` with `readonly: true`, `file-based` with WAL). Origin system (`global`, `project`, `inline`) replaces pseudo-paths. `better-sqlite3` replaces `sql.js`. `getSchema` MUST for both modes. `runSql` auto-injected. Max queries increased to 8. Block patterns removed. `source: 'markdown'` resource type with parameter-based access. Folder renamed `data/` to `resources/`. All fields required. Prompts: `contentFile` field for Provider-Prompts (content in external file). `references` field required (empty array when none). `about` convention (SHOULD) for Provider-Schemas and Agent-Manifests. |
 
 ---
 
@@ -284,8 +284,8 @@ The v3.1.0 release enhances Resources and Prompts with production-ready features
 - **Origin system** — `origin: 'global'`, `origin: 'project'`, `origin: 'inline'` replace pseudo-paths (`~/.flowmcp/data/`, `./data/`). Explicit storage locations with clear resolution rules.
 - **`better-sqlite3` runtime** — Replaces `sql.js` as the unified SQLite runtime. Native C bindings, real `readonly: true` flag, WAL mode for concurrent writes.
 - **`getSchema` is MUST** — Required for both modes (previously SHOULD). Schema authors must define it. CLI uses it to create databases for `file-based` mode.
-- **`freeQuery` auto-injected** — Runtime automatically adds freeQuery. SELECT-only for in-memory, all statements for file-based.
-- **Max queries increased to 8** — 7 schema-defined (including getSchema) + 1 auto-injected freeQuery.
+- **`runSql` auto-injected** — Runtime automatically adds runSql. SELECT-only for in-memory, all statements for file-based.
+- **Max queries increased to 8** — 7 schema-defined (including getSchema) + 1 auto-injected runSql.
 - **Block patterns removed** — `readonly: true` handles in-memory security at DB level. No more SQL pattern matching.
 - **Markdown resources** — `source: 'markdown'` with parameter-based access (section, lines, search). Intended for API documentation shipped with schemas.
 - **Folder renamed** — `resources/` replaces `data/`.

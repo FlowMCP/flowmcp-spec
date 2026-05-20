@@ -77,6 +77,11 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `docs` | `string[]` | `[]` | Documentation URLs for the API provider. Informational only. |
+| `termsOfService` | `string \| null` | `null` | URL to the API provider's Terms of Services. **Informational only — FlowMCP does not classify or interpret ToS.** See `23-license-and-tos.md`. |
+| `termsOfServiceCheckedAt` | `string \| null` | `null` | ISO-Date (YYYY-MM-DD) when `termsOfService` URL was last verified by FlowMCP authors. |
+| `termsOfServiceLanguage` | `string \| null` | `null` | Two-letter language code of the ToS document (`'en'`, `'de'`, `'multi'`). |
+| `dataLicense` | `string \| null` | `null` | URL to the data license of API responses (e.g. CC-BY, Public Domain), if separately published by provider. |
+| `dataLicenseName` | `string \| null` | `null` | Human-readable name of the data license (e.g. `'CC-BY-SA-4.0'`, `'Public Domain'`). |
 | `tags` | `string[]` | `[]` | Categorization tags for tool discovery (e.g. `['defi', 'tvl']`). |
 | `requiredServerParams` | `string[]` | `[]` | Environment variable names needed at runtime (e.g. `['ETHERSCAN_API_KEY']`). |
 | `requiredLibraries` | `string[]` | `[]` | npm packages needed by handlers. Must be on the runtime allowlist. See `05-security.md`. |

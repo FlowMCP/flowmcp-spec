@@ -8,7 +8,7 @@ Output schemas make tool responses predictable. AI clients can know in advance w
 
 ## Purpose
 
-Without output schemas, an AI client calling a FlowMCP tool receives an opaque blob of JSON. The client must infer the structure from context, previous calls, or the tool description — all unreliable strategies.
+Without output schemas, an AI client calling a FlowMCP tool receives an opaque blob of JSON. The client MUST infer the structure from context, previous calls, or the tool description — all unreliable strategies.
 
 Output schemas solve this by declaring the expected response shape at the route level:
 
@@ -57,7 +57,7 @@ routes: {
 }
 ```
 
-The `output` field lives in the `main` block and is therefore part of the hashable, JSON-serializable schema surface. It must not contain functions or dynamic expressions.
+The `output` field lives in the `main` block and is therefore part of the hashable, JSON-serializable schema surface. It MUST NOT contain functions or dynamic expressions.
 
 ---
 
@@ -151,7 +151,7 @@ The following JSON Schema keywords are intentionally excluded:
 - `$ref` — no schema references; output schemas are self-contained
 - `oneOf`, `anyOf`, `allOf` — no union types; keep schemas simple
 - `required` — all declared properties are informational, not enforced
-- `additionalProperties` — APIs may return extra fields; the schema describes the guaranteed minimum
+- `additionalProperties` — APIs MAY return extra fields; the schema describes the guaranteed minimum
 - `pattern` — no regex validation on output fields
 - `minimum`, `maximum` — no range validation on output fields
 
@@ -322,7 +322,7 @@ output: {
 
 ## Nullable Fields
 
-Fields that may be `null` in a successful response must declare `nullable: true`:
+Fields that MAY be `null` in a successful response MUST declare `nullable: true`:
 
 ```javascript
 properties: {
@@ -331,7 +331,7 @@ properties: {
 }
 ```
 
-Without `nullable: true`, a `null` value in the response triggers a validation warning. This distinction helps AI clients differentiate between "field not available for this entry" (nullable) and "field should always be present" (not nullable).
+Without `nullable: true`, a `null` value in the response triggers a validation warning. This distinction helps AI clients differentiate between "field not available for this entry" (nullable) and "field SHOULD always be present" (not nullable).
 
 ---
 
@@ -382,7 +382,7 @@ Omitting the output schema is acceptable for:
 - Routes with highly variable response shapes (rare)
 - Exploratory schemas during development
 
-For production schemas, the output schema should always be declared.
+For production schemas, the output schema SHOULD always be declared.
 
 ---
 
@@ -489,7 +489,7 @@ A 5th level is rejected.
 
 Output schema validation is **non-blocking**. A mismatch between the actual handler output and the declared schema produces a validation **warning**, not an error. The response is still delivered to the client.
 
-This design choice reflects the reality that external APIs may change their response shapes without notice. A strict error would break the tool even though the data might still be usable. The warning is logged and surfaced to schema maintainers for review.
+This design choice reflects the reality that external APIs MAY change their response shapes without notice. A strict error would break the tool even though the data might still be usable. The warning is logged and surfaced to schema maintainers for review.
 
 ```mermaid
 flowchart TD

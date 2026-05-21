@@ -24,7 +24,7 @@ The diagram shows the five roles of a test: teaching consumers what the tool or 
 
 ### Tests as Learning Instrument
 
-A developer or AI agent reading a schema should understand a tool's or resource query's capabilities **by reading the tests alone**. Well-designed tests express the breadth of what the tool or query can do — different parameter combinations, edge cases, different data categories. They are not regression tests — they are **executable documentation**.
+A developer or AI agent reading a schema SHOULD understand a tool's or resource query's capabilities **by reading the tests alone**. Well-designed tests express the breadth of what the tool or query can do — different parameter combinations, edge cases, different data categories. They are not regression tests — they are **executable documentation**.
 
 ### Tests as Output Schema Source
 
@@ -73,7 +73,7 @@ tools: {
 }
 ```
 
-The `tests` array is part of the `main` block and therefore JSON-serializable. It must not contain functions, Date objects, or any non-serializable values.
+The `tests` array is part of the `main` block and therefore JSON-serializable. It MUST NOT contain functions, Date objects, or any non-serializable values.
 
 ---
 
@@ -104,7 +104,7 @@ The description explains **what this specific test demonstrates** — not what t
 
 ### Parameter Values
 
-Each `{{USER_PARAM}}` parameter's `position.key` becomes a key in the test object. The value must pass the parameter's `z` validation:
+Each `{{USER_PARAM}}` parameter's `position.key` becomes a key in the test object. The value MUST pass the parameter's `z` validation:
 
 ```javascript
 // Parameter definition
@@ -124,7 +124,7 @@ Fixed parameters (value is not `{{USER_PARAM}}`) and server parameters (`{{SERVE
 
 ### 1. Express the Breadth
 
-Tests should cover the **range of what is possible** with the tool or resource query. A tool that accepts a chain ID should test multiple chains. A tool that accepts different asset types should test each type. The goal is not exhaustive coverage but representative variety.
+Tests SHOULD cover the **range of what is possible** with the tool or resource query. A tool that accepts a chain ID SHOULD test multiple chains. A tool that accepts different asset types SHOULD test each type. The goal is not exhaustive coverage but representative variety.
 
 ```javascript
 // Good — shows breadth of chains and token types
@@ -144,7 +144,7 @@ tests: [
 
 ### 2. Teach Through Examples
 
-Someone reading the tests should learn what the tool or resource query can do without reading the documentation. Each test teaches one capability or variation:
+Someone reading the tests SHOULD learn what the tool or resource query can do without reading the documentation. Each test teaches one capability or variation:
 
 ```javascript
 // The tests teach: this route handles single/multiple coins, different currencies,
@@ -158,7 +158,7 @@ tests: [
 
 ### 3. No Personal Data
 
-Tests must never contain personal data. All test values must be **publicly known, verifiable, and non-sensitive**:
+Tests MUST never contain personal data. All test values MUST be **publicly known, verifiable, and non-sensitive**:
 
 | Allowed | Not Allowed |
 |---------|-------------|
@@ -179,13 +179,13 @@ Tests must never contain personal data. All test values must be **publicly known
 
 ### 4. Reproducible Results
 
-Tests should produce **consistent, verifiable results** when executed. Prefer:
+Tests SHOULD produce **consistent, verifiable results** when executed. Prefer:
 
 - Well-established tokens/contracts over newly deployed ones
 - Historical data queries (specific block numbers) over latest-block queries when possible
 - Stable endpoints over experimental ones
 
-The API response may change over time (prices update, new data appears), but the **structure** of the response should remain stable. This structural stability is what makes captured responses useful for output schema generation.
+The API response MAY change over time (prices update, new data appears), but the **structure** of the response SHOULD remain stable. This structural stability is what makes captured responses useful for output schema generation.
 
 ---
 
@@ -212,7 +212,7 @@ The API response may change over time (prices update, new data appears), but the
 
 **Minimum: 3 tests per resource query is required.** Three tests ensure breadth coverage: one basic case, one edge case, and one cross-cutting case. Resource query tests execute against the bundled database, so they are always runnable without API keys or network access. Results are deterministic.
 
-**Maximum: No hard limit**, but tests should be purposeful. Each test must demonstrate something different. Duplicate or near-duplicate tests waste execution time during response capture.
+**Maximum: No hard limit**, but tests SHOULD be purposeful. Each test MUST demonstrate something different. Duplicate or near-duplicate tests waste execution time during response capture.
 
 ---
 
@@ -328,9 +328,9 @@ The output schema (defined in `04-output-schema.md`) describes the `data` field 
 
 | Without Tests | With Tests |
 |---------------|------------|
-| Output schema must be written by hand | Output schema is generated from real responses |
+| Output schema MUST be written by hand | Output schema is generated from real responses |
 | Schema author guesses the response shape | Schema author captures the actual shape |
-| Output schema may drift from reality | Output schema is verified against reality |
+| Output schema MAY drift from reality | Output schema is verified against reality |
 | No way to detect API changes | Response capture detects structural changes |
 
 **Tests and output schemas are complementary.** Tests provide the input, response capture provides the data, and the generator produces the schema. Maintaining one without the other is incomplete.
@@ -456,7 +456,7 @@ queries: {
 | Execution target | External API over network | Local SQLite database |
 | API keys required | Often yes (`requiredServerParams`) | Never |
 | Network required | Yes | No |
-| Result determinism | Response may vary over time | Always deterministic (bundled data) |
+| Result determinism | Response MAY vary over time | Always deterministic (bundled data) |
 | Test count minimum | 3 per tool | 3 per query |
 | Server params in test | Never included | Not applicable |
 
@@ -484,7 +484,7 @@ See `13-resources.md` for the complete resource specification including query de
 
 ## Agent Tests
 
-Agent tests validate end-to-end behavior at the agent level. Instead of testing individual tool calls with parameter values, agent tests provide a **natural language prompt** and assert which tools the agent should invoke and what content the response should contain.
+Agent tests validate end-to-end behavior at the agent level. Instead of testing individual tool calls with parameter values, agent tests provide a **natural language prompt** and assert which tools the agent SHOULD invoke and what content the response SHOULD contain.
 
 ### Agent Test Format
 
@@ -507,10 +507,10 @@ Agent tests validate end-to-end behavior at the agent level. Instead of testing 
 |-------|------|----------|-------------|
 | `_description` | `string` | Yes | What this test demonstrates |
 | `input` | `string` | Yes | Natural language prompt (as a user would ask) |
-| `expectedTools` | `string[]` | Yes | Tool IDs that should be called (deterministic check) |
+| `expectedTools` | `string[]` | Yes | Tool IDs that SHOULD be called (deterministic check) |
 | `expectedContent` | `string[]` | No | Content assertions against response text |
 
-The `input` field contains a prompt exactly as a human user would type it. The `expectedTools` array lists the tool IDs (in `namespace/tool/name` format) that the agent must invoke to answer the prompt. The optional `expectedContent` array contains substrings that the final response text must include (case-insensitive matching).
+The `input` field contains a prompt exactly as a human user would type it. The `expectedTools` array lists the tool IDs (in `namespace/tool/name` format) that the agent MUST invoke to answer the prompt. The optional `expectedContent` array contains substrings that the final response text MUST include (case-insensitive matching).
 
 ### Three-Level Test Model
 
@@ -529,11 +529,11 @@ flowchart LR
 | Content | Partially — assertions | expectedContent[] against response text (case-insensitive) |
 | Quality | No — subjective | Human review or LLM-as-Judge |
 
-**Tool Usage** is the strongest assertion. Given a well-scoped prompt, the set of tools an agent should call is deterministic. If the prompt is "What is the current price of Ethereum?", the agent must call the price tool — there is no ambiguity.
+**Tool Usage** is the strongest assertion. Given a well-scoped prompt, the set of tools an agent SHOULD call is deterministic. If the prompt is "What is the current price of Ethereum?", the agent MUST call the price tool — there is no ambiguity.
 
 **Content** assertions are semi-deterministic. The response text will vary across LLM runs, but certain factual elements (like "current price" or "24h change") should always appear if the agent answered correctly.
 
-**Quality** is subjective and cannot be validated by the spec runtime. It is included in the model for completeness — teams may use LLM-as-Judge or human review to evaluate response quality beyond the scope of automated checks.
+**Quality** is subjective and cannot be validated by the spec runtime. It is included in the model for completeness — teams MAY use LLM-as-Judge or human review to evaluate response quality beyond the scope of automated checks.
 
 ### Consistency: Tool Tests vs Agent Tests
 
@@ -658,16 +658,16 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 
 | Code | Severity | Rule |
 |------|----------|------|
-| TST001 | error | Each tool must have at least 3 tests. Each resource query must have at least 3 tests. Each agent must have at least 3 tests. |
-| TST002 | error | Each test must have a `_description` field of type string |
-| TST003 | error | Each test must provide values for all required `{{USER_PARAM}}` parameters |
-| TST004 | error | Test parameter values must pass the corresponding `z` validation |
-| TST005 | error | Test objects must be JSON-serializable (no functions, no Date, no undefined) |
-| TST006 | error | Test objects must only contain keys that match `{{USER_PARAM}}` parameter keys or `_description` |
-| TST007 | warning | Tools/queries with enum or chain parameters should have tests covering multiple enum values |
+| TST001 | error | Each tool MUST have at least 3 tests. Each resource query MUST have at least 3 tests. Each agent MUST have at least 3 tests. |
+| TST002 | error | Each test MUST have a `_description` field of type string |
+| TST003 | error | Each test MUST provide values for all required `{{USER_PARAM}}` parameters |
+| TST004 | error | Test parameter values MUST pass the corresponding `z` validation |
+| TST005 | error | Test objects MUST be JSON-serializable (no functions, no Date, no undefined) |
+| TST006 | error | Test objects MUST only contain keys that match `{{USER_PARAM}}` parameter keys or `_description` |
+| TST007 | warning | Tools/queries with enum or chain parameters SHOULD have tests covering multiple enum values |
 | TST008 | info | Consider adding tests that demonstrate optional parameter usage |
-| TST009 | error | Each agent test must have an `input` field of type string |
-| TST010 | error | Each agent test must have an `expectedTools` field as non-empty array |
-| TST011 | error | Each expectedTools entry must be a valid ID (contains `/`) |
-| TST012 | warning | Agent tests should cover different tool combinations |
+| TST009 | error | Each agent test MUST have an `input` field of type string |
+| TST010 | error | Each agent test MUST have an `expectedTools` field as non-empty array |
+| TST011 | error | Each expectedTools entry MUST be a valid ID (contains `/`) |
+| TST012 | warning | Agent tests SHOULD cover different tool combinations |
 | TST013 | info | Consider adding expectedContent assertions for richer validation |

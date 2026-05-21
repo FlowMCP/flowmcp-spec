@@ -10,7 +10,7 @@ A Catalog is the top-level organizational unit in FlowMCP v3. It is a named dire
 
 As FlowMCP grows beyond individual schemas and shared lists, a higher-level structure is needed to group related content into a cohesive, distributable unit. Without catalogs:
 
-- **No manifest** — the runtime must scan directories and infer relationships between schemas, lists, and agents
+- **No manifest** — the runtime MUST scan directories and infer relationships between schemas, lists, and agents
 - **No isolation** — company-internal schemas mix with community schemas in a flat namespace
 - **No import boundary** — importing from a remote registry requires knowledge of internal file structure
 
@@ -90,7 +90,7 @@ schemas/v3.0.0/
 
 ### Naming Rules
 
-- The catalog directory name must match the `name` field in `registry.json`
+- The catalog directory name MUST match the `name` field in `registry.json`
 - Directory names use kebab-case: `flowmcp-community`, `my-company-tools`
 - Provider namespace directories use kebab-case: `coingecko-com`, `defi-llama`
 - Agent directories use kebab-case: `crypto-research`, `defi-monitor`
@@ -113,8 +113,8 @@ schemas/v3.0.0/
 
 ### Isolation Guarantees
 
-1. **No cross-catalog shared lists** — a schema in `my-company-tools` cannot reference a shared list defined in `flowmcp-community`. If both catalogs need the same list, each must include its own copy.
-2. **No namespace collisions across catalogs** — two catalogs may contain providers with the same namespace (e.g. both have `etherscan/`). The runtime qualifies tool names with the catalog name to prevent collisions.
+1. **No cross-catalog shared lists** — a schema in `my-company-tools` cannot reference a shared list defined in `flowmcp-community`. If both catalogs need the same list, each MUST include its own copy.
+2. **No namespace collisions across catalogs** — two catalogs MAY contain providers with the same namespace (e.g. both have `etherscan/`). The runtime qualifies tool names with the catalog name to prevent collisions.
 3. **Independent versioning** — each catalog has its own `version` field. Updating `flowmcp-community` to version `3.1.0` does not affect `my-company-tools` at version `3.0.0`.
 4. **Independent import** — `flowmcp import-registry` targets a single catalog. Importing one catalog does not pull in others.
 
@@ -358,10 +358,10 @@ The following rules are enforced when loading and validating a catalog.
 | Code | Severity | Rule |
 |------|----------|------|
 | CAT001 | error | `registry.json` must exist in the catalog root directory |
-| CAT002 | error | `name` field must match the catalog directory name |
-| CAT003 | error | All `shared[].file` paths must resolve to existing files |
-| CAT004 | error | All `schemas[].file` paths must resolve to existing files |
-| CAT005 | error | All `agents[].manifest` paths must resolve to existing files |
+| CAT002 | error | `name` field MUST match the catalog directory name |
+| CAT003 | error | All `shared[].file` paths MUST resolve to existing files |
+| CAT004 | error | All `schemas[].file` paths MUST resolve to existing files |
+| CAT005 | error | All `agents[].manifest` paths MUST resolve to existing files |
 | CAT006 | warning | Orphaned files (exist in the catalog directory but are not listed in `registry.json`) should be reported |
 | CAT007 | error | `schemaSpec` must be a valid FlowMCP specification version |
 
@@ -369,7 +369,7 @@ The following rules are enforced when loading and validating a catalog.
 
 **CAT001** — The `registry.json` file is the entry point for catalog resolution. Without it, the runtime cannot discover the catalog contents. A directory without `registry.json` is not a catalog.
 
-**CAT002** — The catalog name in the manifest must match the directory name. If the directory is `flowmcp-community/`, then `name` must be `"flowmcp-community"`. This prevents confusion when multiple catalogs coexist.
+**CAT002** — The catalog name in the manifest MUST match the directory name. If the directory is `flowmcp-community/`, then `name` must be `"flowmcp-community"`. This prevents confusion when multiple catalogs coexist.
 
 **CAT003** — Every shared list declared in `shared[]` must have a corresponding `.mjs` file at the declared path. Missing files indicate a broken manifest that was not regenerated after file operations.
 
@@ -379,7 +379,7 @@ The following rules are enforced when loading and validating a catalog.
 
 **CAT006** — Files that exist in the catalog directory tree but are not referenced in `registry.json` may indicate forgotten schemas or leftover files from development. The validator reports these as warnings to help catalog authors maintain a clean manifest.
 
-**CAT007** — The `schemaSpec` field must reference a known FlowMCP specification version. This ensures the runtime applies the correct validation rules and loading behavior for the catalog's contents. Invalid version strings (e.g. `"latest"`, `"2.x"`) are rejected.
+**CAT007** — The `schemaSpec` field MUST reference a known FlowMCP specification version. This ensures the runtime applies the correct validation rules and loading behavior for the catalog's contents. Invalid version strings (e.g. `"latest"`, `"2.x"`) are rejected.
 
 ### Validation Command
 

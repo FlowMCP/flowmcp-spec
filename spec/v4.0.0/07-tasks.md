@@ -30,4 +30,4 @@ v2.1.0 will define:
 
 ## Reserved Fields
 
-Schema authors may include an `async` field in route definitions for forward compatibility. In v2.0.0, this field is **ignored** by the runtime but preserved for future use.
+Schema authors MAY include an `async` field in route definitions for forward compatibility. In v2.0.0, this field is **ignored** by the runtime but preserved for future use.

@@ -68,7 +68,7 @@ export const list = {
 }
 ```
 
-The file must export exactly one `list` constant. No other exports are permitted. The file must not contain imports, function definitions, or dynamic expressions.
+The file MUST export exactly one `list` constant. No other exports are permitted. The file MUST NOT contain imports, function definitions, or dynamic expressions.
 
 ---
 
@@ -86,7 +86,7 @@ The `meta` block describes the list identity and structure.
 
 ### Naming Convention
 
-List names use camelCase and must be globally unique across the entire list registry. The name should describe the collection, not a single entry:
+List names use camelCase and MUST be globally unique across the entire list registry. The name SHOULD describe the collection, not a single entry:
 
 - `evmChains` (not `evmChain`)
 - `fiatCurrencies` (not `fiatCurrency`)
@@ -100,20 +100,20 @@ Lists follow strict semver. A version bump is required when:
 - **Minor** (`1.1.0`) — adding new entries, adding new optional fields
 - **Major** (`2.0.0`) — removing entries, removing fields, renaming fields, changing field types
 
-Schemas pin to a specific version. If a list bumps its major version, all referencing schemas must update their `version` field in the `sharedLists` reference.
+Schemas pin to a specific version. If a list bumps its major version, all referencing schemas MUST update their `version` field in the `sharedLists` reference.
 
 ---
 
 ## Field Definition
 
-Each entry in `meta.fields` describes one field that entries can or must contain.
+Each entry in `meta.fields` describes one field that entries can or MUST contain.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `key` | `string` | Yes | Field name |
 | `type` | `string` | Yes | `string`, `number`, `boolean` |
 | `description` | `string` | Yes | What this field represents |
-| `optional` | `boolean` | No | If `true`, entries may omit this field |
+| `optional` | `boolean` | No | If `true`, entries MAY omit this field |
 
 ### Type Constraints
 
@@ -129,7 +129,7 @@ Complex types (objects, arrays, nested structures) are not supported in shared l
 
 ### Required vs Optional Fields
 
-Fields without `optional: true` are required. Every entry must include all required fields. Optional fields may be omitted entirely or set to `null`. This distinction is what enables provider-specific columns — `etherscanAlias` is optional because not every chain has an Etherscan explorer.
+Fields without `optional: true` are required. Every entry MUST include all required fields. Optional fields MAY be omitted entirely or set to `null`. This distinction is what enables provider-specific columns — `etherscanAlias` is optional because not every chain has an Etherscan explorer.
 
 ---
 
@@ -174,10 +174,10 @@ export const list = {
 
 ### Dependency Rules
 
-1. **`ref` must resolve** — the referenced list name must exist in the list registry
+1. **`ref` must resolve** — the referenced list name MUST exist in the list registry
 2. **Version pinning** — `version` pins the dependency to a specific semver version; the runtime rejects mismatches
 3. **`condition` is optional** — when present, it filters the parent list to a subset; when absent, the full parent list is available
-4. **No circular dependencies** — if list A depends on list B, then list B must not depend on list A (directly or transitively)
+4. **No circular dependencies** — if list A depends on list B, then list B MUST NOT depend on list A (directly or transitively)
 5. **Maximum depth: 3 levels** — a list can depend on a list that depends on another list, but no deeper; this prevents resolution complexity and keeps the dependency graph shallow
 
 ```mermaid
@@ -230,7 +230,7 @@ main: {
 | `version` | `string` | Yes | Required list version |
 | `filter` | `object` | No | Filter entries before injection |
 
-A schema may reference multiple shared lists. Each reference is resolved independently.
+A schema MAY reference multiple shared lists. Each reference is resolved independently.
 
 ### Filter Types
 
@@ -304,7 +304,7 @@ The runtime looks up each `ref` in the list registry. If the list does not exist
 
 ### Step 2: Version Check
 
-The runtime verifies that the registry version matches the schema's declared `version`. A mismatch is a hard error — the schema must be updated to reference the correct version.
+The runtime verifies that the registry version matches the schema's declared `version`. A mismatch is a hard error — the schema MUST be updated to reference the correct version.
 
 ### Step 3: Filter
 
@@ -377,7 +377,7 @@ preRequest: ({ struct, payload }) => {
 
 ### Why This Pattern Matters
 
-Without Alias-Mapping, every provider maintains its own chain list with provider-specific values. An LLM using multiple providers must know that `ethereum` for CoinGecko means `eth` for Moralis, `ETH` for Etherscan, and `Ethereum` for DeFi Llama. This knowledge cannot be embedded reliably in tool descriptions.
+Without Alias-Mapping, every provider maintains its own chain list with provider-specific values. An LLM using multiple providers MUST know that `ethereum` for CoinGecko means `eth` for Moralis, `ETH` for Etherscan, and `Ethereum` for DeFi Llama. This knowledge cannot be embedded reliably in tool descriptions.
 
 With Alias-Mapping, every provider exposes the same canonical user-side alias (`ethereum`). The handler maps it to the provider-specific value at call time. The LLM only needs to know one alias per chain.
 
@@ -441,7 +441,7 @@ This allows schema authors to understand the blast radius of a list change befor
 
 ## List Registry
 
-All shared lists are tracked in `_lists/_registry.json`. This file is auto-generated by the CLI and must not be edited manually.
+All shared lists are tracked in `_lists/_registry.json`. This file is auto-generated by the CLI and MUST NOT be edited manually.
 
 ```json
 {
@@ -471,7 +471,7 @@ All shared lists are tracked in `_lists/_registry.json`. This file is auto-gener
 
 ### Registry Invariants
 
-- Every `.mjs` file in the `_lists/` directory must have a corresponding entry in `_registry.json`
+- Every `.mjs` file in the `_lists/` directory MUST have a corresponding entry in `_registry.json`
 - Every entry in `_registry.json` must point to an existing `.mjs` file
 - The `hash` must match the current file content; a mismatch indicates an unregistered change
 - The CLI command `flowmcp validate-lists` verifies all three invariants
@@ -492,11 +492,11 @@ Every entry in `entries` must include all fields from `meta.fields` that do not 
 
 ### 3. Optional Field Handling
 
-Fields with `optional: true` may be omitted from an entry entirely, or may be set to `null`. Both representations are equivalent at runtime.
+Fields with `optional: true` may be omitted from an entry entirely, or MAY be set to `null`. Both representations are equivalent at runtime.
 
 ### 4. Type Matching
 
-The value of each field in an entry must match the `type` declared in `meta.fields`. A `chainId` declared as `number` must be a number in every entry — string values like `'1'` are rejected.
+The value of each field in an entry MUST match the `type` declared in `meta.fields`. A `chainId` declared as `number` must be a number in every entry — string values like `'1'` are rejected.
 
 ### 5. Dependency Resolution
 
@@ -504,17 +504,17 @@ All entries in `meta.dependsOn` must resolve to existing lists with matching ver
 
 ### 6. No Version Conflicts
 
-If two schemas reference the same list with different versions, this is a hard error. The schema author must reconcile the versions. The runtime does not support loading multiple versions of the same list simultaneously.
+If two schemas reference the same list with different versions, this is a hard error. The schema author MUST reconcile the versions. The runtime does not support loading multiple versions of the same list simultaneously.
 
 ### 7. Security Scan Compliance
 
-The list file must pass the security scan defined in `05-security.md`. Specifically:
+The list file MUST pass the security scan defined in `05-security.md`. Specifically:
 
 - No `import` or `require` statements
 - No function definitions or function expressions
 - No dynamic expressions (`eval`, template literals with expressions, computed properties)
 - No references to `process`, `fs`, `fetch`, or other runtime APIs
-- The file must contain only static data: strings, numbers, booleans, arrays, and plain objects
+- The file MUST contain only static data: strings, numbers, booleans, arrays, and plain objects
 
 ---
 
@@ -535,7 +535,7 @@ _lists/
 
 - File names use kebab-case: `evm-chains.mjs`
 - List names use camelCase: `evmChains`
-- The file name should be the kebab-case equivalent of the list name
+- The file name SHOULD be the kebab-case equivalent of the list name
 
 ### One List Per File
 

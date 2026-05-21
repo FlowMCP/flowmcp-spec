@@ -237,7 +237,7 @@ resources: {
 | **File changes** | Yes — persistent on disk |
 | **Only allowed origin** | `project` |
 | **Use case** | Analysis results, agent memory, data collection |
-| **getSchema** | **OPTIONAL** — define only if CLI must bootstrap DB via CREATE TABLE |
+| **getSchema** | **OPTIONAL** — define only if CLI MUST bootstrap DB via CREATE TABLE |
 | **runSql** | Auto-injected by runtime (all statements) |
 | **describeTables** | Auto-injected by runtime (AI-friendly schema discovery) |
 | **DB does not exist** | CLI creates DB based on getSchema if defined, otherwise reports missing-DB warning |
@@ -254,7 +254,7 @@ resources: {
 | CREATE/DROP TABLE | No | **Yes** |
 | Changes persistent | No | **Yes** |
 | Allowed origins | `global`, `project` | Only `project` |
-| DB must exist | Yes (warning if missing) | No (CLI creates via getSchema) |
+| DB MUST exist | Yes (warning if missing) | No (CLI creates via getSchema) |
 | getSchema | OPTIONAL (rarely needed) | OPTIONAL (only for CLI DB bootstrap) |
 | runSql | Auto-injected (SELECT only) | Auto-injected (all statements) |
 | describeTables | Auto-injected (structured discovery) | Auto-injected (structured discovery) |
@@ -428,9 +428,9 @@ flowchart TD
 | `project` | Yes | **Yes** (only allowed origin) | Yes |
 | `global` | Yes (recommended) | **Not allowed** | Yes |
 
-**Why SQLite inline is not recommended:** SQLite databases may contain personal data, proprietary datasets, or large binary files. Committing them to a schema repository exposes data to all users of the catalog. Markdown documents are text, typically documentation, and safe to commit.
+**Why SQLite inline is not recommended:** SQLite databases MAY contain personal data, proprietary datasets, or large binary files. Committing them to a schema repository exposes data to all users of the catalog. Markdown documents are text, typically documentation, and safe to commit.
 
-**Why file-based is project-only:** Writable databases must be isolated to a single project. A writable global database could be corrupted by concurrent use from multiple projects.
+**Why file-based is project-only:** Writable databases MUST be isolated to a single project. A writable global database could be corrupted by concurrent use from multiple projects.
 
 ### Name Field
 
@@ -466,7 +466,7 @@ Schema authors MAY define `getSchema` if they want to expose CREATE TABLE statem
 
 **When to define `getSchema`:**
 
-- `mode: 'file-based'`: Only when the CLI must create the database on first run. The CLI derives CREATE TABLE statements from the getSchema return value (table names, column names, column types).
+- `mode: 'file-based'`: Only when the CLI MUST create the database on first run. The CLI derives CREATE TABLE statements from the getSchema return value (table names, column names, column types).
 - `mode: 'in-memory'`: Almost never — `describeTables` is sufficient. Define `getSchema` only if a downstream consumer needs the CREATE TABLE text directly (e.g. dump/migration tooling).
 
 **getSchema and CREATE TABLE:** When defined, the CLI can derive CREATE TABLE statements from the getSchema return value. No separate `createSchema` query is needed.
@@ -554,7 +554,7 @@ WHERE m.type = 'table'
 | AI-friendliness | High (immediate consumption) | Medium (regex parsing required) |
 | Use case | Default AI discovery | Author needs CREATE-text (e.g. CLI bootstraps file-based DB) |
 
-For `mode: 'in-memory'`, constraints are practically irrelevant — the agent only builds SELECTs. `describeTables` covers 100% of practical discovery use cases. For `mode: 'file-based'`, schema authors may still define `getSchema` if the CLI needs CREATE TABLE statements to bootstrap the database on first run.
+For `mode: 'in-memory'`, constraints are practically irrelevant — the agent only builds SELECTs. `describeTables` covers 100% of practical discovery use cases. For `mode: 'file-based'`, schema authors MAY still define `getSchema` if the CLI needs CREATE TABLE statements to bootstrap the database on first run.
 
 ### Query Limits
 
@@ -752,7 +752,7 @@ resources: {
 
 ### Validation Rule
 
-**RES010:** `source: 'http'` requires a `url` field. The URL must use HTTPS (`https://`). HTTP URLs are rejected to prevent insecure data transfer.
+**RES010:** `source: 'http'` requires a `url` field. The URL MUST use HTTPS (`https://`). HTTP URLs are rejected to prevent insecure data transfer.
 
 ---
 
@@ -774,7 +774,7 @@ No block patterns needed. `better-sqlite3` with `readonly: true` prevents all wr
 |-------|-------------|
 | Only project-level | No access to global or inline DBs |
 | All statements allowed | User has consciously chosen file-based |
-| CLI asks on creation | User must confirm |
+| CLI asks on creation | User MUST confirm |
 | Backup before first write | `.bak` copy as safety net |
 | WAL mode | Concurrent access safely possible |
 | Changes persistent | Intended — that is the purpose |
@@ -807,7 +807,7 @@ flowchart LR
 
 ### Problem
 
-For `file-based` databases at project level, the DB must exist before the agent can write. But who creates it?
+For `file-based` databases at project level, the DB MUST exist before the agent can write. But who creates it?
 
 ### Solution: CLI Creates on Demand
 
@@ -831,7 +831,7 @@ flowchart TD
 | CLI creates DB | Only when `source: 'sqlite'` + `mode: 'file-based'` + DB missing |
 | User confirmation | **Required** — CLI always asks |
 | Path | Always `project`: `.{base}/resources/{name}` |
-| getSchema | OPTIONAL for file-based — required only when CLI must bootstrap the DB on first run (derives CREATE TABLE) |
+| getSchema | OPTIONAL for file-based — required only when CLI MUST bootstrap the DB on first run (derives CREATE TABLE) |
 | Backup | `.bak` copy before first write (for existing DB) |
 
 ### Backup Strategy
@@ -938,7 +938,7 @@ This is used by the auto-injected `runSql`. Schema authors do not normally need 
 
 #### `{{DYNAMIC_SQL}}` Rules
 
-1. **Runtime security checks** — for `in-memory`, user SQL must start with `SELECT` and must not contain write operations. For `file-based`, all statements are allowed.
+1. **Runtime security checks** — for `in-memory`, user SQL MUST start with `SELECT` and MUST NOT contain write operations. For `file-based`, all statements are allowed.
 2. **Automatic LIMIT** — the runtime appends `LIMIT {n}` to SELECT queries if no LIMIT clause is present. Default: 100, maximum: 1000.
 3. **The `sql` parameter** — provides the user's SQL query.
 4. **The `limit` parameter** — optional, controls the automatic LIMIT.
@@ -990,7 +990,7 @@ parameters: [
 ]
 ```
 
-The number of parameters must match the number of `?` placeholders in the SQL statement. A mismatch is a validation error.
+The number of parameters MUST match the number of `?` placeholders in the SQL statement. A mismatch is a validation error.
 
 ### Supported Primitives
 
@@ -1055,7 +1055,7 @@ Resource handlers only support `postRequest`. There is no `preRequest` for resou
 1. **Handlers are optional.** Queries without handlers return the raw SQL result rows directly.
 2. **Only `postRequest` is supported.** Resource handlers transform query results, not query construction.
 3. **Same security restrictions apply.** Resource handlers follow the same rules as tool handlers: no imports, no restricted globals, pure transformations only. See `05-security.md`.
-4. **Return shape must match.** `postRequest` must return `{ response }`.
+4. **Return shape MUST match.** `postRequest` must return `{ response }`.
 
 ---
 
@@ -1161,7 +1161,7 @@ export const main = {
 1. **`tools` and `resources` are independent.** A schema can have tools only, resources only, or both.
 2. **Limits are separate.** The 8-tool limit and 2-resource limit are independent constraints.
 3. **Handlers are namespaced.** Tool handlers are keyed by tool name, resource handlers are keyed by resource name then query name. There is no collision because resource handlers are nested one level deeper.
-4. **`root` is not required when a schema has only resources.** The `root` field provides the base URL for HTTP tools. A resource-only schema does not make HTTP calls and may omit `root`.
+4. **`root` is not required when a schema has only resources.** The `root` field provides the base URL for HTTP tools. A resource-only schema does not make HTTP calls and MAY omit `root`.
 
 ---
 
@@ -1169,7 +1169,7 @@ export const main = {
 
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
-| Max resources per schema | 2 | Keeps schemas focused. Resources should be tightly scoped to one data domain. |
+| Max resources per schema | 2 | Keeps schemas focused. Resources SHOULD be tightly scoped to one data domain. |
 | Max schema-defined queries per resource | 7 | getSchema is optional. Plus 2 auto-injected (runSql + describeTables) = 9 total. |
 | Query name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
 | Resource name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, consistent with tool names. |
@@ -1201,7 +1201,7 @@ The following fields are part of the `main` export and therefore included in the
 
 | Excluded | Reason |
 |----------|--------|
-| Database file contents | Data updates should not invalidate the schema hash. |
+| Database file contents | Data updates SHOULD NOT invalidate the schema hash. |
 | Markdown file contents | Same reasoning as database contents. |
 | Handler code | Consistent with tool handler exclusion. Handler functions are in the `handlers` export, not in `main`. |
 
@@ -1228,33 +1228,33 @@ The following rules are enforced when validating resource definitions:
 |------|----------|------|
 | RES001 | error | `source` must be `'sqlite'` or `'markdown'`. |
 | RES002 | error | `description` must be a non-empty string. |
-| RES003 | error | `mode` is required for `source: 'sqlite'` and must be `'in-memory'` or `'file-based'`. |
-| RES004 | error | `origin` is required and must be `'global'`, `'project'`, or `'inline'`. |
+| RES003 | error | `mode` is required for `source: 'sqlite'` and MUST be `'in-memory'` or `'file-based'`. |
+| RES004 | error | `origin` is required and MUST be `'global'`, `'project'`, or `'inline'`. |
 | RES005 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
 | RES006 | error | Maximum 2 resources per schema. |
 | RES007 | error | Maximum 7 schema-defined queries per SQLite resource (9 total with auto-injected runSql + describeTables). |
-| RES008 | error | Each query must have a `sql` field of type string. |
-| RES009 | error | Each query must have a `description` field of type string. |
-| RES010 | error | Each query must have a `parameters` array. |
-| RES011 | error | Each query must have an `output` object with `mimeType` and `schema`. |
-| RES012 | error | Each query must have at least 1 test. |
-| RES013 | error | For `mode: 'in-memory'`, schema-defined SQL must begin with `SELECT` or `WITH` (CTE). |
-| RES014 | error | Number of parameters must match number of `?` placeholders in the SQL statement. |
-| RES015 | error | Resource parameters must not have a `location` field in `position`. |
-| RES016 | error | Resource parameters must not use `{{SERVER_PARAM:...}}` values. |
-| RES017 | error | Resource name must match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
-| RES018 | error | Query name must match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
-| RES019 | error | Resource parameter primitives must be scalar: `string()`, `number()`, `boolean()`, or `enum()`. |
-| RES020 | warning | Database file should exist at validation time. Missing file produces a warning. |
+| RES008 | error | Each query MUST have a `sql` field of type string. |
+| RES009 | error | Each query MUST have a `description` field of type string. |
+| RES010 | error | Each query MUST have a `parameters` array. |
+| RES011 | error | Each query MUST have an `output` object with `mimeType` and `schema`. |
+| RES012 | error | Each query MUST have at least 1 test. |
+| RES013 | error | For `mode: 'in-memory'`, schema-defined SQL MUST begin with `SELECT` or `WITH` (CTE). |
+| RES014 | error | Number of parameters MUST match number of `?` placeholders in the SQL statement. |
+| RES015 | error | Resource parameters MUST NOT have a `location` field in `position`. |
+| RES016 | error | Resource parameters MUST NOT use `{{SERVER_PARAM:...}}` values. |
+| RES017 | error | Resource name MUST match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
+| RES018 | error | Query name MUST match `^[a-z][a-zA-Z0-9]*$` (camelCase). |
+| RES019 | error | Resource parameter primitives MUST be scalar: `string()`, `number()`, `boolean()`, or `enum()`. |
+| RES020 | warning | Database file SHOULD exist at validation time. Missing file produces a warning. |
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
-| RES022 | error | Test parameter values must pass the corresponding `z` validation. |
-| RES023 | error | Test objects must be JSON-serializable. |
+| RES022 | error | Test parameter values MUST pass the corresponding `z` validation. |
+| RES023 | error | Test objects MUST be JSON-serializable. |
 | RES024 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
 | RES025 | error | `mode: 'file-based'` requires `origin: 'project'`. |
-| RES026 | error | `source: 'markdown'` must not have a `mode` field. |
-| RES027 | error | `source: 'markdown'` must not have a `queries` field. |
+| RES026 | error | `source: 'markdown'` MUST NOT have a `mode` field. |
+| RES027 | error | `source: 'markdown'` MUST NOT have a `queries` field. |
 | RES028 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
-| RES029 | error | All resource fields are required. No field may be omitted. |
+| RES029 | error | All resource fields are required. No field MAY be omitted. |
 | RES030 | error | `source: 'sqlite-gtfs'` requires `mode: 'file-based'`. `in-memory` is not allowed. |
 | RES031 | error | `source: 'sqlite-gtfs'` requires the `addon` field (add-on name). |
 | RES032 | error | Database at `path` does not contain `meta.qualitySeal === 'sqlite-gtfs'`. Schema rejected. |

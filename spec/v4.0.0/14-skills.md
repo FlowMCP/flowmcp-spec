@@ -113,7 +113,7 @@ export const skill = {
 }
 ```
 
-This pattern keeps the Markdown instructions visually separated from the metadata. The variable name must be `content`. Other names are permitted by the language but rejected by the validator — see validation rule SKL010.
+This pattern keeps the Markdown instructions visually separated from the metadata. The variable name MUST be `content`. Other names are permitted by the language but rejected by the validator — see validation rule SKL010.
 
 ---
 
@@ -130,7 +130,7 @@ The `export const skill` object contains all metadata and instructions for the s
 | `description` | `string` | Maximum 1024 characters | Human-readable explanation of what the skill does. Appears in MCP prompt listings. |
 | `output` | `string` | Must not be empty | Description of what the skill produces as a final artifact. |
 | `content` | `string` | Must not be empty | Markdown instructions for the AI agent. Contains placeholders referencing tools, resources, and input parameters. |
-| `whenToUse` | `string` | Must not be empty | **New in v4.** When an AI agent should activate this skill. One sentence describing the trigger scenario. |
+| `whenToUse` | `string` | Must not be empty | **New in v4.** When an AI agent SHOULD activate this skill. One sentence describing the trigger scenario. |
 | `type` | `string` | One of: `'namespace'`, `'selection'`, `'agent'` | **New in v4.** Skill classification. See [Skill Types](#skill-types). |
 
 ### Optional Fields
@@ -138,8 +138,8 @@ The `export const skill` object contains all metadata and instructions for the s
 | Field | Type | Default | Constraints | Description |
 |-------|------|---------|-------------|-------------|
 | `requires` | `object` | `{}` | See below | Declares dependencies on tools, resources, and external capabilities. |
-| `requires.tools` | `string[]` | `[]` | Each must be a tool name in the same schema's `main.tools` | Tools the skill needs. |
-| `requires.resources` | `string[]` | `[]` | Each must be a resource name in the same schema's `main.resources` | Resources the skill reads. |
+| `requires.tools` | `string[]` | `[]` | Each MUST be a tool name in the same schema's `main.tools` | Tools the skill needs. |
+| `requires.resources` | `string[]` | `[]` | Each MUST be a resource name in the same schema's `main.resources` | Resources the skill reads. |
 | `requires.external` | `string[]` | `[]` | Free-form strings | External capabilities the skill assumes (e.g. `'playwright'`, `'file-system'`). Informational — not validated against the runtime. |
 | `input` | `object[]` | `[]` | See below | Parameters the user provides when invoking the skill. |
 | `prefill` | `array` | `[]` | **New in v4.** Array of tool call specifications to execute before delivering the Skill. See `18-prefill.md`. |
@@ -160,7 +160,7 @@ Skills are registered into their parent scope via the parent's manifest (`select
 
 #### `name`
 
-The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and as the key under which the skill is registered in `selection.skills` or `agent.skills` (or as the file basename in `providers/{ns}/skills/`). Only lowercase letters, numbers, and hyphens are allowed. The name must start with a letter.
+The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and as the key under which the skill is registered in `selection.skills` or `agent.skills` (or as the file basename in `providers/{ns}/skills/`). Only lowercase letters, numbers, and hyphens are allowed. The name MUST start with a letter.
 
 ```javascript
 // Valid
@@ -230,9 +230,9 @@ requires: {
 requires: {}
 ```
 
-**`requires.tools`** — Each entry must be a tool name that exists in the same schema's `main.tools`. The validator checks this at load time (SKL005). These references tell the runtime which tools the skill needs and allow consumers to verify that all dependencies are available.
+**`requires.tools`** — Each entry MUST be a tool name that exists in the same schema's `main.tools`. The validator checks this at load time (SKL005). These references tell the runtime which tools the skill needs and allow consumers to verify that all dependencies are available.
 
-**`requires.resources`** — Each entry must be a resource name that exists in the same schema's `main.resources`. The validator checks this at load time (SKL006).
+**`requires.resources`** — Each entry MUST be a resource name that exists in the same schema's `main.resources`. The validator checks this at load time (SKL006).
 
 **`requires.external`** — Free-form strings declaring external capabilities. These are informational only — the runtime does not validate them against available capabilities. They help consumers understand what environment the skill expects.
 
@@ -308,7 +308,7 @@ output: 'Some data.'
 
 #### `content`
 
-The Markdown instructions that the AI agent follows. This is the core of the skill — it tells the agent what to do, step by step. Content must not be empty. It may contain placeholders that reference tools, resources, other skills, and input parameters. See [Placeholders](#placeholders).
+The Markdown instructions that the AI agent follows. This is the core of the skill — it tells the agent what to do, step by step. Content MUST NOT be empty. It may contain placeholders that reference tools, resources, other skills, and input parameters. See [Placeholders](#placeholders).
 
 ---
 
@@ -327,11 +327,11 @@ The `content` field supports four placeholder types. Placeholders use the `{{typ
 
 ### Placeholder Rules
 
-1. **Tool placeholders** (`{{tool:name}}`) — the `name` must exist as a key in the same schema's `main.tools`. The validator checks this at load time (SKL005 via `requires.tools`). Every tool referenced via `{{tool:name}}` in content should be listed in `requires.tools`.
+1. **Tool placeholders** (`{{tool:name}}`) — the `name` must exist as a key in the same schema's `main.tools`. The validator checks this at load time (SKL005 via `requires.tools`). Every tool referenced via `{{tool:name}}` in content SHOULD be listed in `requires.tools`.
 
-2. **Resource placeholders** (`{{resource:name}}`) — the `name` must exist as a key in the same schema's `main.resources`. The validator checks this at load time (SKL006 via `requires.resources`). Every resource referenced via `{{resource:name}}` in content should be listed in `requires.resources`.
+2. **Resource placeholders** (`{{resource:name}}`) — the `name` must exist as a key in the same schema's `main.resources`. The validator checks this at load time (SKL006 via `requires.resources`). Every resource referenced via `{{resource:name}}` in content SHOULD be listed in `requires.resources`.
 
-3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a registered skill in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` must not itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
+3. **Skill placeholders** (`{{skill:name}}`) — the `name` must exist as a registered skill in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). Skill-to-skill references are limited to **one level deep** — a skill referenced via `{{skill:name}}` MUST NOT itself contain `{{skill:...}}` placeholders. This prevents circular chains and unbounded nesting. See [Scope Rules](#scope-rules).
 
 4. **Input placeholders** (`{{input:key}}`) — the `key` must exist in the skill's own `input` array. The validator checks this at load time (SKL008).
 
@@ -473,7 +473,7 @@ The only valid version in this release is `flowmcp/4.0.0`. The legacy `flowmcp-s
 All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 1. **Single source of truth.** Schemas, Selections, Agents, Skills, and Prompts evolve as one specification. Mixing primitive versions inside one catalog is not supported.
-2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools should apply the new rules.
+2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools SHOULD apply the new rules.
 3. **Upgrade paths.** A coordinated version bump signals that existing catalog content needs review and migration in lockstep.
 
 ---
@@ -486,23 +486,23 @@ These rules can be checked at load time by examining the skill file and the sche
 
 | Code | Severity | Rule |
 |------|----------|------|
-| SKL001 | error | Skill file must export `skill` as a named export |
+| SKL001 | error | Skill file MUST export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
 | SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'`. `'flowmcp-skill/1.0.0'` is accepted with a deprecation warning during migration. |
+| SKL004 | error | `skill.version` is required and MUST be `'flowmcp/4.0.0'`. `'flowmcp-skill/1.0.0'` is accepted with a deprecation warning during migration. |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
 | SKL008 | error | Each `{{input:key}}` placeholder in `content` must have a matching entry in `skill.input` |
 | SKL009 | error | `input[].values` is required when `type` is `'enum'` and forbidden otherwise |
-| SKL010 | error | `skill.content` is required and must be a non-empty string |
-| SKL011 | error | `skill.output` is required and must be a non-empty string |
+| SKL010 | error | `skill.content` is required and MUST be a non-empty string |
+| SKL011 | error | `skill.output` is required and MUST be a non-empty string |
 | SKL012 | error | `input[].key` must match `^[a-z][a-zA-Z0-9]*$` (camelCase) |
 | SKL013 | error | `input[].type` must be one of: `string`, `number`, `boolean`, `enum` |
-| SKL014 | error | `input[].description` is required and must be a non-empty string |
+| SKL014 | error | `input[].description` is required and MUST be a non-empty string |
 | SKL015 | error | `input[].required` must be a boolean |
 | SKL016 | error | Skill registration entries (`selection.skills`, `agent.skills`): `file` must end with `.mjs` |
-| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file must exist |
+| SKL017 | error | Skill registration entries (`selection.skills`, `agent.skills`): referenced file MUST exist |
 | SKL018 | error | Maximum 4 skills per registration scope (selection or agent) |
 
 ### Reference Rules (Cross-Validation)
@@ -514,7 +514,7 @@ These rules validate references between skills, tools, and resources within the 
 | SKL020 | warning | `{{tool:name}}` placeholder in content references a tool not listed in `requires.tools` |
 | SKL021 | warning | `{{resource:name}}` placeholder in content references a resource not listed in `requires.resources` |
 | SKL022 | error | `{{skill:name}}` placeholder references a skill not registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace). |
-| SKL023 | error | `{{skill:name}}` target skill must not itself contain `{{skill:...}}` placeholders (1 level deep only) |
+| SKL023 | error | `{{skill:name}}` target skill MUST NOT itself contain `{{skill:...}}` placeholders (1 level deep only) |
 | SKL024 | warning | Entry in `requires.tools` is not referenced via `{{tool:...}}` in content |
 | SKL025 | warning | Entry in `requires.resources` is not referenced via `{{resource:...}}` in content |
 
@@ -565,11 +565,11 @@ Every Skill `content` field MUST embed:
 
 | Element | Why Required | Format |
 |---------|-------------|--------|
-| Tool call description | Agent must know what tool to call | `## Step N: Call {{tool:toolName}}` |
-| Parameter table per tool | Agent must know which parameters exist | Markdown table with name, type, description, required |
-| Enum values | Agent must know valid values | Listed inline in the parameter table |
-| Example call | Agent must understand the pattern | Code block with placeholder values |
-| Expected output | Agent must know what to do with the result | One sentence per tool |
+| Tool call description | Agent MUST know what tool to call | `## Step N: Call {{tool:toolName}}` |
+| Parameter table per tool | Agent MUST know which parameters exist | Markdown table with name, type, description, required |
+| Enum values | Agent MUST know valid values | Listed inline in the parameter table |
+| Example call | Agent MUST understand the pattern | Code block with placeholder values |
+| Expected output | Agent MUST know what to do with the result | One sentence per tool |
 
 ### Non-Compliant Skill (Fails One-Shot)
 
@@ -580,7 +580,7 @@ const content = `
 Call {{tool:getSimplePrice}} for the token {{input:tokenId}}.
 `
 // FAILS: No parameter table, no enum values, no example call
-// Agent must call ToolSearch to discover parameters → not one-shot
+// Agent MUST call ToolSearch to discover parameters → not one-shot
 ```
 
 ### Compliant Skill (Passes One-Shot)
@@ -740,8 +740,8 @@ SEC001 etherscan/skills/contract-audit.mjs: Forbidden pattern "import " found at
 
 | Constraint | Value | Rationale |
 |------------|-------|-----------|
-| Max skills per registration scope | 4 | Keeps each Selection or Agent focused. Skills beyond 4 in one scope indicate the scope should be split. Namespace-scoped skills are bounded by directory contents, not by an explicit limit. |
-| Content must not be empty | Required | A skill without instructions has no purpose. |
+| Max skills per registration scope | 4 | Keeps each Selection or Agent focused. Skills beyond 4 in one scope indicate the scope SHOULD be split. Namespace-scoped skills are bounded by directory contents, not by an explicit limit. |
+| Content MUST NOT be empty | Required | A skill without instructions has no purpose. |
 | Skill name max length | 64 characters | Prevents excessively long MCP prompt identifiers. |
 | Description max length | 1024 characters | Consistent with schema description limits. |
 | Skill-to-skill depth | 1 level | Prevents circular references and context explosion. |
@@ -786,10 +786,10 @@ The diagram shows how skill loading collects from three scope sources and runs t
 4. **Dynamic import** — the file is imported via `import()`.
 5. **Extract `skill` export** — the named `skill` export is read.
 6. **Validate skill fields** — name, version, description, output, content, input parameters.
-7. **Validate `requires.tools`** — each entry must exist in `main.tools`.
-8. **Validate `requires.resources`** — each entry must exist in `main.resources`.
-9. **Validate placeholders** — `{{input:key}}` references must match `input` entries; `{{tool:name}}` and `{{resource:name}}` references are checked against `requires` declarations.
-10. **Check skill-to-skill depth** — if the content contains `{{skill:name}}`, the referenced skill must not itself contain `{{skill:...}}` placeholders.
+7. **Validate `requires.tools`** — each entry MUST exist in `main.tools`.
+8. **Validate `requires.resources`** — each entry MUST exist in `main.resources`.
+9. **Validate placeholders** — `{{input:key}}` references MUST match `input` entries; `{{tool:name}}` and `{{resource:name}}` references are checked against `requires` declarations.
+10. **Check skill-to-skill depth** — if the content contains `{{skill:name}}`, the referenced skill MUST NOT itself contain `{{skill:...}}` placeholders.
 11. **Register as MCP prompts** — each validated skill is exposed as an MCP prompt.
 
 ### No Additional Dependencies

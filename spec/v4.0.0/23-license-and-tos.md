@@ -6,7 +6,7 @@
 
 ## Three-Layer License Model
 
-FlowMCP operates in a three-layer license model. **Schema authors and users must understand all three layers.**
+FlowMCP operates in a three-layer license model. **Schema authors and users MUST understand all three layers.**
 
 | Layer | What | Who Decides | What FlowMCP Does |
 |-------|------|-------------|---------------------|

@@ -41,13 +41,13 @@ export const selection = {
 | `name` | string | Selection name (kebab-case) |
 | `version` | string | Must be `'flowmcp/4.0.0'` |
 | `description` | string | What this selection provides |
-| `whenToUse` | string | When an agent should activate this selection (SEL001) |
+| `whenToUse` | string | When an agent SHOULD activate this selection (SEL001) |
 | `tools` | string[] | Tool Primitive-IDs included |
 | `skills` | string[] | Skill Primitive-IDs included |
 | `resources` | string[] | Resource Primitive-IDs included |
 | `prompts` | string[] | Prompt Primitive-IDs included |
 
-At least one array must be non-empty (SEL002).
+At least one array MUST be non-empty (SEL002).
 
 ## ID Format
 
@@ -69,9 +69,9 @@ Directory `selections/` is at root level, alongside `providers/` and `agents/`.
 
 | Code | Severity | Rule |
 |------|----------|------|
-| SEL001 | error | `whenToUse` is required and must not be empty |
+| SEL001 | error | `whenToUse` is required and MUST NOT be empty |
 | SEL002 | error | At least one array (tools/skills/resources/prompts) must be non-empty |
-| SEL003 | error | All referenced Primitive-IDs must be resolvable |
+| SEL003 | error | All referenced Primitive-IDs MUST be resolvable |
 
 ## Selection as Test-Trigger
 

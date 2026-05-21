@@ -124,7 +124,7 @@ Options are applied in array order after the primitive type check.
 
 3. **`length()` semantics** — For `string()`, this is character count. For `array()`, this is item count. For other types, it is ignored.
 
-4. **Multiple options** — Options are combined with AND logic. `[ 'min(1)', 'max(100)' ]` means the value must be >= 1 AND <= 100.
+4. **Multiple options** — Options are combined with AND logic. `[ 'min(1)', 'max(100)' ]` means the value MUST be >= 1 AND <= 100.
 
 > **Note:** Regular expressions are intentionally excluded from validation options. AI agents work poorly with regex patterns, and type-level validation combined with `min()`/`max()`/`length()` constraints covers the vast majority of use cases.
 
@@ -165,7 +165,7 @@ primitive: 'enum(ETHEREUM_MAINNET,POLYGON_MAINNET,ARBITRUM_MAINNET,OPTIMISM_MAIN
 
 1. **`{{listName:fieldName}}` is only allowed inside `enum()`**. Using it in `string()`, `number()`, or any other primitive is a load-time error.
 
-2. **The referenced list must be declared in `main.sharedLists`.** If a parameter references `{{evmChains:etherscanAlias}}` but `main.sharedLists` does not include an entry with `name: 'evmChains'`, the runtime rejects the schema.
+2. **The referenced list MUST be declared in `main.sharedLists`.** If a parameter references `{{evmChains:etherscanAlias}}` but `main.sharedLists` does not include an entry with `name: 'evmChains'`, the runtime rejects the schema.
 
 3. **If the shared list reference has a `filter`, only matching entries are used.** A filter `{ field: 'hasEtherscan', value: true }` means only entries where `hasEtherscan === true` contribute values.
 
@@ -206,7 +206,7 @@ Fixed parameters are common for APIs that use query parameters for routing (like
 ### Fixed Parameter Rules
 
 1. Fixed parameters are **not exposed to the AI client** in the tool's input schema.
-2. The `z` block still applies — the fixed value must pass validation. This is checked at load-time.
+2. The `z` block still applies — the fixed value MUST pass validation. This is checked at load-time.
 3. Fixed parameters are processed in array order alongside user parameters.
 
 ---
@@ -237,7 +237,7 @@ API keys and other server-level secrets are injected via the `{{SERVER_PARAM:KEY
 
 3. **The runtime resolves `{{SERVER_PARAM:KEY_NAME}}`** by reading the corresponding environment variable. If the variable is not set, the tool is not exposed (the schema loads but its tools are hidden).
 
-4. **Server parameters are never logged.** The runtime must not include server parameter values in error messages, debug output, or response data.
+4. **Server parameters are never logged.** The runtime MUST NOT include server parameter values in error messages, debug output, or response data.
 
 ---
 
@@ -305,7 +305,7 @@ When the runtime encounters a tool placeholder, it:
 
 ### Input Parameters (`{{input:key}}`)
 
-An `{{input:key}}` placeholder is a **user-input parameter**. The value is provided by the user when the prompt is invoked. Parameter keys follow camelCase conventions and must match an entry in the skill's `input` array.
+An `{{input:key}}` placeholder is a **user-input parameter**. The value is provided by the user when the prompt is invoked. Parameter keys follow camelCase conventions and MUST match an entry in the skill's `input` array.
 
 ```
 {{input:chainId}}       ← user provides a chain identifier
@@ -377,7 +377,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 
 | Code | Severity | Rule |
 |------|----------|------|
-| PH001 | error | `{{type:name}}` content must not be empty (e.g., `{{tool:}}` is invalid) |
+| PH001 | error | `{{type:name}}` content MUST NOT be empty (e.g., `{{tool:}}` is invalid) |
 | PH002 | error | Tool references (`{{tool:name}}`) must resolve to a tool in the same schema's `main.tools` |
 | PH003 | error | Input parameter keys (`{{input:key}}`) must match `^[a-zA-Z][a-zA-Z0-9]*$` and exist in the skill's `input` array |
 | PH004 | error | Prompt placeholders (`{{tool:...}}`, `{{resource:...}}`, `{{skill:...}}`, `{{input:...}}`) are only valid in prompt `content` fields, not in schema `main` blocks |
@@ -429,7 +429,7 @@ A parameter that accepts an Ethereum address and validates its length:
 
 **Behavior:**
 - The AI client sees an input field named `contractAddress` of type `string`.
-- The user must provide a string of exactly 42 characters (e.g., `0x` followed by 40 hex characters).
+- The user MUST provide a string of exactly 42 characters (e.g., `0x` followed by 40 hex characters).
 - The value is appended as `?contractAddress=0x...` to the URL.
 - If the length constraint fails, the runtime returns a validation error before making any HTTP request.
 
@@ -586,7 +586,7 @@ Resource parameters use the same `position` + `z` system as tool parameters, wit
 | `array()` / `object()` | Supported | Not supported — SQL accepts scalars only |
 | Binding order | Determined by `location` | Determined by array index (first param = first `?`) |
 
-The number of parameters must match the number of `?` placeholders in the SQL statement. A mismatch is a validation error. See `13-resources.md` for the complete resource specification.
+The number of parameters MUST match the number of `?` placeholders in the SQL statement. A mismatch is a validation error. See `13-resources.md` for the complete resource specification.
 
 ---
 

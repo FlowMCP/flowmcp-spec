@@ -57,7 +57,7 @@ flowchart LR
 
 Before a schema is loaded, the **raw file content** (as a string) is scanned for forbidden patterns. This happens before `import()` to prevent code execution.
 
-Since all dependencies are injected through the factory function, schema files should have **zero import statements**. This makes the scan simpler and more restrictive than in previous versions.
+Since all dependencies are injected through the factory function, schema files SHOULD have **zero import statements**. This makes the scan simpler and more restrictive than in previous versions.
 
 ### Forbidden Patterns (Entire File)
 
@@ -144,7 +144,7 @@ flowchart TD
 **Step-by-step:**
 
 1. **Read `main.requiredLibraries`** — extract the list of declared packages.
-2. **Check each against the allowlist** — every entry must appear in the default or user-extended allowlist.
+2. **Check each against the allowlist** — every entry MUST appear in the default or user-extended allowlist.
 3. **Reject unapproved libraries** — if any library is not on the allowlist, the schema is rejected with error code SEC013.
 4. **Load approved libraries** — each approved library is loaded via dynamic `import()`.
 5. **Package into `libraries` object** — loaded modules are keyed by package name.
@@ -182,7 +182,7 @@ Even after passing the static scan, handlers are constrained at runtime:
 2. **No side effects**: Handlers receive data and return data. No logging, no file writes, no timers.
 3. **`sharedLists` is read-only**: Shared list data is deep-frozen via `Object.freeze()`. Mutations throw a `TypeError`.
 4. **`libraries` contains only allowlisted packages**: Even if a handler tries to access a non-injected package, it is not available in scope.
-5. **Return value required**: Handlers must return the expected shape or the runtime throws.
+5. **Return value required**: Handlers MUST return the expected shape or the runtime throws.
 
 ### Handler Function Signatures
 

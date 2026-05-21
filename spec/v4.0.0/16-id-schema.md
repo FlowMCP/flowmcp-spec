@@ -2,7 +2,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-A unified ID system for referencing all FlowMCP primitives. IDs must be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
+A unified ID system for referencing all FlowMCP primitives. IDs MUST be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
 
 ---
 
@@ -75,7 +75,7 @@ Each segment serves a distinct purpose: the namespace identifies the owner, the 
 
 #### Namespace
 
-The namespace identifies the owner of the primitive. It is derived from the provider's domain name or agent name and must be globally unique within a FlowMCP registry.
+The namespace identifies the owner of the primitive. It is derived from the provider's domain name or agent name and MUST be globally unique within a FlowMCP registry.
 
 ```
 coingecko          ← provider namespace
@@ -275,7 +275,7 @@ defi-monitor        ← agent that monitors DeFi protocols
 |-----------|---------|
 | `shared` | Shared lists referenced across schemas. Only `list` type is valid under this namespace. |
 
-The `shared` namespace is reserved by the FlowMCP specification. Schema authors must not use `shared` as a provider or agent namespace.
+The `shared` namespace is reserved by the FlowMCP specification. Schema authors MUST NOT use `shared` as a provider or agent namespace.
 
 ---
 
@@ -283,10 +283,10 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 
 | Code | Severity | Rule |
 |------|----------|------|
-| ID001 | error | ID must contain at least one `/` separator |
-| ID002 | error | Namespace must match `^[a-z][a-z0-9-]*$` |
-| ID003 | error | ResourceType must be one of: `tool`, `resource`, `prompt`, `list`, `skill`, `selection`, `agent` |
-| ID004 | error | Name must not be empty |
+| ID001 | error | ID MUST contain at least one `/` separator |
+| ID002 | error | Namespace MUST match `^[a-z][a-z0-9-]*$` |
+| ID003 | error | ResourceType MUST be one of: `tool`, `resource`, `prompt`, `list`, `skill`, `selection`, `agent` |
+| ID004 | error | Name MUST NOT be empty |
 | ID005 | error | Short Form is not supported — full form (`namespace/type/name`) is always required |
 | ID006 | error | Full form is required everywhere — no context-based inference |
 
@@ -311,7 +311,7 @@ flowmcp validate --id "COINGECKO/tool/simplePrice"
 ```
 flowmcp validate --id "simplePrice"
 
-  ID001 error   ID must contain at least one "/" separator
+  ID001 error   ID MUST contain at least one "/" separator
 
   1 error, 0 warnings
   ID is invalid

@@ -8,7 +8,7 @@ An Agent is a complete, purpose-driven definition that bundles tools from multip
 
 ## Purpose
 
-A typical FlowMCP catalog contains hundreds of tools across dozens of providers. A developer working on a crypto research task needs tools from CoinGecko (prices), Etherscan (on-chain data), and DeFi Llama (TVL data) — but not the other 200 tools in the catalog. An Agent selects exactly the tools needed, binds them to a specific LLM, defines how the LLM should behave, and includes tests that verify the composition works.
+A typical FlowMCP catalog contains hundreds of tools across dozens of providers. A developer working on a crypto research task needs tools from CoinGecko (prices), Etherscan (on-chain data), and DeFi Llama (TVL data) — but not the other 200 tools in the catalog. An Agent selects exactly the tools needed, binds them to a specific LLM, defines how the LLM SHOULD behave, and includes tests that verify the composition works.
 
 ```mermaid
 flowchart LR
@@ -32,7 +32,7 @@ flowchart LR
     H --> Q[Own SQLite databases]
 ```
 
-The diagram shows how an agent manifest connects seven concerns: which tools to use, which model to target, how the model should behave, how to verify the composition, what explanatory prompts to provide, what instructional skills to include, and what own resources to bring.
+The diagram shows how an agent manifest connects seven concerns: which tools to use, which model to target, how the model SHOULD behave, how to verify the composition, what explanatory prompts to provide, what instructional skills to include, and what own resources to bring.
 
 ---
 
@@ -106,16 +106,16 @@ export const agent = {
 | `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning across all FlowMCP primitives). |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
-| `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
+| `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value MUST be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
 | `tests` | `array` | Yes | Minimum 3 agent tests. See [Agent Tests](#agent-tests). |
 | `maxRounds` | `number` | No | Maximum tool-call rounds per conversation. Default: `10`. |
 | `maxTokens` | `number` | No | Maximum tokens per LLM response. Default: `4096`. |
-| `prompts` | `object` | No | Explanatory prompts. Keys with `/` are external provider-prompt references (value must be `null`). Keys without `/` are inline declarations (value must have a `file` key pointing to an `.mjs` file that exports `export const content`). See [Slash Rule](#slash-rule). |
-| `skills` | `object` | No | Instructional skills. Keys must NOT contain `/` — skills are model-specific and cannot be externally referenced. Each value must have a `file` key pointing to an `.mjs` file that exports `export const skill`. |
-| `resources` | `object` | No | Own resources (SQLite databases). Keys with `/` are external provider-resource references (value must be `null`). Keys without `/` are inline resource definitions. See [Slash Rule](#slash-rule). |
+| `prompts` | `object` | No | Explanatory prompts. Keys with `/` are external provider-prompt references (value MUST be `null`). Keys without `/` are inline declarations (value MUST have a `file` key pointing to an `.mjs` file that exports `export const content`). See [Slash Rule](#slash-rule). |
+| `skills` | `object` | No | Instructional skills. Keys MUST NOT contain `/` — skills are model-specific and cannot be externally referenced. Each value MUST have a `file` key pointing to an `.mjs` file that exports `export const skill`. |
+| `resources` | `object` | No | Own resources (SQLite databases). Keys with `/` are external provider-resource references (value MUST be `null`). Keys without `/` are inline resource definitions. See [Slash Rule](#slash-rule). |
 | `sharedLists` | `string[]` | No | Names of shared lists the agent needs. Resolved from the catalog's `_lists/` directory. |
 | `inputSchema` | `object` | No | JSON Schema defining the agent's input format. |
-| `selections` | `string[]` | No | Selection IDs to load when the agent starts. All referenced Selections must be resolvable. See [Selections](#selections). |
+| `selections` | `string[]` | No | Selection IDs to load when the agent starts. All referenced Selections MUST be resolvable. See [Selections](#selections). |
 | `elicitation` | `object` | No | MCP Elicitation configuration. See [Elicitation](#elicitation). |
 
 ### Field Details
@@ -145,7 +145,7 @@ flowmcp/2.0.0            <- INVALID (agents are a v3+ concept)
 
 #### `model`
 
-The model field uses OpenRouter syntax: `provider/model-name`. The `/` separator is required and distinguishes the model provider from the model identifier. The model determines which LLM the agent is tested with and optimized for. Agent prompts and skills are model-specific — a prompt tuned for Claude may not work well with GPT-4o and vice versa.
+The model field uses OpenRouter syntax: `provider/model-name`. The `/` separator is required and distinguishes the model provider from the model identifier. The model determines which LLM the agent is tested with and optimized for. Agent prompts and skills are model-specific — a prompt tuned for Claude MAY not work well with GPT-4o and vice versa.
 
 ```
 anthropic/claude-sonnet-4-5-20250929     <- valid
@@ -196,15 +196,15 @@ See [Tool Cherry-Picking](#tool-cherry-picking) for external tool resolution det
 
 #### `maxRounds`
 
-The maximum number of tool-call rounds the agent may execute in a single conversation turn. A "round" is one cycle of: LLM generates a tool call, runtime executes it, result is returned to the LLM. Default is `10`. Set lower for agents that should answer quickly, higher for agents that perform complex multi-step analysis.
+The maximum number of tool-call rounds the agent MAY execute in a single conversation turn. A "round" is one cycle of: LLM generates a tool call, runtime executes it, result is returned to the LLM. Default is `10`. Set lower for agents that SHOULD answer quickly, higher for agents that perform complex multi-step analysis.
 
 #### `maxTokens`
 
-The maximum number of tokens the LLM may generate per response. Default is `4096`. This controls response length, not total context.
+The maximum number of tokens the LLM MAY generate per response. Default is `4096`. This controls response length, not total context.
 
 #### `prompts`
 
-Explanatory prompts declared as an object. Each key is the prompt name, each value must have a `file` key pointing to an `.mjs` file. Prompt files export `export const content` — a string containing the explanatory text.
+Explanatory prompts declared as an object. Each key is the prompt name, each value MUST have a `file` key pointing to an `.mjs` file. Prompt files export `export const content` — a string containing the explanatory text.
 
 Agent-level prompts describe what the agent does and how its providers work together. The `about` prompt is a convention (SHOULD) that explains the agent's capabilities.
 
@@ -224,7 +224,7 @@ External prompt references (slash keys with `null` value) import prompts from pr
 
 #### `skills`
 
-Instructional skills declared as an object. Each key is the skill name, each value must have a `file` key pointing to an `.mjs` file. Skill files export `export const skill` — an object containing the skill definition with content, input parameters, output description, and optionally external requirements.
+Instructional skills declared as an object. Each key is the skill name, each value MUST have a `file` key pointing to an `.mjs` file. Skill files export `export const skill` — an object containing the skill definition with content, input parameters, output description, and optionally external requirements.
 
 Agent-level skills are **model-specific** — they are written and tested for the LLM specified in `model`. They describe multi-step workflows, tool chaining strategies, and fallback logic.
 
@@ -238,7 +238,7 @@ export const agent = {
 }
 ```
 
-Skills cannot be externally referenced because they are model-specific (`testedWith` required). A skill written for Claude may not work with GPT-4o. Skill files follow the format defined in `14-skills.md`.
+Skills cannot be externally referenced because they are model-specific (`testedWith` required). A skill written for Claude MAY not work with GPT-4o. Skill files follow the format defined in `14-skills.md`.
 
 #### systemPrompt vs prompts vs skills
 
@@ -285,7 +285,7 @@ export const agent = {
 
 #### `sharedLists`
 
-Names of shared lists the agent needs. These are resolved from the catalog's `_lists/` directory at load time. Shared lists provide reusable value sets (EVM chain IDs, country codes, trading pairs) that the agent's prompts and system prompt may reference.
+Names of shared lists the agent needs. These are resolved from the catalog's `_lists/` directory at load time. Shared lists provide reusable value sets (EVM chain IDs, country codes, trading pairs) that the agent's prompts and system prompt MAY reference.
 
 #### `inputSchema`
 
@@ -321,7 +321,7 @@ flowchart TD
 | `resources` | Yes | Yes (resource definition) | Can reference provider resources |
 | `skills` | **No** (AGT014) | Yes (`{ file: './...' }`) | Model-specific, cannot be shared |
 
-Skills are the exception: they cannot have slash keys because they are model-specific (`testedWith` required). A skill written for Claude may produce incorrect results with GPT-4o.
+Skills are the exception: they cannot have slash keys because they are model-specific (`testedWith` required). A skill written for Claude MAY produce incorrect results with GPT-4o.
 
 ---
 
@@ -404,7 +404,7 @@ Agent tests are executed against the specified model. The `expectedTools` and `e
 
 ### 2. Prompt and Skill Optimization
 
-Agent-level prompts (in the `prompts/` directory) and skills (in the `skills/` directory) are written for the specific model. They leverage the model's strengths and work around its weaknesses. A skill that works well with Claude's structured thinking may not translate to GPT-4o's different reasoning style.
+Agent-level prompts (in the `prompts/` directory) and skills (in the `skills/` directory) are written for the specific model. They leverage the model's strengths and work around its weaknesses. A skill that works well with Claude's structured thinking MAY not translate to GPT-4o's different reasoning style.
 
 ### 3. Runtime Model Selection
 
@@ -485,8 +485,8 @@ export const agent = {
 |-------|------|----------|-------------|
 | `_description` | `string` | Yes | What this test demonstrates |
 | `input` | `string` | Yes | Natural language prompt (as a user would ask) |
-| `expectedTools` | `string[]` | Yes | Tool IDs that should be called (deterministic check) |
-| `expectedContent` | `string[]` | No | Substrings the response text must contain (case-insensitive) |
+| `expectedTools` | `string[]` | Yes | Tool IDs that SHOULD be called (deterministic check) |
+| `expectedContent` | `string[]` | No | Substrings the response text MUST contain (case-insensitive) |
 
 ### Three-Level Test Model
 
@@ -513,11 +513,11 @@ flowchart TD
 
 **Content** assertions are semi-deterministic. LLM output varies across runs, but factual elements like "current price" or "USD" should appear in any correct response.
 
-**Quality** is outside the scope of automated validation. It exists in the model for completeness — teams may evaluate response quality through human review or LLM-as-Judge.
+**Quality** is outside the scope of automated validation. It exists in the model for completeness — teams MAY evaluate response quality through human review or LLM-as-Judge.
 
 ### Minimum Test Count
 
-Every agent must have at least 3 tests (validation rule AGT008). Three tests ensure coverage across:
+Every agent MUST have at least 3 tests (validation rule AGT008). Three tests ensure coverage across:
 
 1. **Basic case** — a straightforward single-tool query
 2. **Edge case** — a question requiring multiple tools or complex reasoning
@@ -527,8 +527,8 @@ Every agent must have at least 3 tests (validation rule AGT008). Three tests ens
 
 The same principles from `10-tests.md` apply:
 
-- **Express the breadth** — each test should demonstrate a different capability
-- **Teach through examples** — reading the tests should reveal what the agent can do
+- **Express the breadth** — each test SHOULD demonstrate a different capability
+- **Teach through examples** — reading the tests SHOULD reveal what the agent can do
 - **No personal data** — use public, well-known entities
 - **Reproducible** — prefer stable queries over time-sensitive ones
 
@@ -664,7 +664,7 @@ agents/
 
 ### Directory Rules
 
-- The directory name must match `agent.name`
+- The directory name MUST match `agent.name`
 - `agent.mjs` is required — it is the agent's entry point
 - `prompts/` is optional — only needed if the agent defines prompts
 - `skills/` is optional — only needed if the agent defines skills
@@ -772,8 +772,8 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 8. **Resolve lists** — load shared lists declared in `agent.sharedLists`
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
 10. **Load resources** — initialize agent-owned resources (SQLite databases) from `agent.resources`
-11. **Load prompts** — import prompt files from `main.prompts`, each must export `export const content`
-12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each must export `export const skill`. `main.skills` is forbidden in v4.0.0.
+11. **Load prompts** — import prompt files from `main.prompts`, each MUST export `export const content`
+12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each MUST export `export const skill`. `main.skills` is forbidden in v4.0.0.
 13. **Register tools** — expose the agent's tools via MCP `server.tool`
 14. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
 15. **Register skills** — expose the agent's skills via MCP `server.prompt`
@@ -798,7 +798,7 @@ export const agent = {
 
 ### Selection Loading Behavior
 
-- Each Selection ID must follow the `namespace/selection/name` format (see `17-selections.md`)
+- Each Selection ID MUST follow the `namespace/selection/name` format (see `17-selections.md`)
 - Selections are loaded at agent startup as part of the activation sequence
 - If a referenced Selection cannot be loaded (missing file, resolution error), agent startup fails with validation rule AGT030
 
@@ -861,7 +861,7 @@ Elicitation uses the MCP `elicitation/create` method to request input from the u
 |-------|------|----------|-------------|
 | `enabled` | `boolean` | Yes | Whether elicitation is active for this agent |
 | `maxRounds` | `number` | Yes | Maximum number of elicitation rounds per conversation. Must be a positive integer (≥ 1). |
-| `requestedSchemas` | `array` | No | Pre-defined elicitation request templates the agent may use |
+| `requestedSchemas` | `array` | No | Pre-defined elicitation request templates the agent MAY use |
 
 ### FlowMCP Policy
 
@@ -885,58 +885,58 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 | AGT004 | error | `version` must be `flowmcp/4.0.0` |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools` is required, must be a non-empty object |
-| AGT007 | error | Each tool key containing `/` must be a valid ID format (`namespace/type/name`) and its value must be `null` |
+| AGT007 | error | Each tool key containing `/` must be a valid ID format (`namespace/type/name`) and its value MUST be `null` |
 | AGT008 | error | `tests[]` is required, minimum 3 tests |
-| AGT009 | error | Each test must have an `input` field of type string |
-| AGT010 | error | Each test must have an `expectedTools` field as a non-empty array |
-| AGT011 | error | Each `expectedTools` entry must be a valid ID (contains `/`) |
-| AGT012 | warning | Tests should cover different tool combinations |
-| AGT013 | error | `prompts` if present must be an object. Keys with `/`: value must be `null` (external). Keys without `/`: value must have a `file` key |
-| AGT014 | error | `skills` if present must be an object. Keys must NOT contain `/` (skills are model-specific, inline-only). Each value must have a `file` key |
-| AGT015 | error | `resources` if present must be an object. Keys with `/`: value must be `null` (external). Keys without `/`: follows schema resource rules |
-| AGT016 | error | Referenced prompt and skill files must exist and have `.mjs` extension |
-| AGT017 | error | Prompt files must export `export const content` |
-| AGT018 | error | Skill files must export `export const skill` |
+| AGT009 | error | Each test MUST have an `input` field of type string |
+| AGT010 | error | Each test MUST have an `expectedTools` field as a non-empty array |
+| AGT011 | error | Each `expectedTools` entry MUST be a valid ID (contains `/`) |
+| AGT012 | warning | Tests SHOULD cover different tool combinations |
+| AGT013 | error | `prompts` if present MUST be an object. Keys with `/`: value MUST be `null` (external). Keys without `/`: value MUST have a `file` key |
+| AGT014 | error | `skills` if present MUST be an object. Keys MUST NOT contain `/` (skills are model-specific, inline-only). Each value MUST have a `file` key |
+| AGT015 | error | `resources` if present MUST be an object. Keys with `/`: value MUST be `null` (external). Keys without `/`: follows schema resource rules |
+| AGT016 | error | Referenced prompt and skill files MUST exist and have `.mjs` extension |
+| AGT017 | error | Prompt files MUST export `export const content` |
+| AGT018 | error | Skill files MUST export `export const skill` |
 | AGT019 | error | Inline tool keys (without `/`) must have a valid tool definition object as value (with `method`, `path`, `description`) |
-| AGT020 | error | Keys containing `/` with a non-`null` value are forbidden (slash keys must always be `null`) |
+| AGT020 | error | Keys containing `/` with a non-`null` value are forbidden (slash keys MUST always be `null`) |
 
 ### Rule Details
 
-**AGT001** — The agent name is the primary identifier and must match the directory name. Invalid names prevent catalog resolution.
+**AGT001** — The agent name is the primary identifier and MUST match the directory name. Invalid names prevent catalog resolution.
 
 **AGT002** — The description is displayed in catalog listings and agent discovery. It must be meaningful — empty strings are rejected.
 
 **AGT003** — The model field uses OpenRouter syntax where the `/` separates the provider from the model name. A model string without `/` cannot be routed to any provider. Examples: `anthropic/claude-sonnet-4-5-20250929`, `openai/gpt-4o`.
 
-**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string).
+**AGT004** — The version MUST be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string).
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 
-**AGT006** — An agent without tools has nothing to execute. The tools object must contain at least one entry (external or inline).
+**AGT006** — An agent without tools has nothing to execute. The tools object MUST contain at least one entry (external or inline).
 
-**AGT007** — External tool keys (containing `/`) must follow the ID schema from `16-id-schema.md`. The full form `namespace/type/name` is required to ensure unambiguous resolution. The value for external keys must be `null`.
+**AGT007** — External tool keys (containing `/`) must follow the ID schema from `16-id-schema.md`. The full form `namespace/type/name` is required to ensure unambiguous resolution. The value for external keys MUST be `null`.
 
 **AGT008** — Three tests is the minimum for meaningful coverage: one basic case, one edge case, one cross-cutting case. This matches the tool test minimum from `10-tests.md`.
 
-**AGT009–AGT011** — These rules validate individual test fields. They correspond to the agent test validation rules TST009–TST011 defined in `10-tests.md`. Every test must have a natural language input and at least one expected tool call.
+**AGT009–AGT011** — These rules validate individual test fields. They correspond to the agent test validation rules TST009–TST011 defined in `10-tests.md`. Every test MUST have a natural language input and at least one expected tool call.
 
-**AGT012** — Tests should demonstrate breadth. If all three tests expect the same single tool, the test suite does not validate the agent's multi-tool orchestration capability. This is a warning, not an error, because some agents genuinely use only one tool.
+**AGT012** — Tests SHOULD demonstrate breadth. If all three tests expect the same single tool, the test suite does not validate the agent's multi-tool orchestration capability. This is a warning, not an error, because some agents genuinely use only one tool.
 
-**AGT013** — The `prompts` field must be an object. Keys containing `/` are external provider-prompt references — their value must be `null`. Keys without `/` are inline prompt declarations — their value must have a `file` key pointing to a `.mjs` file.
+**AGT013** — The `prompts` field MUST be an object. Keys containing `/` are external provider-prompt references — their value MUST be `null`. Keys without `/` are inline prompt declarations — their value MUST have a `file` key pointing to a `.mjs` file.
 
-**AGT014** — The `skills` field must be an object. Keys must NOT contain `/` because skills are model-specific (`testedWith` required) and cannot be shared across agents targeting different models. Each value must have a `file` key pointing to a skill file.
+**AGT014** — The `skills` field MUST be an object. Keys MUST NOT contain `/` because skills are model-specific (`testedWith` required) and cannot be shared across agents targeting different models. Each value MUST have a `file` key pointing to a skill file.
 
-**AGT015** — The `resources` field must be an object. Keys containing `/` are external provider-resource references — their value must be `null`. Keys without `/` are inline resource definitions that must have a valid `source` and optional `queries`.
+**AGT015** — The `resources` field MUST be an object. Keys containing `/` are external provider-resource references — their value MUST be `null`. Keys without `/` are inline resource definitions that MUST have a valid `source` and optional `queries`.
 
-**AGT019** — Inline tool keys (without `/`) must have a valid tool definition object as their value. The object must contain at minimum `method`, `path`, and `description` — the same fields required for tools in provider schemas.
+**AGT019** — Inline tool keys (without `/`) must have a valid tool definition object as their value. The object MUST contain at minimum `method`, `path`, and `description` — the same fields required for tools in provider schemas.
 
-**AGT020** — A key containing `/` with a non-`null` value is always an error. This rule applies uniformly to `tools`, `prompts`, and `resources`. The slash in the key signals an external reference, which must have `null` as its value.
+**AGT020** — A key containing `/` with a non-`null` value is always an error. This rule applies uniformly to `tools`, `prompts`, and `resources`. The slash in the key signals an external reference, which MUST have `null` as its value.
 
-**AGT016** — All files referenced in `prompts` and `skills` must exist on disk and must have the `.mjs` extension. Missing files prevent activation.
+**AGT016** — All files referenced in `prompts` and `skills` must exist on disk and MUST have the `.mjs` extension. Missing files prevent activation.
 
-**AGT017** — Prompt files must export a named constant `content` (`export const content`). This is a string containing the explanatory text, optionally with `{{...}}` placeholders.
+**AGT017** — Prompt files MUST export a named constant `content` (`export const content`). This is a string containing the explanatory text, optionally with `{{...}}` placeholders.
 
-**AGT018** — Skill files must export a named constant `skill` (`export const skill`). This is an object containing the skill definition as specified in `14-skills.md`.
+**AGT018** — Skill files MUST export a named constant `skill` (`export const skill`). This is an object containing the skill definition as specified in `14-skills.md`.
 
 ### Validation Command
 

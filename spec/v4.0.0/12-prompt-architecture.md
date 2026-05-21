@@ -120,10 +120,10 @@ prices. Suggest using coinMarkets with the order parameter for trending analysis
 
 **Content file rules:**
 
-- Export must be `export const content` (not `export const prompt`)
+- Export MUST be `export const content` (not `export const prompt`)
 - No imports allowed (zero-import policy)
 - `{{type:name}}` placeholder syntax for references and parameters
-- Content must not be empty
+- Content MUST NOT be empty
 
 ### Provider-Prompt Characteristics
 
@@ -133,7 +133,7 @@ prices. Suggest using coinMarkets with the order parameter for trending analysis
 - **`contentFile` field** is a relative path to the `.mjs` file containing the prompt content.
 - **No `testedWith` field** — Provider-Prompts are model-neutral. Any LLM can benefit from them.
 - **No `agent` field** — the `namespace` field indicates this is a Provider-Prompt.
-- **`{{type:name}}` references** in content use the type prefix to distinguish tool references (`{{tool:coingecko/simplePrice}}`), resource references (`{{resource:name}}`), and input parameters (`{{input:coins}}`). References must target tools within the same namespace.
+- **`{{type:name}}` references** in content use the type prefix to distinguish tool references (`{{tool:coingecko/simplePrice}}`), resource references (`{{resource:name}}`), and input parameters (`{{input:coins}}`). References MUST target tools within the same namespace.
 
 ---
 
@@ -178,7 +178,7 @@ export const prompt = {
 ### Agent-Prompt Characteristics
 
 - **`agent` field** identifies the owning agent. Must match an agent name in the catalog.
-- **`dependsOn` uses full ID format** — since Agent-Prompts span multiple providers, each tool reference must be unambiguous. `'coingecko/tool/simplePrice'` specifies both the namespace and the tool name.
+- **`dependsOn` uses full ID format** — since Agent-Prompts span multiple providers, each tool reference MUST be unambiguous. `'coingecko/tool/simplePrice'` specifies both the namespace and the tool name.
 - **`testedWith` is required** — documents which LLM model the prompt was tested and optimized for.
 - **No `namespace` field** — the `agent` field indicates this is an Agent-Prompt.
 - **`references` array** allows including content from other prompts (see [Composable Prompts](#composable-prompts)).
@@ -239,16 +239,16 @@ version: 'flowmcp-skill/1.0.0'    // wrong prefix (this is a skill version)
 
 #### `namespace` vs `agent`
 
-These two fields are mutually exclusive. Exactly one must be set — not both, not neither. The presence of `namespace` marks a Provider-Prompt. The presence of `agent` marks an Agent-Prompt.
+These two fields are mutually exclusive. Exactly one MUST be set — not both, not neither. The presence of `namespace` marks a Provider-Prompt. The presence of `agent` marks an Agent-Prompt.
 
 ```javascript
 // Provider-Prompt
 namespace: 'coingecko'
-// agent field must NOT be present
+// agent field MUST NOT be present
 
 // Agent-Prompt
 agent: 'crypto-research'
-// namespace field must NOT be present
+// namespace field MUST NOT be present
 ```
 
 #### `testedWith`
@@ -266,11 +266,11 @@ testedWith: 'claude-sonnet'      // missing organization prefix
 testedWith: 'gpt-4o'             // must contain /
 ```
 
-The `testedWith` field documents which model the prompt was optimized for. Other models may work but are not guaranteed to produce the same quality of results. This is especially relevant for complex multi-step workflows where models differ in their ability to chain tool calls and handle intermediate results.
+The `testedWith` field documents which model the prompt was optimized for. Other models MAY work but are not guaranteed to produce the same quality of results. This is especially relevant for complex multi-step workflows where models differ in their ability to chain tool calls and handle intermediate results.
 
 #### `dependsOn`
 
-Lists the tools that the prompt references. Every tool mentioned in the prompt's `content` via `{{tool:...}}` placeholders should appear in `dependsOn`. This enables validation — the runtime checks that all declared dependencies resolve to existing tools.
+Lists the tools that the prompt references. Every tool mentioned in the prompt's `content` via `{{tool:...}}` placeholders SHOULD appear in `dependsOn`. This enables validation — the runtime checks that all declared dependencies resolve to existing tools.
 
 **Provider-Prompts** use bare tool names (same namespace is implied):
 
@@ -305,7 +305,7 @@ references: [ 'coingecko/prompt/price-comparison' ]
 
 #### `contentFile` (Provider-Prompt only)
 
-A relative path to the `.mjs` file containing the prompt content. Required for Provider-Prompts, forbidden for Agent-Prompts. The file must export `export const content = '...'`.
+A relative path to the `.mjs` file containing the prompt content. Required for Provider-Prompts, forbidden for Agent-Prompts. The file MUST export `export const content = '...'`.
 
 ```javascript
 // Valid
@@ -485,7 +485,7 @@ The diagram shows that composition is limited to one level. The referencing prom
 
 | Rule | Description |
 |------|-------------|
-| **One level deep** | A referenced prompt must not itself have `references[]`. No chains: A -> B -> C is forbidden. |
+| **One level deep** | A referenced prompt MUST NOT itself have `references[]`. No chains: A -> B -> C is forbidden. |
 | **Agent -> Provider** | Agent-Prompts can reference Provider-Prompts (cross-scope). |
 | **Provider -> Provider** | Provider-Prompts can reference other prompts within the same namespace only. |
 | **Provider -> Agent** | Provider-Prompts cannot reference Agent-Prompts (Agent-Prompts are model-specific, Provider-Prompts are model-neutral). |
@@ -507,7 +507,7 @@ The `testedWith` field documents which LLM model an Agent-Prompt was tested and 
 
 ### Format
 
-The value must contain a `/` separator between the organization and model name:
+The value MUST contain a `/` separator between the organization and model name:
 
 ```
 organization/model-name
@@ -524,10 +524,10 @@ organization/model-name
 
 ### Implications
 
-- **Required for Agent-Prompts** — every Agent-Prompt must declare which model it was tested with.
+- **Required for Agent-Prompts** — every Agent-Prompt MUST declare which model it was tested with.
 - **Forbidden for Provider-Prompts** — Provider-Prompts are model-neutral by design.
-- **Not a restriction** — the field documents testing history, not a runtime requirement. Other models may work, but the prompt author has only verified behavior with the declared model.
-- **Model-specific optimizations** — different models handle tool chaining, JSON parsing, and multi-step reasoning differently. An Agent-Prompt tested with Claude may structure instructions differently than one tested with GPT-4o.
+- **Not a restriction** — the field documents testing history, not a runtime requirement. Other models MAY work, but the prompt author has only verified behavior with the declared model.
+- **Model-specific optimizations** — different models handle tool chaining, JSON parsing, and multi-step reasoning differently. An Agent-Prompt tested with Claude MAY structure instructions differently than one tested with GPT-4o.
 
 ---
 
@@ -649,18 +649,18 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 | Code | Severity | Rule |
 |------|----------|------|
 | PRM001 | error | `name` is required, must be a string, must match `^[a-z][a-z0-9-]*$` |
-| PRM002 | error | `version` is required and must be `'flowmcp-prompt/1.0.0'` |
+| PRM002 | error | `version` is required and MUST be `'flowmcp-prompt/1.0.0'` |
 | PRM003 | error | Exactly one of `namespace` or `agent` must be set (not both, not neither) |
 | PRM004 | error | `testedWith` is required when `agent` is set, forbidden when `namespace` is set |
-| PRM005 | error | `testedWith` value must contain `/` (OpenRouter model ID format) |
-| PRM006 | error | Each `dependsOn` entry must resolve to an existing tool in the catalog |
-| PRM007 | error | Each `references[]` entry must resolve to an existing prompt in the catalog |
-| PRM008 | error | Referenced prompts must not themselves have `references[]` (one level deep only) |
-| PRM009 | error | `{{type:name}}` reference placeholders in prompt content must resolve to registered primitives |
-| PRM010 | error | Agent-Prompts: `content` is required and must be a non-empty string. Provider-Prompts: `content` is forbidden. |
+| PRM005 | error | `testedWith` value MUST contain `/` (OpenRouter model ID format) |
+| PRM006 | error | Each `dependsOn` entry MUST resolve to an existing tool in the catalog |
+| PRM007 | error | Each `references[]` entry MUST resolve to an existing prompt in the catalog |
+| PRM008 | error | Referenced prompts MUST NOT themselves have `references[]` (one level deep only) |
+| PRM009 | error | `{{type:name}}` reference placeholders in prompt content MUST resolve to registered primitives |
+| PRM010 | error | Agent-Prompts: `content` is required and MUST be a non-empty string. Provider-Prompts: `content` is forbidden. |
 | PRM011 | error | Provider-Prompts: `contentFile` is required, must be a relative path ending with `.mjs`. Agent-Prompts: `contentFile` is forbidden. |
-| PRM012 | error | Content file must export `export const content` (not `export const prompt`). |
-| PRM013 | error | `references` is required and must be an array (empty `[]` when no references). |
+| PRM012 | error | Content file MUST export `export const content` (not `export const prompt`). |
+| PRM013 | error | `references` is required and MUST be an array (empty `[]` when no references). |
 
 ### Rule Details
 
@@ -668,7 +668,7 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 
 **PRM002** — The version string enables the validator to apply the correct rule set. Future versions of the prompt format will increment this value.
 
-**PRM003** — A prompt must be either a Provider-Prompt (has `namespace`) or an Agent-Prompt (has `agent`). Having both or neither is invalid. This rule enforces the two-tier architecture.
+**PRM003** — A prompt MUST be either a Provider-Prompt (has `namespace`) or an Agent-Prompt (has `agent`). Having both or neither is invalid. This rule enforces the two-tier architecture.
 
 **PRM004** — Provider-Prompts are model-neutral, so `testedWith` would be misleading. Agent-Prompts are model-specific, so `testedWith` is mandatory to document the testing context.
 
@@ -678,15 +678,15 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 
 **PRM007** — Every prompt listed in `references[]` must exist in the catalog. References use full ID format (`namespace/prompt/name`).
 
-**PRM008** — If prompt A references prompt B, prompt B must not have its own `references[]` array. This enforces one-level-deep composition.
+**PRM008** — If prompt A references prompt B, prompt B MUST NOT have its own `references[]` array. This enforces one-level-deep composition.
 
-**PRM009** — All `{{tool:...}}`, `{{resource:...}}`, and `{{prompt:...}}` reference placeholders in the `content` field must resolve to registered tools, resources, or prompts. Parameter placeholders (`{{input:...}}`) are not validated against the catalog — they are user inputs.
+**PRM009** — All `{{tool:...}}`, `{{resource:...}}`, and `{{prompt:...}}` reference placeholders in the `content` field MUST resolve to registered tools, resources, or prompts. Parameter placeholders (`{{input:...}}`) are not validated against the catalog — they are user inputs.
 
 **PRM010** — Agent-Prompts need inline content. Provider-Prompts get their content from an external file via `contentFile`.
 
-**PRM011** — Provider-Prompts must declare where their content lives via `contentFile`. The file must be a relative `.mjs` path. Agent-Prompts must not have `contentFile` because their content is inline.
+**PRM011** — Provider-Prompts MUST declare where their content lives via `contentFile`. The file MUST be a relative `.mjs` path. Agent-Prompts MUST NOT have `contentFile` because their content is inline.
 
-**PRM012** — Content files must use `export const content` as the named export. Using `export const prompt` would create ambiguity with the Agent-Prompt export pattern.
+**PRM012** — Content files MUST use `export const content` as the named export. Using `export const prompt` would create ambiguity with the Agent-Prompt export pattern.
 
 **PRM013** — The `references` field is always required. When a prompt does not compose other prompts, an empty array `[]` must be provided. This makes the absence of references explicit rather than ambiguous.
 

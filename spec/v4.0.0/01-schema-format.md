@@ -70,7 +70,7 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `namespace` | `string` | Provider identifier, lowercase letters and hyphens (`/^[a-z][a-z0-9-]*$/`). Groups schemas by data source. |
 | `name` | `string` | Human-readable schema name in PascalCase (e.g. `SmartContractExplorer`). |
 | `description` | `string` | What this schema does, 1-2 sentences. Appears in tool discovery. |
-| `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major must be `4`). Version `3.\d+.\d+` is accepted during migration. |
+| `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major MUST be `4`). Version `3.\d+.\d+` is accepted during migration. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
 
@@ -119,7 +119,7 @@ namespace: 'web3_data'     // underscore not allowed
 
 #### `root`
 
-The base URL is prepended to every route's `path`. It must use HTTPS and must not end with a slash:
+The base URL is prepended to every route's `path`. It must use HTTPS and MUST NOT end with a slash:
 
 ```javascript
 // Valid
@@ -133,7 +133,7 @@ root: 'https://api.etherscan.io/'   // no trailing slash
 
 #### `requiredServerParams`
 
-Declares environment variables that must be available at runtime. The runtime checks for their presence before exposing the schema's tools. Values are injected into parameters via the `{{SERVER_PARAM:KEY_NAME}}` syntax (see `02-parameters.md`).
+Declares environment variables that MUST be available at runtime. The runtime checks for their presence before exposing the schema's tools. Values are injected into parameters via the `{{SERVER_PARAM:KEY_NAME}}` syntax (see `02-parameters.md`).
 
 ```javascript
 requiredServerParams: [ 'ETHERSCAN_API_KEY' ]
@@ -246,7 +246,7 @@ path: '/api/v1/{{address}}/transactions'
 path: '/api/v1/{{chainId}}/address/{{address}}/balances'
 ```
 
-Every `{{key}}` placeholder must have a corresponding parameter with `location: 'insert'`. The runtime validates this at load-time.
+Every `{{key}}` placeholder MUST have a corresponding parameter with `location: 'insert'`. The runtime validates this at load-time.
 
 ---
 
@@ -333,7 +333,7 @@ When `executeRequest` is defined for a tool, the runtime skips the standard HTTP
 - **XML/TRIAS APIs** that cannot be parsed with the standard JSON pipeline
 - **CSW/OGC endpoints** with non-standard response formats
 - **SQLite-backed schemas** that resolve queries locally without HTTP
-- **Composite calls** that must combine multiple upstream requests into one
+- **Composite calls** that MUST combine multiple upstream requests into one
 
 ```javascript
 export const handlers = ( { sharedLists, libraries } ) => ({
@@ -363,19 +363,19 @@ Server parameters (`requiredServerParams`) are handled by the runtime during URL
 
 ### Handler Rules
 
-1. **Handlers are optional.** Tools without handlers make direct API calls using the constructed URL and parameters. Most tools should not need handlers.
+1. **Handlers are optional.** Tools without handlers make direct API calls using the constructed URL and parameters. Most tools SHOULD NOT need handlers.
 
-2. **Schema files must NOT contain import statements.** No `import`, no `require`, no dynamic `import()`. All dependencies are injected through the factory function. The security scanner rejects any schema containing import statements. See `05-security.md`.
+2. **Schema files MUST NOT contain import statements.** No `import`, no `require`, no dynamic `import()`. All dependencies are injected through the factory function. The security scanner rejects any schema containing import statements. See `05-security.md`.
 
-3. **Handlers must NOT access restricted globals.** The following are forbidden: `fetch`, `fs`, `process`, `eval`, `Function`, `setTimeout`, `setInterval`, `XMLHttpRequest`, `WebSocket`. See `05-security.md` for the complete list.
+3. **Handlers MUST NOT access restricted globals.** The following are forbidden: `fetch`, `fs`, `process`, `eval`, `Function`, `setTimeout`, `setInterval`, `XMLHttpRequest`, `WebSocket`. See `05-security.md` for the complete list.
 
 4. **`sharedLists` provides resolved list data.** If a schema references shared lists in `main.sharedLists`, the resolved data is available inside the factory closure via `sharedLists['listName']` or `sharedLists.listName`. The data is deep-frozen — mutations throw.
 
 5. **`libraries` provides approved npm packages.** If a schema declares `main.requiredLibraries`, the loaded modules are available inside the factory closure via `libraries['packageName']` or `libraries.packageName`.
 
-6. **Handlers must be pure transformations.** They receive data, transform it, and return data. No side effects, no state mutations outside the return value, no logging.
+6. **Handlers MUST be pure transformations.** They receive data, transform it, and return data. No side effects, no state mutations outside the return value, no logging.
 
-7. **Return shape must match the handler type.** `preRequest` must return `{ struct, payload }`. `postRequest` must return `{ response }`. Missing keys cause a runtime error.
+7. **Return shape MUST match the handler type.** `preRequest` must return `{ struct, payload }`. `postRequest` must return `{ response }`. Missing keys cause a runtime error.
 
 8. **Resource handlers are nested one level deeper.** Tool handlers are keyed by tool name, resource handlers are keyed by resource name then query name. See `13-resources.md` for details.
 
@@ -404,15 +404,15 @@ Server parameters (`requiredServerParams`) are handled by the runtime during URL
 | Max tools per schema | 8 | Keeps schemas focused. Split large APIs into multiple schemas. |
 | Max resources per schema | 2 | Keeps resource scope focused. See `13-resources.md`. |
 | Version major | `4` | Must match `4.\d+.\d+`. Version `3.\d+.\d+` accepted during migration with warning. |
-| `tools` + `routes` simultaneously | Forbidden | A schema must use `tools` or `routes`, never both. Using both is a validation error. |
+| `tools` + `routes` simultaneously | Forbidden | A schema MUST use `tools` or `routes`, never both. Using both is a validation error. |
 | Namespace pattern | `^[a-z][a-z0-9-]*$` | Lowercase letters, digits, hyphens. No underscores or uppercase. |
 | Tool name pattern | `^[a-z][a-zA-Z0-9]*$` | camelCase, starts with lowercase letter. |
 | Root URL protocol | `https://` | HTTP is not allowed. All API calls go over TLS. |
 | Root URL requirement | Conditional | Required when `tools` are defined. Optional for resource-only or skill-only schemas. |
-| Root URL trailing slash | Forbidden | `root` must not end with `/`. |
+| Root URL trailing slash | Forbidden | `root` MUST NOT end with `/`. |
 | `main` export | JSON-serializable | Must survive `JSON.parse( JSON.stringify() )` roundtrip. |
-| Schema file imports | Zero | Schema files must have no `import` statements. All dependencies are injected. |
-| `requiredLibraries` | Allowlist only | Every entry must be on the runtime allowlist. See `05-security.md`. |
+| Schema file imports | Zero | Schema files MUST have no `import` statements. All dependencies are injected. |
+| `requiredLibraries` | Allowlist only | Every entry MUST be on the runtime allowlist. See `05-security.md`. |
 
 ---
 

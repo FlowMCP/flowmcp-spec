@@ -2,7 +2,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime may cache the response locally.
+This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime MAY cache the response locally.
 
 ---
 
@@ -66,15 +66,15 @@ These rules extend the existing validation rule set from `09-validation-rules.md
 | `VAL060` | error | If `preload` is present, it must be a plain object. |
 | `VAL061` | error | `preload.enabled` must be a boolean. |
 | `VAL062` | error | `preload.ttl` must be a positive integer (> 0). |
-| `VAL063` | warning | `preload.description` if present must be a string. |
+| `VAL063` | warning | `preload.description` if present MUST be a string. |
 | `VAL064` | info | Routes with `preload.enabled: true` and no parameters are ideal cache candidates. |
-| `VAL065` | warning | Routes with `preload.enabled: true` and required parameters should document caching behavior — the cache key must include parameter values. |
+| `VAL065` | warning | Routes with `preload.enabled: true` and required parameters SHOULD document caching behavior — the cache key MUST include parameter values. |
 
 ---
 
 ## Cache Key
 
-When a route has parameters, the cache key must include the parameter values to avoid serving stale data for different inputs. The recommended cache key format is:
+When a route has parameters, the cache key MUST include the parameter values to avoid serving stale data for different inputs. The recommended cache key format is:
 
 ```
 {namespace}/{routeName}/{paramHash}.json
@@ -125,7 +125,7 @@ flowchart TD
 
 ### User Overrides
 
-Runtimes should support these override mechanisms:
+Runtimes SHOULD support these override mechanisms:
 
 | Flag | Behavior |
 |------|----------|
@@ -134,7 +134,7 @@ Runtimes should support these override mechanisms:
 
 ### Cache Management Commands
 
-Runtimes should provide cache management:
+Runtimes SHOULD provide cache management:
 
 | Command | Description |
 |---------|-------------|
@@ -193,7 +193,7 @@ Handlers (`preRequest`, `postRequest`) still execute on cached data. The cache s
 
 **Alternative (simpler):** Cache the final transformed response after `postRequest`. This avoids re-running handlers on every cache hit but requires cache invalidation when handler logic changes.
 
-Runtimes should document which approach they use.
+Runtimes SHOULD document which approach they use.
 
 ### Tests
 

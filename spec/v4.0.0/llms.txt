@@ -43,6 +43,19 @@ This document provides the conceptual foundation, positioning, terminology, and 
 
 ---
 
+## Conformance Language
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
+
+Some specification files in `spec/v4.0.0/` are intentionally written in prose without normative keywords because they describe history, lifecycle, or conceptual background (this overview document, the migration guide, the schema lifecycle document). All other specification files use normative language and assume this conformance interpretation.
+
+References:
+- [RFC2119](https://www.rfc-editor.org/rfc/rfc2119) — Key words for use in RFCs to Indicate Requirement Levels
+- [RFC8174](https://www.rfc-editor.org/rfc/rfc8174) — Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words
+- [BCP 14](https://www.rfc-editor.org/info/bcp14) — Best Current Practice 14 (combined RFC2119 + RFC8174)
+
+---
+
 ## The Problem FlowMCP Solves
 
 Not every data source is a clean REST API. The real world is messy — some APIs have quirks, some tasks require combining multiple APIs, and some data lives behind websites with no API at all. FlowMCP provides a solution for each scenario:
@@ -77,7 +90,7 @@ flowchart TD
     G --> H[Tool Combinatorics — How to chain tools across providers]
 ```
 
-FlowMCP provides **five primitives**: Tools, Resources, Prompts, Skills, and Selections. Tools, Resources, and Prompts are defined in `main.tools`, `main.resources`, and `main.prompts`. **Skills are a top-level entity** that lives outside `main` and is scoped to a namespace, selection, or agent — never `main.skills` (forbidden in v4.0.0, see Memo 022 REV-08 and VAL016). Selections are curated subsets that bundle tools/resources/prompts/skills for agent loading. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
+FlowMCP provides **five primitives**: Tools, Resources, Prompts, Skills, and Selections. Tools, Resources, and Prompts are defined in `main.tools`, `main.resources`, and `main.prompts`. **Skills are a top-level entity** that lives outside `main` and is scoped to a namespace, selection, or agent — never `main.skills` (forbidden in v4.0.0, see VAL016). Selections are curated subsets that bundle tools/resources/prompts/skills for agent loading. Tools and Resources are deterministic — same input always produces the same result. Prompts and Skills are non-deterministic — they guide LLMs on which tools to call, in which order, how to pass results between them, and when to fall back to alternative providers. Prompts are explanatory (describing a namespace or workflow), while Skills are instructional (step-by-step procedures with typed inputs and outputs). Together, they encode knowledge that would take hours to figure out manually.
 
 ---
 
@@ -342,7 +355,7 @@ The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API kn
 
 - **Tools replace Routes** — `main.tools` is the primary key. `main.routes` is accepted as a deprecated alias with a warning (removed in v3.2.0). Schemas must not define both `tools` and `routes`.
 - **Resources** — Embedded SQLite databases for local, deterministic data access. Defined in `main.resources`. See `13-resources.md`.
-- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. In v3.0.0 Skills were schema-scoped via `main.skills`; in v4.0.0 they are namespace/selection/agent-scoped (see `14-skills.md` and Memo 022 REV-08).
+- **Skills** — Self-contained instruction sets for AI agents. Defined as `.mjs` files with `export const skill` and `{{type:name}}` placeholders. In v4.0.0 Skills are namespace/selection/agent-scoped (see `14-skills.md`).
 - **Groups renamed to Agents** — Groups evolve into full agent manifests (`agent.mjs` with `export const agent`) with model binding, system prompts, and purpose-driven tool selection. See `06-agents.md`.
 - **Prompt Architecture** — Two-tier prompt system: Provider-Prompts (model-neutral, single namespace) and Agent-Prompts (model-specific, multi-provider workflows). Unified `{{type:name}}` placeholder syntax (replaces deprecated `[[...]]`). See `12-prompt-architecture.md`.
 - **Catalog with registry.json** — Named catalogs with a manifest file listing all providers, agents, and shared lists. Enables import and distribution. See `15-catalog.md`.
@@ -371,6 +384,8 @@ The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 ---
 
 # FlowMCP Specification v4.0.0 — Schema Format
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 This document defines the structure of a FlowMCP schema file, the two named exports (`main` and `handlers`), tool definitions, resource declarations, skill references, naming conventions, and constraints.
 
@@ -1003,6 +1018,8 @@ export const handlers = ( { sharedLists } ) => ({
 
 # FlowMCP Specification v4.0.0 — Parameters
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is validated (`z`). Resource parameters use the same `position` + `z` system but without a `location` field. Skill input uses a simpler format.
 
 ---
@@ -1631,6 +1648,8 @@ See `14-skills.md` for the complete skill specification.
 
 # FlowMCP Specification v4.0.0 — Shared Lists
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list. This document defines the list format, field definitions, dependency model, schema referencing, runtime injection, and validation rules.
 
 ---
@@ -2174,6 +2193,8 @@ Each `.mjs` file contains exactly one shared list. Combining multiple lists in a
 
 # FlowMCP Specification v4.0.0 — Output Schema
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output declaration format, supported types, the response envelope, handler interaction, and validation rules.
 
 ---
@@ -2679,6 +2700,8 @@ The diagram shows the non-blocking validation flow: mismatches produce warnings 
 
 # FlowMCP Specification v4.0.0 — Security Model
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.
 
 ---
@@ -3013,6 +3036,8 @@ All violations in a single file are reported together (the scan does not stop at
 
 # FlowMCP Specification v4.0.0 — Agents
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, prompts, skills, and optional resources. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
 
 ---
@@ -3114,7 +3139,7 @@ export const agent = {
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | Agent name. Must match `^[a-z][a-z0-9-]*$`. Must match the agent directory name. |
 | `description` | `string` | Yes | Human-readable description of the agent's purpose. |
-| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4). |
+| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning across all FlowMCP primitives). |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
 | `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
@@ -3919,7 +3944,7 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 
 **AGT003** — The model field uses OpenRouter syntax where the `/` separates the provider from the model name. A model string without `/` cannot be routed to any provider. Examples: `anthropic/claude-sonnet-4-5-20250929`, `openai/gpt-4o`.
 
-**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4 — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string). The legacy `flowmcp/3.0.0` is accepted with a deprecation warning during migration.
+**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string).
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 
@@ -4070,6 +4095,8 @@ export const agent = {
 ---
 
 # FlowMCP Specification v4.0.0 — MCP Tasks
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 ## Status
 
@@ -4699,9 +4726,11 @@ Per schema:
 
 # FlowMCP Specification v4.0.0 — Validation Rules
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
-This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream memos (e.g. Memo 026 Validation Strategy) reference this registry but do not redefine codes.
+This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
 ---
 
@@ -4857,7 +4886,7 @@ See `13-resources.md` for the complete resource specification.
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
 | SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version per Memo 022 REV-08). |
+| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version). |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
@@ -4942,7 +4971,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
 | AGT002 | error | `description` is required, must be a non-empty string |
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
-| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version per Memo 022 REV-08). |
+| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version). |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools[]` is required, must be a non-empty array |
 | AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
@@ -4974,7 +5003,7 @@ See `06-agents.md` for the complete agent specification.
 | VAL105 | error | `meta.aliases` is required and must be a string array |
 | VAL106 | error | `meta.alwaysLoad` is required and must be a boolean |
 | VAL107 | error | When enum values correspond to a Shared List, `{{listName:alias}}` MUST be used. Hardcoded enum values that duplicate a Shared List are forbidden. |
-| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See Memo 022 REV-08 Kap. 3.3 and `17-selections.md` for the full slash-rule matrix. |
+| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See `17-selections.md` for the full slash-rule matrix. |
 
 See `19-mcp-integration.md` for the complete meta block specification.
 
@@ -5136,6 +5165,8 @@ flowmcp validate --security etherscan/contracts.mjs
 ---
 
 # FlowMCP Specification v4.0.0 — Tests
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
 
@@ -5755,7 +5786,7 @@ A Skill passes the **One-Shot Test** when an AI agent can execute the complete w
 
 **Definition:** The One-Shot Test is a probabilistic (LLM-eval) test. The skill is delivered to an AI agent as an MCP prompt. The agent executes it. If the agent can complete the workflow in one pass — calling the correct tools in the correct order, with correct parameters — the skill passes.
 
-**Empirical basis:** Testing in Memo 021 (Harness CLI, March 2026) showed:
+**Empirical basis:** Testing in March 2026 (FlowMCP Harness CLI) showed:
 
 | Skill Type | 5-Run Success Rate |
 |------------|-------------------|
@@ -5810,6 +5841,8 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 ---
 
 # FlowMCP Specification v4.0.0 — Preload & Caching
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime may cache the response locally.
 
@@ -6015,6 +6048,8 @@ The output schema (`04-output-schema.md`) describes the response shape regardles
 ---
 
 # FlowMCP Specification v4.0.0 — Prompt Architecture
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
@@ -6923,6 +6958,8 @@ agents/
 
 # FlowMCP Specification v4.0.0 — Resources
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
 
 ---
@@ -7194,6 +7231,109 @@ Intermediate modes (append-only, insert-but-no-delete) are intentionally omitted
 1. **Hard to enforce** — SQL is too flexible for reliable pattern matching
 2. **Misleading** — they suggest safety that cannot be guaranteed
 3. **Counterproductive** — they create problems without solving real ones
+
+---
+
+## SQLite-GTFS Resources
+
+### Overview
+
+The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`** (Design C — top-level with inheritance). It denotes a SQLite database that has been produced by a FlowMCP add-on (such as `gtfs-sqlite-toolkit`) and carries a verified quality seal in its `meta` table. The seal guarantees that the database structure, validation status, and discoverable capabilities are conformant with a known add-on contract — which allows FlowMCP-CLI to automatically inject standard tools without the schema author writing any SQL by hand.
+
+`sqlite-gtfs` is **not** a fallback for `sqlite`. A database without a valid seal is rejected (see [Validation Rules](#validation-rules) — `RES032`). Users who want full manual control over a SQLite database continue to use `source: 'sqlite'`.
+
+### Required Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `source` | `'sqlite-gtfs'` | Yes | Resource type. Must be `'sqlite-gtfs'`. |
+| `mode` | `'file-based'` | Yes | Access mode. Only `'file-based'` is allowed. `'in-memory'` is rejected (`RES030`) because the seal verification depends on the persisted `meta` table. |
+| `path` | `string` | Yes | Absolute path to the converted SQLite database. May contain the path variable `${FLOWMCP_RESOURCES}` (see [Path Variable Support](#path-variable-support)). |
+| `addon` | `string` | Yes | Name of the FlowMCP add-on responsible for producing and interpreting the database (e.g. `gtfs-sqlite-toolkit`). The add-on is the authority over which standard tools are auto-injected. |
+
+### Optional Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `addonVersion` | `string` | No | SemVer range pinning the add-on version (e.g. `>=0.1.0`). When omitted, the FlowMCP-CLI uses the version listed in its add-on registry. |
+| `addonSource` | `string` | No | Add-on source reference. Default: `github:FlowMCP/<addon>`. **NPM is not supported** — only `github:` paths are valid. FlowMCP is not published to the NPM registry. |
+
+### Seal Requirement
+
+Every `sqlite-gtfs` resource MUST point to a database whose `meta` table contains the entry `qualitySeal === 'sqlite-gtfs'`. This is a hard requirement enforced by the validator (`RES032`). A database that does not carry the seal — whether because it was produced by an unverified converter, manually edited, or partially converted — is rejected at schema activation time.
+
+The seal is written by the converter (e.g. `MetaWriter` in `gtfs-sqlite-toolkit`) only when the conversion completes successfully and all pre-validation checks pass strictly. A failed or partial conversion produces `qualitySeal: null` and the database is not usable as a `sqlite-gtfs` resource.
+
+### Required Meta Keys
+
+The `meta` table of a sealed database MUST contain the following ten keys. They support reproducibility, capability detection, and audit logging:
+
+| Key | Purpose |
+|-----|---------|
+| `qualitySeal` | Add-on identifier (here: `'sqlite-gtfs'`). The seal value. |
+| `specRevision` | FlowMCP spec revision the converter targeted (e.g. `'2026-04-27'`). Used for spec-drift warnings (`RES034`). |
+| `specUrl` | URL of the spec revision document. |
+| `converterVersion` | SemVer of the add-on that produced the database (e.g. `gtfs-sqlite-toolkit@0.1.0`). |
+| `capabilities` | JSON-encoded map of capability booleans (e.g. `basicLookup`, `routing`, `shapesVisualization`, `flexService`). Drives auto-injection. |
+| `validationReport` | JSON-encoded summary of pre-validation results (counts of errors / warnings / info). |
+| `buildDate` | ISO-8601 timestamp of the conversion run. |
+| `rowCounts` | JSON-encoded per-table row counts. |
+| `sourceUrl` | URL of the upstream data source the converter consumed (provider feed URL). |
+| `sourceHash` | SHA-256 hash of the source archive — supports content-addressed deduplication and replay. |
+
+### Path Variable Support
+
+The `path` field MAY contain the variable `${FLOWMCP_RESOURCES}`. The FlowMCP-CLI resolves the variable from the `FLOWMCP_RESOURCES` environment variable, falling back to `~/.flowmcp/resources/` when the variable is unset.
+
+| Variable | Resolution | Default when unset |
+|----------|------------|--------------------|
+| `${FLOWMCP_RESOURCES}` | `process.env.FLOWMCP_RESOURCES` | `~/.flowmcp/resources/` |
+
+Path variables establish the `FLOWMCP_*` naming family — variable names mirror the spec primitive they reference (`main.resources` → `FLOWMCP_RESOURCES`). Future variables follow the same pattern (`FLOWMCP_LOGS`, `FLOWMCP_CACHE`).
+
+A path variable that cannot be resolved (no environment variable and no documented default) raises `RES035`.
+
+### Schema Example
+
+A minimal POC schema demonstrating `sqlite-gtfs`:
+
+```javascript
+export const schema = {
+    namespace: 'gtfsde',
+    name: 'gtfsde-transit-v2',
+    version: '2.0.0',
+    main: {
+        resources: [
+            {
+                source: 'sqlite-gtfs',                              // Design C
+                mode: 'file-based',
+                path: '${FLOWMCP_RESOURCES}/gtfs-de.db',            // User-configurable
+                addon: 'gtfs-sqlite-toolkit',                       // Authority over default methods
+                addonVersion: '>=0.1.0',                            // optional
+                addonSource: 'github:FlowMCP/gtfs-sqlite-toolkit'   // NPM is not supported
+            }
+        ],
+        tools: [
+            // OPTIONAL: schema-specific tools only.
+            // Standard GTFS tools are auto-injected by the add-on.
+        ]
+    }
+}
+```
+
+When the FlowMCP-CLI activates this schema via `flowmcp add`, it (1) resolves the path variable, (2) verifies the seal, (3) reads `capabilities` from the `meta` table, (4) loads the add-on declared in `addon`, and (5) injects the standard toolset that the add-on derives from the active capabilities.
+
+### Add-on Authority
+
+The `sqlite-gtfs` resource type **delegates the definition of standard tools to the add-on**. The spec describes the resource contract; the add-on (e.g. `gtfs-sqlite-toolkit`) owns the catalog of default methods — `searchStops`, `searchRoutes`, `getDepartures`, `getShapeForRoute`, `getFlexBookingRules`, and so on — and decides which ones become available based on the `capabilities` map.
+
+This split keeps the spec stable while letting add-ons evolve independently. New add-ons (for example a future `sqlite-netex` or `sqlite-trias`) follow the same `Design C` pattern: top-level source value, seal requirement, add-on reference, capability-driven auto-injection.
+
+### Data Policy Note
+
+**Provider GTFS data MUST NOT be committed to the spec repository, the add-on repository, or any other public FlowMCP repository.** GTFS feeds carry third-party licensing terms that typically prohibit redistribution. Users provide their own GTFS data locally — either by downloading from the provider directly or by using the add-on's converter against a local source archive. The converted database lives under the user-controlled `${FLOWMCP_RESOURCES}` directory and is never published.
+
+The synthetic Mini-GTFS fixture shipped with `gtfs-sqlite-toolkit` (under a CC0 license) is the only GTFS-shaped data permitted in any public FlowMCP repository. It exists exclusively for testing and CI.
 
 ---
 
@@ -8073,6 +8213,12 @@ The following rules are enforced when validating resource definitions:
 | RES027 | error | `source: 'markdown'` must not have a `queries` field. |
 | RES028 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
 | RES029 | error | All resource fields are required. No field may be omitted. |
+| RES030 | error | `source: 'sqlite-gtfs'` requires `mode: 'file-based'`. `in-memory` is not allowed. |
+| RES031 | error | `source: 'sqlite-gtfs'` requires the `addon` field (add-on name). |
+| RES032 | error | Database at `path` does not contain `meta.qualitySeal === 'sqlite-gtfs'`. Schema rejected. |
+| RES033 | error | Database at `path` cannot be opened (file missing or corrupt). |
+| RES034 | warning | Database `meta.specRevision` is outside the expected range. |
+| RES035 | error | Path variable in `path` (e.g. `${FLOWMCP_RESOURCES}`) cannot be resolved (environment variable not set AND no default available). |
 
 ---
 
@@ -8191,6 +8337,8 @@ The SQLite database `duneanalytics-templates.db` is not in the schema directory 
 ---
 
 # FlowMCP Specification v4.0.0 — Skills
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown instructions with typed metadata. This document defines the skill file format, field specifications, placeholder syntax, schema integration, scope rules, security constraints, and validation rules.
 
@@ -8336,7 +8484,7 @@ The `export const skill` object contains all metadata and instructions for the s
 
 ### Skill Types (v4.0.0)
 
-The `type` field classifies the skill's intended scope. Values follow Memo 022 REV-08 Kap. 5.1 — bare strings without `-skill` suffix.
+The `type` field classifies the skill's intended scope. Values are bare strings without `-skill` suffix.
 
 | Type | Description | Location (file path) |
 |------|-------------|----------------------|
@@ -8344,7 +8492,7 @@ The `type` field classifies the skill's intended scope. Values follow Memo 022 R
 | `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
 | `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
 
-Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016 and Memo 022 REV-08).
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016).
 
 ### Field Details
 
@@ -8381,7 +8529,7 @@ version: '1.0.0'               // missing prefix
 version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Unified versioning in v4.0.0: per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. This replaces the v3 split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills). When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
+Unified versioning in v4.0.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -8558,7 +8706,7 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ## Skill Registration (v4.0.0)
 
-Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016 and Memo 022 REV-08).
+Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016).
 
 ### Three Registration Scopes
 
@@ -8660,7 +8808,7 @@ The only valid version in this release is `flowmcp/4.0.0`. The legacy `flowmcp-s
 
 ### Unified Versioning Rationale
 
-Per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
+All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 1. **Single source of truth.** Schemas, Selections, Agents, Skills, and Prompts evolve as one specification. Mixing primitive versions inside one catalog is not supported.
 2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools should apply the new rules.
@@ -8728,7 +8876,7 @@ A Skill MUST be written so that an AI agent can execute the complete workflow in
 
 ### Empirical Basis
 
-Testing conducted in Memo 021 (Harness CLI, March 2026):
+Testing conducted in March 2026 (FlowMCP Harness CLI):
 
 | Skill Version | Tool Descriptions | Parameter Tables | Example Calls | 5-Run Success Rate |
 |---------------|------------------|------------------|---------------|-------------------|
@@ -9116,6 +9264,8 @@ etherscan/
 ---
 
 # FlowMCP Specification v4.0.0 — Catalog
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
@@ -9508,6 +9658,8 @@ The command runs all CAT rules and reports errors and warnings. A catalog with a
 
 # FlowMCP Specification v4.0.0 — ID Schema
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 A unified ID system for referencing all FlowMCP primitives. IDs must be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
 
 ---
@@ -9886,6 +10038,8 @@ The ID schema provides a single, consistent format that replaces these context-s
 
 # FlowMCP Specification v4.0.0 — Selections
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 **Version:** FlowMCP 4.0.0  
 **Status:** Active  
 **Primitive:** Selection (5th primitive)
@@ -10015,6 +10169,8 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 
 # FlowMCP Specification v4.0.0 — Prefill and Placeholders
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 **Version:** FlowMCP 4.0.0  
 **Status:** Active
 
@@ -10095,6 +10251,8 @@ This ensures the Skill is always delivered — even if some references are broke
 ---
 
 # FlowMCP Specification v4.0.0 — MCP Server Integration
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 **Version:** FlowMCP 4.0.0  
 **Status:** Active
@@ -10185,6 +10343,8 @@ Empty array `[]` is valid — means no aliases.
 ---
 
 # FlowMCP Specification v4.0.0 — Validation Strategy
+
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 **Version:** FlowMCP 4.0.0  
 **Status:** Active
@@ -10420,6 +10580,8 @@ A primitive passes when at least one of its test cases returns a 2xx response wi
 
 # Scoring Protocol v1
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
 
 ---
@@ -10466,7 +10628,7 @@ Each dimension yields a score on a 1.0-5.0 scale (floating point).
 | C | 2.5 <= s < 3.5 | Hold (improvement plan) |
 | D / F | < 2.5 | Blocked (no deploy) |
 
-Production-Gate (Memo 027): Score >= 3.5 required for deployment.
+Production-Gate: Score >= 3.5 required for deployment.
 
 ---
 
@@ -10625,11 +10787,7 @@ A Grader MUST NOT:
 
 ## References
 
-- Memo 029 PRD F2 (`flowmcp dev grade` original design — superseded by Memo 036)
-- Memo 036 (LLM-Integration-Pattern, REV-06)
-- Memo 026 REV-09 (Grade-Schwellen)
-- Memo 027 REV-07 (Production-Gate)
-- Spec 20 (`20-validation-strategy.md` — overall validation strategy)
-- Spec 21 (`21-schema-lifecycle.md` — when grading happens in the lifecycle)
+- [`20-validation-strategy.md`](./20-validation-strategy.md) — overall validation strategy
+- [`21-schema-lifecycle.md`](./21-schema-lifecycle.md) — when grading happens in the lifecycle
 
 ---

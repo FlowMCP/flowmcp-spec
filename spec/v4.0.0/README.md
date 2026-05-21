@@ -72,7 +72,7 @@ Stand der letzten formalen Pflege-Pruefung:
 
 | Datei | Last-Reviewed |
 |-------|---------------|
-| Alle Spec-Files | 2026-05-21 (Memo 049 Rollout) |
+| Alle Spec-Files | 2026-05-21 (Spec-Quality-Rollout) |
 
 (Diese Tabelle wird in Folge-Memos pro File aktualisiert, sobald `evaluator-spec-rfc2119` produktiv laeuft.)
 

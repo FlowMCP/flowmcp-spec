@@ -103,7 +103,7 @@ export const agent = {
 |-------|------|----------|-------------|
 | `name` | `string` | Yes | Agent name. Must match `^[a-z][a-z0-9-]*$`. Must match the agent directory name. |
 | `description` | `string` | Yes | Human-readable description of the agent's purpose. |
-| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4). |
+| `version` | `string` | Yes | Must be `flowmcp/4.0.0`. Declares which spec version this agent conforms to (unified versioning across all FlowMCP primitives). |
 | `model` | `string` | Yes | Target LLM in OpenRouter syntax (`provider/model-name`). Must contain `/`. |
 | `systemPrompt` | `string` | Yes | Agent persona and behavioral instructions. Sent as the system message in every conversation. |
 | `tools` | `object` | Yes | Tool references as object. Keys with `/` are external references (value must be `null`). Keys without `/` are inline tool definitions (value is the tool definition object). Non-empty. See [Slash Rule](#slash-rule). |
@@ -908,7 +908,7 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 
 **AGT003** — The model field uses OpenRouter syntax where the `/` separates the provider from the model name. A model string without `/` cannot be routed to any provider. Examples: `anthropic/claude-sonnet-4-5-20250929`, `openai/gpt-4o`.
 
-**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning per Memo 022 REV-08 Kap. 2.4 — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string). The legacy `flowmcp/3.0.0` is accepted with a deprecation warning during migration.
+**AGT004** — The version must be exactly `flowmcp/4.0.0`. This is not the agent's own version — it declares which FlowMCP specification the manifest conforms to (unified versioning — Schema, Selection, Agent, Skill, and Prompt all use the same `flowmcp/X.Y.Z` string).
 
 **AGT005** — The system prompt defines the agent's behavior. Without it, the agent has no persona or instructions. Empty strings are rejected because they provide no behavioral guidance.
 

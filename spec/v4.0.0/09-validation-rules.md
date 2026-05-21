@@ -4,7 +4,7 @@
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
-This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream memos (e.g. Memo 026 Validation Strategy) reference this registry but do not redefine codes.
+This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
 ---
 
@@ -160,7 +160,7 @@ See `13-resources.md` for the complete resource specification.
 | SKL001 | error | Skill file must export `skill` as a named export |
 | SKL002 | error | `skill.name` is required, must be a string, must match `^[a-z][a-z0-9-]{0,63}$` |
 | SKL003 | error | `skill.name` must match the key under which the skill is registered (`selection.skills`, `agent.skills`) or the file basename without `.mjs` for namespace-scoped skills. |
-| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version per Memo 022 REV-08). |
+| SKL004 | error | `skill.version` is required and must be `'flowmcp/4.0.0'` (unified spec version). |
 | SKL005 | error | Each entry in `requires.tools` must exist as a key in `main.tools` |
 | SKL006 | error | Each entry in `requires.resources` must exist as a key in `main.resources` |
 | SKL007 | error | `skill.description` is required, must be a string, maximum 1024 characters |
@@ -245,7 +245,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT001 | error | `name` is required, must match `^[a-z][a-z0-9-]*$` |
 | AGT002 | error | `description` is required, must be a non-empty string |
 | AGT003 | error | `model` is required, must contain `/` (OpenRouter syntax) |
-| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version per Memo 022 REV-08). |
+| AGT004 | error | `version` must be `flowmcp/4.0.0` (unified spec version). |
 | AGT005 | error | `systemPrompt` is required, must be a non-empty string |
 | AGT006 | error | `tools[]` is required, must be a non-empty array |
 | AGT007 | error | Each tool reference must be a valid ID format (`namespace/type/name`) |
@@ -277,7 +277,7 @@ See `06-agents.md` for the complete agent specification.
 | VAL105 | error | `meta.aliases` is required and must be a string array |
 | VAL106 | error | `meta.alwaysLoad` is required and must be a boolean |
 | VAL107 | error | When enum values correspond to a Shared List, `{{listName:alias}}` MUST be used. Hardcoded enum values that duplicate a Shared List are forbidden. |
-| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See Memo 022 REV-08 Kap. 3.3 and `17-selections.md` for the full slash-rule matrix. |
+| VAL110 | error | Slash-Rule: Keys in `selection.tools`, `selection.resources`, `selection.prompts`, `agent.tools`, and `agent.prompts` that act as references MUST contain a `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain a `/` (inline form with `{ file }`). See `17-selections.md` for the full slash-rule matrix. |
 
 See `19-mcp-integration.md` for the complete meta block specification.
 

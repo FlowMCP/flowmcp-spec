@@ -620,7 +620,7 @@ A Skill passes the **One-Shot Test** when an AI agent can execute the complete w
 
 **Definition:** The One-Shot Test is a probabilistic (LLM-eval) test. The skill is delivered to an AI agent as an MCP prompt. The agent executes it. If the agent can complete the workflow in one pass — calling the correct tools in the correct order, with correct parameters — the skill passes.
 
-**Empirical basis:** Testing in Memo 021 (Harness CLI, March 2026) showed:
+**Empirical basis:** Testing in March 2026 (FlowMCP Harness CLI) showed:
 
 | Skill Type | 5-Run Success Rate |
 |------------|-------------------|

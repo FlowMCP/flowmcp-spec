@@ -146,7 +146,7 @@ The `export const skill` object contains all metadata and instructions for the s
 
 ### Skill Types (v4.0.0)
 
-The `type` field classifies the skill's intended scope. Values follow Memo 022 REV-08 Kap. 5.1 — bare strings without `-skill` suffix.
+The `type` field classifies the skill's intended scope. Values are bare strings without `-skill` suffix.
 
 | Type | Description | Location (file path) |
 |------|-------------|----------------------|
@@ -154,7 +154,7 @@ The `type` field classifies the skill's intended scope. Values follow Memo 022 R
 | `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
 | `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
 
-Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016 and Memo 022 REV-08).
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.0.0** — that pattern is forbidden (see VAL016).
 
 ### Field Details
 
@@ -191,7 +191,7 @@ version: '1.0.0'               // missing prefix
 version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Unified versioning in v4.0.0: per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. This replaces the v3 split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills). When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
+Unified versioning in v4.0.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -368,7 +368,7 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ## Skill Registration (v4.0.0)
 
-Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016 and Memo 022 REV-08).
+Skills in v4.0.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.0.0 (see VAL016).
 
 ### Three Registration Scopes
 
@@ -470,7 +470,7 @@ The only valid version in this release is `flowmcp/4.0.0`. The legacy `flowmcp-s
 
 ### Unified Versioning Rationale
 
-Per Memo 022 REV-08 Kap. 2.4, all FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
+All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 1. **Single source of truth.** Schemas, Selections, Agents, Skills, and Prompts evolve as one specification. Mixing primitive versions inside one catalog is not supported.
 2. **Validation targeting.** The validator uses the version string to apply the correct rule set. A primitive at `flowmcp/4.0.0` is validated against this specification revision. A future `flowmcp/5.0.0` may add new required fields or change semantics; the version increment signals that consuming tools should apply the new rules.
@@ -538,7 +538,7 @@ A Skill MUST be written so that an AI agent can execute the complete workflow in
 
 ### Empirical Basis
 
-Testing conducted in Memo 021 (Harness CLI, March 2026):
+Testing conducted in March 2026 (FlowMCP Harness CLI):
 
 | Skill Version | Tool Descriptions | Parameter Tables | Example Calls | 5-Run Success Rate |
 |---------------|------------------|------------------|---------------|-------------------|

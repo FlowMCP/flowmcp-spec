@@ -1,5 +1,7 @@
 # FlowMCP Specification v4.0.0 — ID Schema
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 A unified ID system for referencing all FlowMCP primitives. IDs must be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
 
 ---

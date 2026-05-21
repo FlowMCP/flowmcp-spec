@@ -1,5 +1,7 @@
 # FlowMCP Specification v4.0.0 — Preload & Caching
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime may cache the response locally.
 
 ---

@@ -1,5 +1,7 @@
 # FlowMCP Specification v4.0.0 — Validation Rules
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
 This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream memos (e.g. Memo 026 Validation Strategy) reference this registry but do not redefine codes.

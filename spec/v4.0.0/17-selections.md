@@ -1,5 +1,7 @@
 # FlowMCP Specification v4.0.0 — Selections
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 **Version:** FlowMCP 4.0.0  
 **Status:** Active  
 **Primitive:** Selection (5th primitive)

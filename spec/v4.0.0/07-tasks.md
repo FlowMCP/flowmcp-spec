@@ -1,5 +1,7 @@
 # FlowMCP Specification v4.0.0 — MCP Tasks
 
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+
 ## Status
 
 **Deferred to v2.1.0.** This section is a placeholder.

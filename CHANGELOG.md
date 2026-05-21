@@ -22,34 +22,32 @@ Additive, non-breaking release introducing the `sqlite-gtfs` resource source typ
 
 Major release introducing Selection as the 5th primitive, MCP integration via meta blocks, two-layer validation strategy, and unified versioning across all primitives.
 
-> **Note (2026-05-14):** Originally drafted on 2026-05-12, this entry was consolidated on 2026-05-14 following the Memo 031 conflict audit (Session 2.5). Items marked **[Consolidation 2026-05-14]** reflect changes from Memos 031a + 031b.
-
 ### Added
 
 - **Selection**: 5th primitive — named collections of Primitives for agent activation. `selections/` directory at root level. Validation rules SEL001–SEL003. See `17-selections.md`.
 - **Prefill & Placeholders**: Complete placeholder system (12 types) with pre-execution support. `prefill[]` array in skills. See `18-prefill.md`.
 - **MCP Integration**: `meta` block required per Tool (VAL100–VAL106). `alwaysLoad`, `searchHint`, `aliases` fields. MCP annotation translation. See `19-mcp-integration.md`.
-- **Validation Strategy**: Two-layer validation (deterministic + probabilistic). Grade system A–F with thresholds **4.5 / 3.5 / 2.5** [Consolidation 2026-05-14, Memo 031 Kap. 1.3]. Grade Report with `schemaId` (Schema-File-ID), `primitives[]` array, `validatorVersion`. See `20-validation-strategy.md`.
+- **Validation Strategy**: Two-layer validation (deterministic + probabilistic). Grade system A–F with thresholds **4.5 / 3.5 / 2.5** [Consolidation 2026-05-14]. Grade Report with `schemaId` (Schema-File-ID), `primitives[]` array, `validatorVersion`. See `20-validation-strategy.md`.
 - **Schema Lifecycle**: 6-stage lifecycle from Research to Production. Production gate: **Score >= 3.5 (Grade B)** [Consolidation 2026-05-14]. Partial Schema Policy: failing Primitives removed before deploy. Static schema auto-PASS. See `21-schema-lifecycle.md`.
-- **HTTP Resources**: `source: 'http'` for remote files via HTTPS (rule RES024). RES001 extended to accept **`'sqlite' | 'markdown' | 'http'`** [Consolidation 2026-05-14, Memo 031 K23]. See `13-resources.md`.
+- **HTTP Resources**: `source: 'http'` for remote files via HTTPS (rule RES024). RES001 extended to accept **`'sqlite' | 'markdown' | 'http'`** [Consolidation 2026-05-14]. See `13-resources.md`.
 - **Schema-File-ID**: New ID type `namespace/schema-name` (1 slash) identifying the physical schema file. See `16-id-schema.md`.
 - **CLI-Adapter**: Internal MCP tool name mapping `name_namespace` documented. No Short Form rule. See `16-id-schema.md`.
 - **Agent Selections**: `agent.selections[]` field for loading Selections. Rule AGT030 [Consolidation 2026-05-14, code renumbered from AGT010]. See `06-agents.md`.
 - **Agent Elicitation**: `agent.elicitation` field (MCP Spec 2025-06-18). `requestedSchemas[]` with restricted JSON Schema. Rule AGT031 [Consolidation 2026-05-14, code renumbered from AGT011]. See `06-agents.md`.
 - **One-Shot Skill Design**: Skills must be self-contained for single-pass execution. One-Shot test (probabilistic). See `14-skills.md`.
-- **VAL110 Slash-Rule** [Consolidation 2026-05-14, Memo 031 K20]: References in `selection.tools/resources/prompts` and `agent.tools/prompts` MUST contain `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain `/` (inline form). See VAL110 in `09-validation-rules.md`.
-- **Central code registry** [Consolidation 2026-05-14, Memo 031 K1-K7 + Kap. 4.5]: `09-validation-rules.md` is the single source of truth for all VAL/SEL/AGT/SKL/RES codes. Downstream memos reference, do not redefine.
+- **VAL110 Slash-Rule** [Consolidation 2026-05-14]: References in `selection.tools/resources/prompts` and `agent.tools/prompts` MUST contain `/` (full ID form). Keys in `selection.skills` and `agent.skills` MUST NOT contain `/` (inline form). See VAL110 in `09-validation-rules.md`.
+- **Central code registry** [Consolidation 2026-05-14]: `09-validation-rules.md` is the single source of truth for all VAL/SEL/AGT/SKL/RES codes. Downstream tooling references, does not redefine.
 
 ### Changed
 
-- **`main.skills` removed**: Hard breaking change. Skills now live at Namespace, Selection, or Agent level (never `main.skills`). Enforced via VAL016 [Consolidation 2026-05-14, Memo 022 REV-08 + Memo 031 K22].
+- **`main.skills` removed**: Hard breaking change. Skills now live at Namespace, Selection, or Agent level (never `main.skills`). Enforced via VAL016 [Consolidation 2026-05-14].
 - **`meta` block required per Tool**: VAL100–VAL106 are errors.
 - **Namespace pattern**: `^[a-z]+$` → `^[a-z][a-z0-9-]*$` (allows digits and hyphens). Now explicitly coded as VAL011.
 - **Version pattern**: `^3\.\d+\.\d+$` → `^4\.\d+\.\d+$`. Now explicitly coded as VAL014.
-- **Unified versioning** [Consolidation 2026-05-14, Memo 022 REV-08 Kap. 2.4]: All primitives use `flowmcp/4.0.0` (Schema, Selection, Agent, Skill, Prompt). Was previously split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills).
-- **Skill type enum** [Consolidation 2026-05-14, Memo 022 REV-08 Kap. 5.5]: Bare strings `'namespace' | 'selection' | 'agent'` (was: `-skill` suffix).
-- **AGT004 Agent Version**: Required value `flowmcp/4.0.0` [Consolidation 2026-05-14, Memo 031 K28].
-- **SKL004 Skill Version**: Required value `'flowmcp/4.0.0'` (was: `'flowmcp-skill/1.0.0'`) [Consolidation 2026-05-14, Memo 031 K25 + Kap. 4.4].
+- **Unified versioning** [Consolidation 2026-05-14]: All primitives use `flowmcp/4.0.0` (Schema, Selection, Agent, Skill, Prompt). Was previously split (`flowmcp/3.0.0` for schemas/agents vs `flowmcp-skill/1.0.0` for skills).
+- **Skill type enum** [Consolidation 2026-05-14]: Bare strings `'namespace' | 'selection' | 'agent'` (was: `-skill` suffix).
+- **AGT004 Agent Version**: Required value `flowmcp/4.0.0` [Consolidation 2026-05-14].
+- **SKL004 Skill Version**: Required value `'flowmcp/4.0.0'` (was: `'flowmcp-skill/1.0.0'`) [Consolidation 2026-05-14].
 - **`executeRequest` handler documented**: Standard HTTP fetch replacement. See `01-schema-format.md`.
 - **VAL107**: Enums matching Shared List MUST use `{{listName:alias}}` interpolation.
 - **`03-shared-lists.md`**: Header corrected (was v2.0.0), Alias-Mapping Pattern section added.
@@ -57,10 +55,10 @@ Major release introducing Selection as the 5th primitive, MCP integration via me
 
 ### Fixed
 
-- **VAL011/VAL014 explicit codes** [Consolidation 2026-05-14, Memo 031 K20]: Namespace and version regex checks now carry explicit code prefixes for diagnostic clarity.
-- **`16-id-schema.md` Resource Type table** [Consolidation 2026-05-14, Memo 031 K22]: Extended to seven primitives (tool, resource, prompt, skill, list, selection, agent). Bug fix: `prompt` maps to `main.prompts` (was incorrectly `main.skills`).
-- **Pipeline Skills-only Sonderpfad removed** [Consolidation 2026-05-14, Memo 031 B1]: Dead code removed from `flowmcp-core/src/v4/task/Pipeline.mjs` — `main.skills` is forbidden in v4, special path has no use.
-- **SelectionValidator SEL003 Resolvability** [Consolidation 2026-05-14, Memo 031 B2]: Check now implemented in `flowmcp-core/src/v4/task/SelectionValidator.mjs` (optional `catalog` parameter).
+- **VAL011/VAL014 explicit codes** [Consolidation 2026-05-14]: Namespace and version regex checks now carry explicit code prefixes for diagnostic clarity.
+- **`16-id-schema.md` Resource Type table** [Consolidation 2026-05-14]: Extended to seven primitives (tool, resource, prompt, skill, list, selection, agent). Bug fix: `prompt` maps to `main.prompts` (was incorrectly `main.skills`).
+- **Pipeline Skills-only Sonderpfad removed** [Consolidation 2026-05-14]: Dead code removed from `flowmcp-core/src/v4/task/Pipeline.mjs` — `main.skills` is forbidden in v4, special path has no use.
+- **SelectionValidator SEL003 Resolvability** [Consolidation 2026-05-14]: Check now implemented in `flowmcp-core/src/v4/task/SelectionValidator.mjs` (optional `catalog` parameter).
 
 ---
 

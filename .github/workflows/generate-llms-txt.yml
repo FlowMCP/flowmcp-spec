@@ -19,7 +19,10 @@ jobs:
       - name: Generate llms.txt from spec files
         run: |
           SPEC_DIR="spec/v4.0.0"
-          OUTPUT="$SPEC_DIR/llms.txt"
+          OUTPUT_DIR="generated"
+          OUTPUT="$OUTPUT_DIR/llms.txt"
+          OUTPUT_ALIAS="$OUTPUT_DIR/llms-schema-spec.txt"
+          mkdir -p "$OUTPUT_DIR"
 
           TITLES=(
             "Overview"
@@ -107,16 +110,19 @@ jobs:
             fi
           done
 
+          # Mirror llms.txt as llms-schema-spec.txt (alias for docs-site convention)
+          cp "$OUTPUT" "$OUTPUT_ALIAS"
+
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet spec/v4.0.0/llms.txt || echo "changed=true" >> "$GITHUB_OUTPUT"
+          git diff --quiet generated/llms.txt generated/llms-schema-spec.txt || echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add spec/v4.0.0/llms.txt
+          git add generated/llms.txt generated/llms-schema-spec.txt
           git commit -m "Auto-regenerate llms.txt from spec changes"
           git push

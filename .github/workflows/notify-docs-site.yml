@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'spec/v4.0.0/**'
+      - 'generated/**'
 
 jobs:
   notify:

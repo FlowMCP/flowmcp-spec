@@ -1,0 +1,47 @@
+name: Generate docs-payload
+
+on:
+  push:
+    paths:
+      - 'spec/v4.0.0/*.md'
+      - 'scripts/generate-docs-payload.mjs'
+      - 'scripts/generate-manifest.mjs'
+      - 'skills/spec-quality/evaluator-spec-rfc2119/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate docs-payload from spec files
+        run: node scripts/generate-docs-payload.mjs
+
+      - name: Generate manifest.json
+        run: node scripts/generate-manifest.mjs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if [ -n "$(git status --porcelain generated/docs-payload/)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add generated/docs-payload/
+          git commit -m "Auto-regenerate docs-payload from spec changes"
+          git push

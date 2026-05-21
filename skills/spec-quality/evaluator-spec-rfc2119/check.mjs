@@ -60,11 +60,13 @@ const checkRFC001 = ( { lines, fileName } ) => {
 
 const checkRFC002 = ( { lines } ) => {
     const issues = []
-    // Detect obvious mixed-case keywords like mUsT, Must, MuSt
+    // Detect obvious mixed-case keywords (mid-word inconsistency only).
+    // Title-case "Must"/"Should"/"May" at the start of sentences or table cells
+    // is left to RFC-003 (warning) — it is judgement-call territory.
     lines.forEach( ( line, idx ) => {
         const codeBlockSkip = /^(\s{4,}|\t|```)/.test( line )
         if( codeBlockSkip ) return
-        const matches = line.match( /\b(mUsT|Must|MuSt|mUST|sHOuLD|Should|sHOULD|MAy|May)\b/g ) || []
+        const matches = line.match( /\b(mUsT|MuSt|mUST|sHOuLD|sHOULD|mAY)\b/g ) || []
         matches.forEach( ( match ) => {
             issues.push( {
                 severity: 'error',

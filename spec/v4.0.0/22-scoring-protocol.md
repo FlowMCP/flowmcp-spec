@@ -48,7 +48,7 @@ Each dimension yields a score on a 1.0-5.0 scale (floating point).
 | C | 2.5 <= s < 3.5 | Hold (improvement plan) |
 | D / F | < 2.5 | Blocked (no deploy) |
 
-Production-Gate (Memo 027): Score >= 3.5 required for deployment.
+Production-Gate: Score >= 3.5 required for deployment.
 
 ---
 
@@ -207,9 +207,5 @@ A Grader MUST NOT:
 
 ## References
 
-- Memo 029 PRD F2 (`flowmcp dev grade` original design — superseded by Memo 036)
-- Memo 036 (LLM-Integration-Pattern, REV-06)
-- Memo 026 REV-09 (Grade-Schwellen)
-- Memo 027 REV-07 (Production-Gate)
-- Spec 20 (`20-validation-strategy.md` — overall validation strategy)
-- Spec 21 (`21-schema-lifecycle.md` — when grading happens in the lifecycle)
+- [`20-validation-strategy.md`](./20-validation-strategy.md) — overall validation strategy
+- [`21-schema-lifecycle.md`](./21-schema-lifecycle.md) — when grading happens in the lifecycle

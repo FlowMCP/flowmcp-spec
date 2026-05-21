@@ -58,7 +58,7 @@ export const schema = {
 
 ## Implementation in flowmcp-cli
 
-Schema authors are encouraged to use the `tos-research` skill to populate these fields semi-automatically (see Memo 041 for skill details).
+Schema authors are encouraged to use the `tos-research` skill to populate these fields semi-automatically.
 
 The CLI exposes an opt-in disclaimer flag:
 
@@ -98,6 +98,5 @@ ToS change. FlowMCP recommends:
 
 ## See Also
 
-- `01-schema-format.md` — Schema field reference
-- `19-mcp-integration.md` — Meta block (per-tool metadata)
-- Memo 041 — ToS + License Strategy (`tos-research` skill, `licenses-internal.json` for internal evaluation)
+- [`01-schema-format.md`](./01-schema-format.md) — Schema field reference
+- [`19-mcp-integration.md`](./19-mcp-integration.md) — Meta block (per-tool metadata)

@@ -1,0 +1,41 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "required": [ "bundle_version", "generated_at", "spec_version", "name", "description", "recommended_model", "capabilities", "categories", "conversation_starters", "files" ],
+    "properties": {
+        "bundle_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "spec_version": { "type": "string" },
+        "name": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 300 },
+        "recommended_model": { "type": "string" },
+        "capabilities": {
+            "type": "object",
+            "required": [ "web_search", "canvas", "image_generation", "code_interpreter_and_data_analysis" ],
+            "properties": {
+                "web_search": { "type": "boolean" },
+                "canvas": { "type": "boolean" },
+                "image_generation": { "type": "boolean" },
+                "code_interpreter_and_data_analysis": { "type": "boolean" }
+            }
+        },
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "conversation_starters": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": { "type": "string", "maxLength": 120 }
+        },
+        "files": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [ "path", "sha256" ],
+                "properties": {
+                    "path": { "type": "string" },
+                    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+                }
+            }
+        }
+    }
+}

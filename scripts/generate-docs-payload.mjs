@@ -13,6 +13,7 @@
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { execSync } from 'node:child_process'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -106,7 +107,9 @@ const orderFromFilename = ( { filename } ) => {
 }
 
 
-const buildFrontmatter = ( { filename, title, description, normative, now } ) => {
+const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit } ) => {
+    const relativeSourcePath = `spec/v${ SPEC_VERSION }/${ filename }`
+    const sourceUrl = `https://github.com/FlowMCP/flowmcp-spec/blob/${ sourceCommit }/${ relativeSourcePath }`
     const lines = []
     lines.push( '---' )
     lines.push( `title: "${ escapeYamlString( { value: title } ) }"` )
@@ -116,16 +119,18 @@ const buildFrontmatter = ( { filename, title, description, normative, now } ) =>
     lines.push( `order: ${ orderFromFilename( { filename } ) }` )
     lines.push( 'section: "Specification"' )
     lines.push( `normative: ${ normative }` )
+    lines.push( `source_commit: "${ sourceCommit }"` )
+    lines.push( `source_url: "${ sourceUrl }"` )
     lines.push( `generated_at: "${ now }"` )
-    lines.push( `generated_from: "spec/v${ SPEC_VERSION }/${ filename }"` )
+    lines.push( `generated_from: "${ relativeSourcePath }"` )
     lines.push( `generator: "${ GENERATOR }"` )
-    lines.push( `edit_warning: "This file is auto-generated. Source: spec/v${ SPEC_VERSION }/${ filename }."` )
+    lines.push( `edit_warning: "This file is auto-generated. Source: ${ relativeSourcePath }."` )
     lines.push( '---' )
     return lines.join( '\n' ) + '\n'
 }
 
 
-const generateFile = async ( { filename, now } ) => {
+const generateFile = async ( { filename, now, sourceCommit } ) => {
     const sourcePath = join( SPEC_DIR, filename )
     const content = await readFile( sourcePath, 'utf-8' )
 
@@ -133,7 +138,7 @@ const generateFile = async ( { filename, now } ) => {
     const description = extractDescription( { content } )
     const normative = !PROSAIC_FILES.has( filename )
 
-    const frontmatter = buildFrontmatter( { filename, title, description, normative, now } )
+    const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit } )
     const body = rewriteCrossRefs( { content } )
 
     // Strip leading H1 because Astro typically renders title from frontmatter
@@ -149,6 +154,18 @@ const generateFile = async ( { filename, now } ) => {
 const main = async () => {
     await mkdir( PAYLOAD_DIR, { recursive: true } )
 
+    let sourceCommit
+    try {
+        sourceCommit = execSync( 'git rev-parse HEAD', { cwd: REPO } )
+            .toString()
+            .trim()
+            .slice( 0, 7 )
+    } catch( err ) {
+        console.error( '[ERROR] Failed to determine source_commit via git rev-parse HEAD.' )
+        console.error( '[ERROR] Aborting docs-payload generation. Run inside a git repository.' )
+        process.exit( 1 )
+    }
+
     const allFiles = await readdir( SPEC_DIR )
     const specFiles = allFiles
         .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
@@ -157,9 +174,9 @@ const main = async () => {
     const now = new Date().toISOString()
     const results = []
 
-    console.log( `Generating docs-payload from ${ specFiles.length } spec files...` )
+    console.log( `Generating docs-payload from ${ specFiles.length } spec files (source_commit=${ sourceCommit })...` )
     for( const filename of specFiles ) {
-        const result = await generateFile( { filename, now } )
+        const result = await generateFile( { filename, now, sourceCommit } )
         results.push( result )
         console.log( `  ✓ ${ filename } → ${ result.title }` )
     }

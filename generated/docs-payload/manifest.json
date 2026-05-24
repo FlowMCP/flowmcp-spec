@@ -1,6 +1,6 @@
 {
     "spec_version": "4.1.0",
-    "generated_at": "2026-05-24T02:50:55.764Z",
+    "generated_at": "2026-05-24T02:54:06.782Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -11,6 +11,9 @@
             "order": 0,
             "section": "Specification",
             "normative": false,
+            "sidebar_group": "introduction",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -24,6 +27,9 @@
             "order": 1,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -37,6 +43,9 @@
             "order": 2,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -50,6 +59,9 @@
             "order": 3,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -63,6 +75,9 @@
             "order": 4,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -76,6 +91,9 @@
             "order": 5,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -89,6 +107,9 @@
             "order": 6,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -102,6 +123,9 @@
             "order": 7,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -115,6 +139,9 @@
             "order": 8,
             "section": "Specification",
             "normative": false,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 2
@@ -128,6 +155,9 @@
             "order": 9,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -141,6 +171,9 @@
             "order": 10,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -154,6 +187,9 @@
             "order": 11,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -167,6 +203,9 @@
             "order": 12,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -180,6 +219,9 @@
             "order": 13,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -193,6 +235,9 @@
             "order": 14,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -206,6 +251,9 @@
             "order": 15,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -219,6 +267,9 @@
             "order": 16,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -232,6 +283,9 @@
             "order": 17,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -245,6 +299,9 @@
             "order": 18,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -258,6 +315,9 @@
             "order": 19,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "specification",
+            "version_added": "4.0.0",
+            "collapsed": false,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -271,6 +331,9 @@
             "order": 20,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "guides",
+            "version_added": "4.0.0",
+            "collapsed": true,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -284,6 +347,9 @@
             "order": 21,
             "section": "Specification",
             "normative": false,
+            "sidebar_group": "guides",
+            "version_added": "4.0.0",
+            "collapsed": true,
             "spec_quality": {
                 "grade": 5,
                 "issues": 2
@@ -297,6 +363,9 @@
             "order": 22,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "guides",
+            "version_added": "4.0.0",
+            "collapsed": true,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0
@@ -310,6 +379,9 @@
             "order": 23,
             "section": "Specification",
             "normative": true,
+            "sidebar_group": "guides",
+            "version_added": "4.0.0",
+            "collapsed": true,
             "spec_quality": {
                 "grade": 5,
                 "issues": 0

@@ -13,6 +13,7 @@ on:
     paths:
       - 'generated/refs.resolved.json'
       - 'data/mini-skill.template.md'
+  workflow_dispatch:
 
 permissions:
   contents: read

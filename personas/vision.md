@@ -1,0 +1,70 @@
+# FlowMCP Vision
+
+> **Internes Kalibrierungs-Dokument.** Quelle für Hero-Texte, About-Inhalte, Blog-Intros, Pitch-Decks und Conference-Abstracts.
+> Stand: 2026-05-24 — basierend auf Memo 058 REV-04 (finalisiert).
+
+## Kern-Identitätssatz
+
+> *FlowMCP normalisiert hunderte Datenquellen zu einer durchsuchbaren Library aus AI-bereiten Tools — damit deine Agenten suchen, kombinieren und antworten können, ohne dass du sie zu Integrations-Maintainern machst.*
+
+Dieser Satz ist die **Single Source** für Hero-Sub-Headline und About-Lead. Er wird **wörtlich** verwendet, nicht paraphrasiert.
+
+## FlowMCP in Zahlen (FAKT, Stand 2026-05-24)
+
+| Metrik | Wert | Quelle |
+|--------|------|--------|
+| Schemas (v4 production) | **365** | `flowmcp-schemas-private/schemas/v4.0.0/` |
+| Datenquellen | **288** | Provider-Verzeichnisse |
+| Abrufbare Tools | **3.100+** | Tool-Routes über alle v4-Schemas |
+| Schemas inkl. v3-Legacy | 904 | v3 + v4 |
+| Lizenz | MIT | Open Source |
+
+> Reproduzierbar via `npm run stats` in `flowmcp.github.io` (siehe `scripts/count-flowmcp-stats.mjs`).
+
+## Was FlowMCP ist (Substanz)
+
+| Aspekt | Beschreibung |
+|--------|--------------|
+| **Primitive Idee** | Ein **Fluss** ("Flow") von Daten — aus heterogenen Datenquellen, durch normalisierte Schemas, in AI-Pipelines. |
+| **Schema-Library** | 365 v4-Schemas, 288 Datenquellen, 3.100+ Tool-Routes. |
+| **Primärer Use** | CLI-Tool. Kein heutiger MCP-Client kann ~3.100 Tools im Kontext halten — im CLI lässt sich der Tool-Kontext dynamisch laden. |
+| **Sekundärer Use** | MCP-Server-Modus weiter unterstützt, aber nicht der Default. MCP-Protokoll hat "dynamic tools" spezifiziert; viele Clients implementieren es bisher nicht. |
+| **Mehrwert** | Entsteht durch **Kombinatorik**: viele Datenquellen + automatische Auffindbarkeit + AI-getriebene Verkettung. |
+| **Sicherheits-Plus** | Schemas sind klein und auditierbar. API-Keys liegen in FlowMCP, **nicht in der AI** — AI sieht nie einen Key. Bei jedem direkten REST-Call durch eine AI würde der Key exposed. |
+| **Killer-Feature** | **Rückwärtssuche über Shared Lists** — Schemas tragen sich in geteilte Listen ein (z.B. "Ethereum Mainnet", "Berlin"). AI kann fragen: "Welche Schemas decken X ab?" — selbst wenn der Kontext leer ist. |
+| **v4-Erweiterung** | **Skills + Prefill + Selections + Output-Schema + Pipes** (siehe Blog-Artikel zu v4). |
+| **v4.1-Erweiterung** | **Add-on-Konzept** — externe Toolkits wie `gtfs-sqlite-toolkit` können FlowMCP erweitern. |
+| **Datenklassen** | Crypto (EVM, Solana, DeFi, Identity, NFT), Open Data (DE/EU), Weather/Geo, Web3 Social, News, Dev-Tools. |
+
+## Was FlowMCP NICHT (mehr) ist
+
+| Missverständnis | Realität |
+|-----------------|----------|
+| "Ein MCP-Server" | Nein — CLI-First. MCP-Server-Modus ist optional. |
+| "Eine Krypto-Library" | Begann dort, ist seit Oktober 2025 mit Open Data deutlich breiter. |
+| "Eine API-Wrapper-Sammlung" | Nein — Engine ist zentral geschrieben, Schemas sind dünne Deklarationen. Ein Audit der Engine reicht für alle Schemas. |
+| "Ein API-Key-Manager" | Nicht primär. Key-Management ist Nebenprodukt der Trennung AI ↔ Key. |
+
+## Historie (kurz)
+
+FlowMCP startete als Versuch, **mehrere Datenquellen** an einen einzigen MCP-Server zu hängen. Daraus wuchs ein **Schema-System**, mit dem ein MCP-Server eine unbegrenzte Zahl an Schemas dynamisch verwalten kann. Der Name "FlowMCP" trägt das "MCP" historisch weiter — die Substanz hat sich verschoben.
+
+## Antwort auf Halluzination & Determinismus
+
+FlowMCP ist sich des Spannungsfelds **LLM-Variabilität vs. deterministischer Output** bewusst. Eine technische Antwort steckt in v4: das **Self-Contained Skill Pattern**. Skills bringen ihre eigene Parameter-Referenz mit. Schema-Daten stehen **vor** den Workflow-Instruktionen. AI rät nicht, sondern wählt.
+
+Beleg (Labortest): Skills mit voller Parameter/Enum/Beispiel-Information hatten in einem internen Test **5/5 Erfolgsrate**. Skills mit nur Name + Beschreibung hatten **0/5**.
+
+## Naming-Spannung (Hinweis)
+
+FlowMCP heißt weiter "FlowMCP", obwohl das Projekt nicht primär MCP ist. Diese Spannung wird in einem eigenen Folge-Memo behandelt (Memo 042 Folge-Memo D). Die Content-Strategie wird auf den **heutigen Namen** kalibriert.
+
+## Verwendung dieses Dokuments
+
+- **Hero-Sub-Headline:** Kern-Identitätssatz (oben) wörtlich.
+- **About-Seite:** Substanz-Tabelle + Was-NICHT-Tabelle + Killer-Feature-Block.
+- **Blog-Intros:** Kern-Identitätssatz + 1 Aspekt aus der Substanz-Tabelle.
+- **Pitch-Decks:** Stats (365/288/3.100+) + Sicherheits-Plus + Killer-Feature.
+- **Conference-Abstracts:** Kern-Identitätssatz + Antwort auf Halluzination.
+
+Wiederverwendbare Textblöcke siehe `vision-snippets.md`.

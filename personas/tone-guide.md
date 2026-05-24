@@ -1,0 +1,82 @@
+# FlowMCP Tone-Guide
+
+> **Internes Kalibrierungs-Dokument.** Lens für jedes Content-Stück (Hero, About, Quickstart, Concepts, Specification, Reference, Guides, Blog, Roadmap, Team).
+> Stand: 2026-05-24 — basierend auf Memo 058 REV-04, Kap. 4.
+
+## Grund-Tonalität
+
+| Eigenschaft | Ausprägung |
+|-------------|------------|
+| Register | Faktisch, präzise, ohne Hype-Adjektive |
+| Sprache | Englisch primär, Deutsch sekundär (siehe Sprachversions-Regel unten) |
+| Buzzwords | **Vermeiden:** "revolutionary", "next-generation", "AI-native" als Hero-Adjektive. **Erlaubt:** wenn faktisch belegt (z.B. "AI-callable tools" beschreibt eine konkrete Eigenschaft). |
+| Personalisierung | Keine Persona-Anreden ("For X"). Inhalt spricht durch Substanz an. |
+| Code-Snippets | Immer mit erwarteter Output-Zeile darunter. Mock-Mode dokumentieren. |
+| Diagramme | Mermaid für Strukturen (**TD/Top-Down**), PNG-Diagramme aus User-Material weiter berücksichtigen. |
+| **Positionierung** | **Neutral.** FlowMCP wird nicht als "MCP-Tool" oder "Crypto-Tool" oder "Mobility-Tool" positioniert, sondern als **neutrale Engine zwischen Datenquellen und AI**. |
+
+## Tone per Section
+
+| Section | Erlaubter Ton | Beispiel |
+|---------|---------------|----------|
+| Hero / Landing | knapp, klar, leicht zugespitzt | "Hunderte Datenquellen, eine Library, AI-bereit." |
+| About / Why | faktisch, narrativ, ohne Werbung | "FlowMCP entstand aus dem Versuch, mehrere APIs ohne Maintenance-Aufwand an AI-Agenten anzuschließen." |
+| Quickstart | imperativ, copy-paste-fähig, mit Output | `flowmcp call dexscreener-token-info '{"address":"..."}'` → expected output |
+| Concepts | erklärend, mit Diagramm, ohne Marketing | "Schemas sind dünne JSON-Deklarationen. Die Engine wird einmal geschrieben." |
+| Specification | präzise, mit IDs (z.B. RES001), regelhaft | "RES001: Schemas MUST declare ..." |
+| Reference | trocken, vollständig, alphabetisch | Liste aller CLI-Commands mit Argumenten |
+| Guides | tutorial-haft, Schritt für Schritt, mit Zwischen-Erfolg | "Schritt 3 — du solltest jetzt 4 Schemas in der Liste sehen." |
+| Blog | erzählerisch, Substanz vor Selbstlob | Story → Was passiert ist → Was es bedeutet |
+| Roadmap | dated, mit "Now / Next / Later"-Spalten | Q3/2026: SQL-Resources, Q4/2026: ... |
+| Team | Foto + Name + LinkedIn + GitHub | (Anders erkennt Maintainer-Status) |
+
+## Verbotene Patterns (mit Alternativen)
+
+| Schlecht | Besser |
+|----------|--------|
+| "Revolutionary new framework for AI agents" | "Library of normalised API schemas for AI agents" |
+| "Game-changing schema library" | "365 production-ready schemas, 288 data sources" |
+| "AI-native development experience" | "AI-callable tools through one auditable engine" |
+| "For Decision Makers" | "What is FlowMCP" (Anders findet das von selbst) |
+| "For Developers" | "Concepts" + "Reference" (Daniel findet das von selbst) |
+| "Bus-Faktor: 1" | "Maintainer-Status sichtbar" (Sektion mit GitHub-Profil) |
+| "v3 oder v4 — beide funktionieren" | "v4 is the active spec. v3 lives in the archive." |
+| API-Key hardcoded in code-snippet (`api_key="sk-..."`) | `api_key=process.env.FLOWMCP_API_KEY` + Mock-Mode-Hinweis |
+| "Used by NASA, Google, Microsoft" (ohne Beleg) | "Production deployments listed below the fold" |
+| "Built for the future of AI" | (entfernen — leere Aussage) |
+
+## Schärfen statt Erweitern (3-Fragen-Test)
+
+**Regel:** Jeder Content-Vorschlag wird gegen drei Fragen geprüft, bevor er umgesetzt wird:
+
+- [ ] **Schärft** dieser Vorschlag eine bestehende Aussage, oder fügt er nur eine neue hinzu?
+- [ ] Kann der Inhalt in eine **vorhandene** Seite integriert werden, statt eine neue zu erzeugen?
+- [ ] Wird die Zielseite durch diesen Vorschlag **kürzer und klarer** oder nur länger?
+
+**Anwendung:**
+- Wenn 2+ Antworten "nein" sind → Vorschlag überarbeiten oder ablehnen.
+- Bei "ja, aber Persona-Begründung fehlt" → Persona-Gap explizit benennen (z.B. "schließt Mira-Friction: Hackathon-Setup <5min").
+- Bei "alle ja" → umsetzen.
+
+## Sprachversions-Regel (VERBINDLICH)
+
+| Bereich | Sprache(n) | Begründung |
+|---------|------------|------------|
+| **Specification** (`docs/specification/`) | **NUR Englisch** | Die Spec ist die Source of Truth. Übersetzungen bergen Abweichungs-Risiko. Mehrsprachigkeit der Spec ist explizit ausgeschlossen. |
+| Quickstart, Concepts, Guides, Reference, About, Roadmap, Team, Blog, Hackathon-Kit | **EN + DE** | DE-Spiegelung bleibt definitiv. Wichtiges Feature. |
+
+**Migrations-Reihenfolge:** EN-First. DE wird **nach** EN-Finalisierung synchron nachgezogen. Nichts wird auf Standby gesetzt.
+
+## Mermaid-Regel
+
+| Erlaubt | Verboten |
+|---------|----------|
+| `flowchart TD` (Top-Down) | `flowchart LR` (Left-Right) |
+| `graph TD` | — |
+
+Begründung: TD ist auf allen Bildschirmgrößen besser lesbar (besonders mobile). LR-Diagramme schneiden auf engen Viewports rechts ab.
+
+## Audit-Spur
+
+Quelle: Memo 058 REV-04 Kap. 4 (Tonalitäts-Definition).
+Verwandt: `tone-checklist.md` (Print-Version, 1 Seite).

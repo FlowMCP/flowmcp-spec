@@ -1,0 +1,62 @@
+# Vision-Snippets — wiederverwendbare Textblöcke
+
+> Source: `vision.md`. Diese Datei enthält fertige Textbausteine für die häufigsten Content-Stellen.
+> Stand: 2026-05-24 (Memo 058 REV-04).
+
+## 1. Hero-Sub-Headline (EN, 1 Satz)
+
+> *FlowMCP normalises hundreds of data sources into a searchable library of AI-ready tools — so your agents can search, combine, and answer without turning you into an integrations maintainer.*
+
+## 2. Hero-Sub-Headline (DE, 1 Satz)
+
+> *FlowMCP normalisiert hunderte Datenquellen zu einer durchsuchbaren Library aus AI-bereiten Tools — damit deine Agenten suchen, kombinieren und antworten können, ohne dass du sie zu Integrations-Maintainern machst.*
+
+## 3. About-Lead-Paragraph (EN, 3 Sätze)
+
+> *FlowMCP started as an attempt to attach multiple data sources to a single MCP server. Over time it became a schema library: 365 production-ready definitions, 288 data sources, 3,100+ callable tools, all routed through one auditable engine. AI agents call FlowMCP — never the underlying APIs directly — so your API keys stay in your control, not in the model context.*
+
+## 4. About-Lead-Paragraph (DE, 3 Sätze)
+
+> *FlowMCP entstand aus dem Versuch, mehrere Datenquellen an einen einzigen MCP-Server zu hängen. Aus diesem Anfang ist eine Schema-Library geworden: 365 produktionsreife Definitionen, 288 Datenquellen, 3.100+ aufrufbare Tools — alle durch eine zentrale, auditierbare Engine geleitet. AI-Agenten rufen FlowMCP — nie die zugrundeliegenden APIs direkt — sodass deine API-Keys in deiner Kontrolle bleiben, nicht im Modell-Kontext.*
+
+## 5. Blogpost-Intro (EN, 2-4 Sätze)
+
+> *FlowMCP turns the chaos of hundreds of different APIs into a single, searchable library of tools that AI agents can actually use. Every schema is small, auditable, and routes through one engine — so one audit covers thousands of endpoints. This post walks through {topic}.*
+
+## 6. Blogpost-Intro (DE, 2-4 Sätze)
+
+> *FlowMCP verwandelt das Chaos hunderter unterschiedlicher APIs in eine durchsuchbare Library von Tools, die AI-Agenten wirklich nutzen können. Jedes Schema ist klein, auditierbar und läuft durch eine einzige Engine — ein Audit deckt damit Tausende Endpunkte ab. Dieser Beitrag beschäftigt sich mit {Thema}.*
+
+## 7. Pitch-Deck-Slide-Text (Bullets, EN)
+
+- 365 production-ready API schemas
+- 288 data sources (Crypto, Open Data DE/EU, Weather/Geo, more)
+- 3,100+ callable tools — all routed through one auditable engine
+- API keys stay in FlowMCP, never in the AI context
+- "Shared Lists" make schemas discoverable in reverse: ask "which schemas cover X?"
+- v4 introduces Skills, Selections, Pipes for deterministic LLM composition
+- MIT licensed, CLI-first, MCP-server mode optional
+
+## 8. Pitch-Deck-Slide-Text (Bullets, DE)
+
+- 365 produktionsreife API-Schemas
+- 288 Datenquellen (Crypto, Open Data DE/EU, Weather/Geo, weitere)
+- 3.100+ aufrufbare Tools — alle durch eine auditierbare Engine
+- API-Keys bleiben in FlowMCP, niemals im AI-Kontext
+- "Shared Lists" machen Schemas rückwärts auffindbar: "Welche Schemas decken X ab?"
+- v4 führt Skills, Selections, Pipes für deterministische LLM-Komposition ein
+- MIT-Lizenz, CLI-First, MCP-Server-Modus optional
+
+## 9. Conference-Abstract (EN, ~50 Wörter)
+
+> *FlowMCP is an open-source schema library that normalises 288 data sources — from Ethereum to German open data — into 3,100+ AI-callable tools. The new v4 release introduces Skills, Selections, and Pipes: deterministic structures that let LLMs compose multi-step queries without hallucinating parameters. MIT licensed.*
+
+## 10. Conference-Abstract (DE, ~50 Wörter)
+
+> *FlowMCP ist eine Open-Source-Schema-Library, die 288 Datenquellen — von Ethereum bis zu deutschen Open-Data-Portalen — in 3.100+ AI-aufrufbare Tools normalisiert. Das neue v4-Release führt Skills, Selections und Pipes ein: deterministische Strukturen, mit denen LLMs mehrstufige Abfragen komponieren, ohne Parameter zu halluzinieren. MIT-lizensiert.*
+
+## Audit-Spur
+
+Jeder Snippet ist eine Komprimierung von `vision.md`. Bei Änderungen an `vision.md` müssen die Snippets entsprechend nachgezogen werden.
+
+Quelle: Memo 058 REV-04 Kap. 2 (Vision-Klärung).

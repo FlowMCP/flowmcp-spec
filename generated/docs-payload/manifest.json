@@ -1,6 +1,6 @@
 {
     "spec_version": "4.1.0",
-    "generated_at": "2026-05-24T18:45:15.077Z",
+    "generated_at": "2026-05-24T19:10:00.480Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -403,14 +403,14 @@
     },
     "meta": {
         "stats": {
-            "count_schemas": null,
-            "count_unique_datasources": null,
-            "count_tools": null,
-            "count_resources": null,
-            "count_skills": null,
-            "timestamp": null,
-            "schema_version": null,
-            "build_hash": null
+            "count_schemas": 365,
+            "count_unique_datasources": 288,
+            "count_tools": 1575,
+            "count_resources": 0,
+            "count_skills": 0,
+            "timestamp": "2026-05-24T18:20:39.289Z",
+            "schema_version": "v4.0.0",
+            "build_hash": "326a272"
         }
     }
 }

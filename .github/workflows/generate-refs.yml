@@ -16,7 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # PAT (not GITHUB_TOKEN) so the auto-commit triggers downstream
+          # workflows (notify-org-profile, notify-docs-site).
+          # Anti-loop: paths-filter excludes generated/, so this workflow
+          # does not re-trigger itself.
+          token: ${{ secrets.REPO_DISPATCH_TOKEN }}
           ref: ${{ github.ref_name }}
 
       - name: Use Node.js 22

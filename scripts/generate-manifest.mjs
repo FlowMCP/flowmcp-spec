@@ -80,6 +80,40 @@ const slugFromFilename = ( { filename } ) => {
 }
 
 
+// Sidebar mapping (PRD-06): groups filenames into UI-Sidebar buckets
+// 00         -> introduction (single overview)
+// 01-19      -> specification (core normative chapters)
+// 20-23      -> guides (validation strategy, lifecycle, scoring, license)
+const sidebarGroupFromFilename = ( { filename } ) => {
+    const match = filename.match( /^(\d{2})-/ )
+    if( !match ) return 'specification'
+    const order = parseInt( match[ 1 ], 10 )
+    if( order === 0 ) return 'introduction'
+    if( order >= 20 ) return 'guides'
+    return 'specification'
+}
+
+
+// Per-group default collapsed-state
+const COLLAPSED_DEFAULT = {
+    introduction: false,
+    specification: false,
+    guides: true
+}
+
+
+// Explicit version_added overrides for files that did not exist in 4.0.0.
+// Default is 4.0.0 (hardcopy from v4.0.0). Add entries here when new files
+// land in 4.1.0 or later.
+const VERSION_ADDED_OVERRIDES = {}
+
+
+const versionAddedFromFilename = ( { filename } ) => {
+    if( VERSION_ADDED_OVERRIDES[ filename ] ) return VERSION_ADDED_OVERRIDES[ filename ]
+    return '4.0.0'
+}
+
+
 const main = async () => {
     const allFiles = await readdir( PAYLOAD_DIR )
     const docFiles = allFiles
@@ -107,6 +141,7 @@ const main = async () => {
         const sourcePath = join( SPEC_DIR, filename )
         const { grade, issues } = await runChecker( { filePath: sourcePath } )
 
+        const sidebarGroup = sidebarGroupFromFilename( { filename } )
         const entry = {
             filename,
             slug: slugFromFilename( { filename } ),
@@ -115,6 +150,9 @@ const main = async () => {
             order: fm.order,
             section: fm.section,
             normative: fm.normative,
+            sidebar_group: sidebarGroup,
+            version_added: versionAddedFromFilename( { filename } ),
+            collapsed: COLLAPSED_DEFAULT[ sidebarGroup ] ?? false,
             spec_quality: { grade, issues }
         }
         fileEntries.push( entry )

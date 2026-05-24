@@ -1,6 +1,6 @@
 ---
 title: "MCP Server Integration"
-description: "**Version:** FlowMCP 4.0.0"
+description: "**Version:** FlowMCP 4.1.0"
 spec_version: "4.1.0"
 spec_file: "19-mcp-integration.md"
 order: 19
@@ -16,7 +16,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/19-mcp-integrati
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---
@@ -29,7 +29,7 @@ When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific
 
 ## Meta Block (Required per Tool)
 
-Every Tool in v4.0.0 MUST have a `meta` block:
+Every Tool in v4.1.0 MUST have a `meta` block:
 
 ```javascript
 export const schema = {

@@ -3,7 +3,8 @@ name: Generate llms.txt
 on:
   push:
     paths:
-      - 'spec/v4.0.0/*.md'
+      - 'spec/v4.1.0/*.md'
+      - 'package.json'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +19,8 @@ jobs:
 
       - name: Generate llms.txt from spec files
         run: |
-          SPEC_DIR="spec/v4.0.0"
+          SPEC_VERSION=$(node -p "require('./package.json').version")
+          SPEC_DIR="spec/v${SPEC_VERSION}"
           OUTPUT_DIR="generated"
           OUTPUT="$OUTPUT_DIR/llms.txt"
           OUTPUT_ALIAS="$OUTPUT_DIR/llms-schema-spec.txt"
@@ -77,8 +79,8 @@ jobs:
           )
 
           # Header
-          cat > "$OUTPUT" << 'HEADER'
-          # FlowMCP Specification v4.0.0
+          cat > "$OUTPUT" << HEADER
+          # FlowMCP Specification v${SPEC_VERSION}
           > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
           >
           > This file concatenates all 23 specification documents into a single file for LLM consumption.

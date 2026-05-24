@@ -604,7 +604,7 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
-## Skill Tests (v4.0.0)
+## Skill Tests (v4.1.0)
 
 Skills have two test types: structural and one-shot.
 

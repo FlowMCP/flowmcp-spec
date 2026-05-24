@@ -1,8 +1,8 @@
-# FlowMCP Specification v4.0.0 — Prefill and Placeholders
+# FlowMCP Specification v4.1.0 — Prefill and Placeholders
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---

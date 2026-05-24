@@ -1,8 +1,8 @@
-# FlowMCP Specification v4.0.0 — MCP Server Integration
+# FlowMCP Specification v4.1.0 — MCP Server Integration
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---
@@ -15,7 +15,7 @@ When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific
 
 ## Meta Block (Required per Tool)
 
-Every Tool in v4.0.0 MUST have a `meta` block:
+Every Tool in v4.1.0 MUST have a `meta` block:
 
 ```javascript
 export const schema = {

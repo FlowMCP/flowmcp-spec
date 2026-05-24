@@ -66,7 +66,7 @@ schemas/v3.0.0/
     │   │   ├── simple-price.mjs
     │   │   └── prompts/             <- Provider prompts (model-neutral)
     │   └── ...
-    ├── selections/                  <- Curated tool subsets (v4.0.0)
+    ├── selections/                  <- Curated tool subsets (v4.1.0)
     │   ├── evm-research/
     │   │   └── selection.mjs
     │   └── defi-monitor/
@@ -93,7 +93,7 @@ schemas/v3.0.0/
 | `_lists/` | Root | Shared value lists consumed by all providers and agents |
 | `_shared/` | Root | Shared helper modules consumed by provider schemas |
 | `providers/` | Root | Provider schema directories, one per namespace |
-| `selections/` | Root | Curated tool subsets for agent context loading (v4.0.0). See `17-selections.md`. |
+| `selections/` | Root | Curated tool subsets for agent context loading (v4.1.0). See `17-selections.md`. |
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |

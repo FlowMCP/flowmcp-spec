@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Preload & Caching
+# FlowMCP Specification v4.1.0 — Preload & Caching
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 

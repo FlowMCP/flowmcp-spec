@@ -1,6 +1,6 @@
 ---
 title: "Prefill and Placeholders"
-description: "**Version:** FlowMCP 4.0.0"
+description: "**Version:** FlowMCP 4.1.0"
 spec_version: "4.1.0"
 spec_file: "18-prefill.md"
 order: 18
@@ -16,7 +16,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/18-prefill.md."
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---

@@ -1,15 +1,15 @@
-# FlowMCP Specification v4.0.0 — Validation Strategy
+# FlowMCP Specification v4.1.0 — Validation Strategy
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---
 
 ## Overview
 
-FlowMCP v4.0.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+FlowMCP v4.1.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
 
 ---
 

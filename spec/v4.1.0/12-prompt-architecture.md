@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Prompt Architecture
+# FlowMCP Specification v4.1.0 — Prompt Architecture
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 

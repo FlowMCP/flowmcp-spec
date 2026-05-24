@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Schema Lifecycle
+# FlowMCP Specification v4.1.0 — Schema Lifecycle
 
 **Version:** 4.0.0  
 **Status:** Active

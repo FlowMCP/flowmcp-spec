@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Tests
+# FlowMCP Specification v4.1.0 — Tests
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -590,7 +590,7 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
-## Skill Tests (v4.0.0)
+## Skill Tests (v4.1.0)
 
 Skills have two test types: structural and one-shot.
 

@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Index
+# FlowMCP Specification v4.1.0 — Index
 
 This directory contains the active FlowMCP specification (version 4.0.0). All files are hand-pflege — generated artifacts live in [`../../generated/`](../../generated/).
 

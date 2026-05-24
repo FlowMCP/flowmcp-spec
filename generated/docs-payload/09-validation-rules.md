@@ -18,7 +18,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/09-validation-ru
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
-This file is the **central code registry** for FlowMCP v4.0.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
+This file is the **central code registry** for FlowMCP v4.1.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
 ---
 
@@ -279,7 +279,7 @@ See `06-agents.md` for the complete agent specification.
 
 ---
 
-## MCP Integration Meta Rules (v4.0.0)
+## MCP Integration Meta Rules (v4.1.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -297,7 +297,7 @@ See `19-mcp-integration.md` for the complete meta block specification.
 
 ---
 
-## Selection Validation Rules (v4.0.0)
+## Selection Validation Rules (v4.1.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -309,7 +309,7 @@ See `17-selections.md` for the complete Selection specification.
 
 ---
 
-## Extended Agent Validation Rules (v4.0.0)
+## Extended Agent Validation Rules (v4.1.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -318,7 +318,7 @@ See `17-selections.md` for the complete Selection specification.
 
 ---
 
-## HTTP Resource Validation Rules (v4.0.0)
+## HTTP Resource Validation Rules (v4.1.0)
 
 | Code | Severity | Rule |
 |------|----------|------|

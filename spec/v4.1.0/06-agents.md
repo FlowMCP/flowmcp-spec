@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Agents
+# FlowMCP Specification v4.1.0 — Agents
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 

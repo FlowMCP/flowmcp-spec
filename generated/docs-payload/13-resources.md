@@ -357,7 +357,7 @@ A minimal POC schema demonstrating `sqlite-gtfs`:
 export const schema = {
     namespace: 'gtfsde',
     name: 'gtfsde-transit-v2',
-    version: '2.0.0',
+    version: '4.1.0',
     main: {
         resources: [
             {
@@ -666,7 +666,7 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 
 ---
 
-## HTTP Resources (v4.0.0)
+## HTTP Resources (v4.1.0)
 
 HTTP Resources allow schemas to reference remote files (typically SQLite databases) that are fetched via HTTPS and cached locally. They combine the rich query interface of SQLite resources with the distribution flexibility of remote hosting.
 

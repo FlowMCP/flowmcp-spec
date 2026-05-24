@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — ID Schema
+# FlowMCP Specification v4.1.0 — ID Schema
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -93,7 +93,7 @@ Namespace rules:
 
 #### Resource Type
 
-The resource type discriminates between the seven kinds of addressable primitives in v4.0.0:
+The resource type discriminates between the seven kinds of addressable primitives in v4.1.0:
 
 | Type | Maps To | Defined In |
 |------|---------|-----------|
@@ -145,7 +145,7 @@ Contains Primitive-IDs:
 ### Directory Mapping
 
 ```
-schemas/v4.0.0/providers/etherscan-io/contracts.mjs
+schemas/v4.1.0/providers/etherscan-io/contracts.mjs
                           └── namespace    └── schema-name.mjs
 → Schema-File-ID: etherscan-io/contracts
 ```

@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.0.0 — Migration Guide
+# FlowMCP Specification v4.1.0 — Migration Guide
 
 This guide covers migrating schemas between FlowMCP versions. Section 1 covers v2.0.0 to v3.0.0 migration. Section 2 preserves the v1.2.0 to v2.0.0 guide for reference.
 

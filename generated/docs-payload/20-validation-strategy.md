@@ -1,6 +1,6 @@
 ---
 title: "Validation Strategy"
-description: "**Version:** FlowMCP 4.0.0"
+description: "**Version:** FlowMCP 4.1.0"
 spec_version: "4.1.0"
 spec_file: "20-validation-strategy.md"
 order: 20
@@ -16,14 +16,14 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/20-validation-st
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active
 
 ---
 
 ## Overview
 
-FlowMCP v4.0.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+FlowMCP v4.1.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
 
 ---
 

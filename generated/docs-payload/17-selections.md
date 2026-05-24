@@ -1,6 +1,6 @@
 ---
 title: "Selections"
-description: "**Version:** FlowMCP 4.0.0"
+description: "**Version:** FlowMCP 4.1.0"
 spec_version: "4.1.0"
 spec_file: "17-selections.md"
 order: 17
@@ -16,7 +16,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/17-selections.md
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
-**Version:** FlowMCP 4.0.0  
+**Version:** FlowMCP 4.1.0  
 **Status:** Active  
 **Primitive:** Selection (5th primitive)
 
@@ -72,7 +72,7 @@ Example: `evm-research/selection/contract-analysis`
 ## File Location
 
 ```
-schemas/v4.0.0/selections/
+schemas/v4.1.0/selections/
   evm-research/
     contract-analysis.mjs
 ```

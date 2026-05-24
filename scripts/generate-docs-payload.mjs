@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // generate-docs-payload.mjs — Memo 049 Phase 5 PRD-18
 //
-// Reads spec/v4.0.0/*.md, adds YAML frontmatter with discovery metadata,
+// Reads spec/v4.1.0/*.md, adds YAML frontmatter with discovery metadata,
 // rewrites cross-references to relative links, and writes the result to
 // generated/docs-payload/{NN}-{slug}.md.
 //
@@ -17,9 +17,9 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-const SPEC_DIR = join( REPO, 'spec/v4.0.0' )
+const SPEC_DIR = join( REPO, 'spec/v4.1.0' )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
-const SPEC_VERSION = '4.0.0'
+const SPEC_VERSION = '4.1.0'
 const GENERATOR = 'scripts/generate-docs-payload.mjs'
 
 
@@ -43,7 +43,7 @@ const escapeYamlString = ( { value } ) => {
 const extractTitle = ( { content } ) => {
     const match = content.match( /^#\s+(.+?)\s*$/m )
     if( !match ) return null
-    // Strip "FlowMCP Specification v4.0.0 — " prefix
+    // Strip "FlowMCP Specification v4.1.0 — " prefix
     return match[ 1 ].replace( /^FlowMCP Specification v[\d.]+\s*[—-]\s*/, '' ).trim()
 }
 

@@ -1,15 +1,15 @@
 ---
 title: "Validation Rules"
 description: "This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description."
-spec_version: "4.0.0"
+spec_version: "4.1.0"
 spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-generated_at: "2026-05-21T21:05:42.677Z"
-generated_from: "spec/v4.0.0/09-validation-rules.md"
+generated_at: "2026-05-24T02:50:55.437Z"
+generated_from: "spec/v4.1.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.0.0/09-validation-rules.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.1.0/09-validation-rules.md."
 ---
 
 # FlowMCP Specification v4.0.0 — Validation Rules

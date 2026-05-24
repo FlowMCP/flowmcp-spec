@@ -18,11 +18,11 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-const SPEC_DIR = join( REPO, 'spec/v4.0.0' )
+const SPEC_DIR = join( REPO, 'spec/v4.1.0' )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const MANIFEST_PATH = join( PAYLOAD_DIR, 'manifest.json' )
 const CHECKER = join( REPO, 'skills/spec-quality/evaluator-spec-rfc2119/check.mjs' )
-const SPEC_VERSION = '4.0.0'
+const SPEC_VERSION = '4.1.0'
 const GENERATOR = 'scripts/generate-manifest.mjs'
 
 

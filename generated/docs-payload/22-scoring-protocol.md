@@ -1,15 +1,15 @@
 ---
 title: "Scoring Protocol v1"
 description: "Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation)."
-spec_version: "4.0.0"
+spec_version: "4.1.0"
 spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-generated_at: "2026-05-21T21:05:42.677Z"
-generated_from: "spec/v4.0.0/22-scoring-protocol.md"
+generated_at: "2026-05-24T02:50:55.437Z"
+generated_from: "spec/v4.1.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.0.0/22-scoring-protocol.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.1.0/22-scoring-protocol.md."
 ---
 
 # Scoring Protocol v1

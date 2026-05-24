@@ -1,12 +1,12 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-05-24T10:25:01.662Z",
-        "fromCommit": "c74f3d3",
+        "at": "2026-05-24T12:35:34.423Z",
+        "fromCommit": "c10a5a5",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
-        "currentVersion": "4.1.1",
+        "currentVersion": "4.1.0",
         "recommendedRelease": "v4.1.0",
         "specDir": "spec/v4.1.0",
         "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.1.0/spec/v4.1.0",

@@ -1,0 +1,48 @@
+name: Generate refs.resolved.json
+
+on:
+  push:
+    paths:
+      - 'data/refs.manual.json'
+      - 'data/refs.schema.json'
+
+permissions:
+  contents: write
+
+jobs:
+  generate-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run refs resolver
+        run: node scripts/generate-refs.mjs
+
+      - name: Check for diff
+        id: diff
+        run: |
+          if git diff --quiet -- generated/refs.resolved.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push resolved refs
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/refs.resolved.json
+          git commit -m "chore(refs): regenerate refs.resolved.json [skip ci]"
+          git push

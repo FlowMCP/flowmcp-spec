@@ -1,0 +1,50 @@
+{
+    "schemaVersion": "refs/1.0.0",
+    "spec": {
+        "currentVersion": "4.1.0",
+        "recommendedRelease": "v4.1.0",
+        "historicalVersions": [ "4.0.0", "4.1.0" ],
+        "specDir": "spec/v4.1.0",
+        "miniSkillTemplate": "data/mini-skill.template.md"
+    },
+    "imports": {
+        "cli": "github:FlowMCP/flowmcp-cli#v4.1.0",
+        "core": "github:FlowMCP/flowmcp-core#v4.1.0",
+        "schemasPublic": "github:FlowMCP/flowmcp-schemas-public#main",
+        "gtfsToolkit": "github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0"
+    },
+    "docs": {
+        "canonical": "https://flowmcp.github.io",
+        "entryPoints": {
+            "hackathon": "/quickstart/quickstart/",
+            "aiEngineer": "/specification/overview/",
+            "schemaMaintainer": "/specification/schema-format/",
+            "decisionMaker": "/about/for-decision-makers/"
+        }
+    },
+    "github": {
+        "organization": "https://github.com/flowmcp",
+        "specRepo": "https://github.com/FlowMCP/flowmcp-spec",
+        "sponsorsUrl": "https://github.com/sponsors/FlowMCP"
+    },
+    "llmsFiles": {
+        "indexUrl": "https://flowmcp.github.io/llms.txt",
+        "docsUrl": "https://flowmcp.github.io/docs-llms.txt",
+        "fullUrl": "https://flowmcp.github.io/llms-full.txt",
+        "specUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt"
+    },
+    "robotsTxt": {
+        "publishedLlmsFiles": [
+            "/llms.txt",
+            "/docs-llms.txt",
+            "/llms-full.txt"
+        ]
+    },
+    "addons": [
+        {
+            "name": "gtfs-sqlite-toolkit",
+            "import": "github:FlowMCP/gtfs-sqlite-toolkit",
+            "description": "Convert GTFS Schedule feeds to queryable SQLite"
+        }
+    ]
+}

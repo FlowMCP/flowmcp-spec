@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FlowMCP Refs Manual Schema",
+    "type": "object",
+    "required": [ "schemaVersion", "spec", "imports", "docs", "github", "llmsFiles", "robotsTxt" ],
+    "additionalProperties": false,
+    "properties": {
+        "schemaVersion": {
+            "type": "string",
+            "pattern": "^refs/\\d+\\.\\d+\\.\\d+$"
+        },
+        "spec": {
+            "type": "object",
+            "required": [ "currentVersion", "recommendedRelease", "historicalVersions", "specDir", "miniSkillTemplate" ],
+            "additionalProperties": false,
+            "properties": {
+                "currentVersion": { "type": "string", "pattern": "^4\\.\\d+\\.\\d+$" },
+                "recommendedRelease": { "type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$" },
+                "historicalVersions": {
+                    "type": "array",
+                    "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+                },
+                "specDir": { "type": "string", "pattern": "^spec/v\\d+\\.\\d+\\.\\d+$" },
+                "miniSkillTemplate": { "type": "string", "pattern": "^data/.*\\.md$" }
+            }
+        },
+        "imports": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+                "type": "string",
+                "pattern": "^github:FlowMCP/[\\w-]+(#[\\w./-]+)?$"
+            }
+        },
+        "docs": {
+            "type": "object",
+            "required": [ "canonical", "entryPoints" ],
+            "additionalProperties": false,
+            "properties": {
+                "canonical": { "type": "string", "pattern": "^https://[a-z0-9.-]+(/.*)?$" },
+                "entryPoints": {
+                    "type": "object",
+                    "additionalProperties": { "type": "string", "pattern": "^/.*/$" }
+                }
+            }
+        },
+        "github": {
+            "type": "object",
+            "required": [ "organization", "specRepo", "sponsorsUrl" ],
+            "additionalProperties": false,
+            "properties": {
+                "organization": { "type": "string", "pattern": "^https://github.com/.+$" },
+                "specRepo": { "type": "string", "pattern": "^https://github.com/.+$" },
+                "sponsorsUrl": { "type": "string", "pattern": "^https://github.com/.+$" }
+            }
+        },
+        "llmsFiles": {
+            "type": "object",
+            "required": [ "indexUrl", "docsUrl", "fullUrl", "specUrl" ],
+            "additionalProperties": false,
+            "properties": {
+                "indexUrl": { "type": "string", "pattern": "^https://.+\\.txt$" },
+                "docsUrl": { "type": "string", "pattern": "^https://.+\\.txt$" },
+                "fullUrl": { "type": "string", "pattern": "^https://.+\\.txt$" },
+                "specUrl": { "type": "string", "pattern": "^https://.+\\.txt$" }
+            }
+        },
+        "robotsTxt": {
+            "type": "object",
+            "required": [ "publishedLlmsFiles" ],
+            "additionalProperties": false,
+            "properties": {
+                "publishedLlmsFiles": {
+                    "type": "array",
+                    "items": { "type": "string", "pattern": "^/.*\\.txt$" }
+                }
+            }
+        },
+        "addons": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [ "name", "import" ],
+                "additionalProperties": false,
+                "properties": {
+                    "name": { "type": "string" },
+                    "import": { "type": "string", "pattern": "^github:FlowMCP/[\\w-]+(#[\\w./-]+)?$" },
+                    "description": { "type": "string" }
+                }
+            }
+        }
+    }
+}

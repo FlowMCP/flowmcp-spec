@@ -17,7 +17,8 @@
     ],
     "scripts": {
         "generate-refs": "node scripts/generate-refs.mjs",
-        "test:refs-regex": "node scripts/test-refs-regex.mjs"
+        "test:refs-regex": "node scripts/test-refs-regex.mjs",
+        "test:e2e": "node scripts/test-e2e-pipeline.mjs"
     },
     "devDependencies": {
         "ajv": "^8.20.0"

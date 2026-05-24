@@ -1,12 +1,12 @@
 # Changelog
 
-## v4.1.0 — YYYY-MM-DD
+## v4.1.0 — 2026-05-24
 
 Additive, non-breaking release introducing the `sqlite-gtfs` resource source type, six new validation codes, the first FlowMCP add-on, and the `FLOWMCP_*` path variable family.
 
 ### Added
 
-- **New resource source type `sqlite-gtfs`** (Design C — extends sqlite with seal verification and add-on reference). The new source delegates the catalog of standard tools to a FlowMCP add-on, enabling capability-driven auto-injection. See `spec/v4.0.0/13-resources.md` section "SQLite-GTFS Resources". Example schema: `examples/sqlite-gtfs-example.mjs`.
+- **New resource source type `sqlite-gtfs`** (Design C — extends sqlite with seal verification and add-on reference). The new source delegates the catalog of standard tools to a FlowMCP add-on, enabling capability-driven auto-injection. See `spec/v4.1.0/13-resources.md` section "SQLite-GTFS Resources". Example schema: `examples/sqlite-gtfs-example.mjs`.
 - **Validation codes RES030–RES035** for sqlite-gtfs resources (mode constraint, addon requirement, seal verification, DB open failure, spec drift, path variable resolution).
 - **First FlowMCP add-on: `gtfs-sqlite-toolkit`** (`github:FlowMCP/gtfs-sqlite-toolkit`). Add-ons supply the converter, the default-method catalog, and the capability detector for a given seal value. NPM is not used — add-ons are referenced via `github:` paths only.
 - **Path variable support** (`${FLOWMCP_RESOURCES}`) for user-configurable resource locations. Resolution falls back to `~/.flowmcp/resources/` when the environment variable is unset.

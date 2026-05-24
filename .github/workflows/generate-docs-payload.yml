@@ -3,7 +3,7 @@ name: Generate docs-payload
 on:
   push:
     paths:
-      - 'spec/v4.0.0/*.md'
+      - 'spec/v4.1.0/*.md'
       - 'scripts/generate-docs-payload.mjs'
       - 'scripts/generate-manifest.mjs'
       - 'skills/spec-quality/evaluator-spec-rfc2119/**'
@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

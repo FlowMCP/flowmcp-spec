@@ -1,7 +1,7 @@
 {
     "schemaVersion": "refs/1.0.0",
     "spec": {
-        "currentVersion": "4.1.0",
+        "currentVersion": "4.1.1",
         "recommendedRelease": "v4.1.0",
         "historicalVersions": [ "4.0.0", "4.1.0" ],
         "specDir": "spec/v4.1.0",

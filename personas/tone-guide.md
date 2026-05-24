@@ -76,7 +76,21 @@
 
 Begründung: TD ist auf allen Bildschirmgrößen besser lesbar (besonders mobile). LR-Diagramme schneiden auf engen Viewports rechts ab.
 
+## Diagramme in Blogposts
+
+**Pflicht-Regel:** Jeder Blogpost enthaelt mindestens 1 Diagramm.
+
+| Position | Style | Skill |
+|----------|-------|-------|
+| Hero (oben im Post) | Excalidraw-Stil | `image-diagram-excalidraw` |
+| Interne Diagramme | Mermaid TD | — (inline) |
+
+Vollstaendige Style-Tabelle und Kontext-Mapping siehe `personas/diagramme-policy.md`.
+
+**Quelle:** Memo 059 REV-04 Cluster H.1.
+
 ## Audit-Spur
 
 Quelle: Memo 058 REV-04 Kap. 4 (Tonalitäts-Definition).
 Verwandt: `tone-checklist.md` (Print-Version, 1 Seite).
+Erweitert: Memo 059 REV-04 Cluster H.1 (Diagramm-Pflicht-Regel).

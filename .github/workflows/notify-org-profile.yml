@@ -1,9 +1,9 @@
 name: Notify Org Profile
 
-# Sends a repository_dispatch to FlowMCP/dot-github whenever the
-# source-of-truth refs file or the mini-skill template changes on main.
-# Secret ORG_PROFILE_REPO_DISPATCH_TOKEN must be a PAT (Classic) with `repo`
-# scope and write access to FlowMCP/dot-github.
+# Sends a repository_dispatch to FlowMCP/.github (the org-profile repo)
+# whenever the source-of-truth refs file or the mini-skill template changes
+# on main. Secret ORG_PROFILE_REPO_DISPATCH_TOKEN must be a PAT (Classic) with
+# `repo` scope and write access to FlowMCP/.github.
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.ORG_PROFILE_REPO_DISPATCH_TOKEN }}
-          repository: FlowMCP/dot-github
+          repository: FlowMCP/.github
           event-type: refs-updated
           client-payload: |
             {

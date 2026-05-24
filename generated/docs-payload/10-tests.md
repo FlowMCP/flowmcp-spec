@@ -6,9 +6,9 @@ spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "0223c78"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/0223c78/spec/v4.1.0/10-tests.md"
-generated_at: "2026-05-24T02:54:06.611Z"
+source_commit: "d43fd27"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/d43fd27/spec/v4.1.0/10-tests.md"
+generated_at: "2026-05-24T09:17:43.286Z"
 generated_from: "spec/v4.1.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/10-tests.md."

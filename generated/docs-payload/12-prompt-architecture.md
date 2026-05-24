@@ -6,17 +6,15 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "Specification"
 normative: true
-source_commit: "1ce7230"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/1ce7230/spec/v4.1.0/12-prompt-architecture.md"
-generated_at: "2026-05-24T09:44:07.759Z"
+source_commit: "22574dd"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/22574dd/spec/v4.1.0/12-prompt-architecture.md"
+generated_at: "2026-05-24T18:45:14.019Z"
 generated_from: "spec/v4.1.0/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/12-prompt-architecture.md."
 ---
 
-# FlowMCP Specification v4.0.0 — Prompt Architecture
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 

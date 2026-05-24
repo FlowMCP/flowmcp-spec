@@ -6,17 +6,15 @@ spec_file: "23-license-and-tos.md"
 order: 23
 section: "Specification"
 normative: true
-source_commit: "1ce7230"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/1ce7230/spec/v4.1.0/23-license-and-tos.md"
-generated_at: "2026-05-24T09:44:07.759Z"
+source_commit: "22574dd"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/22574dd/spec/v4.1.0/23-license-and-tos.md"
+generated_at: "2026-05-24T18:45:14.019Z"
 generated_from: "spec/v4.1.0/23-license-and-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/23-license-and-tos.md."
 ---
 
-# License & Terms of Services
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 > Defines how FlowMCP handles third-party API Terms of Services (ToS) and data licensing.
 

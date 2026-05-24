@@ -6,17 +6,15 @@ spec_file: "02-parameters.md"
 order: 2
 section: "Specification"
 normative: true
-source_commit: "1ce7230"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/1ce7230/spec/v4.1.0/02-parameters.md"
-generated_at: "2026-05-24T09:44:07.759Z"
+source_commit: "22574dd"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/22574dd/spec/v4.1.0/02-parameters.md"
+generated_at: "2026-05-24T18:45:14.019Z"
 generated_from: "spec/v4.1.0/02-parameters.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/02-parameters.md."
 ---
 
-# FlowMCP Specification v4.0.0 — Parameters
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is validated (`z`). Resource parameters use the same `position` + `z` system but without a `location` field. Skill input uses a simpler format.
 

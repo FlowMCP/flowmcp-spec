@@ -6,15 +6,13 @@ spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "1ce7230"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/1ce7230/spec/v4.1.0/21-schema-lifecycle.md"
-generated_at: "2026-05-24T09:44:07.759Z"
+source_commit: "22574dd"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/22574dd/spec/v4.1.0/21-schema-lifecycle.md"
+generated_at: "2026-05-24T18:45:14.019Z"
 generated_from: "spec/v4.1.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/21-schema-lifecycle.md."
 ---
-
-# FlowMCP Specification v4.0.0 — Schema Lifecycle
 
 **Version:** 4.0.0  
 **Status:** Active

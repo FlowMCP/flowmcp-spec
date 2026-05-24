@@ -18,9 +18,18 @@ import { execSync } from 'node:child_process'
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-const SPEC_DIR = join( REPO, 'spec/v4.1.0' )
+
+// Memo 059 PRD-008: spec version is read from package.json (single source of
+// truth) — no hardcoded value. Strict mode: fail loudly if missing.
+const PKG_PATH = join( REPO, 'package.json' )
+const { readFileSync } = await import( 'node:fs' )
+const PKG = JSON.parse( readFileSync( PKG_PATH, 'utf-8' ) )
+if( typeof PKG.version !== 'string' || PKG.version.length === 0 ) {
+    throw new Error( '[generate-docs-payload] package.json#version missing or empty' )
+}
+const SPEC_VERSION = PKG.version
+const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
-const SPEC_VERSION = '4.1.0'
 const GENERATOR = 'scripts/generate-docs-payload.mjs'
 
 
@@ -89,6 +98,16 @@ const rewriteCrossRefs = ( { content } ) => {
         /\bsee\s+(\d{2}-[a-z][a-z0-9-]*)\.md\b/g,
         ( match, slug ) => `see [${ slug }](./${ slug }.md)`
     )
+    // Memo 059 PRD-008 (D3 + D4): the docs site renders Starlight slugs
+    // (e.g. /specification/overview/) — a literal "./00-overview.md" relative
+    // link in the markdown would 404 in the browser. Rewrite the
+    // conformance-blockquote link to the actual rendered route AND deep-link
+    // to the Conformance Language heading so the user lands directly on the
+    // relevant section.
+    result = result.replace(
+        /\[00-overview\.md\]\(\.\/00-overview\.md\)\s+\(Conformance Language\)/g,
+        '[Conformance Language](/specification/overview/#conformance-language)'
+    )
     // Plain mentions like "13-resources.md" without context — leave as is
     // (the file resolves locally in docs-payload/)
     return result
@@ -139,10 +158,15 @@ const generateFile = async ( { filename, now, sourceCommit } ) => {
     const normative = !PROSAIC_FILES.has( filename )
 
     const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit } )
-    const body = rewriteCrossRefs( { content } )
+    const bodyRewritten = rewriteCrossRefs( { content } )
 
-    // Strip leading H1 because Astro typically renders title from frontmatter
-    // Keep it for now — the existing flow shows both, that's ok
+    // Memo 059 PRD-008 (D1 + D2 + D5): Strip the leading H1 — Starlight
+    // renders the page title from the frontmatter, so the body H1 was a
+    // duplicate that also carried a stale "v4.0.0" version string (D2).
+    // Removing it eliminates both the duplicated heading and the version
+    // inconsistency, and trims the "extra paragraph" feel under the header.
+    const body = bodyRewritten.replace( /^#\s+.+?\n+/, '' )
+
     const output = frontmatter + '\n' + body
 
     const targetPath = join( PAYLOAD_DIR, filename )

@@ -24,6 +24,66 @@ const MANIFEST_PATH = join( PAYLOAD_DIR, 'manifest.json' )
 const CHECKER = join( REPO, 'skills/spec-quality/evaluator-spec-rfc2119/check.mjs' )
 const SPEC_VERSION = '4.1.0'
 const GENERATOR = 'scripts/generate-manifest.mjs'
+const STATS_URL = 'https://raw.githubusercontent.com/FlowMCP/flowmcp-schemas-public/main/stats.json'
+const STATS_FETCH_TIMEOUT_MS = 10000
+const STATS_NULL_BLOCK = {
+    count_schemas: null,
+    count_unique_datasources: null,
+    count_tools: null,
+    count_resources: null,
+    count_skills: null,
+    timestamp: null,
+    schema_version: null,
+    build_hash: null
+}
+
+
+const fetchStats = async () => {
+    const controller = new AbortController()
+    const timer = setTimeout( () => controller.abort(), STATS_FETCH_TIMEOUT_MS )
+    try {
+        const response = await fetch( STATS_URL, { signal: controller.signal } )
+        if( !response.ok ) {
+            throw new Error( `HTTP ${ response.status }` )
+        }
+        const stats = await response.json()
+        return { stats, source: 'fetch' }
+    } catch( error ) {
+        console.warn( `Stats fetch failed: ${ error.message }` )
+        return { stats: null, source: 'fetch-failed' }
+    } finally {
+        clearTimeout( timer )
+    }
+}
+
+
+const readPreviousStats = async ( { manifestPath } ) => {
+    try {
+        const previous = JSON.parse( await readFile( manifestPath, 'utf-8' ) )
+        if( previous?.meta?.stats ) {
+            return previous.meta.stats
+        }
+        return null
+    } catch( error ) {
+        console.warn( `No previous manifest available: ${ error.message }` )
+        return null
+    }
+}
+
+
+const getStats = async ( { manifestPath } ) => {
+    const { stats: fetched } = await fetchStats()
+    if( fetched ) {
+        return fetched
+    }
+    const previous = await readPreviousStats( { manifestPath } )
+    if( previous ) {
+        console.warn( 'Stats fetch failed, using fallback from previous payload' )
+        return previous
+    }
+    console.warn( 'No stats available — using null placeholders' )
+    return STATS_NULL_BLOCK
+}
 
 
 const parseFrontmatter = ( { content } ) => {
@@ -167,6 +227,8 @@ const main = async () => {
         console.log( `  ✓ ${ filename } — grade ${ grade } (${ issues } issues)` )
     }
 
+    const schemaStats = await getStats( { manifestPath: MANIFEST_PATH } )
+
     const manifest = {
         spec_version: SPEC_VERSION,
         generated_at: now,
@@ -180,6 +242,9 @@ const main = async () => {
             normative_files: normativeCount,
             prose_files: proseCount,
             average_grade: gradeCount > 0 ? Number( ( totalGrade / gradeCount ).toFixed( 2 ) ) : null
+        },
+        meta: {
+            stats: schemaStats
         }
     }
 

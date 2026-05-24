@@ -1,6 +1,6 @@
 {
     "name": "flowmcp-spec",
-    "version": "2.0.0",
+    "version": "4.1.0",
     "description": "FlowMCP Specification — Deterministic Normalization Layer for AI Tool Orchestration",
     "author": "a6b8",
     "license": "MIT",
@@ -14,5 +14,12 @@
         "specification",
         "ai-tools",
         "normalization"
-    ]
+    ],
+    "scripts": {
+        "generate-refs": "node scripts/generate-refs.mjs",
+        "test:refs-regex": "node scripts/test-refs-regex.mjs"
+    },
+    "devDependencies": {
+        "ajv": "^8.20.0"
+    }
 }

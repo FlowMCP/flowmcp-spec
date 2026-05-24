@@ -1,0 +1,102 @@
+{
+    "schemaVersion": "refs/1.0.0",
+    "generated": {
+        "at": "2026-05-24T02:45:01.534Z",
+        "fromCommit": "0ee4802",
+        "generator": "scripts/generate-refs.mjs"
+    },
+    "spec": {
+        "currentVersion": "4.1.0",
+        "recommendedRelease": "v4.1.0",
+        "specDir": "spec/v4.1.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.1.0/spec/v4.1.0",
+        "llmsTxtUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt",
+        "miniSkillTemplate": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/data/mini-skill.template.md"
+    },
+    "imports": {
+        "cli": {
+            "github": "github:FlowMCP/flowmcp-cli#v4.1.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-cli#v4.1.0",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-cli/tree/v4.1.0"
+        },
+        "core": {
+            "github": "github:FlowMCP/flowmcp-core#v4.1.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-core#v4.1.0",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-core/tree/v4.1.0"
+        },
+        "schemasPublic": {
+            "github": "github:FlowMCP/flowmcp-schemas-public#main",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-schemas-public#main",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-schemas-public/tree/main"
+        },
+        "gtfsToolkit": {
+            "github": "github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0",
+            "browseUrl": "https://github.com/FlowMCP/gtfs-sqlite-toolkit/tree/v1.0.0"
+        }
+    },
+    "docs": {
+        "canonical": "https://flowmcp.github.io",
+        "entryPoints": {
+            "hackathon": "/quickstart/quickstart/",
+            "aiEngineer": "/specification/overview/",
+            "schemaMaintainer": "/specification/schema-format/",
+            "decisionMaker": "/about/for-decision-makers/"
+        }
+    },
+    "github": {
+        "organization": "https://github.com/flowmcp",
+        "specRepo": "https://github.com/FlowMCP/flowmcp-spec",
+        "sponsorsUrl": "https://github.com/sponsors/FlowMCP"
+    },
+    "llmsFiles": {
+        "indexUrl": "https://flowmcp.github.io/llms.txt",
+        "docsUrl": "https://flowmcp.github.io/docs-llms.txt",
+        "fullUrl": "https://flowmcp.github.io/llms-full.txt",
+        "specUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt"
+    },
+    "robotsTxt": {
+        "publishedLlmsFiles": [
+            "/llms.txt",
+            "/docs-llms.txt",
+            "/llms-full.txt"
+        ]
+    },
+    "addons": [
+        {
+            "name": "gtfs-sqlite-toolkit",
+            "import": "github:FlowMCP/gtfs-sqlite-toolkit",
+            "description": "Convert GTFS Schedule feeds to queryable SQLite"
+        }
+    ],
+    "validation": {
+        "passed": true,
+        "checks": [
+            {
+                "field": "spec.currentVersion",
+                "regex": "^4\\.\\d+\\.\\d+$",
+                "ok": true
+            },
+            {
+                "field": "imports.cli",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.core",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.schemasPublic",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.gtfsToolkit",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            }
+        ]
+    }
+}

@@ -17,6 +17,7 @@
     ],
     "scripts": {
         "generate-refs": "node scripts/generate-refs.mjs",
+        "sync-stats": "node scripts/sync-stats.mjs",
         "test:refs-regex": "node scripts/test-refs-regex.mjs",
         "test:e2e": "node scripts/test-e2e-pipeline.mjs"
     },

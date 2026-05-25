@@ -1,6 +1,6 @@
 # FlowMCP Specification
 
-![Version](https://img.shields.io/badge/version-4.0.0-blue) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Version](https://img.shields.io/badge/dynamic/json?label=version&query=$.version&url=https%3A%2F%2Fraw.githubusercontent.com%2FFlowMCP%2Fflowmcp-spec%2Fmain%2Fpackage.json&color=blue&prefix=v) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels: **CLI** (direct access) and **MCP/A2A Server** (for agents and MCP clients). This repository contains the specification documents and reference examples — no executable code.
 

@@ -1,0 +1,17 @@
+name: Lint Boilerplate
+
+# Caller for FlowMCP/.github reusable workflow check-boilerplate.yml.
+# Blocks PRs that introduce hardcoded Schema-/Tool-/Datenquellen numbers
+# in source files (Memo 060 Phase 8 PRD-026).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    uses: FlowMCP/.github/.github/workflows/check-boilerplate.yml@main
+    with:
+      whitelist-paths: "node_modules,dist,generated,archive,.template.md,.template.mdx,template.txt,stats.json,registry.json,manifest.json,schemas-snapshot.json,refs.json,spec/v2.0.0,spec/v3.0.0,.git,personas"

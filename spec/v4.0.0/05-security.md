@@ -101,16 +101,22 @@ The runtime maintains an allowlist of approved npm packages. Only packages on th
 
 ### Default Allowlist
 
-The following packages are built into `flowmcp-core` as approved:
+The following packages are built into `flowmcp-core` as approved (source of truth: `flowmcp-core/src/v2/task/LibraryLoader.mjs`, re-exported for v4):
 
 ```javascript
 const DEFAULT_ALLOWLIST = [
+    // Node.js built-ins
+    'zlib', 'crypto', 'buffer', 'path', 'url', 'util', 'stream', 'querystring',
+    // Blockchain / Web3
     'ethers',
-    'moment',
-    'indicatorts',
-    '@erc725/erc725.js',
-    'ccxt',
-    'axios'
+    // Trading / Finance
+    'ccxt', 'indicatorts', 'yahoo-finance2', 'trading-signals', 'talib', 'technicalindicators', 'moment',
+    // Visualization
+    'vega-lite', 'vega', 'canvas',
+    // Storage / IPFS
+    'pinata', 'irys',
+    // Database
+    'better-sqlite3'
 ]
 ```
 

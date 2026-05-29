@@ -6,9 +6,9 @@ spec_file: "20-validation-strategy.md"
 order: 20
 section: "Specification"
 normative: true
-source_commit: "07d4071"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/07d4071/spec/v4.1.0/20-validation-strategy.md"
-generated_at: "2026-05-25T03:02:46.785Z"
+source_commit: "dbbe036"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/20-validation-strategy.md"
+generated_at: "2026-05-29T13:35:54.422Z"
 generated_from: "spec/v4.1.0/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/20-validation-strategy.md."
@@ -24,6 +24,14 @@ edit_warning: "This file is auto-generated. Source: spec/v4.1.0/20-validation-st
 ## Overview
 
 FlowMCP v4.1.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+
+---
+
+## See also — Grading-Spec in `flowmcp-grading`
+
+A separate **Grading-Spec** (`gradingSpec/1.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.1.0 remains the highest instance.
+
+Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
 
 ---
 

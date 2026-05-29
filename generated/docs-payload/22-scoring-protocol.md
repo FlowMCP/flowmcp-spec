@@ -6,9 +6,9 @@ spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-source_commit: "07d4071"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/07d4071/spec/v4.1.0/22-scoring-protocol.md"
-generated_at: "2026-05-25T03:02:46.785Z"
+source_commit: "dbbe036"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/22-scoring-protocol.md"
+generated_at: "2026-05-29T13:35:54.422Z"
 generated_from: "spec/v4.1.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/22-scoring-protocol.md."
@@ -29,6 +29,14 @@ The scoring protocol decouples three concerns:
 3. **Grade calculation** — done deterministically by `flowmcp-core/v4/GradeReporter.grade`
 
 CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via JSON files (`prompts.json`, `scores.json`).
+
+---
+
+## See also — Grading-Spec in `flowmcp-grading`
+
+A separate **Grading-Spec** (`gradingSpec/1.0.0`) exists in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. It describes Single-Schema and Selection grading, Scoring System, Grading System, Veto, Tier, and skill families. The Schemas-Spec v4.1.0 remains the highest instance; the Scoring Protocol v1 defined in this file is **sub-consumed** by the Grading-Spec, not delegated to it.
+
+Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
 
 ---
 

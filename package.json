@@ -2,11 +2,19 @@
     "name": "flowmcp-spec",
     "version": "4.1.0",
     "description": "FlowMCP Specification — Deterministic Normalization Layer for AI Tool Orchestration",
+    "type": "module",
     "author": "a6b8",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/FlowMCP/flowmcp-spec.git"
+        "url": "git+https://github.com/FlowMCP/flowmcp-spec.git"
+    },
+    "bugs": {
+        "url": "https://github.com/FlowMCP/flowmcp-spec/issues"
+    },
+    "homepage": "https://github.com/FlowMCP/flowmcp-spec#readme",
+    "engines": {
+        "node": ">=22"
     },
     "keywords": [
         "flowmcp",

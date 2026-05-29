@@ -6,9 +6,9 @@ spec_file: "13-resources.md"
 order: 13
 section: "Specification"
 normative: true
-source_commit: "07d4071"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/07d4071/spec/v4.1.0/13-resources.md"
-generated_at: "2026-05-25T03:02:46.785Z"
+source_commit: "dbbe036"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/13-resources.md"
+generated_at: "2026-05-29T13:35:54.422Z"
 generated_from: "spec/v4.1.0/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.1.0/13-resources.md."
@@ -1231,6 +1231,12 @@ The following fields are part of the `main` export and therefore included in the
 | Database filename | kebab-case with namespace prefix | `^[a-z][a-z0-9-]*\.db$` | `tranco-ranking.db`, `ofacsdn-sanctions.db` |
 | Markdown filename | kebab-case with namespace prefix | `^[a-z][a-z0-9-]*\.md$` | `duneanalytics-sql-reference.md` |
 | Resource folder | `resources/` | Fixed | Not `data/` |
+
+### Reserved Route Name — `about`
+
+The Resource route name `about` is reserved as a namespace-level convention by the FlowMCP Grading Specification ([`flowmcp-grading` — `spec/1.0.0/11-about-convention.md`](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/11-about-convention.md)). A namespace MAY expose a `Resource.About` route; when it does, the resource is expected to follow the content contract defined in the Grading-Spec.
+
+This is a **forward-looking convention**, not a v4.1 validation rule. The Schemas-Spec does NOT enforce the reservation; conformant schemas MUST NOT use the route name `about` for a resource that is not an About Resource per the Grading-Spec contract. The binding content contract lives in the Grading-Spec.
 
 ---
 

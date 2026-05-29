@@ -13,6 +13,14 @@ FlowMCP v4.1.0 introduces a two-layer validation strategy: **deterministic** (st
 
 ---
 
+## See also — Grading-Spec in `flowmcp-grading`
+
+A separate **Grading-Spec** (`gradingSpec/1.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.1.0 remains the highest instance.
+
+Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
+
+---
+
 ## Grade System
 
 | Grade | Condition | Meaning |

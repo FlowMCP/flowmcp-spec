@@ -18,6 +18,14 @@ CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via J
 
 ---
 
+## See also — Grading-Spec in `flowmcp-grading`
+
+A separate **Grading-Spec** (`gradingSpec/1.0.0`) exists in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. It describes Single-Schema and Selection grading, Scoring System, Grading System, Veto, Tier, and skill families. The Schemas-Spec v4.1.0 remains the highest instance; the Scoring Protocol v1 defined in this file is **sub-consumed** by the Grading-Spec, not delegated to it.
+
+Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
+
+---
+
 ## Protocol Version
 
 `scoringProtocol: "v1"`

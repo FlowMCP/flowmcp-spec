@@ -1,5 +1,26 @@
 # Changelog
 
+## v4.1.1 — 2026-05-29 (additive — Memo 080 PRD-11)
+
+Additive release introducing two new schema-header fields that ride alongside the existing `version` field. Grading-System Iteration 2 requires deterministic schema identification across iterations.
+
+### Added
+
+- **`schemaVersion`** (required, semver pattern `\d+\.\d+\.\d+`). Schema-Content-Version. Decouples schema content evolution from the FlowMCP spec version. Initial value for all migrated schemas: `1.0.0`.
+- **`schemaHash`** (required, regex `[0-9a-f]{8}`). 8-character sha256-prefix of canonical-JSON-serialized schema (excluding the `schemaHash` field itself). Used as stable identifier in `grading-data/schemas/<namespace>/<hash>--v<X.Y.Z>.mjs` snapshots.
+
+### Migration
+
+- Migration script in `flowmcp-schemas-private`: `scripts/add-schema-version-field.mjs` (additive, idempotent, dry-run capable).
+- 406 production schemas in `schemas/v4.0.0/providers/` migrated. Skill-files under `<namespace>/skills/` excluded (no `main`/`schema` export, by design).
+- Verification: `tests/manual/check-schemas-have-schema-version.mjs` asserts 100 % coverage and recomputes hash to ensure consistency.
+
+### Bump-Rule
+
+- Same `schemaVersion` + different `schemaHash` = bump-rule violation (Memo 080 Kap 10, Z. 448). Detected by `BumpHelper.checkVersionHashConsistency` in `flowmcp-grading`.
+
+---
+
 ## v4.1.0 — 2026-05-24
 
 Additive, non-breaking release introducing the `sqlite-gtfs` resource source type, six new validation codes, the first FlowMCP add-on, and the `FLOWMCP_*` path variable family.

@@ -116,10 +116,10 @@ Selection of data sources SHOULD reflect this priority order. Commercial APIs wi
 
 ## 7. Verification
 
-The eligibility rules of §3–§6 are verified in the phases defined in [`04-phases-single.md`](./04-phases-single.md):
+The eligibility rules of §3–§6 are verified during the grading areas defined in [`04-phases-single.md`](./04-phases-single.md):
 
-- §3 (exclusion criteria) is enforced in P2 (analysis) — the endpoint list MUST already be eligibility-classified.
-- §4 (access classes) and §5 (splitting) are enforced in P2 and P3 (schema draft).
+- §3 (exclusion criteria) is enforced before the `single-test` area runs — the endpoint list MUST already be eligibility-classified.
+- §4 (access classes) and §5 (splitting) are reflected in the `single-test` and `tools-aggregate-schema` areas.
 - §6 (target audience) is a corpus-level guideline — verified by the maintainers, not by an automated grader.
 
 The detailed verification method belongs to the grader implementation and is out of scope for this chapter.
@@ -130,4 +130,4 @@ The detailed verification method belongs to the grader implementation and is out
 
 - [`00-overview.md`](./00-overview.md) — Conformance language.
 - [`01-default-journey.md`](./01-default-journey.md) — The maximalism principle operates within the eligibility boundary defined here.
-- [`04-phases-single.md`](./04-phases-single.md) — Verification phases P2/P3.
+- [`04-phases-single.md`](./04-phases-single.md) — `single-test` and `tools-aggregate-schema` grading areas.

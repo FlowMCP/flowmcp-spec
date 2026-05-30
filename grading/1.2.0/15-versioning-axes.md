@@ -1,95 +1,57 @@
-# 15 — Version Axes + Bump Tables (§10)
+# 15 — Versioning + Canonical Hash (§10)
 
 | Field | Value |
 |-------|-------|
-| Status | Normative — NEW in 1.1.0 |
-| Version | `gradingSpec/1.1.0` |
+| Status | Normative — restructured in 1.2.0 |
+| Version | `gradingSpec/1.2.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
 | Related | [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`19-folder-layout.md`](./19-folder-layout.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
 
-> **Spec:** `gradingSpec/1.1.0`
-> **Status:** stable (additive extension of 1.0.0)
-> **Changes vs. 1.0.0:** entirely new section §10 (version axes + bump tables + consistency check + canonical representation).
+> **Spec:** `gradingSpec/1.2.0`
+> **Status:** stable (structural break vs. 1.1.0)
+> **Changes vs. 1.1.0:** the SemVer bump tables are removed — versioning is timestamp-based, carried by the filename. The sha256-8 hash algorithm is kept but the hash is moved out of the source files into the filename and the derived `index.json`. The `schemaVersion` / `selectionVersion` snapshot fields are removed from the source.
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
 
 ---
 
-## §10 Version Axes
+## §10 Versioning + Canonical Hash
 
-### §10.1 Two Version Axes
+### §10.1 Timestamp Versioning
 
-`gradingSpec/1.1.0` introduces a **second version axis**. In `gradingSpec/1.0.0` there was only the `version` field (FlowMCP spec version). Schema content changes (e.g. adding a parameter, sharpening a description) now require their own version, independent of the FlowMCP spec version.
+Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in [`19-folder-layout.md`](./19-folder-layout.md) §17.3:
 
 ```
-FlowMCP schema/selection header
-├── version: '4.x.y'              ⟵ Spec version (frozen on major 4)
-└── schemaVersion: 'X.Y.Z'        ⟵ Schema version (free, semver)
-     or selectionVersion: 'X.Y.Z'
+<name>--<YYYY-MM-DDTHH-MM-SSZ>--<hash8>.<ext>
 ```
 
-| Axis | Field | Range | Meaning |
-|------|-------|-------|---------|
-| **Spec version** | `version` | `4.\d+.\d+` (major frozen) | FlowMCP spec |
-| **Schema version** | `schemaVersion` | `<major>.<minor>.<patch>` (semver, free) | Schema content |
-| **Selection version** | `selectionVersion` | `<major>.<minor>.<patch>` (semver, free) | Selection content |
+The timestamp comes **before** the hash, so a naive `sort().at(-1)` always yields the newest version. A content change writes a new file next to the old one; the old file is never overwritten and remains referenceable for historical gradings.
 
-**Historical background:** earlier schema generations carried two parallel fields (one for the schema, one for the spec); later generations dropped the schema field; v4.0.0 introduced "unified versioning". `gradingSpec/1.1.0` reintroduces the second axis.
+The only version key that stays inside the source is `version` (FlowMCP spec format, e.g. `'flowmcp/4.0.0'`), which is a FlowMCP-Spec mandatory field. The snapshot version keys `schemaVersion` and `selectionVersion` are **removed** from the source — the snapshot a grading was run against is identified by the filename timestamp plus hash and recorded (frozen) in `index.json.lockSnapshot` (see [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2).
 
-### §10.2 Bump Table `schemaVersion`
+| Field | Status | Location | Meaning |
+|-------|--------|----------|---------|
+| `version` | KEEP | source (`flowmcp/4.x.y`) | FlowMCP spec version (major frozen on 4) |
+| `schemaVersion` | REMOVED from source | filename timestamp + `index.json` | snapshot identity of a schema |
+| `selectionVersion` | REMOVED from source | filename timestamp + `index.json.lockSnapshot` | snapshot identity of a selection |
 
-Changes to schema content force a bump along this table (binding):
+### §10.2 Hash Out of Source (Neutrality)
 
-| Change type | Bump |
-|-------------|------|
-| Tool name changed | Major |
-| Tool removed | Major |
-| Tool added | Minor |
-| Tool description improved (semantic) | Minor |
-| Tool description stylistic only | Patch |
-| Parameter added (optional) | Minor |
-| Parameter added (required) | Major |
-| Parameter renamed | Major |
-| Parameter default changed | Minor |
-| Output field added | Minor |
-| Output field renamed/removed | Major |
-| `requiredServerParams` changed | Minor |
-| Comment/JSDoc update | Patch |
-| Whitespace/formatting | Patch |
-| Shared-List entry changed | Patch |
+The schema `.mjs` and the `selection.json` are **neutral**: they carry only logical names. The in-source keys `schemaHash`, `selectionHash`, and `aboutHash` are **removed** — they drifted on every edit, so the recorded value no longer matched the actual content.
 
-15 change types in total.
+The hash is still computed (see §10.3) but it lands only in the **filename** and in the derived **`index.json`** — never inside the source. The source stays clean; the binding stays traceable through the derived index.
 
-### §10.3 Bump Table `selectionVersion`
+Reference resolution by logical name (examples):
 
-Changes to selection content force a bump along this table (binding):
+- `resources.about.name: 'defillama-about.md'` → newest `…/resources/about/defillama-about--<ts>--<hash8>.md`
+- `members[].schemaId: 'defillama.prices'` → newest `…/prices/schema/prices--<ts>--<hash8>.mjs`
+- `skills: ['crypto-price-entry']` → newest `…/skills/crypto-price-entry/crypto-price-entry--<ts>--<hash8>.mjs`
 
-| Change type | Bump |
-|-------------|------|
-| Member removed | Major |
-| Persona list changed (semantic) | Major |
-| Member added | Minor |
-| Description changed (semantic) | Minor |
-| Skills list extended (within max 4) | Minor |
-| Description stylistic only | Patch |
-| Skill implementation changed | Patch |
+There is no flat `defillama-about.md` — only the versioned file. `resolveLatest` knows which one is newest.
 
-7 change types in total.
+### §10.3 Canonical Representation for the Hash
 
-### §10.4 Consistency Check
-
-> Same `schemaVersion` + different `schemaHash` = **bump-rule violation**. The toolchain (a diff-based bump helper) must alert the author to the required bump before the commit is allowed.
-
-The same applies to Selections: same `selectionVersion` + different `selectionHash` = bump-rule violation.
-
-| Check | Expectation | Consequence on violation |
-|-------|-------------|--------------------------|
-| `(schemaVersion, schemaHash)` consistency | same hash → same version; different hash → bump per table | Toolchain blocks the commit, proposes the bump level |
-| `(selectionVersion, selectionHash)` consistency | same | same |
-
-### §10.5 Canonical Representation for `schemaHash`
-
-`schemaHash` is computed by JSON stable-stringify (sorted keys, deterministic whitespace handling) over the schema object and hashed with sha256 (8 hex chars). Cross-reference: [`08-grading-model.md`](./08-grading-model.md) §3.X (mandatory field).
+The hash is computed by JSON stable-stringify (sorted keys, deterministic whitespace handling) over the object and hashed with sha256 (8 hex chars). The same procedure applies to `schemaHash` (schema object), `selectionHash` (selection object), `aboutHash` (About file bytes), and `namespaceHash` (namespace rollup payload). These values are recorded in the grading entry (see [`08-grading-model.md`](./08-grading-model.md) §3) and in `index.json` — not in the source.
 
 **Pseudo-algorithm:**
 
@@ -102,11 +64,11 @@ function computeSchemaHash( { schema } ) {
 }
 ```
 
-The same applies to `selectionHash` (selection object), `aboutHash` (About file bytes), and `namespaceHash` (namespace payload, see [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.4).
+Reference implementation: [`src/HashGenerator.mjs`](../../src/HashGenerator.mjs) (`computeSchemaHash` / `computeSelectionHash` / `computeNamespaceHash`). The algorithm is unchanged from 1.1.0; only the placement of the result changed (filename + `index.json`, never source).
 
-### §10.6 Cross-Refs
+### §10.4 Cross-Refs
 
-- Top-level mandatory fields (`schemaVersion`, `schemaHash`) → [`08-grading-model.md`](./08-grading-model.md) §3.X
-- Lockfile fields per member (`schemaVersion`, `schemaHash`, `gradingStatus`) → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2
-- Folder layout (`<schema-hash>--v<X.Y.Z>.mjs`) → [`19-folder-layout.md`](./19-folder-layout.md) §17.2
-- Flywheel — version bump in the iteration loop → [`18-flywheel-loop.md`](./18-flywheel-loop.md) §16
+- Hashes in the grading entry → [`08-grading-model.md`](./08-grading-model.md) §3
+- Per-member hash binding (frozen) → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2 (`index.json.lockSnapshot`)
+- Filename naming grammar → [`19-folder-layout.md`](./19-folder-layout.md) §17.3
+- Flywheel — new file in the iteration loop → [`18-flywheel-loop.md`](./18-flywheel-loop.md) §16

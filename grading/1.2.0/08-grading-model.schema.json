@@ -1,19 +1,19 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://flowmcp.org/spec/grading/1.1.0/grading-model.schema.json",
-    "title": "FlowMCP Grading Entry (gradingSpec/1.1.0)",
-    "description": "JSON-Schema for one grading entry as defined in the Grading-Spec chapter 08-grading-model.md. If gradingMode == 'partial', the gradings[] array may contain a subset; aggregateGrade MUST remain the value computed by the most recent 'full' grading.",
+    "$id": "https://flowmcp.org/spec/grading/1.2.0/grading-model.schema.json",
+    "title": "FlowMCP Grading Entry (gradingSpec/1.2.0)",
+    "description": "JSON-Schema for one grading entry as defined in the Grading-Spec chapter 08-grading-model.md. A grading entry targets exactly one Area (area const). If gradingMode == 'partial', the gradings[] array may contain a subset; aggregateGrade MUST remain the value computed by the most recent 'full' grading. schemaHash and aboutHash are derived (filename + index.json) and recorded on the grading entry; they are NOT part of the source schema.",
     "type": "object",
     "additionalProperties": false,
     "required": [
         "gradingId",
         "schemaId",
+        "area",
         "version",
-        "schemaVersion",
         "schemaHash",
         "gradingMode",
-        "aboutHash",
         "gradingTier",
+        "harness",
         "scoringSystem",
         "gradingSystem",
         "gradings",
@@ -25,32 +25,67 @@
         "gradingId": {
             "type": "string",
             "pattern": "^[a-f0-9]{8}--.+$",
-            "description": "Unique grading instance ID: <schemaHash>--<timestamp>. NEW in 1.1.0."
+            "description": "Unique grading instance ID: <schemaHash>--<timestamp>."
+        },
+        "area": {
+            "type": "string",
+            "enum": [
+                "single-test",
+                "tools-aggregate-schema",
+                "tools-aggregate-namespace",
+                "namespace-description",
+                "namespace-skills",
+                "about-namespace",
+                "about-selection",
+                "selection-skills-L1",
+                "selection-skills-L2",
+                "selection-skills-L3",
+                "selection-aggregate"
+            ],
+            "description": "The Area this entry grades. One of the 11 Areas. See 08-grading-model.md §5.1."
         },
         "version": {
             "type": "string",
-            "pattern": "^4\\.[0-9]+\\.[0-9]+$",
-            "description": "FlowMCP spec version (major frozen on 4). NEW in 1.1.0."
-        },
-        "schemaVersion": {
-            "type": "string",
-            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-            "description": "Schema content version (semver, free). NEW in 1.1.0. See 15-versioning-axes.md."
+            "pattern": "^flowmcp/4\\.[0-9]+\\.[0-9]+$",
+            "description": "FlowMCP spec version (major frozen on 4), e.g. flowmcp/4.0.0."
         },
         "schemaHash": {
             "type": "string",
             "pattern": "^[a-f0-9]{8}$",
-            "description": "Deterministic sha256-8 of canonical schema JSON. NEW in 1.1.0."
-        },
-        "gradingMode": {
-            "type": "string",
-            "enum": ["partial", "full"],
-            "description": "Grading mode. 'full' computes new aggregateGrade; 'partial' leaves aggregateGrade unchanged (last full value). NEW in 1.1.0."
+            "description": "Deterministic sha256-8 of canonical schema JSON. Derived; recorded on the grading entry and in index.json, NOT in the source schema. See 15-versioning-axes.md §10.2/§10.3."
         },
         "aboutHash": {
             "type": "string",
             "pattern": "^[a-f0-9]{8}$",
-            "description": "Sha256-8 hash of the about-page file (Namespace or Selection). NEW in 1.1.0. See 11-about-convention.md §19."
+            "description": "Sha256-8 hash of the about-page file (Namespace or Selection). Derived; recorded on the grading entry and in index.json, NOT in the source. See 11-about-convention.md §19."
+        },
+        "gradingMode": {
+            "type": "string",
+            "enum": ["partial", "full"],
+            "description": "Grading mode. 'full' computes new aggregateGrade; 'partial' leaves aggregateGrade unchanged (last full value)."
+        },
+        "harness": {
+            "type": "string",
+            "enum": ["claude-code"],
+            "description": "The harness that drove the non-deterministic evaluation. NEW in 1.2.0. Currently the only allowed value is claude-code."
+        },
+        "persona": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["basePersonaId", "lensId"],
+            "description": "Persona lens for persona-bound areas. NEW in 1.2.0. Required for persona-bound areas (see allOf below).",
+            "properties": {
+                "basePersonaId": {
+                    "type": "string",
+                    "enum": ["ai-engineer", "decision-maker", "hackathon-builder", "schema-maintainer"]
+                },
+                "lensId": { "type": "string", "minLength": 1 }
+            }
+        },
+        "skillId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Identifier of the graded skill instance. NEW in 1.2.0. Required for per-skill areas (see allOf below)."
         },
         "schemaId": {
             "type": "string",
@@ -81,12 +116,12 @@
         "gradings": {
             "type": "array",
             "minItems": 1,
-            "description": "Per-dimension grading entries.",
+            "description": "Per-question answers for this Area.",
             "items": {
                 "type": "object",
                 "additionalProperties": false,
                 "required": [
-                    "dimension",
+                    "questionId",
                     "score",
                     "weight",
                     "determinism",
@@ -94,38 +129,28 @@
                     "timestamp"
                 ],
                 "properties": {
-                    "dimension": {
+                    "questionId": {
                         "type": "string",
-                        "description": "Single-dimension (P1-P7) for single gradings OR Selection-dimension (S1-S4) for selection gradings. See $defs.singleDimension / $defs.selectionDimension. The two domains are disjoint.",
-                        "enum": [
-                            "whenToUse",
-                            "parameters",
-                            "apiAvailability",
-                            "personaUseCaseFit",
-                            "domainConformance",
-                            "tosMatch",
-                            "legalAssessment",
-                            "securityScore",
-                            "formattingCompliance",
-                            "outputSchemaConformance",
-                            "descriptionNeutrality",
-                            "completeness",
-                            "aboutConventionCompliance",
-                            "namespaceSkillValidity",
-                            "selectionSkillL1",
-                            "selectionSkillL2",
-                            "selectionSkillL3",
-                            "S1-Coverage",
-                            "S2-PersonaFit",
-                            "S3-SkillAdequacy",
-                            "S4-DomainDocAlignment"
-                        ]
+                        "pattern": "^Q-.+$",
+                        "description": "Identifier of the Area question being answered."
                     },
                     "score": {
                         "oneOf": [
                             { "type": "number", "minimum": 1.0, "maximum": 5.0 },
                             { "type": "string", "enum": ["pass", "fail", "stale", "n/a"] }
                         ]
+                    },
+                    "naReason": {
+                        "type": "string",
+                        "enum": [
+                            "not-applicable-to-tool-type",
+                            "requires-private-data",
+                            "blocked-by-precondition",
+                            "out-of-scope-resource",
+                            "out-of-scope-prompt",
+                            "out-of-scope-procedure"
+                        ],
+                        "description": "Closed-set reason, required when score is n/a. See 08-grading-model.md §5.3."
                     },
                     "weight": {
                         "type": "number",
@@ -208,6 +233,10 @@
                         "then": {
                             "required": ["llmModel"]
                         }
+                    },
+                    {
+                        "if": { "properties": { "score": { "const": "n/a" } } },
+                        "then": { "required": ["naReason"] }
                     }
                 ]
             }
@@ -306,52 +335,41 @@
         {
             "if": { "not": { "properties": { "categoricalVeto": { "type": "null" } } } },
             "then": { "properties": { "aggregateGrade": { "const": "REJECTED" } } }
-        }
-    ],
-    "$defs": {
-        "singleDimension": {
-            "description": "Single-Grading dimension (P1-P7, 17 total). Disjoint from selectionDimension. See spec/1.1.0/08-grading-model.md §5.1.1.",
-            "type": "string",
-            "enum": [
-                "whenToUse",
-                "parameters",
-                "apiAvailability",
-                "personaUseCaseFit",
-                "domainConformance",
-                "tosMatch",
-                "legalAssessment",
-                "securityScore",
-                "formattingCompliance",
-                "outputSchemaConformance",
-                "descriptionNeutrality",
-                "completeness",
-                "aboutConventionCompliance",
-                "namespaceSkillValidity",
-                "selectionSkillL1",
-                "selectionSkillL2",
-                "selectionSkillL3"
-            ]
         },
-        "selectionDimension": {
-            "description": "Selection-Grading dimension (S1-S4). Disjoint from singleDimension. See spec/1.1.0/08-grading-model.md §5.1.2. Concrete dimension structure (including L1/L2/L3 sub-scores) is finalised in the Selection-Validator implementation.",
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["dimension", "score"],
-            "properties": {
-                "dimension": {
-                    "type": "string",
-                    "enum": ["S1-Coverage", "S2-PersonaFit", "S3-SkillAdequacy", "S4-DomainDocAlignment"]
+        {
+            "if": {
+                "properties": {
+                    "area": {
+                        "enum": [
+                            "namespace-skills",
+                            "about-namespace",
+                            "about-selection",
+                            "selection-skills-L1",
+                            "selection-skills-L2",
+                            "selection-skills-L3",
+                            "selection-aggregate"
+                        ]
+                    }
                 },
-                "score": {
-                    "oneOf": [
-                        { "type": "number", "minimum": 1.0, "maximum": 5.0 },
-                        { "type": "string", "enum": ["pass", "fail", "stale", "n/a"] }
-                    ]
+                "required": ["area"]
+            },
+            "then": { "required": ["persona"] }
+        },
+        {
+            "if": {
+                "properties": {
+                    "area": {
+                        "enum": [
+                            "namespace-skills",
+                            "selection-skills-L1",
+                            "selection-skills-L2",
+                            "selection-skills-L3"
+                        ]
+                    }
                 },
-                "l1Score": { "type": "number", "minimum": 1.0, "maximum": 5.0 },
-                "l2Score": { "type": "number", "minimum": 1.0, "maximum": 5.0 },
-                "l3Score": { "type": "number", "minimum": 1.0, "maximum": 5.0 }
-            }
+                "required": ["area"]
+            },
+            "then": { "required": ["skillId"] }
         }
-    }
+    ]
 }

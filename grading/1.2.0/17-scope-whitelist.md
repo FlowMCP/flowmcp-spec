@@ -19,19 +19,21 @@
 
 ### §12.1 Scope Whitelist
 
-`gradingSpec/1.1.0` defines explicitly which FlowMCP constructs are covered by the grading system. Resources, Prompts, and Procedures are FlowMCP constructs without a clear grading methodology — they lie outside the current scope.
+This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by their dedicated areas). All other Resources, Prompts, and Procedures remain FlowMCP constructs without a clear grading methodology — they lie outside the current scope.
 
 | Element | Status | Rationale |
 |---------|--------|-----------|
 | **Tools** | In-Scope (primary) | Most measurable unit |
 | **Shared Lists** | In-Scope (secondary) | Best available |
-| Resources (local files) | Out-of-Scope (on-hold) | Not reproducible |
+| **`about` markdown resource** | In-Scope | The single gradable resource — carries the Domain-Knowledge; graded by the `about-namespace` and `about-selection` areas |
+| **Skills** (`type` namespace / selection / agent) | In-Scope | Graded per-skill by the `namespace-skills` and `selection-skills-L1/L2/L3` areas |
+| Resources other than `about` (local files) | Out-of-Scope (on-hold) | Not reproducible |
 | Resources (local SQLite) | Out-of-Scope (on-hold) | Private DB |
 | Resources (SQL in general) | Out-of-Scope (on-hold) | Connection complexity |
 | Prompts | Out-of-Scope (on-hold) | Unclear how to test |
 | Procedures | Out-of-Scope (on-hold) | Unclear how to test |
 
-Seven entries in total. Adding a new element to the whitelist is a `gradingSpec` bump.
+Nine entries in total. The `about` markdown resource and Skills are in-scope; all other Resources, Prompts, and Procedures remain on-hold. Adding a new element to the whitelist is a `gradingSpec` bump.
 
 ### §12.2 Public-only Principle
 
@@ -41,9 +43,9 @@ This principle is the consequence of [`02-eligibility.md`](./02-eligibility.md) 
 
 ### §12.3 Consequences
 
-- **Single phases are tool-centric** (matches the whitelist) — the 17 Single dimensions P1-P7 evaluate tool aspects (see [`08-grading-model.md`](./08-grading-model.md) §5.1.1)
-- **§5.1 checks tool aspects** (matches) — the Single dimensions are tool-centric and fit the whitelist
-- **Existing non-tool code is marked on-hold** — code audit
+- **Provider areas are tool-centric** (matches the whitelist) — the `single-test`, `tools-aggregate-schema`, and `tools-aggregate-namespace` areas evaluate tool aspects (see [`08-grading-model.md`](./08-grading-model.md) §5.1.1)
+- **Tool-aspect checks match the whitelist** — the provider-side tool areas are tool-centric and fit the whitelist
+- **Existing non-tool code that is not `about` or a Skill is marked on-hold** — code audit
 - **The `n/a` convention** (see [`08-grading-model.md`](./08-grading-model.md) §12) is the standard answer for out-of-scope fields of an otherwise valid schema (e.g. a schema has tools + resources — tools are graded, resources `n/a`)
 
 ### §12.4 Relationship to §3 (Exclusion Criteria) and §4 (Access Classes)
@@ -57,7 +59,7 @@ The two complement each other. A schema can satisfy §3/§4 perfectly and still 
 
 ### §12.5 Cross-Refs
 
-- Tool dimensions P1-P7 → [`08-grading-model.md`](./08-grading-model.md) §5.1.1
+- Tool-centric grading areas (`single-test`, `tools-aggregate-schema`, `tools-aggregate-namespace`) → [`08-grading-model.md`](./08-grading-model.md) §5.1.1
 - `n/a` pragma → [`08-grading-model.md`](./08-grading-model.md) §12
 - Eligibility (read focus, OAuth prohibition) → [`02-eligibility.md`](./02-eligibility.md) §3, §4
 - Target audience (public interfaces) → [`02-eligibility.md`](./02-eligibility.md) §6

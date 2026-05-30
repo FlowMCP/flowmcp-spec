@@ -1,8 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://flowmcp.org/grading/1.1.0/namespace.schema.json",
-    "title": "FlowMCP Grading Namespace Payload (gradingSpec 1.1.0)",
-    "description": "JSON-Schema for namespace.json as defined in spec/1.1.0/16-selection-lockfile.md §11.4. NEW in 1.1.0. NOTE: there is no namespaceVersion field by design — namespaceHash alone identifies the namespace state.",
+    "title": "FlowMCP Grading Namespace Payload (DEPRECATED in gradingSpec 1.2.0)",
+    "deprecated": true,
+    "description": "DEPRECATED in gradingSpec/1.2.0. The authored namespace.json is removed and folded into the derived index.json (see 16-selection-lockfile.md §11.5 and 19-folder-layout.md §17). Retained for historical reference only — new tooling MUST NOT validate against this schema.",
     "type": "object",
     "required": [
         "namespace",

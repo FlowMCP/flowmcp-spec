@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://flowmcp.org/spec/grading/1.1.0/16-selection-lockfile.schema.json",
+    "title": "FlowMCP Selection-Lockfile Annex Index (gradingSpec/1.1.0)",
+    "description": "Pointer/index document for the three sibling schemas of spec/1.1.0/16-selection-lockfile.md §11: selection.schema.json, selection.lock.schema.json, namespace.schema.json. Use the individual sibling files for actual validation.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "selection": {
+            "description": "Pointer to selection.schema.json (selection definition, §11.1).",
+            "$ref": "./selection.schema.json"
+        },
+        "lockfile": {
+            "description": "Pointer to selection.lock.schema.json (lockfile snapshot, §11.2).",
+            "$ref": "./selection.lock.schema.json"
+        },
+        "namespace": {
+            "description": "Pointer to namespace.schema.json (namespace payload, §11.4).",
+            "$ref": "./namespace.schema.json"
+        }
+    }
+}

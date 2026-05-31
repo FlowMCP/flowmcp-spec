@@ -6,9 +6,9 @@ spec_file: "15-catalog.md"
 order: 15
 section: "Specification"
 normative: true
-source_commit: "6152b7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/spec/v4.2.0/15-catalog.md"
-generated_at: "2026-05-31T16:18:50.290Z"
+source_commit: "4a4d7c2"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/spec/v4.2.0/15-catalog.md"
+generated_at: "2026-05-31T16:52:18.836Z"
 generated_from: "spec/v4.2.0/15-catalog.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/15-catalog.md."

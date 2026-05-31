@@ -6,9 +6,9 @@ spec_file: "04-phases-single.md"
 order: 4
 section: "Grading"
 normative: true
-source_commit: "6152b7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/grading/2.0.0/04-phases-single.md"
-generated_at: "2026-05-31T16:18:50.290Z"
+source_commit: "4a4d7c2"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/04-phases-single.md"
+generated_at: "2026-05-31T16:52:18.836Z"
 generated_from: "grading/2.0.0/04-phases-single.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/04-phases-single.md."

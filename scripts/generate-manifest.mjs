@@ -11,6 +11,7 @@
 
 
 import { readdir, readFile, writeFile } from 'node:fs/promises'
+import { readFileSync } from 'node:fs'
 import { spawn } from 'node:child_process'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -18,11 +19,12 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-const SPEC_DIR = join( REPO, 'spec/v4.1.0' )
+// Memo 086 PRD-01: version is the single source of truth in package.json (no hardcode)
+const SPEC_VERSION = JSON.parse( readFileSync( join( REPO, 'package.json' ), 'utf8' ) ).version
+const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const MANIFEST_PATH = join( PAYLOAD_DIR, 'manifest.json' )
 const CHECKER = join( REPO, 'skills/spec-quality/evaluator-spec-rfc2119/check.mjs' )
-const SPEC_VERSION = '4.1.0'
 const GENERATOR = 'scripts/generate-manifest.mjs'
 const STATS_URL = 'https://raw.githubusercontent.com/FlowMCP/flowmcp-schemas-public/main/stats.json'
 const STATS_FETCH_TIMEOUT_MS = 10000

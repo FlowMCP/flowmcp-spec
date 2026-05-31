@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.1.1 — 2026-05-29 (additive — Memo 080 PRD-11)
+## v4.1.1 — 2026-05-29 (additive)
 
 Additive release introducing two new schema-header fields that ride alongside the existing `version` field. Grading-System Iteration 2 requires deterministic schema identification across iterations.
 
@@ -17,7 +17,7 @@ Additive release introducing two new schema-header fields that ride alongside th
 
 ### Bump-Rule
 
-- Same `schemaVersion` + different `schemaHash` = bump-rule violation (Memo 080 Kap 10, Z. 448). Detected by `BumpHelper.checkVersionHashConsistency` in `flowmcp-grading`.
+- Same `schemaVersion` + different `schemaHash` = bump-rule violation (bump rules defined in the grading specification). Detected by `BumpHelper.checkVersionHashConsistency` in `flowmcp-grading`.
 
 ---
 

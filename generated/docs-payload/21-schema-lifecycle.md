@@ -1,21 +1,20 @@
 ---
 title: "Schema Lifecycle"
-description: "**Version:** 4.0.0"
+description: "Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas,..."
 spec_version: "4.2.0"
 spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/spec/v4.2.0/21-schema-lifecycle.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/spec/v4.2.0/21-schema-lifecycle.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "spec/v4.2.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/21-schema-lifecycle.md."
 ---
 
-**Version:** 4.0.0  
-**Status:** Active
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 ---
 

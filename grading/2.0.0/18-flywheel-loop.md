@@ -11,7 +11,7 @@
 
 ---
 
-## 1. The Flywheel as an IN/OUT Round-Trip
+## The Flywheel as an IN/OUT Round-Trip
 
 The grading process is a **round-trip** between the source repository and the workbench:
 
@@ -23,7 +23,7 @@ The pattern is self-reinforcing: every improvement raises the aggregate quality 
 
 ---
 
-## 2. Mermaid Diagram
+## Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -52,13 +52,13 @@ flowchart TD
 
 ---
 
-## 3. Reading Direction
+## Reading Direction
 
 **Reading direction:** top-down (`flowchart TD`) follows the iteration flow. The pre-condition gate and the `stable` back-reference make the flywheel effect visible: every new `stable` provider-side grade opens the door for selection-side grading, and every selection run identifies the weakest schemas in the namespace.
 
 ---
 
-## 4. Reference Fields per Node
+## Reference Fields per Node
 
 | Node | Reference |
 |------|-----------|
@@ -67,12 +67,12 @@ flowchart TD
 | SINGLE / SGRADE | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md) — Area `_gradings/` placement |
 | IDXN / IDXS | [`19-folder-layout.md`](./19-folder-layout.md) — the `index.json` rollup (live rollup + frozen lockSnapshot, 5-status) |
 | GATE | [`21-pre-conditions.md`](./21-pre-conditions.md) — pre-conditions (only `stable` members pass) |
-| STABLE / PART | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8 — partial vs. full and the five node statuses |
+| STABLE / PART | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — partial vs. full and the five node statuses |
 | ABOUT | [`11-about-convention.md`](./11-about-convention.md) — About as a schema Resource |
 
 ---
 
-## 5. Self-Reinforcing Effect
+## Self-Reinforcing Effect
 
 The flywheel is self-reinforcing along three loops:
 
@@ -82,20 +82,20 @@ The flywheel is self-reinforcing along three loops:
 
 ---
 
-## 6. Anti-Patterns
+## Anti-Patterns
 
 The following patterns break the flywheel and are excluded by the spec:
 
-- **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2).
+- **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)).
 - **Schema edit without a new snapshot**: a source edit MUST produce a new versioned snapshot file; editing in place breaks the latest-resolution and the hash binding (see [`19-folder-layout.md`](./19-folder-layout.md)).
 - **Selection grading with non-`stable` members**: the pre-condition (see [`21-pre-conditions.md`](./21-pre-conditions.md)) blocks the selection run before any Area runs.
 
 ---
 
-## 7. Cross-References
+## Cross-References
 
 - Round-trip and folder layout → [`19-folder-layout.md`](./19-folder-layout.md)
-- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8
+- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)
 - Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md)
 - Provider-side Areas → [`04-phases-single.md`](./04-phases-single.md)
 - Selection-side Areas → [`05-phases-selection.md`](./05-phases-selection.md)

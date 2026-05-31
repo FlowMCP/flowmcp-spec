@@ -1,23 +1,20 @@
 ---
 title: "Prefill and Placeholders"
-description: "**Version:** FlowMCP 4.2.0"
+description: "**Placeholders** are template tokens embedded in Skill content that are resolved at runtime. **Prefill** is a mechanism to pre-execute a tool and embed its result into the Skill before delivery."
 spec_version: "4.2.0"
 spec_file: "18-prefill.md"
 order: 18
 section: "Specification"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/spec/v4.2.0/18-prefill.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/spec/v4.2.0/18-prefill.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "spec/v4.2.0/18-prefill.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/18-prefill.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-**Version:** FlowMCP 4.2.0  
-**Status:** Active
 
 ---
 

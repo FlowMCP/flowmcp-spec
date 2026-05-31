@@ -6,32 +6,25 @@ spec_file: "25-harness-and-goal.md"
 order: 25
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/25-harness-and-goal.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/25-harness-and-goal.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/25-harness-and-goal.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/25-harness-and-goal.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative |
-| Version | `gradingSpec/2.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | [`20-entry-point-prompt.md`](./20-entry-point-prompt.md), [`23-index-json.md`](./23-index-json.md), [`24-selection-aggregate.md`](./24-selection-aggregate.md) |
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
 
 ---
 
-## 1. The Harness
+## The Harness
 
 Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with a fresh, empty context, read-only tools, a single pass, and strict-JSON output. Deterministic answers come from code and are merged with the sub-agent answers into one area output.
 
 ---
 
-## 2. `/goal`
+## `/goal`
 
 `/goal` sets a completion condition. The agent then works turn by turn, autonomously, until the condition is satisfied. A **small, fast evaluator model** confirms the condition. The completion condition is at most 4000 characters and can be bounded with "or stop after N turns".
 
@@ -41,7 +34,7 @@ The `/goal` documentation is at `https://code.claude.com/docs/en/goal`. Headless
 
 ---
 
-## 3. The Surfacing Convention (mandatory)
+## The Surfacing Convention (mandatory)
 
 Because the evaluator sees only the transcript, the grading loop **MUST surface its progress and end-state into the transcript**. Writing silently to disk is not enough for `/goal` — the evaluator cannot see disk. This surfacing convention is how the data is moved into view, and it is mandatory.
 
@@ -58,7 +51,7 @@ A `schema-valid=✓` marker confirms the area output validated against its outpu
 
 ---
 
-## 4. Outer Goal Loop and Inner Micro-Loop
+## Outer Goal Loop and Inner Micro-Loop
 
 Two nested loops:
 
@@ -67,13 +60,13 @@ Two nested loops:
 
 ---
 
-## 5. Idempotent Turns
+## Idempotent Turns
 
-Because `/goal` restarts each turn from scratch, every turn MUST be **idempotent**. State lives in files (`state.json` plus the `_gradings/` folders, rolled up in [`index.json`](./23-index-json.md)). Each turn reads the state, picks the **next ungraded area**, grades it, surfaces the result, and writes state. No turn may depend on in-memory state from a previous turn.
+Because `/goal` restarts each turn from scratch, every turn MUST be **idempotent**. State lives in files (`state.json` plus the `_gradings/` folders, rolled up in [`index.json`](/grading/index-json/)). Each turn reads the state, picks the **next ungraded area**, grades it, surfaces the result, and writes state. No turn may depend on in-memory state from a previous turn.
 
 ---
 
-## 6. Harness-Agnostic Artifacts
+## Harness-Agnostic Artifacts
 
 The same artifacts (`state.json`, `_gradings/`, area output schemas, the surfacing lines) are driven by different drivers; only the driver changes:
 
@@ -83,13 +76,19 @@ The same artifacts (`state.json`, `_gradings/`, area output schemas, the surfaci
 | `claude -p "/goal …"` + script stop-hook | Headless / CI; the stop-hook deterministically checks the `_gradings/` folders so the run does not rely on the transcript-only evaluator alone. |
 | `FleetRunner.skillInvoker` callback | Programmatic seam; `FleetRunner` makes no LLM calls itself — it invokes the skill via the callback. |
 
-The prompt builder appends a **Goal-Block** (a fitting completion condition plus the surfacing convention) to the area prompt. The entry-point prompt ([`20-entry-point-prompt.md`](./20-entry-point-prompt.md)) MAY reference this Goal-Block.
+The prompt builder appends a **Goal-Block** (a fitting completion condition plus the surfacing convention) to the area prompt. The entry-point prompt ([`20-entry-point-prompt.md`](/grading/entry-point-prompt/)) MAY reference this Goal-Block.
 
 ---
 
 ## Cross-References
 
-- Grading envelope and `harness` field: [`08-grading-model.md`](./08-grading-model.md)
-- Entry-point prompt (Goal-Block reference): [`20-entry-point-prompt.md`](./20-entry-point-prompt.md)
-- State rollup the turns read/write: [`23-index-json.md`](./23-index-json.md)
+- Grading envelope and `harness` field: [`08-grading-model.md`](/grading/grading-model/)
+- Entry-point prompt (Goal-Block reference): [`20-entry-point-prompt.md`](/grading/entry-point-prompt/)
+- State rollup the turns read/write: [`23-index-json.md`](/grading/index-json/)
 - `/goal` documentation: `https://code.claude.com/docs/en/goal`
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/)
+- **Related:** [`20-entry-point-prompt.md`](/grading/entry-point-prompt/), [`23-index-json.md`](/grading/index-json/), [`24-selection-aggregate.md`](/grading/selection-aggregate/)
+

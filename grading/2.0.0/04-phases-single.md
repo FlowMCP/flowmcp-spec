@@ -11,7 +11,7 @@
 
 ---
 
-## 1. Introduction
+## Introduction
 
 This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model of earlier spec versions with an **Area model**: each Area is a self-contained grading rubric attached to the primitive it evaluates, written to a `_gradings/` folder next to that primitive (see [`19-folder-layout.md`](./19-folder-layout.md)).
 
@@ -21,7 +21,7 @@ A schema graded only on the provider side has `gradingTier = autonomous`. Per [`
 
 ---
 
-## 2. The Provider-Side Areas
+## The Provider-Side Areas
 
 The grading system defines **eleven Areas** in total (see [`05-phases-selection.md`](./05-phases-selection.md) and [`19-folder-layout.md`](./19-folder-layout.md)). Of these, the following **six** are provider-side (everything except the selection Areas):
 
@@ -36,15 +36,15 @@ The grading system defines **eleven Areas** in total (see [`05-phases-selection.
 
 The remaining five Areas (`about-selection`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3`, `selection-aggregate`) are selection-side and live in [`05-phases-selection.md`](./05-phases-selection.md).
 
-Each Area is graded **independently**. There is no fixed linear order between Areas; the only ordering obligations are the **cascade and veto procedures** (§3) and the deterministic-first rule of [`06-determinism-and-tier.md`](./06-determinism-and-tier.md).
+Each Area is graded **independently**. There is no fixed linear order between Areas; the only ordering obligations are the **cascade and veto procedures** (see [Area Procedures](#area-procedures)) and the deterministic-first rule of [`06-determinism-and-tier.md`](./06-determinism-and-tier.md).
 
 ---
 
-## 3. Area Procedures
+## Area Procedures
 
 The Area model retains four procedures that previously lived inside the phase model. They are now expressed as **rules that apply across the provider-side Areas**.
 
-### 3.1 Description Cascade (within `single-test` and `tools-aggregate-*`)
+### Description Cascade (within `single-test` and `tools-aggregate-*`)
 
 The description cascade is a **mandatory ordered procedure** for validating tool descriptions. It MUST be executed in the following order; skipping or reordering steps is a finding.
 
@@ -52,11 +52,11 @@ The description cascade is a **mandatory ordered procedure** for validating tool
 2. **Check the responses** and validate the tool description against the actual responses.
 3. **Normalise / update the tool description** to match the validated responses.
 4. **All tools, resources, and prompts MUST have descriptions** — and each description MUST be individually checked.
-5. **Descriptions MUST be neutral** — see §4.
+5. **Descriptions MUST be neutral** — see [Description Neutrality](#description-neutrality-cross-cutting).
 
 The cascade is a contract: outputs of step *n* are inputs of step *n+1*. A failure in any step halts the cascade for the affected tool and is recorded as a finding. `single-test` carries the per-tool cascade result; `tools-aggregate-schema` and `tools-aggregate-namespace` aggregate the per-tool cascade outcomes.
 
-### 3.2 Description Neutrality (cross-cutting)
+### Description Neutrality (cross-cutting)
 
 The neutrality rule (cascade step 5) is normative and worth restating:
 
@@ -66,17 +66,17 @@ The neutrality rule (cascade step 5) is normative and worth restating:
 
 This separation is essential for LLM-grader reproducibility: neutral descriptions can be deterministically compared to the observed API behaviour; mixed descriptions cannot.
 
-### 3.3 Cascade Stop / Veto (cross-cutting)
+### Cascade Stop / Veto (cross-cutting)
 
 A failed gate **MUST halt the dependent grading** for the affected schema. A categorical veto raised in any Area **MUST stop** further grading for that schema. Examples:
 
 - **`api-key-domain-mismatch` veto** — when the API key declared in the schema metadata does not match the API root domain, the veto is raised and the `single-test` live tests for the affected tools MUST NOT be treated as pass.
-- **HTTP 4xx** — when a tool returns HTTP 4xx (including 401/403), the response MUST NOT be treated as "auth-pass" (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5). The description cascade for that tool **cannot be completed** and is recorded as a finding.
-- **Eligibility violation** — when an endpoint fails an exclusion criterion under [`02-eligibility.md`](./02-eligibility.md) §3 and the schema author insists on including it, the schema is rejected and dependent Areas do not run for it.
+- **HTTP 4xx** — when a tool returns HTTP 4xx (including 401/403), the response MUST NOT be treated as "auth-pass" (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)). The description cascade for that tool **cannot be completed** and is recorded as a finding.
+- **Eligibility violation** — when an endpoint fails an exclusion criterion under [`02-eligibility.md`](./02-eligibility.md) and the schema author insists on including it, the schema is rejected and dependent Areas do not run for it.
 
-Cascade-stop events are recorded in the grading entry. They do not lower the grade silently — a categorical veto replaces the aggregate grade with `REJECTED`, which the index derivation maps to the terminal status `rejected` (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §6 and [`19-folder-layout.md`](./19-folder-layout.md)).
+Cascade-stop events are recorded in the grading entry. They do not lower the grade silently — a categorical veto replaces the aggregate grade with `REJECTED`, which the index derivation maps to the terminal status `rejected` (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) and [`19-folder-layout.md`](./19-folder-layout.md)).
 
-### 3.4 Base Unit (cross-cutting)
+### Base Unit (cross-cutting)
 
 When the provider-side Areas are complete, the artefact set is the **base unit** of the corpus:
 
@@ -89,7 +89,7 @@ The provider-side grade is **closed** at this point. Selection-side grading (see
 
 ---
 
-## 4. About as a Schema Resource
+## About as a Schema Resource
 
 The About Resource is graded by the `about-namespace` Area. It is a **markdown Resource declared in one schema** of the namespace (`main.resources`), stored under `providers/<ns>/<schema>/resources/about/`, **not** a namespace route. The full content contract and the deterministic / non-deterministic split are defined in [`11-about-convention.md`](./11-about-convention.md).
 
@@ -97,13 +97,13 @@ A Resource technically never lives at namespace level — there is no namespace 
 
 ---
 
-## 5. Tier
+## Tier
 
 The provider-side Areas produce `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the maximum attainable grade on `autonomous` is **B**. A schema that should be eligible for grade **A** must additionally be graded on the selection side (`group-bound`, see [`05-phases-selection.md`](./05-phases-selection.md)).
 
 ---
 
-## 6. Cross-References
+## Cross-References
 
 - [`01-default-journey.md`](./01-default-journey.md) — maximalism and the completeness contribution to `single-test` / `tools-aggregate-schema`.
 - [`02-eligibility.md`](./02-eligibility.md) — endpoint eligibility (input to schema authoring).

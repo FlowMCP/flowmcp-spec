@@ -150,6 +150,71 @@ const slugFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 087 PRD-P2-A: grading link rewrite. The grading source uses relative
+// sibling links "[text](./NN-name.md)" which 404 on the site (rendered at
+// /grading/<slug>/). GitHub-blob cross-refs into the sister spec resolve to the
+// in-site /specification/<slug>/ route. Anchors are preserved. Annex .json links
+// are left untouched (not rendered as pages).
+const gradingLinkRewrite = ( { content } ) => {
+    let result = content
+    result = result.replace(
+        /\]\(\.\/(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
+        ( match, fname, anchor ) => `](/grading/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
+    )
+    result = result.replace(
+        /\]\(https:\/\/github\.com\/FlowMCP\/flowmcp-spec\/blob\/[^)]*?\/spec\/v[\d.]+\/(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
+        ( match, fname, anchor ) => `](/specification/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
+    )
+    return result
+}
+
+
+// Memo 087 PRD-P2-B (F2): grading metadata footer. The grading source carries a
+// metadata table right after the H1 (Status/Version/Depends-on/Related/Annex)
+// plus a redundant "> **Spec/Status/Changes**" blockquote. F2: Status/Version
+// drop (all chapters are normative per the conformance note), Depends-on/Related/
+// Annex relocate to a "## Related" footer at the end (AI-navigation value kept).
+// The conformance-language blockquote stays. `normative` is derived upstream by
+// gradingNormativeFn (reads the table BEFORE this strip), so dropping it here is
+// safe. Spec pass uses the identity transform — its output is unchanged.
+const FOOTER_LABELS = new Set( [ 'depends on', 'related', 'annex', 'replaced by' ] )
+
+const gradingMetadataFooter = ( { content } ) => {
+    const tableMatch = content.match( /(^#\s+.+\n\n)((?:\|.*\n)+)/m )
+    if( !tableMatch ) return content
+
+    const tableText = tableMatch[ 2 ]
+    const rows = tableText
+        .split( '\n' )
+        .filter( ( line ) => line.trim().startsWith( '|' ) )
+        .map( ( line ) => line.split( '|' ).map( ( cell ) => cell.trim() ) )
+        .filter( ( cells ) => cells.length >= 4 )
+        .map( ( cells ) => ( { label: cells[ 1 ], value: cells[ 2 ] } ) )
+        .filter( ( row ) => row.label !== '' && !/^-+$/.test( row.label ) && row.label.toLowerCase() !== 'field' )
+
+    const footerRows = rows.filter( ( row ) => FOOTER_LABELS.has( row.label.toLowerCase() ) )
+    const footer = footerRows.length > 0
+        ? '\n\n## Related\n\n' + footerRows.map( ( row ) => `- **${ row.label }:** ${ row.value }` ).join( '\n' ) + '\n'
+        : ''
+
+    // Drop the metadata table, keeping the H1 + blank line.
+    let result = content.replace( tableMatch[ 0 ], tableMatch[ 1 ] )
+    // Drop the redundant "> **Spec/Status/Changes**" blockquote lines (keep the
+    // conformance-language blockquote, which has no leading bold key).
+    result = result.replace( /^>\s*\*\*(Spec|Status|Changes)[^\n]*\n/gm, '' )
+    // Collapse any blank-line runs left behind near the header.
+    result = result.replace( /\n{3,}/g, '\n\n' )
+
+    return result.replace( /\s*$/, '' ) + footer + '\n'
+}
+
+
+const gradingBodyTransform = ( { content } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+
+
+const identityBodyTransform = ( { content } ) => content
+
+
 const orderFromFilename = ( { filename } ) => {
     const match = filename.match( /^(\d+)-/ )
     return match ? parseInt( match[ 1 ], 10 ) : 999
@@ -164,7 +229,12 @@ const identityTitle = ( { title } ) => title
 
 const cleanGradingTitle = ( { title, filename } ) => {
     if( filename === '00-overview.md' ) return 'Overview'
-    return title.replace( /^\d+\s*[—–-]\s*/, '' ).trim()
+    // Memo 087 PRD-P2-D (F5=A): strip the "NN — " order prefix AND the trailing
+    // "(§NN)" section-sign suffix so grading titles read plain like the spec's.
+    return title
+        .replace( /^\d+\s*[—–-]\s*/, '' )
+        .replace( /\s*\(§\d+(?:\.\d+)*\)\s*$/, '' )
+        .trim()
 }
 
 
@@ -203,7 +273,7 @@ const buildFrontmatter = ( { filename, title, description, normative, now, sourc
 }
 
 
-const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn } ) => {
+const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } ) => {
     const sourcePath = join( sourceDir, filename )
     const content = await readFile( sourcePath, 'utf-8' )
 
@@ -215,12 +285,17 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
     const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } )
     const bodyRewritten = rewriteCrossRefs( { content } )
 
+    // Memo 087 PRD-P2-A/B: pass-specific body transform (grading relocates
+    // metadata to a footer + rewrites relative links to /grading/ routes; spec
+    // uses identity so its output stays byte-compatible).
+    const bodyTransformed = bodyTransform( { content: bodyRewritten, filename } )
+
     // Memo 059 PRD-008 (D1 + D2 + D5): Strip the leading H1 — Starlight
     // renders the page title from the frontmatter, so the body H1 was a
     // duplicate that also carried a stale "v4.0.0" version string (D2).
     // Removing it eliminates both the duplicated heading and the version
     // inconsistency, and trims the "extra paragraph" feel under the header.
-    const body = bodyRewritten.replace( /^#\s+.+?\n+/, '' )
+    const body = bodyTransformed.replace( /^#\s+.+?\n+/, '' )
 
     const output = frontmatter + '\n' + body
 
@@ -230,7 +305,7 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
 }
 
 
-const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit, titleTransform, normativeFn } ) => {
+const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit, titleTransform, normativeFn, bodyTransform } ) => {
     await mkdir( targetDir, { recursive: true } )
     const allFiles = await readdir( sourceDir )
     const docFiles = allFiles
@@ -240,7 +315,7 @@ const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, sectio
     console.log( `Generating ${ label } payload from ${ docFiles.length } files (version=${ version }, source_commit=${ sourceCommit })...` )
     const results = []
     for( const filename of docFiles ) {
-        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn } )
+        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } )
         results.push( result )
         console.log( `  ✓ ${ filename } → ${ result.title }` )
     }
@@ -276,7 +351,8 @@ const main = async () => {
         now,
         sourceCommit,
         titleTransform: identityTitle,
-        normativeFn: specNormativeFn
+        normativeFn: specNormativeFn,
+        bodyTransform: identityBodyTransform
     } )
 
     console.log( `\nGenerated ${ specResults.length } spec files in ${ PAYLOAD_DIR }` )
@@ -305,7 +381,8 @@ const main = async () => {
             now,
             sourceCommit,
             titleTransform: cleanGradingTitle,
-            normativeFn: gradingNormativeFn
+            normativeFn: gradingNormativeFn,
+            bodyTransform: gradingBodyTransform
         } )
         console.log( `\nGenerated ${ gradingResults.length } grading files in ${ GRADING_PAYLOAD_DIR } (grading_version=${ gradingVersion })` )
     } else {

@@ -11,13 +11,13 @@
 
 ---
 
-## 1. The Harness
+## The Harness
 
 Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with a fresh, empty context, read-only tools, a single pass, and strict-JSON output. Deterministic answers come from code and are merged with the sub-agent answers into one area output.
 
 ---
 
-## 2. `/goal`
+## `/goal`
 
 `/goal` sets a completion condition. The agent then works turn by turn, autonomously, until the condition is satisfied. A **small, fast evaluator model** confirms the condition. The completion condition is at most 4000 characters and can be bounded with "or stop after N turns".
 
@@ -27,7 +27,7 @@ The `/goal` documentation is at `https://code.claude.com/docs/en/goal`. Headless
 
 ---
 
-## 3. The Surfacing Convention (mandatory)
+## The Surfacing Convention (mandatory)
 
 Because the evaluator sees only the transcript, the grading loop **MUST surface its progress and end-state into the transcript**. Writing silently to disk is not enough for `/goal` — the evaluator cannot see disk. This surfacing convention is how the data is moved into view, and it is mandatory.
 
@@ -44,7 +44,7 @@ A `schema-valid=✓` marker confirms the area output validated against its outpu
 
 ---
 
-## 4. Outer Goal Loop and Inner Micro-Loop
+## Outer Goal Loop and Inner Micro-Loop
 
 Two nested loops:
 
@@ -53,13 +53,13 @@ Two nested loops:
 
 ---
 
-## 5. Idempotent Turns
+## Idempotent Turns
 
 Because `/goal` restarts each turn from scratch, every turn MUST be **idempotent**. State lives in files (`state.json` plus the `_gradings/` folders, rolled up in [`index.json`](./23-index-json.md)). Each turn reads the state, picks the **next ungraded area**, grades it, surfaces the result, and writes state. No turn may depend on in-memory state from a previous turn.
 
 ---
 
-## 6. Harness-Agnostic Artifacts
+## Harness-Agnostic Artifacts
 
 The same artifacts (`state.json`, `_gradings/`, area output schemas, the surfacing lines) are driven by different drivers; only the driver changes:
 

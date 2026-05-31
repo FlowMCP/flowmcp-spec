@@ -6,28 +6,21 @@ spec_file: "06-determinism-and-tier.md"
 order: 6
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/06-determinism-and-tier.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/06-determinism-and-tier.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/06-determinism-and-tier.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/06-determinism-and-tier.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative |
-| Version | `gradingSpec/2.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md) |
-| Related | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md), [`09-security-and-development.md`](./09-security-and-development.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
-## 1. Introduction — Two Orthogonal Axes
+## Introduction — Two Orthogonal Axes
 
-The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but autonomous. Both axes are carried independently in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](./08-grading-model.md)).
+The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but autonomous. Both axes are carried independently in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](/grading/grading-model/)).
 
 | Axis | Values | Effect |
 |------|--------|--------|
@@ -36,9 +29,9 @@ The Grading-Spec separates **reproducibility** (Determinism) from **attainabilit
 
 ---
 
-## 2. Axis 1 — Determinism
+## Axis 1 — Determinism
 
-### 2.1 `deterministic`
+### `deterministic`
 
 A dimension is **deterministic** when the score is **reproducible** given:
 
@@ -47,7 +40,7 @@ A dimension is **deterministic** when the score is **reproducible** given:
 
 Examples: schema structure (v4.2 field-shape check), HTTP status, route-name match, imports scan, API-key-domain match, lint.
 
-### 2.2 `non-deterministic`
+### `non-deterministic`
 
 A dimension is **non-deterministic** when the output depends on:
 
@@ -55,9 +48,9 @@ A dimension is **non-deterministic** when the output depends on:
 - the persona under which the evaluation runs, or
 - the group context (selection composition).
 
-For non-deterministic dimensions, the grading entry MUST record both `llmModel` and `selectionContext` (see [`08-grading-model.md`](./08-grading-model.md)).
+For non-deterministic dimensions, the grading entry MUST record both `llmModel` and `selectionContext` (see [`08-grading-model.md`](/grading/grading-model/)).
 
-### 2.3 Mixed Forms
+### Mixed Forms
 
 Some dimensions have **both deterministic and non-deterministic sub-parts**. The canonical example is the About Resource compliance: the route-exists check (is an About Resource declared and present?) is deterministic; the content judgement (is the About content meaningful?) is non-deterministic.
 
@@ -68,23 +61,23 @@ For mixed forms, implementers MAY:
 
 ---
 
-## 3. Axis 2 — Tier
+## Axis 2 — Tier
 
-### 3.1 `autonomous`
+### `autonomous`
 
-The dimension is graded by an **autonomous grader** on the provider side ([`04-phases-single.md`](./04-phases-single.md)) **without group context**. The maximum attainable grade for an aggregate composed exclusively of `autonomous` dimensions is **B**.
+The dimension is graded by an **autonomous grader** on the provider side ([`04-phases-single.md`](/grading/phases-single/)) **without group context**. The maximum attainable grade for an aggregate composed exclusively of `autonomous` dimensions is **B**.
 
-### 3.2 `group-bound`
+### `group-bound`
 
-The dimension is graded by a **group- or persona-bound grader** on the selection side ([`05-phases-selection.md`](./05-phases-selection.md)). Grade **A** is reachable only when the aggregate contains at least one `group-bound` contribution.
+The dimension is graded by a **group- or persona-bound grader** on the selection side ([`05-phases-selection.md`](/grading/phases-selection/)). Grade **A** is reachable only when the aggregate contains at least one `group-bound` contribution.
 
-### 3.3 Consumer Visibility
+### Consumer Visibility
 
-The grading model ([`08-grading-model.md`](./08-grading-model.md)) exposes a `maxAttainableGrade` field. This field makes it visible to a consumer that — for a schema graded only on the provider side — a **higher grade is reachable** by adding the schema's namespace to a selection and running the selection-side Areas.
+The grading model ([`08-grading-model.md`](/grading/grading-model/)) exposes a `maxAttainableGrade` field. This field makes it visible to a consumer that — for a schema graded only on the provider side — a **higher grade is reachable** by adding the schema's namespace to a selection and running the selection-side Areas.
 
 ---
 
-## 4. Dimension–Area Matrix
+## Dimension–Area Matrix
 
 The following table is the **non-exhaustive but canonical** mapping of grading dimensions to the two axes. Each row carries the dimension name, its determinism value, its tier, and the **Area** that writes it.
 
@@ -107,42 +100,42 @@ A dimension that does not appear in this matrix MUST be added (and its axes decl
 
 ---
 
-## 5. Binding Rules
+## Binding Rules
 
 The following four rules are **binding** for every grader, scorer, and aggregator that conforms to this spec.
 
-1. **HTTP 4xx MUST NOT be treated as "auth-pass".** HTTP 4xx — including 401 and 403 — MUST NOT be scored as pass. **200 is pass; everything else is fail or defect.** (See [`04-phases-single.md`](./04-phases-single.md) §3.3.)
+1. **HTTP 4xx MUST NOT be treated as "auth-pass".** HTTP 4xx — including 401 and 403 — MUST NOT be scored as pass. **200 is pass; everything else is fail or defect.** (See [`04-phases-single.md`](/grading/phases-single/).)
 2. **A schema MUST run all applicable deterministic tests.** Selective skipping is forbidden. If a deterministic test is applicable to a schema, the grader MUST execute it; the result MAY be `n/a` only when the test is provably non-applicable (e.g. a jq-pipe check on a schema without output).
 3. **`aggregateGrade ≥ B` SHOULD contain at least one LLM-based (non-deterministic) evaluation.** A schema graded exclusively on deterministic dimensions can reach grade B, but the Grading-Spec recommends that at least one LLM verification be present at grade B and above.
 4. **`aggregateGrade ≥ A` MUST contain at least one `group-bound` evaluation.** Grade A is **not autonomously reachable**. A schema graded only on the provider side (`tier = autonomous` throughout) cannot be assigned grade A.
 
 ---
 
-## 6. Interaction with Veto
+## Interaction with Veto
 
-The categorical Veto (see [`09-security-and-development.md`](./09-security-and-development.md)) can be raised on **either tier**. Veto-driven gates halt dependent Areas regardless of tier — see the cascade-stop rule in [`04-phases-single.md`](./04-phases-single.md) §3.3 and the analogous rule in [`05-phases-selection.md`](./05-phases-selection.md) §5.
+The categorical Veto (see [`09-security-and-development.md`](/grading/security-and-development/)) can be raised on **either tier**. Veto-driven gates halt dependent Areas regardless of tier — see the cascade-stop rule in [`04-phases-single.md`](/grading/phases-single/) and the analogous rule in [`05-phases-selection.md`](/grading/phases-selection/).
 
-A Veto is an outcome of its own; it does not reduce a numerical score, it replaces the aggregate grade with `REJECTED`. The index derivation maps `REJECTED` to the terminal node status `rejected` (see [`19-folder-layout.md`](./19-folder-layout.md)).
+A Veto is an outcome of its own; it does not reduce a numerical score, it replaces the aggregate grade with `REJECTED`. The index derivation maps `REJECTED` to the terminal node status `rejected` (see [`19-folder-layout.md`](/grading/folder-layout/)).
 
 ---
 
-## 7. Interaction with Scoring- / Grading-System Version
+## Interaction with Scoring- / Grading-System Version
 
 Determinism applies **at a fixed Scoring-System version**. A bump of the `scoringSystem/X.Y.Z` namespace can change how a deterministic test is scored — the test remains deterministic at the new version, but old scores cannot be compared one-to-one to new scores.
 
-When `scoringSystem` is bumped, schemas MUST be re-scored. Cached scores from older versions MUST NOT be silently aggregated with new scores. The version contract is described in detail in [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md).
+When `scoringSystem` is bumped, schemas MUST be re-scored. Cached scores from older versions MUST NOT be silently aggregated with new scores. The version contract is described in detail in [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/).
 
 The same applies to `gradingSystem/X.Y.Z` bumps: thresholds, weights, tier trims, and the Veto list MAY change; the mapping from scores to grades is therefore version-bound.
 
 ---
 
-## 8. Tier Trim and Partial Grading
+## Tier Trim and Partial Grading
 
-### 8.1 Tier Trim (Recap)
+### Tier Trim (Recap)
 
-`maxAttainableGrade` is a fixed mapping from `gradingTier` (see §3.3). An autonomous grading can reach grade `B` at most; a group-bound grading can reach grade `A`. Tier trim is the deterministic final stage of the aggregate computation (see [`08-grading-model.md`](./08-grading-model.md) §14 point 3).
+`maxAttainableGrade` is a fixed mapping from `gradingTier` (see [Consumer Visibility](#consumer-visibility)). An autonomous grading can reach grade `B` at most; a group-bound grading can reach grade `A`. Tier trim is the deterministic final stage of the aggregate computation (see [`08-grading-model.md`](/grading/grading-model/)).
 
-### 8.2 Partial vs. Full Grading and the `stable` Status
+### Partial vs. Full Grading and the `stable` Status
 
 A grading with `gradingMode: "partial"` updates only the explicitly checked Areas / dimensions in the grading set. The `aggregateGrade` **remains** at the value computed by the most recent `mode: "full"` operation. Promotion to the node status `stable` is possible only through a `mode: "full"` grading.
 
@@ -155,9 +148,9 @@ Rationale: partial gradings serve iteration steps (re-testing a single dimension
 
 **`aggregateGrade` remains** is the binding statement: a partial grading MUST NOT overwrite the previous aggregate. A pure collection of partials without a concluding full grading never reaches the status `stable`.
 
-### 8.3 The Five Node Statuses
+### The Five Node Statuses
 
-The node status of a graded primitive is one of **five** values, derived by the index rollup (see [`19-folder-layout.md`](./19-folder-layout.md)):
+The node status of a graded primitive is one of **five** values, derived by the index rollup (see [`19-folder-layout.md`](/grading/folder-layout/)):
 
 | Status | Meaning |
 |--------|---------|
@@ -167,21 +160,27 @@ The node status of a graded primitive is one of **five** values, derived by the 
 | `stable` | Fully graded via a `mode: "full"` operation and above threshold — ready for use; only this status passes the selection pre-condition. |
 | `rejected` | Veto raised — **terminal and irreversible**. |
 
-The `partial`/`full` distinction (§8.2) interacts directly with this status set: `partial` keeps the node at its last full status, only `full` can move a node to `stable`.
+The `partial`/`full` distinction (see [Partial vs. Full Grading and the `stable` Status](#partial-vs-full-grading-and-the-stable-status)) interacts directly with this status set: `partial` keeps the node at its last full status, only `full` can move a node to `stable`.
 
 Cross-Refs:
 
-- `gradingMode` as a top-level field → see [`08-grading-model.md`](./08-grading-model.md).
-- Node status in the index rollup and the frozen member snapshot → see [`19-folder-layout.md`](./19-folder-layout.md).
-- Iteration pattern → see [`18-flywheel-loop.md`](./18-flywheel-loop.md).
-- Pre-condition effect (only `stable` members pass) → see [`21-pre-conditions.md`](./21-pre-conditions.md).
+- `gradingMode` as a top-level field → see [`08-grading-model.md`](/grading/grading-model/).
+- Node status in the index rollup and the frozen member snapshot → see [`19-folder-layout.md`](/grading/folder-layout/).
+- Iteration pattern → see [`18-flywheel-loop.md`](/grading/flywheel-loop/).
+- Pre-condition effect (only `stable` members pass) → see [`21-pre-conditions.md`](/grading/pre-conditions/).
 
 ---
 
-## 9. Cross-References
+## Cross-References
 
-- [`04-phases-single.md`](./04-phases-single.md) — provider-side Areas (the cascade-stop and HTTP-4xx rule live here as well).
-- [`05-phases-selection.md`](./05-phases-selection.md) — selection-side Areas (the `group-bound` contributions enter here).
-- [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — versioning contract for `scoringSystem` and `gradingSystem`.
-- [`08-grading-model.md`](./08-grading-model.md) — defines `determinism`, `gradingTier`, and `maxAttainableGrade` as grading-entry fields.
-- [`09-security-and-development.md`](./09-security-and-development.md) — security dimensions (external-module audit, API-key-domain match) listed in §4.
+- [`04-phases-single.md`](/grading/phases-single/) — provider-side Areas (the cascade-stop and HTTP-4xx rule live here as well).
+- [`05-phases-selection.md`](/grading/phases-selection/) — selection-side Areas (the `group-bound` contributions enter here).
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — versioning contract for `scoringSystem` and `gradingSystem`.
+- [`08-grading-model.md`](/grading/grading-model/) — defines `determinism`, `gradingTier`, and `maxAttainableGrade` as grading-entry fields.
+- [`09-security-and-development.md`](/grading/security-and-development/) — security dimensions (external-module audit, API-key-domain match) listed in [Dimension–Area Matrix](#dimensionarea-matrix).
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/)
+- **Related:** [`04-phases-single.md`](/grading/phases-single/), [`05-phases-selection.md`](/grading/phases-selection/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/), [`08-grading-model.md`](/grading/grading-model/), [`09-security-and-development.md`](/grading/security-and-development/), [`18-flywheel-loop.md`](/grading/flywheel-loop/), [`21-pre-conditions.md`](/grading/pre-conditions/)
+

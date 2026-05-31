@@ -287,6 +287,29 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 
 ---
 
+## What Changed in v4.2.0
+
+The v4.2.0 release adds remote-data resources, a fifth primitive, and richer agent validation:
+
+- **HTTP Resources** — `source: 'http'` references remote files (typically SQLite databases) fetched via HTTPS and cached locally. Validated by RES024 (HTTPS required). See `13-resources.md`.
+- **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.
+- **Extended Agent rules** — `agent.selections` references MUST resolve to valid Selection IDs (AGT030). `elicitation.maxRounds` MUST be a positive integer (AGT031). See `06-agents.md`.
+
+---
+
+## What Changed in v4.0.0
+
+The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integration layer:
+
+- **Required `meta` block per Tool** — Every Tool MUST declare `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). Missing `meta` is a validation error.
+- **Skills as a scoped primitive** — `main.skills` is removed. Skills are namespace-, selection-, or agent-scoped instead. See `14-skills.md`.
+- **Enum / Shared List enforcement** — Enum values matching a Shared List MUST use `{{listName:alias}}` rather than hardcoded duplicates (VAL107).
+- **Unified spec version** — Skills and agents adopt `flowmcp/4.0.0` as the unified version identifier.
+
+The migration path from v3.0.0 to v4.0.0 is documented in `08-migration.md`.
+
+---
+
 ## What Changed in v3.1.0
 
 The v3.1.0 release enhances Resources and Prompts with production-ready features:

@@ -11,7 +11,7 @@
 
 ---
 
-## 1. Purpose
+## Purpose
 
 This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** as a contribution to the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)).
 
@@ -19,7 +19,7 @@ The default position is unambiguous: **more tools = better interoperability**. R
 
 ---
 
-## 2. Default Journey (binding)
+## Default Journey (binding)
 
 The **default entry point** for a gradable schema is the **documentation URL** of a publicly documented API. From that documentation, **1..n FlowMCP schemas** are derived which cover — as completely as possible — all endpoints admitted by the eligibility rules of [`02-eligibility.md`](./02-eligibility.md).
 
@@ -30,20 +30,20 @@ A documentation URL is **NOT** a mandatory entry point. Other entry paths — in
 
 ---
 
-## 3. Maximalism Principle (MUST)
+## Maximalism Principle (MUST)
 
 When the entry path is a documentation URL, the resulting schema (or schema set) **MUST be maximalist**: it MUST cover **all endpoints admitted by [`02-eligibility.md`](./02-eligibility.md)** (Chapter 3, eligibility rules).
 
 **Reduction rule (MUST):** A schema that implements **fewer tools than the documentation supports** MUST either
 
-1. carry an explicit, machine-readable justification per omitted endpoint, recorded in the grading JSON of the affected schema (e.g. "endpoint excluded under [`02-eligibility.md`](./02-eligibility.md) §3.2"), **or**
+1. carry an explicit, machine-readable justification per omitted endpoint, recorded in the grading JSON of the affected schema (e.g. "endpoint excluded under [`02-eligibility.md`](./02-eligibility.md) Exclusion Criteria"), **or**
 2. accept a proportional point deduction in the **completeness validation** of the `single-test` / `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)).
 
 No silent reduction. An omission without a justification recorded in the grading JSON is a finding.
 
 ---
 
-## 4. Default-Reversal (MUST be stated in the spec)
+## Default-Reversal (MUST be stated in the spec)
 
 The **default is reversed**: when in doubt, take **more tools**.
 
@@ -55,7 +55,7 @@ Implementers MUST treat this as the operational default. Reviewers and graders M
 
 ---
 
-## 5. Connection to Interoperability
+## Connection to Interoperability
 
 Maximalism follows directly from the **main focus interoperability** stated in [`00-overview.md`](./00-overview.md). Every omitted tool is one fewer potential connection between schemas. Predictive reduction — i.e. anticipating which endpoints "won't be useful" — is explicitly **discouraged**. Connect first, optimise later.
 
@@ -63,7 +63,7 @@ This is the **deep cause** for the maximalism principle: a schema that omits end
 
 ---
 
-## 6. Completeness Validation (Area contribution)
+## Completeness Validation (Area contribution)
 
 The **completeness validation** is a deterministic contribution graded in the `single-test` and `tools-aggregate-schema` Areas of [`04-phases-single.md`](./04-phases-single.md).
 
@@ -75,7 +75,7 @@ Gap reporting is mandatory; gap penalisation is conditional on the absence of an
 
 ---
 
-## 7. Cross-References
+## Cross-References
 
 - [`00-overview.md`](./00-overview.md) — Conformance language, interoperability as the main focus.
 - [`02-eligibility.md`](./02-eligibility.md) — Which endpoints are admitted (the maximalism boundary).

@@ -6,26 +6,19 @@ spec_file: "18-flywheel-loop.md"
 order: 18
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/18-flywheel-loop.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/18-flywheel-loop.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/18-flywheel-loop.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/18-flywheel-loop.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative |
-| Version | `gradingSpec/2.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
-| Related | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`11-about-convention.md`](./11-about-convention.md) |
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
-## 1. The Flywheel as an IN/OUT Round-Trip
+## The Flywheel as an IN/OUT Round-Trip
 
 The grading process is a **round-trip** between the source repository and the workbench:
 
@@ -37,7 +30,7 @@ The pattern is self-reinforcing: every improvement raises the aggregate quality 
 
 ---
 
-## 2. Mermaid Diagram
+## Mermaid Diagram
 
 ```mermaid
 flowchart TD
@@ -66,50 +59,56 @@ flowchart TD
 
 ---
 
-## 3. Reading Direction
+## Reading Direction
 
 **Reading direction:** top-down (`flowchart TD`) follows the iteration flow. The pre-condition gate and the `stable` back-reference make the flywheel effect visible: every new `stable` provider-side grade opens the door for selection-side grading, and every selection run identifies the weakest schemas in the namespace.
 
 ---
 
-## 4. Reference Fields per Node
+## Reference Fields per Node
 
 | Node | Reference |
 |------|-----------|
-| IMPORT / OUT | [`19-folder-layout.md`](./19-folder-layout.md) — the IN/OUT round-trip and folder layout |
-| NS / SCHEMA | [`04-phases-single.md`](./04-phases-single.md) — provider-side Areas; [`08-grading-model.md`](./08-grading-model.md) — data model |
-| SINGLE / SGRADE | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md) — Area `_gradings/` placement |
-| IDXN / IDXS | [`19-folder-layout.md`](./19-folder-layout.md) — the `index.json` rollup (live rollup + frozen lockSnapshot, 5-status) |
-| GATE | [`21-pre-conditions.md`](./21-pre-conditions.md) — pre-conditions (only `stable` members pass) |
-| STABLE / PART | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8 — partial vs. full and the five node statuses |
-| ABOUT | [`11-about-convention.md`](./11-about-convention.md) — About as a schema Resource |
+| IMPORT / OUT | [`19-folder-layout.md`](/grading/folder-layout/) — the IN/OUT round-trip and folder layout |
+| NS / SCHEMA | [`04-phases-single.md`](/grading/phases-single/) — provider-side Areas; [`08-grading-model.md`](/grading/grading-model/) — data model |
+| SINGLE / SGRADE | [`04-phases-single.md`](/grading/phases-single/), [`05-phases-selection.md`](/grading/phases-selection/) — Area `_gradings/` placement |
+| IDXN / IDXS | [`19-folder-layout.md`](/grading/folder-layout/) — the `index.json` rollup (live rollup + frozen lockSnapshot, 5-status) |
+| GATE | [`21-pre-conditions.md`](/grading/pre-conditions/) — pre-conditions (only `stable` members pass) |
+| STABLE / PART | [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — partial vs. full and the five node statuses |
+| ABOUT | [`11-about-convention.md`](/grading/about-convention/) — About as a schema Resource |
 
 ---
 
-## 5. Self-Reinforcing Effect
+## Self-Reinforcing Effect
 
 The flywheel is self-reinforcing along three loops:
 
-1. **Quality loop per schema**: SINGLE → CHECK → FIX → NEWSNAP → SCHEMA → SINGLE. Each iteration writes a new versioned snapshot (timestamp + hash in the file name); the next grading tests the improved schema variant. The hash binding lives in `index.json`, never in the source (see [`19-folder-layout.md`](./19-folder-layout.md)).
+1. **Quality loop per schema**: SINGLE → CHECK → FIX → NEWSNAP → SCHEMA → SINGLE. Each iteration writes a new versioned snapshot (timestamp + hash in the file name); the next grading tests the improved schema variant. The hash binding lives in `index.json`, never in the source (see [`19-folder-layout.md`](/grading/folder-layout/)).
 2. **Aggregation loop per selection**: SGRADE → (on member change) GATE → SGRADE. Every re-grading of a member updates the namespace `index.json`; the selection's frozen `lockSnapshot` is refreshed at the next selection-grading start.
 3. **About-verification loop**: ABOUT (route-exists + content check) → on change a new About snapshot → re-check; the namespace `index.json` records the new About grade.
 
 ---
 
-## 6. Anti-Patterns
+## Anti-Patterns
 
 The following patterns break the flywheel and are excluded by the spec:
 
-- **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2).
-- **Schema edit without a new snapshot**: a source edit MUST produce a new versioned snapshot file; editing in place breaks the latest-resolution and the hash binding (see [`19-folder-layout.md`](./19-folder-layout.md)).
-- **Selection grading with non-`stable` members**: the pre-condition (see [`21-pre-conditions.md`](./21-pre-conditions.md)) blocks the selection run before any Area runs.
+- **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
+- **Schema edit without a new snapshot**: a source edit MUST produce a new versioned snapshot file; editing in place breaks the latest-resolution and the hash binding (see [`19-folder-layout.md`](/grading/folder-layout/)).
+- **Selection grading with non-`stable` members**: the pre-condition (see [`21-pre-conditions.md`](/grading/pre-conditions/)) blocks the selection run before any Area runs.
 
 ---
 
-## 7. Cross-References
+## Cross-References
 
-- Round-trip and folder layout → [`19-folder-layout.md`](./19-folder-layout.md)
-- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8
-- Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md)
-- Provider-side Areas → [`04-phases-single.md`](./04-phases-single.md)
-- Selection-side Areas → [`05-phases-selection.md`](./05-phases-selection.md)
+- Round-trip and folder layout → [`19-folder-layout.md`](/grading/folder-layout/)
+- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- Pre-condition → [`21-pre-conditions.md`](/grading/pre-conditions/)
+- Provider-side Areas → [`04-phases-single.md`](/grading/phases-single/)
+- Selection-side Areas → [`05-phases-selection.md`](/grading/phases-selection/)
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`08-grading-model.md`](/grading/grading-model/), [`19-folder-layout.md`](/grading/folder-layout/), [`21-pre-conditions.md`](/grading/pre-conditions/)
+- **Related:** [`04-phases-single.md`](/grading/phases-single/), [`05-phases-selection.md`](/grading/phases-selection/), [`11-about-convention.md`](/grading/about-convention/)
+

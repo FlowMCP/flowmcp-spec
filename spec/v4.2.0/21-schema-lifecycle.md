@@ -1,7 +1,6 @@
 # FlowMCP Specification v4.2.0 — Schema Lifecycle
 
-**Version:** 4.0.0  
-**Status:** Active
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 ---
 

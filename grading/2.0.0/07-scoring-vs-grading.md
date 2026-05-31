@@ -11,15 +11,15 @@
 
 ---
 
-## 1. Core Statement
+## Core Statement
 
 The terms **"Scoring"** and **"Grading"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update does **not** automatically imply a grading update — and vice versa.
 
-A grader, scorer, or aggregator that conforms to `gradingSpec/1.1.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
+A grader, scorer, or aggregator that conforms to `gradingSpec/2.0.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
 
 ---
 
-## 2. Comparison Table
+## Comparison Table
 
 The following table is the canonical, binding distinction between the two systems. Implementers MUST NOT collapse rows.
 
@@ -33,7 +33,7 @@ The following table is the canonical, binding distinction between the two system
 
 ---
 
-## 3. Versioning Schema
+## Versioning Schema
 
 The two systems carry **two independent SemVer namespaces**:
 
@@ -44,13 +44,13 @@ The two systems carry **two independent SemVer namespaces**:
 
 SemVer semantics (`MAJOR.MINOR.PATCH`) apply per namespace independently. The two namespaces are NOT lock-stepped.
 
-The third namespace `gradingSpec/X.Y.Z` (the document set you are reading) is versioned separately again — see [`00-overview.md`](./00-overview.md) §"Three Independently Versioned Namespaces".
+The third namespace `gradingSpec/X.Y.Z` (the document set you are reading) is versioned separately again — see [`00-overview.md`](./00-overview.md), "Three Independently Versioned Namespaces".
 
 ---
 
-## 4. Binding Rules
+## Binding Rules
 
-The following rules are **binding** for every grader, scorer, and aggregator that conforms to `gradingSpec/1.1.0`.
+The following rules are **binding** for every grader, scorer, and aggregator that conforms to `gradingSpec/2.0.0`.
 
 1. **Both version strings MUST be present in every grading entry.** Every grading entry (defined in [`08-grading-model.md`](./08-grading-model.md)) MUST carry both `scoringSystem` and `gradingSystem` as top-level version fields. A grading entry that lacks either field is INVALID. The same two version strings are additionally surfaced in the `index.json` rollup (per namespace and per selection), so the version under which an aggregated node was last scored and graded is visible without opening each grading entry.
 2. **Scoring-System bump and Grading-System bump are independent triggers.** A change in the Scoring System triggers a **re-scoring** at the next re-grading run, but does NOT automatically bump the Grading System. A change in the Grading System triggers a **re-grading** but does NOT automatically bump the Scoring System. Implementers MUST NOT couple the two version namespaces.
@@ -58,7 +58,7 @@ The following rules are **binding** for every grader, scorer, and aggregator tha
 
 ---
 
-## 4.1 Score-to-Grade Thresholds (`gradingSystem/1.0.0`)
+### Score-to-Grade Thresholds (`gradingSystem/1.0.0`)
 
 The aggregate grade is derived from the weighted mean of the per-answer scores. Each answer contributes a numeric value on the `1.0`–`5.0` scale: `pass` maps to `5.0`, `fail` to `1.0`, numeric scores as-is. `n/a` and `stale` answers are excluded from the mean (an all-excluded set yields no grade, i.e. a `pending` node). The mean is then banded:
 
@@ -76,17 +76,17 @@ Changing any threshold, the tier-trim rule, or the numeric mapping bumps the `gr
 
 ---
 
-## 5. Relationship to the Schemas-Spec v4.2.0
+## Relationship to the Schemas-Spec v4.2.0
 
-The Schemas-Spec v4.2.0 provides the **upstream contract** for scoring: the `prompts.json` / `scores.json` artefact pair is defined in [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/22-scoring-protocol.md) of the Schemas-Spec (sister repository `flowmcp-spec`). The Scoring System named here **sub-consumes** that protocol: scores produced by the Schemas-Spec scoring protocol enter this spec's Scoring System as inputs, and the dimensions enumerated in [`08-grading-model.md`](./08-grading-model.md) §"Dimension Enum" extend that protocol with the additional grading dimensions defined here.
+The Schemas-Spec v4.2.0 provides the **upstream contract** for scoring: the `prompts.json` / `scores.json` artefact pair is defined in [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/22-scoring-protocol.md) of the Schemas-Spec (sister repository `flowmcp-spec`). The Scoring System named here **sub-consumes** that protocol: scores produced by the Schemas-Spec scoring protocol enter this spec's Scoring System as inputs, and the dimensions enumerated in [`08-grading-model.md`](./08-grading-model.md), "Dimension Enum", extend that protocol with the additional grading dimensions defined here.
 
 This Grading-Spec does NOT re-define the `prompts.json` / `scores.json` contract. Implementers MUST treat the Schemas-Spec v4.2.0 `22-scoring-protocol.md` as the **highest instance** for the artefact pair; conflicting prose in this spec is to be read as a refinement, not as a replacement.
 
 ---
 
-## 6. Cross-References
+## Cross-References
 
 - [`08-grading-model.md`](./08-grading-model.md) — how scores become a grade (the data model and the JSON-Schema annex).
 - [`04-phases-single.md`](./04-phases-single.md) / [`05-phases-selection.md`](./05-phases-selection.md) — where scores are produced.
 - Schemas-Spec v4.2.0 [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/22-scoring-protocol.md) — sub-consumed scoring artefact contract (external).
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §7 — interaction of version bumps with reproducibility.
+- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — interaction of version bumps with reproducibility.

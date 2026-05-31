@@ -11,7 +11,7 @@
 
 ---
 
-## 1. Scope Statement
+## Scope Statement
 
 This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows.
 
@@ -23,21 +23,21 @@ The About Resource is **a schema Resource**, not a namespace route. It is:
 
 The chapter has three parts:
 
-1. The **declaration contract** — how About is declared in a schema (§3).
-2. The **content contract** — what an About Resource MUST, SHOULD, and MAY carry (§4).
-3. The **detection and grading** of About on the namespace and selection levels (§5–§7).
+1. The **declaration contract** — how About is declared in a schema (see [Declaration Contract](#declaration-contract)).
+2. The **content contract** — what an About Resource MUST, SHOULD, and MAY carry (see [Content Contract](#content-contract)).
+3. The **detection and grading** of About on the namespace and selection levels (see [Detection](#detection-deterministic)–[Selection-Level About](#selection-level-about--domain-knowledge)).
 
 ---
 
-## 2. Purpose
+## Purpose
 
 The About Resource exists because consumers — LLM graders, skill authors, third-party tools, dashboards — repeatedly need a uniform way to ask: *"What does this namespace do, what doesn't it do, which conventions does it follow?"* A single, conventionally named, declared Resource answers that question without the consumer having to read the schema source first.
 
-This is the **guessability argument**. It is the deep cause for reserving the name `about`; the content contract (§4) is what makes the reserved name worth asking against.
+This is the **guessability argument**. It is the deep cause for reserving the name `about`; the content contract (see [Content Contract](#content-contract)) is what makes the reserved name worth asking against.
 
 ---
 
-## 3. Declaration Contract
+## Declaration Contract
 
 The About Resource MUST be declared in the schema under `main.resources` with the reserved name `about`:
 
@@ -55,17 +55,17 @@ resources.about = {
 - `name` — the logical file name; the versioned file lives in `resources/about/` (see [`19-folder-layout.md`](./19-folder-layout.md)). There is no flat `<namespace>-about.md`; only the versioned file exists, and the latest-resolution rule picks the newest.
 - `description` — a one-line summary.
 
-A Resource declared at the name `about` MUST conform to the content contract (§4). A schema MUST NOT use the name `about` for any Resource that is **not** an About Resource per this contract.
+A Resource declared at the name `about` MUST conform to the content contract (see [Content Contract](#content-contract)). A schema MUST NOT use the name `about` for any Resource that is **not** an About Resource per this contract.
 
 Only the `about` Resource is grading-relevant; **all other Resources are ignored** by the grader.
 
-### 3.1 Why a Schema Resource and Not a Namespace Route
+### Why a Schema Resource and Not a Namespace Route
 
-A Resource technically never lives at namespace level — there is no namespace object to attach a Resource to, only schemas. About is therefore inserted into **one** schema of the namespace. The grader does not require a particular schema to carry it; the detector **searches namespace-wide** (§5).
+A Resource technically never lives at namespace level — there is no namespace object to attach a Resource to, only schemas. About is therefore inserted into **one** schema of the namespace. The grader does not require a particular schema to carry it; the detector **searches namespace-wide** (see [Detection](#detection-deterministic)).
 
 ---
 
-## 4. Content Contract
+## Content Contract
 
 The content of an About Resource is governed by the following MUST / SHOULD / MAY contract.
 
@@ -83,7 +83,7 @@ An About Resource that lacks any MUST element scores low on the **content (non-d
 
 ---
 
-## 5. Detection (Deterministic)
+## Detection (Deterministic)
 
 The detector runs as the deterministic sub-part of the `about-namespace` Area (provider side) and `about-selection` Area (selection side). It performs two checks:
 
@@ -94,7 +94,7 @@ If either check fails, the result is `about: false` and the dependent content gr
 
 ---
 
-## 6. Consumers
+## Consumers
 
 The About Resource is consumed by three classes of actor:
 
@@ -106,23 +106,23 @@ The About Resource is consumed by three classes of actor:
 
 ---
 
-## 7. Selection-Level About (= Domain-Knowledge)
+## Selection-Level About (= Domain-Knowledge)
 
-Every selection SHOULD expose its own About Resource under `selections/<selection>/resources/about/`. On the selection level the About Resource **doubles as the Domain-Knowledge content** of the group: it carries the seven mandatory sections defined in [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3. It is graded by the `about-selection` Area.
+Every selection SHOULD expose its own About Resource under `selections/<selection>/resources/about/`. On the selection level the About Resource **doubles as the Domain-Knowledge content** of the group: it carries the seven mandatory sections defined in [`10-domain-knowledge.md`](./10-domain-knowledge.md). It is graded by the `about-selection` Area.
 
-**Score consequence.** Absence of a selection-level About Resource is **NOT** a Categorical Veto. It IS a score deduction at the `group-bound` level: a selection without its own About Resource cannot reach the top of the About grading even when each contained namespace has its own About Resource. Because the selection-level About also carries the Domain-Knowledge content, its absence additionally blocks `domainConformance` from being scored above `stale` / `n/a` (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §7).
+**Score consequence.** Absence of a selection-level About Resource is **NOT** a Categorical Veto. It IS a score deduction at the `group-bound` level: a selection without its own About Resource cannot reach the top of the About grading even when each contained namespace has its own About Resource. Because the selection-level About also carries the Domain-Knowledge content, its absence additionally blocks `domainConformance` from being scored above `stale` / `n/a` (see [`10-domain-knowledge.md`](./10-domain-knowledge.md)).
 
-### 7.1 Why SHOULD and Not MUST
+### Why SHOULD and Not MUST
 
 A MUST at the selection level would over-burden small selections. A selection composed of two tools and intended for ad-hoc use should not be forced to maintain its own About Resource — the cost outweighs the benefit.
 
-### 7.2 Why SHOULD and Not MAY
+### Why SHOULD and Not MAY
 
-A MAY at the selection level would surrender the guessability argument from §2. A selection's About Resource is precisely what an agent asks for when entering the selection; if it MAY be present or absent without consequence, agents cannot rely on it. SHOULD preserves guessability (consumers can ask blind) while still allowing for the small-selection exception (no veto).
+A MAY at the selection level would surrender the guessability argument from [Purpose](#purpose). A selection's About Resource is precisely what an agent asks for when entering the selection; if it MAY be present or absent without consequence, agents cannot rely on it. SHOULD preserves guessability (consumers can ask blind) while still allowing for the small-selection exception (no veto).
 
 ---
 
-## 8. Grading Effect
+## Grading Effect
 
 | Dimension | Determinism | Tier | Source (Area) |
 |-----------|-------------|------|----------------|
@@ -131,11 +131,11 @@ A MAY at the selection level would surrender the guessability argument from §2.
 | About Resource compliance (selection content + Domain-Knowledge) | deterministic + non-deterministic | group-bound | `about-selection` |
 | `personaUseCaseFit` (consumes About) | non-deterministic | group-bound | `selection-aggregate` |
 
-The deterministic sub-part is binary: the declared `about` Resource and its file exist (pass) or they do not (fail). The non-deterministic sub-part scores the content against the contract (§4). The mixed-form handling rule from [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §2.3 applies.
+The deterministic sub-part is binary: the declared `about` Resource and its file exist (pass) or they do not (fail). The non-deterministic sub-part scores the content against the contract (see [Content Contract](#content-contract)). The mixed-form handling rule from [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) applies.
 
 ---
 
-## 9. Relationship to the Schemas-Spec v4.2.0
+## Relationship to the Schemas-Spec v4.2.0
 
 The Schemas-Spec v4.2.0 — particularly [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
 
@@ -143,12 +143,12 @@ A schema-validator at v4.2 MUST NOT reject a schema for failing the About conven
 
 ---
 
-## 10. Cross-References
+## Cross-References
 
 - Schemas-Spec v4.2.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md) — the external Resource primitive against which the convention is defined.
 - Schemas-Spec v4.2.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/17-selections.md) — the selection primitive.
 - [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the selection-level About Resource as the Domain-Knowledge content (seven mandatory sections).
-- [`12-personas-contract.md`](./12-personas-contract.md) — the personas reference required by §4.
+- [`12-personas-contract.md`](./12-personas-contract.md) — the personas reference required by [Content Contract](#content-contract).
 - [`13-skills.md`](./13-skills.md) — the skill obligation to reference the About Resource.
 - [`19-folder-layout.md`](./19-folder-layout.md) — the `resources/about/` placement and the versioned-file naming.
 - [`21-pre-conditions.md`](./21-pre-conditions.md) — About detection as part of the pre-condition gate.

@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Grading"
 normative: false
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/00-overview.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/00-overview.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/00-overview.md."
@@ -18,7 +18,7 @@ edit_warning: "This file is auto-generated. Source: grading/2.0.0/00-overview.md
 > **Status:** stable (v2 — a clean break from the 1.0.0/1.1.0 line)
 > **Changes vs. 1.1.0:** `2.0.0` is the **v2 break**. The earlier 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises grading around eleven areas, a five-status model, the workbench island, the derived `index.json` rollup, and a `/goal`-driven harness. Breaking changes are permitted; there is no backwards-compatibility promise toward the 1.0.0/1.1.0 phase model (`P1`–`P7` / `S1`–`S4`). See [`CHANGELOG.md`](./CHANGELOG.md) for the version history.
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.2.0 [00-overview.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/00-overview.md) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.
+> Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.2.0 [00-overview.md](/specification/overview/) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.
 
 ---
 
@@ -26,7 +26,7 @@ edit_warning: "This file is auto-generated. Source: grading/2.0.0/00-overview.md
 
 This document uses the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" as defined in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals.
 
-The binding source for this conformance interpretation is the FlowMCP Schemas Specification v4.2.0 [00-overview.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/00-overview.md). Some chapters of this Grading-Spec are intentionally written in prose without normative keywords because they describe history, motivation, or conceptual background (this overview document). All other chapters use normative language and assume this conformance interpretation.
+The binding source for this conformance interpretation is the FlowMCP Schemas Specification v4.2.0 [00-overview.md](/specification/overview/). Some chapters of this Grading-Spec are intentionally written in prose without normative keywords because they describe history, motivation, or conceptual background (this overview document). All other chapters use normative language and assume this conformance interpretation.
 
 ---
 
@@ -41,7 +41,7 @@ The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specificat
 | Middle | Grading-Spec in `repos/flowmcp-grading/` (this document) | Independent — describes phases, Scoring System, Grading System, Veto, Tier, Skills, Domain Knowledge |
 | Bottom | Scripts and modules in `repos/flowmcp-grading/src/` | Implementation derived from this spec |
 
-Cross-reference: [Schemas-Spec v4.2.0 — Overview](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/00-overview.md).
+Cross-reference: [Schemas-Spec v4.2.0 — Overview](/specification/overview/).
 
 ---
 
@@ -87,12 +87,12 @@ The grading rules — how scores are mapped to grades, how the categorical veto 
 
 This Grading-Spec relies on definitions from the Schemas-Spec. The following chapters of v4.2.0 are particularly relevant:
 
-- [22-scoring-protocol.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/22-scoring-protocol.md) — the existing `prompts.json` / `scores.json` contract that this Grading-Spec sub-consumes.
-- [20-validation-strategy.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/20-validation-strategy.md) — the deterministic baseline; the Grading System defined here extends (and partly replaces) the Grade System described there.
-- [13-resources.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md) — Resource primitive (basis for the `about` convention to be reserved).
-- [14-skills.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) — Skill types `'namespace' | 'selection' | 'agent'` (already part of v4.2).
-- [17-selections.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/17-selections.md) — Selection as the fifth primitive; carries `tools[]` / `skills[]` / `resources[]` / `prompts[]`.
-- [11-preload.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/11-preload.md) — Preload pattern already in place.
+- [22-scoring-protocol.md](/specification/scoring-protocol/) — the existing `prompts.json` / `scores.json` contract that this Grading-Spec sub-consumes.
+- [20-validation-strategy.md](/specification/validation-strategy/) — the deterministic baseline; the Grading System defined here extends (and partly replaces) the Grade System described there.
+- [13-resources.md](/specification/resources/) — Resource primitive (basis for the `about` convention to be reserved).
+- [14-skills.md](/specification/skills/) — Skill types `'namespace' | 'selection' | 'agent'` (already part of v4.2).
+- [17-selections.md](/specification/selections/) — Selection as the fifth primitive; carries `tools[]` / `skills[]` / `resources[]` / `prompts[]`.
+- [11-preload.md](/specification/preload/) — Preload pattern already in place.
 
 ---
 
@@ -105,7 +105,7 @@ The island is connected by a two-way, non-destructive **IN/OUT round-trip**:
 - **IN — `grading import`:** source → workbench. Validate, assert a single namespace, snapshot any changed source alongside the old one (never overwrite), normalise into the island structure, rebuild `index.json`.
 - **OUT — `grading export`:** workbench → source. The primary hand-off is the `index.json` (the complete graded state); clean stripped `.mjs` files MAY accompany it. The export never overwrites the source.
 
-The full category is defined in [`22-workbench-island.md`](./22-workbench-island.md); the derived rollup it produces is defined in [`23-index-json.md`](./23-index-json.md).
+The full category is defined in [`22-workbench-island.md`](/grading/workbench-island/); the derived rollup it produces is defined in [`23-index-json.md`](/grading/index-json/).
 
 ---
 
@@ -150,12 +150,12 @@ The following are the headline additions of the v2 break over the 1.0.0/1.1.0 li
 
 | Item | Content |
 |------|---------|
-| Workbench island category | [`22-workbench-island.md`](./22-workbench-island.md) — internal verbose names, stripped on mirror-out, IN/OUT round-trip |
-| `index.json` rollup | [`23-index-json.md`](./23-index-json.md) — one per namespace/selection; five-status node enum + operational rollup vocabulary; live-rollup + frozen `lockSnapshot`; member-resolution manifest |
+| Workbench island category | [`22-workbench-island.md`](/grading/workbench-island/) — internal verbose names, stripped on mirror-out, IN/OUT round-trip |
+| `index.json` rollup | [`23-index-json.md`](/grading/index-json/) — one per namespace/selection; five-status node enum + operational rollup vocabulary; live-rollup + frozen `lockSnapshot`; member-resolution manifest |
 | `index.schema.json` | JSON-Schema for the rollup |
-| Eleven grading areas | the per-phase `P*`/`S*` model is replaced by eleven areas; the 11th, `selection-aggregate` ([`24-selection-aggregate.md`](./24-selection-aggregate.md)), is new |
-| `/goal` harness | [`25-harness-and-goal.md`](./25-harness-and-goal.md) — transcript-only evaluator + mandatory `[GRADING]` surfacing convention + idempotent turns |
-| Kanban data contract | superseded by `index.json`; only the audit-trail and irreversible-veto rules are salvaged ([`14-kanban-data-contract.md`](./14-kanban-data-contract.md)) |
+| Eleven grading areas | the per-phase `P*`/`S*` model is replaced by eleven areas; the 11th, `selection-aggregate` ([`24-selection-aggregate.md`](/grading/selection-aggregate/)), is new |
+| `/goal` harness | [`25-harness-and-goal.md`](/grading/harness-and-goal/) — transcript-only evaluator + mandatory `[GRADING]` surfacing convention + idempotent turns |
+| Kanban data contract | superseded by `index.json`; only the audit-trail and irreversible-veto rules are salvaged ([`14-kanban-data-contract.md`](/grading/kanban-data-contract/)) |
 
 ---
 

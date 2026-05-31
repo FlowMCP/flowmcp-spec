@@ -1,41 +1,30 @@
 ---
-title: "Folder Layout (§17)"
-description: "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` §19..."
+title: "Folder Layout"
+description: "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` (About-Pages),..."
 grading_version: "2.0.0"
 spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/19-folder-layout.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/19-folder-layout.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/19-folder-layout.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative — restructured in 2.0.0 |
-| Version | `gradingSpec/2.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md) |
-| Related | [`11-about-convention.md`](./11-about-convention.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
-
-> **Spec:** `gradingSpec/2.0.0`
-> **Status:** stable (structural break vs. 1.1.0)
-> **Changes vs. 1.1.0:** five top-level folders collapse to three (`providers/`, `selections/`, `shared-lists/`). The source-of-truth direction is inverted — source files are neutral (no in-source hashes), all hash bindings live in the derived `index.json`. Filenames follow the timestamp-first naming grammar. About lives at the schema level. `single/`, `phase-status/`, `projects/`, the authored `namespace.json`, and `selection.lock.json` are removed.
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
-## §17 Folder Layout
+## Folder Layout
 
-The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` §19 (About-Pages), and `16-selection-lockfile.md` §11 (selection files + `index.json.lockSnapshot`) all refer to this layout.
+The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` (About-Pages), and `16-selection-lockfile.md` (selection files + `index.json.lockSnapshot`) all refer to this layout.
 
 The grading data set is a **workbench island**: an internal working area on which schemas and selections are iterated daily. Internally the naming is deliberately verbose (timestamp plus hash in the filename, one folder per primitive) because that is exactly what guarantees predictability, linkability, and version tracking. When the data is mirrored out to the real repositories, names are stripped down to clean spec names.
 
-### §17.1 Binding Layout
+### Binding Layout
 
 There are **three top-level folders** (plural, aligned with the source layout `…/providers/` + `…/selections/`):
 
@@ -64,17 +53,17 @@ grading-data/
 
 Three top-level folders: `providers/`, `selections/`, `shared-lists/`.
 
-### §17.2 Source-of-Truth Rule (inverted in 2.0.0)
+### Source-of-Truth Rule (inverted in 2.0.0)
 
-The two important source files — the schema `.mjs` and the `selection.json` — are **neutral**: they carry only logical names and no in-source hashes or snapshot version keys. Versioning lives in the filename; **the hash bindings live in the derived `index.json`** (see [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11).
+The two important source files — the schema `.mjs` and the `selection.json` — are **neutral**: they carry only logical names and no in-source hashes or snapshot version keys. Versioning lives in the filename; **the hash bindings live in the derived `index.json`** (see [`16-selection-lockfile.md`](/grading/selection-lockfile/)).
 
 Rationale: an in-source hash drifts the moment the file is edited, so the recorded hash no longer matches the actual content. Keeping the hash out of the source and recording it in the derived `index.json` keeps the source clean while the binding remains traceable.
 
-`providers/` is the source of truth for schema content — no duplication. Schema files are NOT copied into `selections/`. A selection references its member schemas by logical id; the member resolution and hash binding are recorded in `index.json`. A content change creates a new file *next to* the old one — never *over* it (see [`15-versioning-axes.md`](./15-versioning-axes.md) §10).
+`providers/` is the source of truth for schema content — no duplication. Schema files are NOT copied into `selections/`. A selection references its member schemas by logical id; the member resolution and hash binding are recorded in `index.json`. A content change creates a new file *next to* the old one — never *over* it (see [`15-versioning-axes.md`](/grading/versioning-axes/)).
 
 `index.json` is the **only overwritable file** — it is fully derived and 100% reproducible from the source files and grading artefacts. Source schemas, selection definitions, and grading snapshots are **never** overwritten.
 
-### §17.3 Naming Conventions
+### Naming Conventions
 
 | Artefact | Format | Explanation |
 |----------|--------|-------------|
@@ -83,22 +72,22 @@ Rationale: an in-source hash drifts the moment the file is edited, so the record
 | Test | `test-<n>.json` | the tool name is already in the path |
 | Shared-List | `<listname>--<ts>--<hash8>.json` | same primitive naming grammar |
 
-`<ts>` is in the format `YYYY-MM-DDTHH-MM-SSZ` (hyphens instead of colons for filesystem compatibility). `<hash8>` is the first 8 hex chars of the sha256 over the canonically serialised content (see [`15-versioning-axes.md`](./15-versioning-axes.md) §10.5). The hash appears in the filename and in `index.json` only — never inside the source.
+`<ts>` is in the format `YYYY-MM-DDTHH-MM-SSZ` (hyphens instead of colons for filesystem compatibility). `<hash8>` is the first 8 hex chars of the sha256 over the canonically serialised content (see [`15-versioning-axes.md`](/grading/versioning-axes/)). The hash appears in the filename and in `index.json` only — never inside the source.
 
 `resolveLatest(dir, logicalName)` is the single resolver for both primitives and gradings: it filters on the prefix, sorts, and takes the last entry as the newest version. Date-before-hash is what makes this naive sort correct — with `<name>--<hash>--<ts>` the random hash would dominate the sort and an older file could be picked as the "newest".
 
-### §17.3a `shared-lists/`
+### `shared-lists/`
 
 ```
 grading-data/shared-lists/<listname>/<listname>--<ts>--<hash8>.json
 ```
 
 - `<listname>` is the identifier of the list (e.g. `evmChains`, `tradingExchanges`).
-- `<hash8>` is the first-8-chars sha256 of the canonically serialised list (same procedure as the schema hash, see [`15-versioning-axes.md`](./15-versioning-axes.md) §10.5).
+- `<hash8>` is the first-8-chars sha256 of the canonically serialised list (same procedure as the schema hash, see [`15-versioning-axes.md`](/grading/versioning-axes/)).
 
-Shared Lists are **secondary in-scope** (see §12). They are hashed but not graded on their own — they feed into tool gradings as a data source. Reference implementation: [`src/SharedLists.mjs`](../../src/SharedLists.mjs).
+Shared Lists are **secondary in-scope** (see [`17-scope-whitelist.md`](/grading/scope-whitelist/)). They are hashed but not graded on their own — they feed into tool gradings as a data source. Reference implementation: [`src/SharedLists.mjs`](../../src/SharedLists.mjs).
 
-### §17.4 Universal `_gradings/` Rule
+### Universal `_gradings/` Rule
 
 Every `_gradings/` folder lives in the folder of the primitive it grades; aggregates live at the level they aggregate. There is **no** `_gradings/` at the collection level (`tools/`, `skills/`, `resources/` themselves).
 
@@ -116,11 +105,11 @@ Every `_gradings/` folder lives in the folder of the primitive it grades; aggreg
 
 In `selections/`, own folders exist only for **unique** primitives (the import layer — a tool or prompt defined only in the selection). Member schemas are referenced, never copied.
 
-### §17.5 Resource Rule
+### Resource Rule
 
-A resource is **never** placed at the namespace level technically — there is no namespace object to attach it to, only schemas. The About is declared in **one** schema (`main.resources`); the detector **searches** for it namespace-wide. See [`11-about-convention.md`](./11-about-convention.md) §19.
+A resource is **never** placed at the namespace level technically — there is no namespace object to attach it to, only schemas. The About is declared in **one** schema (`main.resources`); the detector **searches** for it namespace-wide. See [`11-about-convention.md`](/grading/about-convention/).
 
-### §17.6 Lifecycle per Schema Iteration
+### Lifecycle per Schema Iteration
 
 ```
 1. Initial: providers/etherscan/getContract/schema/getContract--2026-05-30T19-44-23Z--a1b2c3d4.mjs is created
@@ -133,7 +122,7 @@ A resource is **never** placed at the namespace level technically — there is n
 
 Old source files remain referenceable for historical gradings — they are not deleted (legacy files are never deleted). The newest file is always the current one (`resolveLatest`).
 
-### §17.7 Removed in 2.0.0
+### Removed in 2.0.0
 
 The following v1 folders and files are **removed** and folded into `index.json`:
 
@@ -143,13 +132,19 @@ The following v1 folders and files are **removed** and folded into `index.json`:
 | `single/` | per-tool `_gradings/` under `providers/<ns>/<schema>/tools/<tool>/` |
 | `phase-status/` | `index.json` (5-status rollup per namespace/selection) |
 | `projects/` | `providers/<ns>/` + `selections/<sel>/` |
-| authored `namespace.json` | folded into `index.json` (see [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.4) |
-| `selection.lock.json` | folded into `index.json.lockSnapshot` (see [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2) |
+| authored `namespace.json` | folded into `index.json` (see [`16-selection-lockfile.md`](/grading/selection-lockfile/)) |
+| `selection.lock.json` | folded into `index.json.lockSnapshot` (see [`16-selection-lockfile.md`](/grading/selection-lockfile/)) |
 
-### §17.8 Cross-Refs
+### Cross-Refs
 
-- Grading-entry top-level fields → [`08-grading-model.md`](./08-grading-model.md) §3 (hashes live in the grading entry and `index.json`, not in the source schema)
-- Version axes + canonical hash → [`15-versioning-axes.md`](./15-versioning-axes.md) §10
-- `index.json.lockSnapshot` + selection definition → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11
-- About-Pages (schema-level resource) → [`11-about-convention.md`](./11-about-convention.md) §19
-- Pre-conditions (`index.json.lockSnapshot` lookup) → [`21-pre-conditions.md`](./21-pre-conditions.md) §20
+- Grading-entry top-level fields → [`08-grading-model.md`](/grading/grading-model/) (hashes live in the grading entry and `index.json`, not in the source schema)
+- Version axes + canonical hash → [`15-versioning-axes.md`](/grading/versioning-axes/)
+- `index.json.lockSnapshot` + selection definition → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- About-Pages (schema-level resource) → [`11-about-convention.md`](/grading/about-convention/)
+- Pre-conditions (`index.json.lockSnapshot` lookup) → [`21-pre-conditions.md`](/grading/pre-conditions/)
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- **Related:** [`11-about-convention.md`](/grading/about-convention/), [`21-pre-conditions.md`](/grading/pre-conditions/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+

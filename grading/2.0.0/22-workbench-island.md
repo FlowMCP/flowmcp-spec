@@ -11,7 +11,7 @@
 
 ---
 
-## 1. The Island Principle
+## The Island Principle
 
 The grading data directory (`grading-data/`) is a **workbench island**: an internal working area where schemas and selections are hammered on day after day. It is deliberately separate from the public, shipped repositories. Treating it as an island is what makes the verbose internal naming scheme defensible — it is not over-engineering, it is the price of predictability.
 
@@ -25,7 +25,7 @@ The island argument beats the "isn't this overkill?" argument: the verbosity liv
 
 ---
 
-## 2. Outside View is the Namespace
+## Outside View is the Namespace
 
 From the outside, the unit of interest is the **namespace** — does it work, what can it do. Individual schemas are an internal complexity split inside a namespace (one namespace, several schemas; see the namespace special case in [`19-folder-layout.md`](./19-folder-layout.md)). The outside consumer asks "is this namespace operational and what grade does it carry", not "which timestamped snapshot of which schema produced it". The island keeps the fine-grained internal structure; the outside view collapses it to the namespace (and, for Task B, to the selection).
 
@@ -33,11 +33,11 @@ The source files that travel — the schema `.mjs` and the `selection.json` — 
 
 ---
 
-## 3. The IN/OUT Round-Trip
+## The IN/OUT Round-Trip
 
 The island is connected to the real repositories by a two-way round-trip. Both directions are non-destructive: the island never overwrites a source, and an export never overwrites the destination.
 
-### 3.1 IN — `grading import <provider-path>`
+### IN — `grading import <provider-path>`
 
 Source (a provider folder or a selection) flows into the workbench:
 
@@ -48,7 +48,7 @@ Source (a provider folder or a selection) flows into the workbench:
 5. Convert into the island structure (resources to `resources/about/`, skills to `skills/`, inline skills normalised into files).
 6. Rebuild `index.json`.
 
-### 3.2 OUT — `grading export <namespace|selection>`
+### OUT — `grading export <namespace|selection>`
 
 Workbench flows back toward the source:
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.0 — 2026-05-31 (delegation)
+
+The Schemas-Spec remains the highest instance and now **delegates** schema grading to a separate, independently versioned standard — the **Grading-Spec** (`gradingSpec/2.0.0`), published as Navigation point 5 in the docs. This delegation is the substance of the `4.2.0` bump; the schema format itself is unchanged.
+
+### Changed
+
+- **`22-scoring-protocol.md`** — rewritten as a short **delegation pointer** to the Grading-Spec instead of carrying a standalone scoring protocol (the Scoring Protocol is now owned by the Grading-Spec, not sub-consumed here).
+- **`20-validation-strategy.md`** — references the Grading-Spec (`gradingSpec/2.0.0`) as the extended grading layer above the deterministic A–F baseline.
+- Spec folder hardcopied to `spec/v4.2.0/`; version constants in `package.json` and `data/refs.manual.json` aligned.
+
 ## v4.1.1 — 2026-05-29 (additive)
 
 Additive release introducing two new schema-header fields that ride alongside the existing `version` field. Grading-System Iteration 2 requires deterministic schema identification across iterations.

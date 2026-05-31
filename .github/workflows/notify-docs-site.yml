@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'spec/v4.1.0/**'
+      - 'spec/v4.2.0/**'
       - 'generated/**'
   workflow_dispatch:
 

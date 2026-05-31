@@ -3,7 +3,7 @@ name: Generate llms.txt
 on:
   push:
     paths:
-      - 'spec/v4.1.0/*.md'
+      - 'spec/v4.2.0/*.md'
       - 'package.json'
   workflow_dispatch:
 

@@ -3,12 +3,12 @@ name: Evaluator CI — RFC2119 Conformance
 on:
   pull_request:
     paths:
-      - 'spec/v4.0.0/**.md'
+      - 'spec/v4.2.0/**.md'
       - 'skills/spec-quality/evaluator-spec-rfc2119/**'
   push:
     branches: [main]
     paths:
-      - 'spec/v4.0.0/**.md'
+      - 'spec/v4.2.0/**.md'
   workflow_dispatch:
 
 permissions:
@@ -38,7 +38,7 @@ jobs:
           report+="| File | Grade | Errors | Warnings | Hints |\n"
           report+="|------|:-----:|:------:|:--------:|:-----:|\n"
 
-          for f in spec/v4.0.0/*.md; do
+          for f in spec/v4.2.0/*.md; do
               name=$(basename "$f")
               result=$(node skills/spec-quality/evaluator-spec-rfc2119/check.mjs --json "$f" 2>/dev/null || echo '{"grade":0,"issues":[]}')
               grade=$(echo "$result" | jq -r .grade)

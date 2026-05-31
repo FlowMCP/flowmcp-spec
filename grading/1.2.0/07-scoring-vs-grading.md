@@ -58,6 +58,24 @@ The following rules are **binding** for every grader, scorer, and aggregator tha
 
 ---
 
+## 4.1 Score-to-Grade Thresholds (`gradingSystem/1.0.0`)
+
+The aggregate grade is derived from the weighted mean of the per-answer scores. Each answer contributes a numeric value on the `1.0`–`5.0` scale: `pass` maps to `5.0`, `fail` to `1.0`, numeric scores as-is. `n/a` and `stale` answers are excluded from the mean (an all-excluded set yields no grade, i.e. a `pending` node). The mean is then banded:
+
+| Weighted mean | Grade |
+|---------------|-------|
+| ≥ 4.5 | A |
+| ≥ 3.5 | B |
+| ≥ 2.5 | C |
+| ≥ 1.5 | D |
+| < 1.5 | F |
+
+**Tier trim.** The banded grade is capped at the tier maximum: `autonomous` → `B`, `group-bound` → `A`. A score that would band to `A` on an `autonomous`-tier node is recorded as `B` (the pre-trim band is preserved as `rawGrade`). A Categorical Veto overrides the entire computation with `REJECTED`.
+
+Changing any threshold, the tier-trim rule, or the numeric mapping bumps the `gradingSystem` version.
+
+---
+
 ## 5. Relationship to the Schemas-Spec v4.1.0
 
 The Schemas-Spec v4.1.0 provides the **upstream contract** for scoring: the `prompts.json` / `scores.json` artefact pair is defined in [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/22-scoring-protocol.md) of the Schemas-Spec (sister repository `flowmcp-spec`). The Scoring System named here **sub-consumes** that protocol: scores produced by the Schemas-Spec scoring protocol enter this spec's Scoring System as inputs, and the dimensions enumerated in [`08-grading-model.md`](./08-grading-model.md) §"Dimension Enum" extend that protocol with the additional grading dimensions defined here.

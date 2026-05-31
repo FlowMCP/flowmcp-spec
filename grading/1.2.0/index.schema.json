@@ -23,7 +23,7 @@
         },
         "grade": {
             "type": "string",
-            "enum": ["A", "B", "C", "F", "REJECTED"],
+            "enum": ["A", "B", "C", "D", "F", "REJECTED"],
             "description": "Resolved grade of the node or rollup."
         },
         "node": {

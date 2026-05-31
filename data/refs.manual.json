@@ -7,6 +7,12 @@
         "specDir": "spec/v4.2.0",
         "miniSkillTemplate": "data/mini-skill.template.md"
     },
+    "grading": {
+        "currentVersion": "2.0.0",
+        "recommendedRelease": "2.0.0",
+        "specDir": "grading/2.0.0",
+        "url": "https://flowmcp.github.io/grading/overview/"
+    },
     "imports": {
         "cli": "github:FlowMCP/flowmcp-cli#v4.1.0",
         "core": "github:FlowMCP/flowmcp-core#v4.1.0",

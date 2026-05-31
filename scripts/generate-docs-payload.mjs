@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-// generate-docs-payload.mjs — Memo 049 Phase 5 PRD-18
+// generate-docs-payload.mjs — Memo 049 Phase 5 PRD-18; Memo 086 PRD-06 (grading second source)
 //
-// Reads spec/v4.1.0/*.md, adds YAML frontmatter with discovery metadata,
-// rewrites cross-references to relative links, and writes the result to
-// generated/docs-payload/{NN}-{slug}.md.
+// Reads spec/v<version>/*.md AND grading/<version>/*.md, adds YAML frontmatter with
+// discovery metadata, rewrites cross-references to relative links, and writes the
+// result to generated/docs-payload/{NN}-{slug}.md (spec) and
+// generated/docs-payload/grading/{NN}-{slug}.md (grading).
+//
+// Single-Payload (Memo 081/086): the grading spec is a SECOND INPUT, not a second
+// output. Spec output is unchanged; grading is emitted additively into a subdir.
 //
 // Output format documented in:
 //   generated/docs-payload/README.md
@@ -30,6 +34,8 @@ if( typeof PKG.version !== 'string' || PKG.version.length === 0 ) {
 const SPEC_VERSION = PKG.version
 const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
+const GRADING_ROOT = join( REPO, 'grading' )
+const GRADING_PAYLOAD_DIR = join( PAYLOAD_DIR, 'grading' )
 const GENERATOR = 'scripts/generate-docs-payload.mjs'
 
 
@@ -39,6 +45,22 @@ const PROSAIC_FILES = new Set( [
     '08-migration.md',
     '21-schema-lifecycle.md'
 ] )
+
+
+// Grading prosaic files — the grading overview is conceptual prose.
+const GRADING_PROSAIC_FILES = new Set( [
+    '00-overview.md'
+] )
+
+
+// Memo 086 PRD-06: grading version is the highest semver folder under grading/
+// (no hardcode — follows whatever the released grading spec is).
+const pickMaxSemverDir = ( { names } ) => {
+    const semverDirs = names
+        .filter( ( name ) => /^\d+\.\d+\.\d+$/.test( name ) )
+        .sort( ( a, b ) => a.localeCompare( b, undefined, { numeric: true } ) )
+    return semverDirs.length > 0 ? semverDirs.at( -1 ) : null
+}
 
 
 const escapeYamlString = ( { value } ) => {
@@ -126,17 +148,17 @@ const orderFromFilename = ( { filename } ) => {
 }
 
 
-const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit } ) => {
-    const relativeSourcePath = `spec/v${ SPEC_VERSION }/${ filename }`
+const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } ) => {
+    const relativeSourcePath = `${ sourceRelBase }/${ filename }`
     const sourceUrl = `https://github.com/FlowMCP/flowmcp-spec/blob/${ sourceCommit }/${ relativeSourcePath }`
     const lines = []
     lines.push( '---' )
     lines.push( `title: "${ escapeYamlString( { value: title } ) }"` )
     lines.push( `description: "${ escapeYamlString( { value: description } ) }"` )
-    lines.push( `spec_version: "${ SPEC_VERSION }"` )
+    lines.push( `${ versionField }: "${ version }"` )
     lines.push( `spec_file: "${ filename }"` )
     lines.push( `order: ${ orderFromFilename( { filename } ) }` )
-    lines.push( 'section: "Specification"' )
+    lines.push( `section: "${ section }"` )
     lines.push( `normative: ${ normative }` )
     lines.push( `source_commit: "${ sourceCommit }"` )
     lines.push( `source_url: "${ sourceUrl }"` )
@@ -149,15 +171,15 @@ const buildFrontmatter = ( { filename, title, description, normative, now, sourc
 }
 
 
-const generateFile = async ( { filename, now, sourceCommit } ) => {
-    const sourcePath = join( SPEC_DIR, filename )
+const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase } ) => {
+    const sourcePath = join( sourceDir, filename )
     const content = await readFile( sourcePath, 'utf-8' )
 
     const title = extractTitle( { content } ) || filename
     const description = extractDescription( { content } )
-    const normative = !PROSAIC_FILES.has( filename )
+    const normative = !prosaicFiles.has( filename )
 
-    const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit } )
+    const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } )
     const bodyRewritten = rewriteCrossRefs( { content } )
 
     // Memo 059 PRD-008 (D1 + D2 + D5): Strip the leading H1 — Starlight
@@ -169,15 +191,31 @@ const generateFile = async ( { filename, now, sourceCommit } ) => {
 
     const output = frontmatter + '\n' + body
 
-    const targetPath = join( PAYLOAD_DIR, filename )
+    const targetPath = join( targetDir, filename )
     await writeFile( targetPath, output, 'utf-8' )
     return { filename, title, normative, descLength: description.length }
 }
 
 
-const main = async () => {
-    await mkdir( PAYLOAD_DIR, { recursive: true } )
+const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit } ) => {
+    await mkdir( targetDir, { recursive: true } )
+    const allFiles = await readdir( sourceDir )
+    const docFiles = allFiles
+        .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
+        .sort()
 
+    console.log( `Generating ${ label } payload from ${ docFiles.length } files (version=${ version }, source_commit=${ sourceCommit })...` )
+    const results = []
+    for( const filename of docFiles ) {
+        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase } )
+        results.push( result )
+        console.log( `  ✓ ${ filename } → ${ result.title }` )
+    }
+    return results
+}
+
+
+const main = async () => {
     let sourceCommit
     try {
         sourceCommit = execSync( 'git rev-parse HEAD', { cwd: REPO } )
@@ -190,23 +228,52 @@ const main = async () => {
         process.exit( 1 )
     }
 
-    const allFiles = await readdir( SPEC_DIR )
-    const specFiles = allFiles
-        .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
-        .sort()
-
     const now = new Date().toISOString()
-    const results = []
 
-    console.log( `Generating docs-payload from ${ specFiles.length } spec files (source_commit=${ sourceCommit })...` )
-    for( const filename of specFiles ) {
-        const result = await generateFile( { filename, now, sourceCommit } )
-        results.push( result )
-        console.log( `  ✓ ${ filename } → ${ result.title }` )
+    // --- Spec pass (unchanged output) ---
+    const specResults = await generatePass( {
+        label: 'spec',
+        sourceDir: SPEC_DIR,
+        targetDir: PAYLOAD_DIR,
+        prosaicFiles: PROSAIC_FILES,
+        section: 'Specification',
+        versionField: 'spec_version',
+        version: SPEC_VERSION,
+        sourceRelBase: `spec/v${ SPEC_VERSION }`,
+        now,
+        sourceCommit
+    } )
+
+    console.log( `\nGenerated ${ specResults.length } spec files in ${ PAYLOAD_DIR }` )
+    console.log( `Normative: ${ specResults.filter( ( r ) => r.normative ).length }, Prosaic: ${ specResults.filter( ( r ) => !r.normative ).length }` )
+
+    // --- Grading pass (Memo 086 PRD-06 — additive second source) ---
+    let gradingResults = []
+    let gradingVersion = null
+    try {
+        const gradingDirs = await readdir( GRADING_ROOT )
+        gradingVersion = pickMaxSemverDir( { names: gradingDirs } )
+    } catch( err ) {
+        console.warn( `\nNo grading/ folder found — skipping grading pass (${ err.message })` )
     }
 
-    console.log( `\nGenerated ${ results.length } files in ${ PAYLOAD_DIR }` )
-    console.log( `Normative: ${ results.filter( ( r ) => r.normative ).length }, Prosaic: ${ results.filter( ( r ) => !r.normative ).length }` )
+    if( gradingVersion ) {
+        gradingResults = await generatePass( {
+            label: 'grading',
+            sourceDir: join( GRADING_ROOT, gradingVersion ),
+            targetDir: GRADING_PAYLOAD_DIR,
+            prosaicFiles: GRADING_PROSAIC_FILES,
+            section: 'Grading',
+            versionField: 'grading_version',
+            version: gradingVersion,
+            sourceRelBase: `grading/${ gradingVersion }`,
+            now,
+            sourceCommit
+        } )
+        console.log( `\nGenerated ${ gradingResults.length } grading files in ${ GRADING_PAYLOAD_DIR } (grading_version=${ gradingVersion })` )
+    } else {
+        console.warn( '\nNo semver grading folder — grading pass skipped.' )
+    }
 }
 
 

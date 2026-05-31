@@ -1,6 +1,6 @@
 {
-    "spec_version": "4.1.0",
-    "generated_at": "2026-05-29T13:35:54.729Z",
+    "spec_version": "4.2.0",
+    "generated_at": "2026-05-31T16:20:17.324Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -279,7 +279,7 @@
             "filename": "17-selections.md",
             "slug": "selections",
             "title": "Selections",
-            "description": "**Version:** FlowMCP 4.1.0",
+            "description": "**Version:** FlowMCP 4.2.0",
             "order": 17,
             "section": "Specification",
             "normative": true,
@@ -295,7 +295,7 @@
             "filename": "18-prefill.md",
             "slug": "prefill",
             "title": "Prefill and Placeholders",
-            "description": "**Version:** FlowMCP 4.1.0",
+            "description": "**Version:** FlowMCP 4.2.0",
             "order": 18,
             "section": "Specification",
             "normative": true,
@@ -311,7 +311,7 @@
             "filename": "19-mcp-integration.md",
             "slug": "mcp-integration",
             "title": "MCP Server Integration",
-            "description": "**Version:** FlowMCP 4.1.0",
+            "description": "**Version:** FlowMCP 4.2.0",
             "order": 19,
             "section": "Specification",
             "normative": true,
@@ -327,7 +327,7 @@
             "filename": "20-validation-strategy.md",
             "slug": "validation-strategy",
             "title": "Validation Strategy",
-            "description": "**Version:** FlowMCP 4.1.0",
+            "description": "**Version:** FlowMCP 4.2.0",
             "order": 20,
             "section": "Specification",
             "normative": true,
@@ -393,6 +393,11 @@
             "name": "Specification",
             "file_count": 24,
             "order": 1
+        },
+        {
+            "name": "Grading",
+            "file_count": 26,
+            "order": 2
         }
     ],
     "stats": {
@@ -403,15 +408,254 @@
     },
     "meta": {
         "stats": {
-            "count_schemas": 365,
-            "count_unique_datasources": 288,
-            "count_tools": 1575,
+            "count_schemas": 373,
+            "count_unique_datasources": 291,
+            "count_tools": 1608,
             "count_resources": 0,
             "count_skills": 0,
-            "count_subset_required_keys": 90,
-            "timestamp": "2026-05-25T03:03:58.605Z",
+            "count_subset_required_keys": 91,
+            "timestamp": "2026-05-29T14:10:31.917Z",
             "schema_version": "v4.0.0",
-            "build_hash": "5067ba9"
+            "build_hash": "1e76731"
         }
+    },
+    "grading": {
+        "version": "2.0.0",
+        "files": [
+            {
+                "filename": "00-overview.md",
+                "slug": "overview",
+                "title": "Grading-Spec `gradingSpec/2.0.0`",
+                "description": "This document uses the key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"NOT RECOMMENDED\", \"MAY\", and \"OPTIONAL\" as defined in BCP 14 [RFC2119]...",
+                "order": 0,
+                "section": "Grading",
+                "normative": false
+            },
+            {
+                "filename": "01-default-journey.md",
+                "slug": "default-journey",
+                "title": "01 — Default Journey & Maximalism",
+                "description": "This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main...",
+                "order": 1,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "02-eligibility.md",
+                "slug": "eligibility",
+                "title": "02 — Eligibility",
+                "description": "This chapter defines **what is allowed to be part of a gradable schema**. Eligibility is the upstream gate: an endpoint that is not eligible MUST NOT appear in a schema. The maximalism principle in...",
+                "order": 2,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "03-tos.md",
+                "slug": "tos",
+                "title": "03 — Terms of Service",
+                "description": "This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer (`Sorgfaltspflicht`), not part of the eligibility gate. A missing...",
+                "order": 3,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "04-phases-single.md",
+                "slug": "phases-single",
+                "title": "04 — Provider-Side Grading Areas",
+                "description": "This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model...",
+                "order": 4,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "05-phases-selection.md",
+                "slug": "phases-selection",
+                "title": "05 — Selection-Side Grading Areas",
+                "description": "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification...",
+                "order": 5,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "06-determinism-and-tier.md",
+                "slug": "determinism-and-tier",
+                "title": "06 — Determinism and Tier",
+                "description": "The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but...",
+                "order": 6,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "07-scoring-vs-grading.md",
+                "slug": "scoring-vs-grading",
+                "title": "07 — Scoring System vs. Grading System",
+                "description": "The terms **\"Scoring\"** and **\"Grading\"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update...",
+                "order": 7,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "08-grading-model.md",
+                "slug": "grading-model",
+                "title": "08 — Grading Model",
+                "description": "A grading is an **array of evaluations** that carries **veto power**, a **tier trim** (autonomous max `B` / group max `A`), and can be **re-triggered by the user**. It is described as **one data...",
+                "order": 8,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "09-security-and-development.md",
+                "slug": "security-and-development",
+                "title": "09 — Security and Development",
+                "description": "Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md)...",
+                "order": 9,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "10-domain-knowledge.md",
+                "slug": "domain-knowledge",
+                "title": "10 — Domain Knowledge and Group Definition",
+                "description": "A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation....",
+                "order": 10,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "11-about-convention.md",
+                "slug": "about-convention",
+                "title": "11 — About Convention as a Schema Resource",
+                "description": "This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows.",
+                "order": 11,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "12-personas-contract.md",
+                "slug": "personas-contract",
+                "title": "12 — Personas Contract",
+                "description": "The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the...",
+                "order": 12,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "13-skills.md",
+                "slug": "skills",
+                "title": "13 — Skills: Namespace Skill vs. Selection Skill",
+                "description": "A skill carries a `type` (§2). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a...",
+                "order": 13,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "14-kanban-data-contract.md",
+                "slug": "kanban-data-contract",
+                "title": "14 — Kanban Data Contract (superseded)",
+                "description": "The earlier `1.1.0` Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. The `2.0.0` break replaces this with a single derived...",
+                "order": 14,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "15-versioning-axes.md",
+                "slug": "versioning-axes",
+                "title": "15 — Versioning + Canonical Hash (§10)",
+                "description": "Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in...",
+                "order": 15,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "16-selection-lockfile.md",
+                "slug": "selection-lockfile",
+                "title": "16 — Selection Definition + `index.json.lockSnapshot` (§11)",
+                "description": "In 1.1.0 the member pins lived in a standalone `selection.lock.json` and the provider unit was described by an authored `namespace.json`. Both files are removed in 2.0.0. The pins are folded into the...",
+                "order": 16,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "17-scope-whitelist.md",
+                "slug": "scope-whitelist",
+                "title": "17 — Scope Whitelist + Public-only Principle (§12)",
+                "description": "This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by...",
+                "order": 17,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "18-flywheel-loop.md",
+                "slug": "flywheel-loop",
+                "title": "18 — Flywheel Loop",
+                "description": "The grading process is a **round-trip** between the source repository and the workbench:",
+                "order": 18,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "19-folder-layout.md",
+                "slug": "folder-layout",
+                "title": "19 — Folder Layout (§17)",
+                "description": "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` §19...",
+                "order": 19,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "20-entry-point-prompt.md",
+                "slug": "entry-point-prompt",
+                "title": "20 — Entry-Point Prompt + Personas Obligation (§18)",
+                "description": "Empty context (see [`02-eligibility.md`](./02-eligibility.md) §3.5) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts...",
+                "order": 20,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "21-pre-conditions.md",
+                "slug": "pre-conditions",
+                "title": "21 — Universal Pre-Condition Obligation (§20)",
+                "description": "This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks...",
+                "order": 21,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "22-workbench-island.md",
+                "slug": "workbench-island",
+                "title": "22 — Workbench Island",
+                "description": "The grading data directory (`grading-data/`) is a **workbench island**: an internal working area where schemas and selections are hammered on day after day. It is deliberately separate from the...",
+                "order": 22,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "23-index-json.md",
+                "slug": "index-json",
+                "title": "23 — The `index.json` Rollup",
+                "description": "Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the...",
+                "order": 23,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "24-selection-aggregate.md",
+                "slug": "selection-aggregate",
+                "title": "24 — The `selection-aggregate` Area (11th area)",
+                "description": "Grading is organised into **areas** — one rubric per primitive type. Ten areas already exist with output schemas under `prompts/output-schemas/`: `single-test`, `tools-aggregate-schema`,...",
+                "order": 24,
+                "section": "Grading",
+                "normative": true
+            },
+            {
+                "filename": "25-harness-and-goal.md",
+                "slug": "harness-and-goal",
+                "title": "25 — Harness and `/goal`",
+                "description": "Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with...",
+                "order": 25,
+                "section": "Grading",
+                "normative": true
+            }
+        ]
     }
 }

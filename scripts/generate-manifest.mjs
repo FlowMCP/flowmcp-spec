@@ -23,6 +23,7 @@ const REPO = resolve( __dirname, '..' )
 const SPEC_VERSION = JSON.parse( readFileSync( join( REPO, 'package.json' ), 'utf8' ) ).version
 const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
+const GRADING_PAYLOAD_DIR = join( PAYLOAD_DIR, 'grading' )
 const MANIFEST_PATH = join( PAYLOAD_DIR, 'manifest.json' )
 const CHECKER = join( REPO, 'skills/spec-quality/evaluator-spec-rfc2119/check.mjs' )
 const GENERATOR = 'scripts/generate-manifest.mjs'
@@ -176,6 +177,50 @@ const versionAddedFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 086 PRD-06: additive grading block. Scans the grading payload subdir
+// (a SECOND input) and returns { version, files[] }. Returns null if absent —
+// manifest.files stays spec-only and byte-compatible (081 F8=A).
+const buildGradingBlock = async () => {
+    let gradingFiles
+    try {
+        const allFiles = await readdir( GRADING_PAYLOAD_DIR )
+        gradingFiles = allFiles
+            .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
+            .sort()
+    } catch( error ) {
+        console.warn( `No grading payload found — manifest.grading omitted (${ error.message })` )
+        return null
+    }
+
+    if( gradingFiles.length === 0 ) return null
+
+    const entries = []
+    let version = null
+    for( const filename of gradingFiles ) {
+        const payloadPath = join( GRADING_PAYLOAD_DIR, filename )
+        const payloadContent = await readFile( payloadPath, 'utf-8' )
+        const fm = parseFrontmatter( { content: payloadContent } )
+        if( !fm ) {
+            console.warn( `  ! grading/${ filename } — could not parse frontmatter, skipping` )
+            continue
+        }
+        if( !version && typeof fm.grading_version === 'string' ) version = fm.grading_version
+        entries.push( {
+            filename,
+            slug: slugFromFilename( { filename } ),
+            title: fm.title,
+            description: fm.description,
+            order: fm.order,
+            section: fm.section,
+            normative: fm.normative
+        } )
+    }
+
+    console.log( `Grading block: ${ entries.length } files (grading_version=${ version })` )
+    return { version, files: entries }
+}
+
+
 const main = async () => {
     const allFiles = await readdir( PAYLOAD_DIR )
     const docFiles = allFiles
@@ -230,6 +275,7 @@ const main = async () => {
     }
 
     const schemaStats = await getStats( { manifestPath: MANIFEST_PATH } )
+    const gradingBlock = await buildGradingBlock()
 
     const manifest = {
         spec_version: SPEC_VERSION,
@@ -248,6 +294,12 @@ const main = async () => {
         meta: {
             stats: schemaStats
         }
+    }
+
+    // Memo 086 PRD-06: additive grading block (manifest.files above stays spec-only)
+    if( gradingBlock ) {
+        manifest.grading = gradingBlock
+        manifest.sections.push( { name: 'Grading', file_count: gradingBlock.files.length, order: 2 } )
     }
 
     await writeFile( MANIFEST_PATH, JSON.stringify( manifest, null, 4 ) + '\n', 'utf-8' )

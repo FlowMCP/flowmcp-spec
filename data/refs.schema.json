@@ -24,6 +24,17 @@
                 "miniSkillTemplate": { "type": "string", "pattern": "^data/.*\\.md$" }
             }
         },
+        "grading": {
+            "type": "object",
+            "required": [ "currentVersion", "url" ],
+            "additionalProperties": false,
+            "properties": {
+                "currentVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+                "recommendedRelease": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+                "specDir": { "type": "string", "pattern": "^grading/\\d+\\.\\d+\\.\\d+$" },
+                "url": { "type": "string", "pattern": "^https://.+$" }
+            }
+        },
         "imports": {
             "type": "object",
             "minProperties": 1,

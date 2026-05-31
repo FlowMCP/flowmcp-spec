@@ -9711,9 +9711,9 @@ The ID schema solves this by defining a **structured, human-readable identifier 
 
 ```mermaid
 flowchart LR
-    A[Namespace] --> B[/]
+    A[Namespace] --> B["/"]
     B --> C[Resource Type]
-    C --> D[/]
+    C --> D["/"]
     D --> E[Name]
     E --> F["coingecko/tool/simplePrice"]
 ```

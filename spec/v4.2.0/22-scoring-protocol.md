@@ -18,11 +18,13 @@ CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via J
 
 ---
 
-## See also — Grading-Spec in `flowmcp-grading`
+## Delegation — the grading model lives in the Grading-Spec
 
-A separate **Grading-Spec** (`gradingSpec/1.0.0`) exists in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. It describes Single-Schema and Selection grading, Scoring System, Grading System, Veto, Tier, and skill families. The Schemas-Spec v4.2.0 remains the highest instance; the Scoring Protocol v1 defined in this file is **sub-consumed** by the Grading-Spec, not delegated to it.
+FlowMCP is the highest instance and **delegates the grading model** to a separate, independently versioned standard: the **Grading-Spec** (`gradingSpec/2.0.0`), published as a dedicated docs area. The Grading-Spec owns the grading model — score-to-grade thresholds, the extended dimension set, Scoring System, Grading System, Categorical-Veto, Tier-trim, and skill families.
 
-Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
+This file owns the **upstream scoring transport** only: the deterministic `prompts.json` / `scores.json` artefact pair exchanged between the CLI and an external Grader. The Grading-Spec **sub-consumes** this transport and treats it as the highest instance for the artefact pair — it does not redefine it.
+
+Entry point: [Grading-Spec 2.0.0 — Overview](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md).
 
 ---
 
@@ -43,20 +45,13 @@ Each schema is evaluated on 2 dimensions:
 | `whenToUse` | Clarity and specificity of the schema description (does an LLM know when to use this schema?) |
 | `parameters` | How well the parameter descriptions enable correct tool invocation |
 
-Each dimension yields a score on a 1.0-5.0 scale (floating point).
+Each dimension yields a score on a 1.0-5.0 scale (floating point). These two are the **base transport dimensions**; the Grading-Spec ([`08-grading-model.md` §Dimension Enum](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/08-grading-model.md)) extends this set with the additional grading dimensions it owns.
 
 ---
 
-## Grade Thresholds
+## Grade Thresholds — delegated to the Grading-Spec
 
-| Grade | Score Range | Action |
-|-------|-------------|--------|
-| A | >= 4.5 | Production-ready |
-| B | 3.5 <= s < 4.5 | Production-ready |
-| C | 2.5 <= s < 3.5 | Hold (improvement plan) |
-| D / F | < 2.5 | Blocked (no deploy) |
-
-Production-Gate: Score >= 3.5 required for deployment.
+The score-to-grade banding, the production gate, the tier-trim rule and the Categorical-Veto list are **owned by the Grading-Spec** (`gradingSystem/1.0.0`), not by this transport protocol. See [Grading-Spec 2.0.0 — §4.1 Score-to-Grade Thresholds](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/07-scoring-vs-grading.md). Changing any threshold or the numeric mapping bumps the `gradingSystem` version independently of `scoringProtocol`.
 
 ---
 

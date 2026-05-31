@@ -11,7 +11,7 @@
 > **Status:** stable (structural break vs. 1.1.0)
 > **Changes vs. 1.1.0:** five top-level folders collapse to three (`providers/`, `selections/`, `shared-lists/`). The source-of-truth direction is inverted — source files are neutral (no in-source hashes), all hash bindings live in the derived `index.json`. Filenames follow the timestamp-first naming grammar. About lives at the schema level. `single/`, `phase-status/`, `projects/`, the authored `namespace.json`, and `selection.lock.json` are removed.
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 

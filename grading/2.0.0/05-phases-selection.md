@@ -7,13 +7,13 @@
 | Depends on | [`00-overview.md`](./00-overview.md), [`04-phases-single.md`](./04-phases-single.md) |
 | Related | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`13-skills.md`](./13-skills.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
 ## 1. Introduction
 
-A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification v4.1 (see [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md)).
+A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification v4.2 (see [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/17-selections.md)).
 
 This chapter is the **normative source for the selection-side grading Areas**. These Areas run **on top of** the provider-side Areas of [`04-phases-single.md`](./04-phases-single.md): they presuppose that every member schema has already been graded on the provider side and reached the status `stable` (see the pre-condition in §6).
 
@@ -123,4 +123,4 @@ This tier is the **only** path to grade **A**. The provider-side Areas (`autonom
 - [`13-skills.md`](./13-skills.md) — selection-skill levels and per-skill grading.
 - [`19-folder-layout.md`](./19-folder-layout.md) — `_gradings/` placement, `index.json`, member resolution.
 - [`21-pre-conditions.md`](./21-pre-conditions.md) — the "all members stable" gate.
-- FlowMCP Schemas Specification v4.1.0 — [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md).
+- FlowMCP Schemas Specification v4.2.0 — [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/17-selections.md).

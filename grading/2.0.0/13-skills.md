@@ -5,9 +5,9 @@
 | Status | Normative |
 | Version | `gradingSpec/2.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md) |
-| Related | Schemas-Spec v4.1.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/14-skills.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md) |
+| Related | Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
@@ -23,7 +23,7 @@ The two categories cover different scopes (a namespace versus a selection of nam
 
 ### 2.1 `type` (Schemas-Spec field)
 
-The Schemas-Spec v4.1.0 distinguishes the three skill scopes via the `type` field. The relevant definition is at `repos/flowmcp-spec/spec/v4.1.0/14-skills.md`:
+The Schemas-Spec v4.2.0 distinguishes the three skill scopes via the `type` field. The relevant definition is at `repos/flowmcp-spec/spec/v4.2.0/14-skills.md`:
 
 ```text
 | `type` | `string` | One of: `'namespace'`, `'selection'`, `'agent'` | … |
@@ -169,11 +169,11 @@ The two categories differ on:
 
 ---
 
-## 7. Relationship to the Schemas-Spec v4.1.0
+## 7. Relationship to the Schemas-Spec v4.2.0
 
-The Schemas-Spec v4.1.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (§2.1).
+The Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (§2.1).
 
-The `level` field (§2.2) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.1 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
+The `level` field (§2.2) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
 
 The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration scope) is preserved without modification.
 
@@ -181,7 +181,7 @@ The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration 
 
 ## 8. Cross-References
 
-- Schemas-Spec v4.1.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/14-skills.md) — the `type` field and the `SKL018` limit.
+- Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) — the `type` field and the `SKL018` limit.
 - [`11-about-convention.md`](./11-about-convention.md) — the About-Resource obligation that skills reference.
 - [`12-personas-contract.md`](./12-personas-contract.md) — the persona contract that the persona focus draws from.
 - [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the soft 5 / hard 7 thresholds that determine whether a selection skill is allowed at full scope.

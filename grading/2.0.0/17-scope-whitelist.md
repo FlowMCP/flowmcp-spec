@@ -11,7 +11,7 @@
 > **Status:** stable (additive extension of 1.0.0)
 > **Changes vs. 1.0.0:** entirely new section §12 (scope whitelist + public-only principle).
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 

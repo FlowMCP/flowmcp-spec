@@ -5,9 +5,9 @@
 | Status | Normative |
 | Version | `gradingSpec/1.1.0`, `gradingSystem/1.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | [`10-domain-knowledge.md`](./10-domain-knowledge.md), Schemas-Spec v4.1.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/11-preload.md), `node-formatting` skill, `node-error-codes` skill |
+| Related | [`10-domain-knowledge.md`](./10-domain-knowledge.md), Schemas-Spec v4.2.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/11-preload.md), `node-formatting` skill, `node-error-codes` skill |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
@@ -80,7 +80,7 @@ The full error-code catalogue for the grading subsystem itself (codes `GRD-*`, `
 
 ## 6. Best-Practice Reference — Preload Pattern
 
-The Schemas-Spec v4.1.0 defines the **Preload pattern** in [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/11-preload.md). For schemas that handle **large, infrequently-updated data sets**, Preload SHOULD be used.
+The Schemas-Spec v4.2.0 defines the **Preload pattern** in [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/11-preload.md). For schemas that handle **large, infrequently-updated data sets**, Preload SHOULD be used.
 
 **Example.** A schema fetches a 2-MB reference data file that is updated daily. The schema SHOULD use Preload to cache the file once per day rather than re-fetching it on every tool call.
 
@@ -162,7 +162,7 @@ Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingS
 - [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — the version namespaces (`scoringSystem` / `gradingSystem`) that bind score changes from this chapter.
 - [`08-grading-model.md`](./08-grading-model.md) — the data model of the Categorical Veto entries defined here.
 - [`10-domain-knowledge.md`](./10-domain-knowledge.md) — Shared Lists and forbidden provider conventions (forward reference).
-- Schemas-Spec v4.1.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/11-preload.md) — the Preload pattern (external).
+- Schemas-Spec v4.2.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/11-preload.md) — the Preload pattern (external).
 - `node-formatting` skill — formatting rules.
 - `node-error-codes` skill — PREFIX-NUMBER error-code pattern.
 - No-silent-defaults rule — anti-defaults rule.

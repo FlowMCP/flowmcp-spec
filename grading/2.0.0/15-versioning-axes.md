@@ -11,7 +11,7 @@
 > **Status:** stable (structural break vs. 1.1.0)
 > **Changes vs. 1.1.0:** the SemVer bump tables are removed — versioning is timestamp-based, carried by the filename. The sha256-8 hash algorithm is kept but the hash is moved out of the source files into the filename and the derived `index.json`. The `schemaVersion` / `selectionVersion` snapshot fields are removed from the source.
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 

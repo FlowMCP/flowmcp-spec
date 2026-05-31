@@ -12,7 +12,7 @@
 > **Status:** stable (structural break vs. 1.1.0)
 > **Changes vs. 1.1.0:** the standalone `selection.lock.json` is **removed** — the member pins now live in `index.json.lockSnapshot`. The authored `namespace.json` is **removed** entirely (folded into `index.json`). The hashes are stripped out of the neutral `selection.json`. The two annex schemas `selection.lock.schema.json` and `namespace.schema.json` are deprecated.
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
@@ -55,7 +55,7 @@ A Selection binds N schemas into a domain coverage. The definition lives in `sel
 | `whenToUse` | string | mandatory trigger sentence — graded as its own field, never collapsed into `description` |
 | `personaIds[]` | array (min 1) | mandatory personas — see [`20-entry-point-prompt.md`](./20-entry-point-prompt.md) §18.3 |
 | `members[]` | array (min 1) | contained schemas (only `schemaId`) |
-| `skills[]` | array (max 4) | bound skills (map / `file` form, see FlowMCP-Spec v4.1.0 SKL018) |
+| `skills[]` | array (max 4) | bound skills (map / `file` form, see FlowMCP-Spec v4.2.0 SKL018) |
 
 **Removed from the source definition:** `selectionHash`, `aboutHash`, `selectionVersion`. The snapshot identity lives in the filename timestamp and (frozen) in `index.json.lockSnapshot`. `version` (the FlowMCP-format field) stays. See [`15-versioning-axes.md`](./15-versioning-axes.md) §10.1.
 

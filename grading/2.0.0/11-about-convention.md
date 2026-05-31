@@ -5,9 +5,9 @@
 | Status | Normative |
 | Version | `gradingSpec/2.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | Schemas-Spec v4.1.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
+| Related | Schemas-Spec v4.2.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
@@ -135,18 +135,18 @@ The deterministic sub-part is binary: the declared `about` Resource and its file
 
 ---
 
-## 9. Relationship to the Schemas-Spec v4.1.0
+## 9. Relationship to the Schemas-Spec v4.2.0
 
-The Schemas-Spec v4.1.0 — particularly [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
+The Schemas-Spec v4.2.0 — particularly [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
 
-A schema-validator at v4.1 MUST NOT reject a schema for failing the About convention; the convention's enforcement lives entirely in the grader.
+A schema-validator at v4.2 MUST NOT reject a schema for failing the About convention; the convention's enforcement lives entirely in the grader.
 
 ---
 
 ## 10. Cross-References
 
-- Schemas-Spec v4.1.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md) — the external Resource primitive against which the convention is defined.
-- Schemas-Spec v4.1.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md) — the selection primitive.
+- Schemas-Spec v4.2.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md) — the external Resource primitive against which the convention is defined.
+- Schemas-Spec v4.2.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/17-selections.md) — the selection primitive.
 - [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the selection-level About Resource as the Domain-Knowledge content (seven mandatory sections).
 - [`12-personas-contract.md`](./12-personas-contract.md) — the personas reference required by §4.
 - [`13-skills.md`](./13-skills.md) — the skill obligation to reference the About Resource.

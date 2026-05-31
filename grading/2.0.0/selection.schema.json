@@ -69,7 +69,7 @@
             "minItems": 0,
             "maxItems": 4,
             "items": { "type": "string" },
-            "description": "Bound skills (max 4 per FlowMCP-Spec v4.1.0 SKL018)."
+            "description": "Bound skills (max 4 per FlowMCP-Spec v4.2.0 SKL018)."
         }
     },
     "additionalProperties": false

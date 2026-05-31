@@ -7,7 +7,7 @@
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`11-about-convention.md`](./11-about-convention.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 

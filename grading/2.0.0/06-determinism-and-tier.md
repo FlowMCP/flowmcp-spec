@@ -7,7 +7,7 @@
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md), [`09-security-and-development.md`](./09-security-and-development.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
@@ -31,7 +31,7 @@ A dimension is **deterministic** when the score is **reproducible** given:
 - identical inputs, and
 - identical `scoringSystem/X.Y.Z` version.
 
-Examples: schema structure (v4.1 field-shape check), HTTP status, route-name match, imports scan, API-key-domain match, lint.
+Examples: schema structure (v4.2 field-shape check), HTTP status, route-name match, imports scan, API-key-domain match, lint.
 
 ### 2.2 `non-deterministic`
 
@@ -76,7 +76,7 @@ The following table is the **non-exhaustive but canonical** mapping of grading d
 
 | Dimension | Determinism | Tier | Source (Area) |
 |-----------|-------------|------|----------------|
-| Schema structure (v4.1) | deterministic | autonomous | `tools-aggregate-schema` |
+| Schema structure (v4.2) | deterministic | autonomous | `tools-aggregate-schema` |
 | HTTP status (200 = pass) | deterministic | autonomous | `single-test` |
 | Tool description neutrality | deterministic (heuristic) | autonomous | `single-test` / `tools-aggregate-schema` |
 | `whenToUse` clarity | non-deterministic | autonomous | `single-test` / `tools-aggregate-schema` |

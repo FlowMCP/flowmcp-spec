@@ -32,7 +32,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 
-**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the schema quality standards for grading criteria.
+**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the [Grading-Spec 2.0.0](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md) for the grading criteria — FlowMCP delegates the grading model to this standard.
 
 **`stage:production`** — The schema is moved from `tests/new-schemas/` to `providers/{namespace}/` in the production catalog and registered in `registry.json`.
 

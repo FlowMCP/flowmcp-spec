@@ -12,7 +12,7 @@
 > **Status:** stable (structural break vs. 1.1.0)
 > **Changes vs. 1.1.0:** the 17 single dimensions plus S1-S4 are replaced by **11 grading Areas** (see §5). The source schema no longer carries `schemaHash` / `aboutHash` — these are derived and live only in the grading entry and `index.json`. The envelope gains three fields: `harness` (enum `["claude-code"]`), `persona` (`{basePersonaId, lensId}`), and `skillId` (for per-skill areas).
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 

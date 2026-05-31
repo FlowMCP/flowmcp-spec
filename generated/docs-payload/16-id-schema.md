@@ -6,9 +6,9 @@ spec_file: "16-id-schema.md"
 order: 16
 section: "Specification"
 normative: true
-source_commit: "534fa4c"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/534fa4c/spec/v4.2.0/16-id-schema.md"
-generated_at: "2026-05-31T22:36:18.559Z"
+source_commit: "7094662"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/16-id-schema.md"
+generated_at: "2026-05-31T23:03:59.972Z"
 generated_from: "spec/v4.2.0/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/16-id-schema.md."
@@ -30,9 +30,9 @@ The ID schema solves this by defining a **structured, human-readable identifier 
 
 ```mermaid
 flowchart LR
-    A[Namespace] --> B[/]
+    A[Namespace] --> B["/"]
     B --> C[Resource Type]
-    C --> D[/]
+    C --> D["/"]
     D --> E[Name]
     E --> F["coingecko/tool/simplePrice"]
 ```

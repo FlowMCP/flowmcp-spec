@@ -6,7 +6,7 @@ The Schemas-Spec remains the highest instance and now **delegates** schema gradi
 
 ### Changed
 
-- **`22-scoring-protocol.md`** — rewritten as a short **delegation pointer** to the Grading-Spec instead of carrying a standalone scoring protocol (the Scoring Protocol is now owned by the Grading-Spec, not sub-consumed here).
+- **`22-scoring-protocol.md`** — **delegates the grading model** (score-to-grade thresholds, the extended dimension set, Veto/Tier) to the Grading-Spec, while **retaining the upstream scoring transport** (the `prompts.json` / `scores.json` artefact pair) that the Grading-Spec sub-consumes and treats as the highest instance.
 - **`20-validation-strategy.md`** — references the Grading-Spec (`gradingSpec/2.0.0`) as the extended grading layer above the deterministic A–F baseline.
 - Spec folder hardcopied to `spec/v4.2.0/`; version constants in `package.json` and `data/refs.manual.json` aligned.
 

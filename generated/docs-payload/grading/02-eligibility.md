@@ -6,9 +6,9 @@ spec_file: "02-eligibility.md"
 order: 2
 section: "Grading"
 normative: true
-source_commit: "2d44cb7"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/02-eligibility.md"
-generated_at: "2026-05-31T17:29:02.778Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/02-eligibility.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/02-eligibility.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/02-eligibility.md."

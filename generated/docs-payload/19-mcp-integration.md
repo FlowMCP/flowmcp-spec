@@ -1,23 +1,20 @@
 ---
 title: "MCP Server Integration"
-description: "**Version:** FlowMCP 4.2.0"
+description: "When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific metadata. The `meta` block in every Tool definition provides this metadata."
 spec_version: "4.2.0"
 spec_file: "19-mcp-integration.md"
 order: 19
 section: "Specification"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/spec/v4.2.0/19-mcp-integration.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/spec/v4.2.0/19-mcp-integration.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "spec/v4.2.0/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/19-mcp-integration.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-**Version:** FlowMCP 4.2.0  
-**Status:** Active
 
 ---
 

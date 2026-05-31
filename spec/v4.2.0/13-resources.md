@@ -664,7 +664,7 @@ HTTP Resources allow schemas to reference remote files (typically SQLite databas
 | Frequently updated datasets | Daily-updated government open data |
 | Externally maintained datasets | Third-party data providers |
 
-### HTTP Resource Fields
+### HTTP Resource Example
 
 ```javascript
 resources: {
@@ -752,7 +752,7 @@ resources: {
 
 ### Validation Rule
 
-**RES010:** `source: 'http'` requires a `url` field. The URL MUST use HTTPS (`https://`). HTTP URLs are rejected to prevent insecure data transfer.
+**RES024:** `source: 'http'` requires a `url` field. The URL MUST use HTTPS (`https://`). HTTP URLs are rejected to prevent insecure data transfer.
 
 ---
 

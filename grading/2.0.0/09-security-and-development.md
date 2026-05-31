@@ -11,15 +11,15 @@
 
 ---
 
-## 1. Introduction
+## Introduction
 
-Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md) §6 live in this chapter (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), and the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. This chapter defines the binding rules for each.
+Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md) live in this chapter (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), and the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. This chapter defines the binding rules for each.
 
 The checks covered here feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit". No check defined in this chapter raises the maximum attainable grade beyond `B` on its own. These checks contribute to the `single-test` and `tools-aggregate-schema` areas (see the 11 Areas in [`08-grading-model.md`](./08-grading-model.md)).
 
 ---
 
-## 2. API-Key Hygiene (Deterministic)
+## API-Key Hygiene (Deterministic)
 
 The following three rules are binding for every schema. A violation of rule (3) raises a Categorical Veto with `triggeredBy = api-key-domain-mismatch`.
 
@@ -33,7 +33,7 @@ A schema that uses a generic placeholder (e.g. `EXAMPLE_API_KEY`) for an API hos
 
 ---
 
-## 3. External Modules and Imports
+## External Modules and Imports
 
 Every imported external module is part of the schema's attack surface. The grader runs an **imports scan** (deterministic) and an **intent judgement** (non-deterministic) over each import.
 
@@ -45,11 +45,11 @@ Every imported external module is part of the schema's attack surface. The grade
 
 The imports scanner MUST list every external module with its name, version, and source (npm, file, URL). The list is part of the `evidence` field of the relevant grading entry.
 
-**Binding rule.** A telemetry-only module that does not exfiltrate user data is NOT a veto trigger — it is a `securityScore` reducer. A veto requires either the deterministic match against the malicious-module list (implementation concern) OR a non-deterministic judgement under `ai-security-veto` (see §4).
+**Binding rule.** A telemetry-only module that does not exfiltrate user data is NOT a veto trigger — it is a `securityScore` reducer. A veto requires either the deterministic match against the malicious-module list (implementation concern) OR a non-deterministic judgement under `ai-security-veto` (see [AI Security Veto](#ai-security-veto-non-deterministic)).
 
 ---
 
-## 4. AI Security Veto (Non-Deterministic)
+## AI Security Veto (Non-Deterministic)
 
 A grader (typically an LLM grader) CAN raise `categoricalVeto.triggeredBy = ai-security-veto` when it detects a security finding that is **not on the deterministic veto list** but is well-evidenced and well-reasoned.
 
@@ -58,13 +58,13 @@ The `ai-security-veto` trigger REQUIRES both:
 - `evidence` — a pointer to the concrete artefact (code snippet, output sample, third-party report) that supports the finding.
 - `reasoning` — a free-text explanation of why the artefact constitutes a security risk.
 
-A grading entry that sets `triggeredBy = ai-security-veto` without populating `evidence` AND `reasoning` is INVALID (see [`08-grading-model.schema.json`](./08-grading-model.schema.json)) and is rejected at validation time with error code `VET-003` (see [`08-grading-model.md`](./08-grading-model.md) §13).
+A grading entry that sets `triggeredBy = ai-security-veto` without populating `evidence` AND `reasoning` is INVALID (see [`08-grading-model.schema.json`](./08-grading-model.schema.json)) and is rejected at validation time with error code `VET-003` (see [`08-grading-model.md`](./08-grading-model.md)).
 
 This rule deliberately keeps the AI veto open-ended in its trigger condition but **closed in its evidence and reasoning obligation**. The closed list of trigger names (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`, `ai-security-veto`) is NOT extensible at runtime; widening the list is a `gradingSystem` bump.
 
 ---
 
-## 5. Error Management (Deterministic)
+## Error Management (Deterministic)
 
 Schemas SHOULD use the PREFIX-NUMBER error-code pattern defined by the `node-error-codes` skill. The pattern requires every emitted error to carry a stable prefix (e.g. `RES`, `SKL`, `GRD`) and a stable numeric code (e.g. `RES013`).
 
@@ -74,11 +74,11 @@ Schemas SHOULD use the PREFIX-NUMBER error-code pattern defined by the `node-err
 | Generic `try { ... } catch( e ) { throw e }` re-throws without code annotation | Score reduction on `formattingCompliance` |
 | Swallowing errors without re-throw or log | Severe reduction on `securityScore` — silent failures hide security incidents |
 
-The full error-code catalogue for the grading subsystem itself (codes `GRD-*`, `SCO-*`, `VET-*`) is delivered in a later stage (referenced from [`08-grading-model.md`](./08-grading-model.md) §13).
+The full error-code catalogue for the grading subsystem itself (codes `GRD-*`, `SCO-*`, `VET-*`) is delivered in a later stage (referenced from [`08-grading-model.md`](./08-grading-model.md)).
 
 ---
 
-## 6. Best-Practice Reference — Preload Pattern
+## Best-Practice Reference — Preload Pattern
 
 The Schemas-Spec v4.2.0 defines the **Preload pattern** in [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/11-preload.md). For schemas that handle **large, infrequently-updated data sets**, Preload SHOULD be used.
 
@@ -94,15 +94,15 @@ Preload is a recommendation; the absence of Preload is NOT a Categorical Veto.
 
 ---
 
-## 7. Best-Practice Reference — Shared Lists
+## Best-Practice Reference — Shared Lists
 
 A group's Domain-Knowledge document (see [`10-domain-knowledge.md`](./10-domain-knowledge.md); this is a forward reference) MAY prescribe a **Shared List** that all schemas in the group MUST use instead of a provider-specific convention. The canonical example is the Shared Chain Name List in the crypto domain: schemas in the crypto group MUST emit `sol` (Shared List) rather than `solana` (CoinGecko convention) when referring to the Solana chain.
 
-A violation of a Shared-List obligation is NOT a Categorical Veto. It is a **strong score penalty** on `domainConformance` (the dimension is `group-bound`, see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §4 dimension matrix). The "forbidden conventions" section of the Domain-Knowledge document is the source of truth for which provider conventions are disallowed per group.
+A violation of a Shared-List obligation is NOT a Categorical Veto. It is a **strong score penalty** on `domainConformance` (the dimension is `group-bound`, see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) dimension matrix). The "forbidden conventions" section of the Domain-Knowledge document is the source of truth for which provider conventions are disallowed per group.
 
 ---
 
-## 8. Formatting (Deterministic)
+## Formatting (Deterministic)
 
 Schema source code MUST follow the rules defined by the `node-formatting` skill. The three most-cited rules are:
 
@@ -114,7 +114,7 @@ A **lint script** is expected as part of the grader's setup (the spec requires i
 
 ---
 
-## 9. Pipebarkeit + Output Schema (Sub-Dimension)
+## Pipebarkeit + Output Schema (Sub-Dimension)
 
 jq-pipe compatibility is a **sub-dimension** of `outputSchemaConformance` with **low weight**. A schema's output SHOULD be navigable by canonical jq expressions (`.data.results[0].balance`); a schema that emits free-form prose at the top level reduces its pipebarkeit score even though no veto is raised.
 
@@ -122,22 +122,22 @@ This sub-dimension is deterministic: the test runs a fixed jq expression against
 
 ---
 
-## 10. Veto-Trigger Overview
+## Veto-Trigger Overview
 
-The following table lists all four Categorical-Veto triggers defined by `gradingSpec/1.1.0`. The trigger names are **identical to** the enum values in [`08-grading-model.schema.json`](./08-grading-model.schema.json) `properties.categoricalVeto.oneOf[1].properties.triggeredBy.enum`. The grader MUST NOT introduce new names at runtime.
+The following table lists all four Categorical-Veto triggers defined by `gradingSpec/2.0.0`. The trigger names are **identical to** the enum values in [`08-grading-model.schema.json`](./08-grading-model.schema.json) `properties.categoricalVeto.oneOf[1].properties.triggeredBy.enum`. The grader MUST NOT introduce new names at runtime.
 
 | Trigger | Class | Source |
 |---------|-------|--------|
-| `malicious-module` | deterministic (imports scan) + non-deterministic (behaviour judgement) | Module audit (§3) |
-| `api-key-domain-mismatch` | deterministic | API-key hygiene (§2) |
+| `malicious-module` | deterministic (imports scan) + non-deterministic (behaviour judgement) | Module audit (see [External Modules and Imports](#external-modules-and-imports)) |
+| `api-key-domain-mismatch` | deterministic | API-key hygiene (see [API-Key Hygiene](#api-key-hygiene-deterministic)) |
 | `illegal-content` | non-deterministic | Content review |
-| `ai-security-veto` | non-deterministic | AI grader reasoning (§4) |
+| `ai-security-veto` | non-deterministic | AI grader reasoning (see [AI Security Veto](#ai-security-veto-non-deterministic)) |
 
-The data model for veto entries lives in [`08-grading-model.md`](./08-grading-model.md) §6; this chapter does NOT redefine the veto record. The four trigger names enumerated above MUST match the enum values defined there.
+The data model for veto entries lives in [`08-grading-model.md`](./08-grading-model.md); this chapter does NOT redefine the veto record. The four trigger names enumerated above MUST match the enum values defined there.
 
 ---
 
-## 11. Env Handling Reference
+## Env Handling Reference
 
 Grader tools MUST NOT read `.env` files **directly** via `Read`/`grep`/`Edit` or any equivalent file API. The only conformant way to consume `~/.flowmcp/.env` is via the helper scripts (`flowmcp dev env doctor`, `flowmcp dev env acquire`, `flowmcp dev env backup`, `flowmcp dev env restore`, `flowmcp dev env diff`). The binding rationale is the never-read-env-files-with-values rule, established after an incident in which several API keys were exposed by direct file operations.
 
@@ -145,11 +145,11 @@ Implementers of graders MUST treat any direct `.env` read as a `securityScore` f
 
 ---
 
-## 12. Anti-Defaults
+## Anti-Defaults
 
 The no-silent-defaults rule is binding for this spec chapter. Every score-boost and every score-reduction described above MUST be **explicit** in the `gradingSystem/1.0.0` implementation:
 
-- No silent fall-through to `0` for missing dimensions (`n/a` is the documented placeholder — see [`08-grading-model.md`](./08-grading-model.md) §12).
+- No silent fall-through to `0` for missing dimensions (`n/a` is the documented placeholder — see [`08-grading-model.md`](./08-grading-model.md)).
 - No silent `||`-defaulting in scoring code (the `||` operator MUST NOT be used to substitute a missing value; explicit conditional validation is required).
 - Aging defaults (14 / 30 / 180 days, the `#AGING_DEFAULTS` constant) MUST be exposed as named constants in the implementation, not as inline literals.
 
@@ -157,7 +157,7 @@ Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingS
 
 ---
 
-## 13. Cross-References
+## Cross-References
 
 - [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — the version namespaces (`scoringSystem` / `gradingSystem`) that bind score changes from this chapter.
 - [`08-grading-model.md`](./08-grading-model.md) — the data model of the Categorical Veto entries defined here.

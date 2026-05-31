@@ -11,17 +11,17 @@
 
 ---
 
-## 1. Opening Clarification
+## Opening Clarification
 
-A skill carries a `type` (§2). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a separate, simpler category and do NOT carry a level.
+A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a separate, simpler category and do NOT carry a level.
 
 The two categories cover different scopes (a namespace versus a selection of namespaces) and accordingly different tiers in the sense of [`06-determinism-and-tier.md`](./06-determinism-and-tier.md): namespace-skill validation is `autonomous` (no group context required); selection-skill validation is `group-bound` (Domain-Knowledge content is required — see [`10-domain-knowledge.md`](./10-domain-knowledge.md)).
 
 ---
 
-## 2. Skill Type and the `level` Extension
+## Skill Type and the `level` Extension
 
-### 2.1 `type` (Schemas-Spec field)
+### `type` (Schemas-Spec field)
 
 The Schemas-Spec v4.2.0 distinguishes the three skill scopes via the `type` field. The relevant definition is at `repos/flowmcp-spec/spec/v4.2.0/14-skills.md`:
 
@@ -37,7 +37,7 @@ This Grading-Spec makes the **validation consequences** of each type explicit:
 
 The Schemas-Spec caps the number of skills per selection / agent registration scope at **4** via rule **`SKL018`**. This Grading-Spec does NOT change the cap.
 
-### 2.2 `level` (Grading-Spec extension)
+### `level` (Grading-Spec extension)
 
 `level` is a **Grading-Spec extension field**, not a Schemas-Spec field. It is **stored in the skill** and the grading **reads** it; the grading does not assign it. Values:
 
@@ -53,7 +53,7 @@ The L-semantics are **Signpost / Topic / Usecase**. They are **NOT** derived fro
 
 ---
 
-## 3. Category 1 — Namespace Skill (`type: 'namespace'`)
+## Category 1 — Namespace Skill (`type: 'namespace'`)
 
 | Property | Value |
 |----------|-------|
@@ -62,7 +62,7 @@ The L-semantics are **Signpost / Topic / Usecase**. They are **NOT** derived fro
 | Level | None. The `level` extension does NOT apply to namespace skills. |
 | Persona requirement | OPTIONAL — namespace skills MAY but do not have to focus on a single persona. |
 
-### 3.1 Mandatory Content (MUST)
+### Mandatory Content (MUST)
 
 A namespace skill MUST contain:
 
@@ -70,15 +70,15 @@ A namespace skill MUST contain:
 2. The **limitations** of the namespace, listed explicitly. Implementers MUST NOT omit limitations — under-stating limitations is the single most common skill anti-pattern.
 3. A **reference to the namespace's About Resource** (see [`11-about-convention.md`](./11-about-convention.md)). When the namespace declares an About Resource, the skill MUST link or embed the reference.
 
-### 3.2 Validation Obligations
+### Validation Obligations
 
 A grader validating a namespace skill MUST check:
 
 1. **Description neutrality.** The skill's description avoids marketing language and does not over-promise.
-2. **About reference presence.** The link to the About Resource is present and resolves to a Resource conformant to [`11-about-convention.md`](./11-about-convention.md) §4.
+2. **About reference presence.** The link to the About Resource is present and resolves to a Resource conformant to [`11-about-convention.md`](./11-about-convention.md).
 3. **Explicit limitations.** The limitations section exists and lists at least one limitation.
 
-### 3.3 Grading
+### Grading
 
 Namespace skills are graded **per skill** by the `namespace-skills` Area; each skill has its own `_gradings/` folder.
 
@@ -90,11 +90,11 @@ The deterministic sub-part scores About-reference presence and limitations exist
 
 ---
 
-## 4. Category 2 — Selection Skill (`type: 'selection'`, L1/L2/L3)
+## Category 2 — Selection Skill (`type: 'selection'`, L1/L2/L3)
 
-A selection skill declares a `level` (§2.2). The level reflects the role of the skill, not difficulty: L1 is the broad signpost, L3 is the persona-bound usecase deep dive.
+A selection skill declares a `level` (see [`level` (Grading-Spec extension)](#level-grading-spec-extension)). The level reflects the role of the skill, not difficulty: L1 is the broad signpost, L3 is the persona-bound usecase deep dive.
 
-### 4.1 Levels
+### Levels
 
 | Level | Role | Mandatory content |
 |-------|------|-------------------|
@@ -102,7 +102,7 @@ A selection skill declares a `level` (§2.2). The level reflects the role of the
 | **L2 — Topic** | Topic area | Which namespaces and tools belong to the topic, references to each namespace's About Resource, persona focus; names the L3 usecase skills it covers. |
 | **L3 — Usecase** | Concrete usecase | Which tools with which parameters for which usecase, bound to a persona focus; the deepest expansion. |
 
-### 4.2 Binding Statements (MUST)
+### Binding Statements (MUST)
 
 The following statements are binding for every selection skill at every level:
 
@@ -112,7 +112,7 @@ The following statements are binding for every selection skill at every level:
 
 The skill quality standards (character counts, mandatory section ordering, fixed templates) are intentionally NOT fixed at this spec version — room for experimentation is preserved.
 
-### 4.3 Per-Skill Grading and the Predecessor Chain
+### Per-Skill Grading and the Predecessor Chain
 
 Selection skills are graded **per skill**, not per level cohort. Each skill has its own `_gradings/` folder and is graded by the Area matching its level (`selection-skills-L1` / `-L2` / `-L3`).
 
@@ -120,7 +120,7 @@ The grading entry MUST carry the `skillId` so that the per-skill result is addre
 
 There is a **predecessor chain**: an L2 skill grading needs the grades of **its** L1 predecessors, and an L3 skill grading needs the grades of **its** L2 predecessors. A missing predecessor grade blocks the dependent skill's grading (recorded as a status reason, not a silent skip).
 
-### 4.4 Grading Dimensions
+### Grading Dimensions
 
 | Dimension | Determinism | Tier | Source (Area) |
 |-----------|-------------|------|----------------|
@@ -130,11 +130,11 @@ There is a **predecessor chain**: an L2 skill grading needs the grades of **its*
 | `skillLimitationsExplicit` (per level) | deterministic + non-deterministic | group-bound | per-skill Area |
 | `skillPersonaFocus` (per level) | non-deterministic | group-bound | per-skill Area |
 
-All dimensions are `group-bound` — a selection-skill validation contributes to `aggregateGrade ≥ A` attainability (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5 rule 4).
+All dimensions are `group-bound` — a selection-skill validation contributes to `aggregateGrade ≥ A` attainability (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) rule 4).
 
 ---
 
-## 5. Cross-Reference Rules (deterministic)
+## Cross-Reference Rules (deterministic)
 
 Selection skills carry **deterministic cross-reference rules** that bind the level chain together. They are checked by a deterministic detector over the skills' content, description, and `whenToUse` text.
 
@@ -148,7 +148,7 @@ The codes `SKC-001` / `SKC-002` / `SKC-003` are registered in the grading `Error
 
 ---
 
-## 6. Relationship Between the Two Categories
+## Relationship Between the Two Categories
 
 The guiding statement is:
 
@@ -159,7 +159,7 @@ A selection-skill validation can therefore be **conceptually** decomposed into s
 The two categories share:
 
 - The about-reference obligation (namespace skill MUST reference the namespace's About Resource; selection skill at L2 MUST reference its included namespaces' About Resources).
-- The explicit-limitations obligation (§3.1 sec. 2; §4.2 sec. 2).
+- The explicit-limitations obligation ([Mandatory Content](#mandatory-content-must) sec. 2; [Binding Statements](#binding-statements-must) sec. 2).
 
 The two categories differ on:
 
@@ -169,17 +169,17 @@ The two categories differ on:
 
 ---
 
-## 7. Relationship to the Schemas-Spec v4.2.0
+## Relationship to the Schemas-Spec v4.2.0
 
-The Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (§2.1).
+The Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
 
-The `level` field (§2.2) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
+The `level` field (see [`level` (Grading-Spec extension)](#level-grading-spec-extension)) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
 
 The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration scope) is preserved without modification.
 
 ---
 
-## 8. Cross-References
+## Cross-References
 
 - Schemas-Spec v4.2.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/14-skills.md) — the `type` field and the `SKL018` limit.
 - [`11-about-convention.md`](./11-about-convention.md) — the About-Resource obligation that skills reference.

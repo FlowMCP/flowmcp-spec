@@ -6,26 +6,19 @@ spec_file: "24-selection-aggregate.md"
 order: 24
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/24-selection-aggregate.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/24-selection-aggregate.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/24-selection-aggregate.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/24-selection-aggregate.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative |
-| Version | `gradingSpec/2.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`05-phases-selection.md`](./05-phases-selection.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`23-index-json.md`](./23-index-json.md), [`25-harness-and-goal.md`](./25-harness-and-goal.md) |
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
 
 ---
 
-## 1. Why this area exists
+## Why this area exists
 
 Grading is organised into **areas** — one rubric per primitive type. Ten areas already exist with output schemas under `prompts/output-schemas/`: `single-test`, `tools-aggregate-schema`, `tools-aggregate-namespace`, `namespace-description`, `namespace-skills`, `about-namespace`, `about-selection`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3`. The **eleventh** area, `selection-aggregate`, is the one missing piece: it grades **the selection as a whole**.
 
@@ -35,7 +28,7 @@ The area's gradings are stored at `selections/<selection>/_gradings/` (the selec
 
 ---
 
-## 2. Carried Dimensions
+## Carried Dimensions
 
 `selection-aggregate` carries the selection-wide dimensions:
 
@@ -50,11 +43,11 @@ The area's gradings are stored at `selections/<selection>/_gradings/` (the selec
 
 ---
 
-## 3. Output Schema
+## Output Schema
 
 The output of every area shares a common **envelope** (from `_master.schema.json` plus the area-specific part) and a list of `answers[]`. The `selection-aggregate` output conforms to that envelope.
 
-### 3.1 Envelope (shared)
+### Envelope (shared)
 
 | Field | Value |
 |-------|-------|
@@ -70,7 +63,7 @@ The output of every area shares a common **envelope** (from `_master.schema.json
 
 Each `answer` has: `questionId` (`^Q-…`), `score` (1–5 **or** `pass`/`fail`/`stale`/`n/a`), `reasoning`, optional `evidence`, and `naReason` (required when `score` is `n/a`).
 
-### 3.2 Area-specific answers
+### Area-specific answers
 
 `selection-aggregate` carries one answer per carried dimension above (deterministic where decidable — e.g. the threshold count — non-deterministic where it requires judgment — e.g. topic coherence, persona fit). The deterministic threshold answer and the non-deterministic judgment answers are **merged** into the single area output; a deterministic-only result is not a valid area grading.
 
@@ -78,27 +71,33 @@ Validation uses draft 2020-12 (`Ajv2020` + `ajv-formats`); `_master` is added on
 
 ---
 
-## 4. Template
+## Template
 
-The prompt template for `selection-aggregate` follows the same contract as the other ten areas' templates: it states the area, injects the resolved member-resolution manifest (from [`index.json`](./23-index-json.md)), the About / Domain-Knowledge, the declared personas, and the threshold counts, then asks one question per carried dimension. The template MUST include the Goal-Block and the surfacing convention (see [`25-harness-and-goal.md`](./25-harness-and-goal.md)).
+The prompt template for `selection-aggregate` follows the same contract as the other ten areas' templates: it states the area, injects the resolved member-resolution manifest (from [`index.json`](/grading/index-json/)), the About / Domain-Knowledge, the declared personas, and the threshold counts, then asks one question per carried dimension. The template MUST include the Goal-Block and the surfacing convention (see [`25-harness-and-goal.md`](/grading/harness-and-goal/)).
 
 ---
 
-## 5. Skill Triad
+## Skill Triad
 
 Like every area, `selection-aggregate` is backed by a skill triad — the three-skill contract (`start-grade` → `evaluate` → `apply-improvement`) that the harness runs as the inner micro-loop. The triad reads the frozen `lockSnapshot` and the member-resolution manifest, evaluates the carried dimensions, and emits `improvementHints[]` when the selection falls short. The triad MUST be built for this area (the other ten already have theirs).
 
 ---
 
-## 6. Relationship to the index rollup
+## Relationship to the index rollup
 
-`selection-aggregate` is the node `selectionAggregate` in the selection's [`index.json`](./23-index-json.md). Its status follows the 5-status node enum; reaching `stable` here (with the hard threshold met and a group-bound evaluation present) is what allows the selection rollup to reach Grade A.
+`selection-aggregate` is the node `selectionAggregate` in the selection's [`index.json`](/grading/index-json/). Its status follows the 5-status node enum; reaching `stable` here (with the hard threshold met and a group-bound evaluation present) is what allows the selection rollup to reach Grade A.
 
 ---
 
 ## Cross-References
 
-- Selection phases and thresholds: [`05-phases-selection.md`](./05-phases-selection.md)
-- Domain knowledge / About distinction: [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`11-about-convention.md`](./11-about-convention.md)
-- Member resolution manifest: [`23-index-json.md`](./23-index-json.md)
-- Harness, Goal-Block, surfacing convention: [`25-harness-and-goal.md`](./25-harness-and-goal.md)
+- Selection phases and thresholds: [`05-phases-selection.md`](/grading/phases-selection/)
+- Domain knowledge / About distinction: [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`11-about-convention.md`](/grading/about-convention/)
+- Member resolution manifest: [`23-index-json.md`](/grading/index-json/)
+- Harness, Goal-Block, surfacing convention: [`25-harness-and-goal.md`](/grading/harness-and-goal/)
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`05-phases-selection.md`](/grading/phases-selection/), [`08-grading-model.md`](/grading/grading-model/)
+- **Related:** [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`11-about-convention.md`](/grading/about-convention/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`23-index-json.md`](/grading/index-json/), [`25-harness-and-goal.md`](/grading/harness-and-goal/)
+

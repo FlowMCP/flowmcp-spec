@@ -6,31 +6,19 @@ spec_file: "08-grading-model.md"
 order: 8
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/08-grading-model.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/08-grading-model.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/08-grading-model.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/08-grading-model.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative — restructured in 2.0.0 |
-| Version | `gradingSpec/2.0.0`, `gradingSystem/1.0.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) |
-| Related | [`09-security-and-development.md`](./09-security-and-development.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`19-folder-layout.md`](./19-folder-layout.md) |
-| Annex | [`08-grading-model.schema.json`](./08-grading-model.schema.json) — JSON-Schema 2020-12 of the grading entry |
-
-> **Spec:** `gradingSpec/2.0.0`
-> **Status:** stable (structural break vs. 1.1.0)
-> **Changes vs. 1.1.0:** the 17 single dimensions plus S1-S4 are replaced by **11 grading Areas** (see §5). The source schema no longer carries `schemaHash` / `aboutHash` — these are derived and live only in the grading entry and `index.json`. The envelope gains three fields: `harness` (enum `["claude-code"]`), `persona` (`{basePersonaId, lensId}`), and `skillId` (for per-skill areas).
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
-## 1. Core Statement
+## Core Statement
 
 A grading is an **array of evaluations** that carries **veto power**, a **tier trim** (autonomous max `B` / group max `A`), and can be **re-triggered by the user**. It is described as **one data model** with **two skill families** writing into it. The Categorical Veto, when present, overrides every aggregation logic and yields `aggregateGrade = REJECTED`.
 
@@ -38,7 +26,7 @@ The grading entry is the **only** durable artefact emitted by a grader; it MUST 
 
 ---
 
-## 2. Architecture Decision
+## Architecture Decision
 
 > **One data model, two skill families.**
 >
@@ -48,7 +36,7 @@ This architecture decision is binding. Implementers MUST NOT split the data mode
 
 ---
 
-## 3. Data Model — Top-Level Fields
+## Data Model — Top-Level Fields
 
 The grading entry is a JSON object with the following top-level fields. The column **Required** indicates MUST / SHOULD / OPTIONAL. The column **Conditional** captures the version-conditional rules.
 
@@ -56,22 +44,22 @@ The grading entry is a JSON object with the following top-level fields. The colu
 |-------|------|---------|-------------|-------------|
 | `schemaId` | `string` | MUST | — | Identifier of the schema under grading. |
 | `selectionId` | `string` | MUST when `gradingTier=group-bound` | If `group-bound`, REQUIRED; if `autonomous`, OPTIONAL | Identifier of the Selection under grading (when group-bound). |
-| `gradingTier` | enum `autonomous` \| `group-bound` | MUST | — | Tier classification (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)). |
-| `scoringSystem` | `string` matching `^scoringSystem/\d+\.\d+\.\d+$` | MUST | — | Scoring System version (see [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md)). |
-| `gradingSystem` | `string` matching `^gradingSystem/\d+\.\d+\.\d+$` | MUST | — | Grading System version (see [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md)). |
-| `area` | enum (see §5) | MUST | — | The Area this entry grades (`const` per entry). |
-| `gradings` | `array` of answer entries | MUST | Minimum length 1 | The per-question answers for this Area (see §4). |
-| `harness` | enum `["claude-code"]` | MUST | — | The harness that drove the non-deterministic evaluation (see §3.Y). |
-| `persona` | `object` `{ basePersonaId, lensId }` | MUST for persona-bound areas | Required for persona-bound Areas (see §5) | The persona lens (see §3.Y, [`12-personas-contract.md`](./12-personas-contract.md)). |
-| `skillId` | `string` | MUST for per-skill areas | Required for `namespace-skills` and `selection-skills-L1/L2/L3` | The graded skill instance (see §3.Y). |
-| `categoricalVeto` | `object` \| `null` | MUST (default `null`) | When non-null, forces `aggregateGrade=REJECTED` | The Categorical Veto record (see §6). |
-| `regradingTrigger` | `object` | OPTIONAL | Present iff this entry is a re-grading | The re-grading trigger that produced this entry (see §11). |
+| `gradingTier` | enum `autonomous` \| `group-bound` | MUST | — | Tier classification (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)). |
+| `scoringSystem` | `string` matching `^scoringSystem/\d+\.\d+\.\d+$` | MUST | — | Scoring System version (see [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)). |
+| `gradingSystem` | `string` matching `^gradingSystem/\d+\.\d+\.\d+$` | MUST | — | Grading System version (see [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)). |
+| `area` | enum (see [Areas and Score Values](#areas-and-score-values)) | MUST | — | The Area this entry grades (`const` per entry). |
+| `gradings` | `array` of answer entries | MUST | Minimum length 1 | The per-question answers for this Area (see [`gradings[]` Element](#data-model--gradings-element-per-question-answer)). |
+| `harness` | enum `["claude-code"]` | MUST | — | The harness that drove the non-deterministic evaluation (see [Envelope Fields](#envelope-fields-new-in-200)). |
+| `persona` | `object` `{ basePersonaId, lensId }` | MUST for persona-bound areas | Required for persona-bound Areas (see [Areas and Score Values](#areas-and-score-values)) | The persona lens (see [Envelope Fields](#envelope-fields-new-in-200), [`12-personas-contract.md`](/grading/personas-contract/)). |
+| `skillId` | `string` | MUST for per-skill areas | Required for `namespace-skills` and `selection-skills-L1/L2/L3` | The graded skill instance (see [Envelope Fields](#envelope-fields-new-in-200)). |
+| `categoricalVeto` | `object` \| `null` | MUST (default `null`) | When non-null, forces `aggregateGrade=REJECTED` | The Categorical Veto record (see [Categorical Veto](#categorical-veto)). |
+| `regradingTrigger` | `object` | OPTIONAL | Present iff this entry is a re-grading | The re-grading trigger that produced this entry (see [Re-Grading Trigger](#re-grading-trigger)). |
 | `aggregateGrade` | enum `A` \| `B` \| `C` \| `D` \| `F` \| `REJECTED` | MUST | `REJECTED` iff `categoricalVeto != null` | The aggregate grade after weighted aggregation and tier trim. |
-| `maxAttainableGrade` | enum `A` \| `B` | MUST | Derived from `gradingTier` | The highest grade attainable at this tier (see §8). |
+| `maxAttainableGrade` | enum `A` \| `B` | MUST | Derived from `gradingTier` | The highest grade attainable at this tier (see [Tier Computation](#tier-computation--maxattainablegrade)). |
 
 A grading entry MUST contain all MUST fields, conditional fields when their condition holds, and MAY contain OPTIONAL fields. `additionalProperties` is `false` (see [`08-grading-model.schema.json`](./08-grading-model.schema.json)).
 
-### 3.X Mandatory Fields + Hash Placement (restructured in 2.0.0)
+### Mandatory Fields + Hash Placement (restructured in 2.0.0)
 
 The grading entry binds a grading to the *concrete tested schema variant* and makes the partial vs. full mode explicit. The fields below live on the grading entry.
 
@@ -84,7 +72,7 @@ The grading entry binds a grading to the *concrete tested schema variant* and ma
 | `gradingMode` | `"partial" \| "full"` | `"full"` | determines the `aggregateGrade` effect |
 | `aboutHash` | sha256, 8 chars | `ef56gh78` | hash of the about page (recorded here, derived) |
 
-**Hash placement (binding in 2.0.0).** `schemaHash` and `aboutHash` are **not** part of the source schema contract. The source schema is **neutral** — it carries only logical names and the FlowMCP `version` field. The hashes are derived from the canonical content and recorded in **two** derived places: the grading entry (above) and the namespace/selection `index.json`. They never live inside the source `.mjs`. Rationale: an in-source hash drifts on every edit, so the recorded value stops matching the content (see [`15-versioning-axes.md`](./15-versioning-axes.md) §10.2).
+**Hash placement (binding in 2.0.0).** `schemaHash` and `aboutHash` are **not** part of the source schema contract. The source schema is **neutral** — it carries only logical names and the FlowMCP `version` field. The hashes are derived from the canonical content and recorded in **two** derived places: the grading entry (above) and the namespace/selection `index.json`. They never live inside the source `.mjs`. Rationale: an in-source hash drifts on every edit, so the recorded value stops matching the content (see [`15-versioning-axes.md`](/grading/versioning-axes/)).
 
 **Example source schema header (neutral — no hashes, no snapshot version):**
 
@@ -115,51 +103,51 @@ export const schema = {
 
 **Cross-Refs:**
 
-- `schemaHash` / `aboutHash` → canonical representation + placement in [`15-versioning-axes.md`](./15-versioning-axes.md) §10.2/§10.3, and the binding `index.json.lockSnapshot` in [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2
-- `gradingMode` → see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8 (tier trim) + [`18-flywheel-loop.md`](./18-flywheel-loop.md) §16 (flywheel)
-- `gradingId` → see [`19-folder-layout.md`](./19-folder-layout.md) §17 (naming convention)
+- `schemaHash` / `aboutHash` → canonical representation + placement in [`15-versioning-axes.md`](/grading/versioning-axes/), and the binding `index.json.lockSnapshot` in [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- `gradingMode` → see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) (tier trim) + [`18-flywheel-loop.md`](/grading/flywheel-loop/) (flywheel)
+- `gradingId` → see [`19-folder-layout.md`](/grading/folder-layout/) (naming convention)
 
-### 3.Y Envelope Fields (NEW in 2.0.0)
+### Envelope Fields (NEW in 2.0.0)
 
 The grading envelope carries three additional fields that describe *how* and *under which lens* a grading was produced.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `harness` | enum `["claude-code"]` | MUST | The harness that drove the non-deterministic evaluation. Currently the only allowed value is `claude-code` (sub-agent with a fresh, empty context, read-only tools, single pass, strict JSON). |
-| `persona` | `object` `{ basePersonaId, lensId }` | MUST for persona-bound areas | The persona under which a non-deterministic area was scored. `basePersonaId` ∈ `ai-engineer` \| `decision-maker` \| `hackathon-builder` \| `schema-maintainer`; `lensId` is the domain lens. See [`12-personas-contract.md`](./12-personas-contract.md). |
-| `skillId` | `string` | MUST for per-skill areas | Identifier of the graded skill instance (per-skill areas grade one skill at a time, not a level cohort — see [`13-skills.md`](./13-skills.md)). |
+| `persona` | `object` `{ basePersonaId, lensId }` | MUST for persona-bound areas | The persona under which a non-deterministic area was scored. `basePersonaId` ∈ `ai-engineer` \| `decision-maker` \| `hackathon-builder` \| `schema-maintainer`; `lensId` is the domain lens. See [`12-personas-contract.md`](/grading/personas-contract/). |
+| `skillId` | `string` | MUST for per-skill areas | Identifier of the graded skill instance (per-skill areas grade one skill at a time, not a level cohort — see [`13-skills.md`](/grading/skills/)). |
 
 `harness` makes the grading reproducible across drivers; `persona` records the lens; `skillId` distinguishes per-skill area instances. The deterministic answers come from code and are merged with the harness sub-agent answers into one grading entry.
 
 ---
 
-## 4. Data Model — `gradings[]` Element (per-question answer)
+## Data Model — `gradings[]` Element (per-question answer)
 
 Each element of the `gradings[]` array is a JSON object describing **one answer** to **one question** of the Area, scored by **one grader** at **one timestamp**. The element fields are:
 
 | Field | Type | Required | Conditional | Description |
 |-------|------|---------|-------------|-------------|
 | `questionId` | `string` matching `^Q-.+` | MUST | — | Identifier of the Area question being answered. |
-| `score` | `number` `1.0`–`5.0` OR enum `pass` \| `fail` \| `stale` \| `n/a` | MUST | See §5.2 | The score value. |
+| `score` | `number` `1.0`–`5.0` OR enum `pass` \| `fail` \| `stale` \| `n/a` | MUST | See [Score Values](#score-values) | The score value. |
 | `weight` | `number` | MUST | — | Weight contributed to the weighted aggregation. |
 | `determinism` | enum `deterministic` \| `non-deterministic` | MUST | — | Whether the answer is reproducible at the same `scoringSystem` version. |
 | `graderIdentity` | `object` (`kind`, `name`, `version`) | MUST | — | Identity of the grader; `kind` ∈ `llm` \| `human` \| `script`. |
 | `llmModel` | `string` | MUST when `graderIdentity.kind=llm` | — | Identifier of the LLM model used (e.g. `claude-opus-4-7`). |
-| `selectionContext` | `object` (`groupId`, `personaIds[]`, `domainDocId`) | MUST when `determinism=non-deterministic` | When the answer is non-deterministic, at least one persona is REQUIRED (see §13) | The group / persona / domain context under which the answer was produced. |
+| `selectionContext` | `object` (`groupId`, `personaIds[]`, `domainDocId`) | MUST when `determinism=non-deterministic` | When the answer is non-deterministic, at least one persona is REQUIRED (see [Personas Obligation](#personas-obligation)) | The group / persona / domain context under which the answer was produced. |
 | `timestamp` | `string` (ISO-8601) | MUST | — | Time of scoring. |
 | `evidence` | `object` or `url` | SHOULD | — | Pointer to the underlying test evidence (HTTP response, LLM transcript, lint output, etc.). |
 | `reasoning` | `string` | SHOULD | — | Human-readable rationale (especially for non-deterministic answers). |
-| `naReason` | enum (see §5.3) | MUST when `score = n/a` | — | Closed-set reason for a non-applicable answer. |
+| `naReason` | enum (see [n/a Convention with Standard Reasons](#na-convention-with-standard-reasons-new-in-110)) | MUST when `score = n/a` | — | Closed-set reason for a non-applicable answer. |
 
-`previousGradingId` is NOT a field on the `gradings[]` element; it lives on the top-level `regradingTrigger` object (see §11).
+`previousGradingId` is NOT a field on the `gradings[]` element; it lives on the top-level `regradingTrigger` object (see [Re-Grading Trigger](#re-grading-trigger)).
 
 ---
 
-## 5. Areas and Score Values
+## Areas and Score Values
 
-### 5.1 The 11 Grading Areas
+### The 11 Grading Areas
 
-As of `gradingSpec/2.0.0`, a grading targets exactly one **Area**. The `area` field is a `const` per grading entry. There are **11 Areas**, split between provider (namespace) grading and selection grading. Each Area carries its own question set; the per-question answers live in the `gradings[]` array (see §4). The detailed question definitions and output schemas are specified in the per-Area chapters and the Area output schemas.
+As of `gradingSpec/2.0.0`, a grading targets exactly one **Area**. The `area` field is a `const` per grading entry. There are **11 Areas**, split between provider (namespace) grading and selection grading. Each Area carries its own question set; the per-question answers live in the `gradings[]` array (see [`gradings[]` Element](#data-model--gradings-element-per-question-answer)). The detailed question definitions and output schemas are specified in the per-Area chapters and the Area output schemas.
 
 | # | Area | Grades | Persona-bound | Det / Non-det |
 |---|------|--------|---------------|---------------|
@@ -175,28 +163,28 @@ As of `gradingSpec/2.0.0`, a grading targets exactly one **Area**. The `area` fi
 | 10 | `selection-skills-L3` | one L3 skill (per skill) | yes | non-det |
 | 11 | `selection-aggregate` | the selection as a whole | yes | deterministic + non-det |
 
-A grading entry that uses an `area` value not listed here is INVALID. Adding a new Area is a `gradingSystem` bump (see [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) §3).
+A grading entry that uses an `area` value not listed here is INVALID. Adding a new Area is a `gradingSystem` bump (see [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)).
 
-Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `providers/<ns>/index.json`). Areas 7–11 are **selection** areas (tier `group-bound`, Grade A attainable, rollup in `selections/<sel>/index.json`). The two blocks are disjoint — a provider schema is not evaluated over the selection areas, and a selection is not evaluated over the provider areas. See [`19-folder-layout.md`](./19-folder-layout.md) §17.4 for the `_gradings/` location per Area.
+Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `providers/<ns>/index.json`). Areas 7–11 are **selection** areas (tier `group-bound`, Grade A attainable, rollup in `selections/<sel>/index.json`). The two blocks are disjoint — a provider schema is not evaluated over the selection areas, and a selection is not evaluated over the provider areas. See [`19-folder-layout.md`](/grading/folder-layout/) for the `_gradings/` location per Area.
 
-#### 5.1.1 `selection-aggregate` (Area 11)
+#### `selection-aggregate` (Area 11)
 
 `selection-aggregate` carries the selection-wide checks: thresholds (soft ≥ 5 / hard ≥ 7 members), topic coherence, `domainConformance` (members checked against the About / domain knowledge), `personaUseCaseFit`, the group-bound tier path to Grade A, and the cascade stop. Per-skill areas (8/9/10) grade one skill at a time and carry `skillId` in the envelope; there is no level-cohort grade.
 
-#### 5.1.2 Answers per Area
+#### Answers per Area
 
 Each Area defines how many answers its grading entry must carry, split into a deterministic block (computed by code) and a non-deterministic block (produced by the harness sub-agent). A deterministic block alone is not a valid Area grading — the two blocks are merged into one entry. The per-Area answer counts and question sets are normative in the Area output schemas.
 
-### 5.2 Score Values
+### Score Values
 
 The `score` field is one of:
 
 - a `number` in `[1.0, 5.0]` (numeric score), OR
 - the enum string `pass` / `fail` / `stale` / `n/a`.
 
-Mixing the two domains (e.g. `score = "3.0"`) is INVALID. The `pass` / `fail` enum is reserved for deterministic answers with a binary outcome (HTTP `200` is `pass`, anything else is `fail` — see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5 rule 1). The `stale` enum is reserved for aged-out time-dependent answers (see §9). The `n/a` enum is reserved for non-applicable answers (see §12).
+Mixing the two domains (e.g. `score = "3.0"`) is INVALID. The `pass` / `fail` enum is reserved for deterministic answers with a binary outcome (HTTP `200` is `pass`, anything else is `fail` — see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) rule 1). The `stale` enum is reserved for aged-out time-dependent answers (see [Timeline Rule + Aging](#timeline-rule--aging)). The `n/a` enum is reserved for non-applicable answers (see [`n/a` Pragma](#na-pragma)).
 
-### 5.3 n/a Convention with Standard Reasons (NEW in 1.1.0)
+### n/a Convention with Standard Reasons (NEW in 1.1.0)
 
 An answer entry with `gradings[i].score === "n/a"` is only permitted when `gradings[i].naReason` carries a value from the following **closed set**:
 
@@ -204,10 +192,10 @@ An answer entry with `gradings[i].score === "n/a"` is only permitted when `gradi
 |----------|---------|
 | `not-applicable-to-tool-type` | Dimension structurally does not apply to this tool type |
 | `requires-private-data` | The check would require a private / non-public data source |
-| `blocked-by-precondition` | Pre-condition from §20 not met (e.g. member schema not stable) |
-| `out-of-scope-resource` | Relates to Resources (out-of-scope, on-hold per §12) |
-| `out-of-scope-prompt` | Relates to Prompts (out-of-scope, on-hold per §12) |
-| `out-of-scope-procedure` | Relates to Procedures (out-of-scope, on-hold per §12) |
+| `blocked-by-precondition` | Pre-condition not met (e.g. member schema not stable) |
+| `out-of-scope-resource` | Relates to Resources (out-of-scope, on-hold per [`n/a` Pragma](#na-pragma)) |
+| `out-of-scope-prompt` | Relates to Prompts (out-of-scope, on-hold per [`n/a` Pragma](#na-pragma)) |
+| `out-of-scope-procedure` | Relates to Procedures (out-of-scope, on-hold per [`n/a` Pragma](#na-pragma)) |
 
 Free-text reasons are rejected by the schema validator (`NA-001 ERROR`). Additional reason values can only be added through a spec bump.
 
@@ -234,7 +222,7 @@ JSON-Schema fragment for `gradings[i]`:
 
 ---
 
-## 6. Categorical Veto
+## Categorical Veto
 
 The `categoricalVeto` field is either `null` (no veto) or an object describing a veto that was raised by a grader. The Veto is a **closed list** at this spec version; the four allowed triggers are enumerated below.
 
@@ -247,10 +235,10 @@ The `categoricalVeto` field is either `null` (no veto) or an object describing a
 
 The `triggeredBy` enum is **closed**. The four allowed values are:
 
-1. `malicious-module` — an imported module exhibits behaviour outside the tool's stated purpose (tracker, telemetry without user knowledge, malware). Deterministic part: imports scan. Non-deterministic part: behaviour judgement. See [`09-security-and-development.md`](./09-security-and-development.md) §3.
-2. `api-key-domain-mismatch` — a `requiredServerParams` entry declares a key name that belongs to a different domain or company than the API itself (e.g. `FACEBOOK_API_KEY` for `example.xyz`). Deterministic. See [`09-security-and-development.md`](./09-security-and-development.md) §2.
-3. `illegal-content` — the schema, its output, or its purpose involves illegal content. Non-deterministic. See [`09-security-and-development.md`](./09-security-and-development.md) §4.
-4. `ai-security-veto` — the grader sees a security finding that is not on the closed deterministic list but is well-evidenced and well-reasoned. Non-deterministic; REQUIRES `evidence` AND `reasoning`. See [`09-security-and-development.md`](./09-security-and-development.md) §4.
+1. `malicious-module` — an imported module exhibits behaviour outside the tool's stated purpose (tracker, telemetry without user knowledge, malware). Deterministic part: imports scan. Non-deterministic part: behaviour judgement. See [`09-security-and-development.md`](/grading/security-and-development/).
+2. `api-key-domain-mismatch` — a `requiredServerParams` entry declares a key name that belongs to a different domain or company than the API itself (e.g. `FACEBOOK_API_KEY` for `example.xyz`). Deterministic. See [`09-security-and-development.md`](/grading/security-and-development/).
+3. `illegal-content` — the schema, its output, or its purpose involves illegal content. Non-deterministic. See [`09-security-and-development.md`](/grading/security-and-development/).
+4. `ai-security-veto` — the grader sees a security finding that is not on the closed deterministic list but is well-evidenced and well-reasoned. Non-deterministic; REQUIRES `evidence` AND `reasoning`. See [`09-security-and-development.md`](/grading/security-and-development/).
 
 Implementers MUST NOT extend the `triggeredBy` enum at runtime. Adding a new trigger is a `gradingSystem` bump.
 
@@ -258,20 +246,20 @@ When `categoricalVeto != null`, `aggregateGrade = REJECTED` (no aggregation is p
 
 ---
 
-## 7. Skill Families (Binding)
+## Skill Families (Binding)
 
 The implementation separates the writers of `gradings[]` entries into **two skill families** — both write into the same data model but cover different tiers:
 
 | Family | Repository | Writes | Yields |
 |--------|-----------|--------|--------|
-| Single-Schema-Validator | `flowmcp-grading` | Provider Areas 1–6 (see [`04-phases-single.md`](./04-phases-single.md)) | `gradingTier = autonomous` |
-| Selection-Validator | `flowmcp-grading` | Consumes provider grading entries plus selection Areas 7–11 (see [`05-phases-selection.md`](./05-phases-selection.md)); writes the `group-bound` Areas | `gradingTier = group-bound` |
+| Single-Schema-Validator | `flowmcp-grading` | Provider Areas 1–6 (see [`04-phases-single.md`](/grading/phases-single/)) | `gradingTier = autonomous` |
+| Selection-Validator | `flowmcp-grading` | Consumes provider grading entries plus selection Areas 7–11 (see [`05-phases-selection.md`](/grading/phases-selection/)); writes the `group-bound` Areas | `gradingTier = group-bound` |
 
 A grading entry MUST be written by **exactly one** of the two families. A Selection-Validator entry MAY reference the Single-Schema-Validator entries it consumed via `selectionContext.domainDocId` and the surrounding aggregator's bookkeeping; the spec does NOT require an explicit cross-link.
 
 ---
 
-## 8. Tier Computation + `maxAttainableGrade`
+## Tier Computation + `maxAttainableGrade`
 
 `maxAttainableGrade` is derived from `gradingTier` by a fixed mapping:
 
@@ -280,11 +268,11 @@ A grading entry MUST be written by **exactly one** of the two families. A Select
 | `autonomous` | `B` |
 | `group-bound` | `A` |
 
-The mapping is binding. Implementers MUST emit `maxAttainableGrade` even though it is mechanically derived from `gradingTier`; consumers of grading entries (UIs, dashboards, registry pages) rely on the field being present so that they can communicate to the consumer that **a higher grade is attainable** by attaching the schema's namespace to a Selection and running the Selection phases. See [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §3.3.
+The mapping is binding. Implementers MUST emit `maxAttainableGrade` even though it is mechanically derived from `gradingTier`; consumers of grading entries (UIs, dashboards, registry pages) rely on the field being present so that they can communicate to the consumer that **a higher grade is attainable** by attaching the schema's namespace to a Selection and running the Selection phases. See [`06-determinism-and-tier.md`](/grading/determinism-and-tier/).
 
 ---
 
-## 9. Timeline Rule + Aging
+## Timeline Rule + Aging
 
 Dimensions fall into two classes by their relationship to time:
 
@@ -301,19 +289,19 @@ Aging defaults — referenced throughout the codebase as the constant `#AGING_DE
 | `TOS_DAYS` | **30 days** | `tosMatch`, `legalAssessment` |
 | `RETENTION_DAYS` | **180 days** | Total grading-entry retention before archival |
 
-**Binding rule.** Aging produces `score = stale`, **not** `score = fail`. The two outcomes are semantically distinct: `fail` is an active negative judgement; `stale` is an absence of a recent positive judgement. Aggregation logic MUST treat `stale` differently from `fail` (see §10).
+**Binding rule.** Aging produces `score = stale`, **not** `score = fail`. The two outcomes are semantically distinct: `fail` is an active negative judgement; `stale` is an absence of a recent positive judgement. Aggregation logic MUST treat `stale` differently from `fail` (see [Multi-Grader Rule](#multi-grader-rule)).
 
-The defaults are explicit per the no-hidden-defaults rule — implementers MUST NOT silently substitute alternative aging windows. Overrides MAY be configured per group but MUST be recorded in the Domain-Knowledge document (see [`10-domain-knowledge.md`](./10-domain-knowledge.md)).
+The defaults are explicit per the no-hidden-defaults rule — implementers MUST NOT silently substitute alternative aging windows. Overrides MAY be configured per group but MUST be recorded in the Domain-Knowledge document (see [`10-domain-knowledge.md`](/grading/domain-knowledge/)).
 
 ---
 
-## 10. Multi-Grader Rule
+## Multi-Grader Rule
 
 Multiple graders MAY independently answer the same question. The data model **does NOT automatically consolidate** these multi-grader entries. Each entry stands on its own under its own `graderIdentity` and `timestamp`. Aggregation logic at the level of `aggregateGrade` SHOULD pick the most recent valid entry per question; tie-breaking and disagreement-handling rules are out of scope for `gradingSystem/1.0.0` and are tracked as a follow-up.
 
 ---
 
-## 11. Re-Grading Trigger
+## Re-Grading Trigger
 
 A user, an aging job, or a version bump CAN trigger a re-grading. The `regradingTrigger` field records the trigger; the **old grading entry is NOT deleted** — the new entry references the old via `previousGradingId`.
 
@@ -331,14 +319,14 @@ The `triggeredBy` enum has four values:
 
 1. `user-report` — a user reported a tool as "no longer working" via the CLI or issue template.
 2. `scheduled` — a scheduled re-grading run (e.g. monthly).
-3. `scoring-system-bump` — the `scoringSystem` version was bumped (see [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md)); affected dimensions are re-scored.
+3. `scoring-system-bump` — the `scoringSystem` version was bumped (see [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)); affected dimensions are re-scored.
 4. `grading-system-bump` — the `gradingSystem` version was bumped; affected dimensions are re-aggregated.
 
 The grader reads `reportedIssue` (when present) and prioritises the re-evaluation of the Area questions implicated by the report. Implementers MUST NOT delete or overwrite the superseded grading entry. The lineage is preserved through `previousGradingId`.
 
 ---
 
-## 12. `n/a` Pragma
+## `n/a` Pragma
 
 > *"Any grading > no grading."*
 
@@ -348,11 +336,11 @@ Aggregation logic at the level of `aggregateGrade` MUST treat `n/a` as **exclude
 
 ---
 
-## 13. Personas Obligation
+## Personas Obligation
 
 Non-deterministic entries (`determinism = non-deterministic`) MUST carry at least one `personaId` in `selectionContext.personaIds[]`. A non-deterministic entry without persona context is INVALID; the JSON-Schema annex enforces this via a conditional `if/then` (see [`08-grading-model.schema.json`](./08-grading-model.schema.json)).
 
-The Personas contract — including the Lens concept and the source of the four generalised personas — is defined in [`12-personas-contract.md`](./12-personas-contract.md).
+The Personas contract — including the Lens concept and the source of the four generalised personas — is defined in [`12-personas-contract.md`](/grading/personas-contract/).
 
 Error-code names for the personas obligation are:
 
@@ -363,23 +351,23 @@ The full error-code catalogue is delivered in a later stage.
 
 ---
 
-## 14. Aggregate-Grade Computation
+## Aggregate-Grade Computation
 
 The `aggregateGrade` is computed by the following rules.
 
 1. **Veto short-circuit.** If `categoricalVeto != null`, then `aggregateGrade = REJECTED`. No aggregation runs.
 2. **Weighted sum.** Otherwise, the grader computes a weighted average over all `gradings[]` entries whose `score` is a number, ignoring entries with `score ∈ { n/a }`. Entries with `score ∈ { pass, fail, stale }` are mapped to numbers by the Grading System version (`pass → 5.0`, `fail → 1.0`, `stale → omitted from numerator and denominator unless the Grading System version specifies otherwise`).
 3. **Tier trim.** The weighted average is mapped to a grade letter `A`/`B`/`C`/`D`/`F` by thresholds defined at the `gradingSystem` version. The result is then **trimmed** by `maxAttainableGrade`: an `autonomous` entry capped at `B` cannot emit `A`.
-4. **Minimum LLM rule.** For `aggregateGrade >= B`, at least one non-deterministic (LLM) entry SHOULD be present (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5 rule 3).
-5. **Group-bound rule for `A`.** For `aggregateGrade >= A`, at least one `group-bound` entry MUST be present (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5 rule 4). A purely autonomous grading cannot yield `A`.
+4. **Minimum LLM rule.** For `aggregateGrade >= B`, at least one non-deterministic (LLM) entry SHOULD be present (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) rule 3).
+5. **Group-bound rule for `A`.** For `aggregateGrade >= A`, at least one `group-bound` entry MUST be present (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) rule 4). A purely autonomous grading cannot yield `A`.
 
 The concrete threshold values, weights per question, and `stale`-handling policy are NOT part of this spec chapter — they live in the `gradingSystem/1.0.0` implementation. The above five rules are the binding contract.
 
 ---
 
-## 15. Examples
+## Examples
 
-### 15.1 Autonomous Grading (`single-test`, three answers)
+### Autonomous Grading (`single-test`, three answers)
 
 ```json
 {
@@ -434,7 +422,7 @@ The concrete threshold values, weights per question, and `stale`-handling policy
 }
 ```
 
-### 15.2 Rejected (Categorical Veto)
+### Rejected (Categorical Veto)
 
 ```json
 {
@@ -474,11 +462,11 @@ Both example documents validate against [`08-grading-model.schema.json`](./08-gr
 
 ---
 
-## 16. Annex — JSON-Schema
+## Annex — JSON-Schema
 
 The normative JSON-Schema for the grading entry is [`08-grading-model.schema.json`](./08-grading-model.schema.json) (JSON-Schema 2020-12). Every grading entry emitted by a grader MUST validate against this schema. The schema mirrors the conditional rules (e.g. `selectionId` required when `gradingTier=group-bound`, `llmModel` required when `graderIdentity.kind=llm`, `personaIds[]` required when `determinism=non-deterministic`, `harness` constrained to `claude-code`) via JSON-Schema `if/then` blocks. Validation uses `Ajv2020` plus `ajv-formats` (the draft-2020-12 build), not the default Ajv build.
 
-### 16.1 Smoke-Test (Pseudo-code)
+### Smoke-Test (Pseudo-code)
 
 ```javascript
 import { readFileSync } from 'node:fs'
@@ -503,11 +491,18 @@ if( rejected.aggregateGrade !== 'REJECTED' ) { throw new Error( 'rejected exampl
 
 ---
 
-## 17. Cross-References
+## Cross-References
 
-- [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — separation of the two systems and their version namespaces.
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — the two axes that underlie the `determinism` and `gradingTier` fields.
-- [`09-security-and-development.md`](./09-security-and-development.md) — the Categorical-Veto trigger definitions and the API-key-hygiene rules.
-- [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the source of `selectionContext.domainDocId`.
-- [`12-personas-contract.md`](./12-personas-contract.md) — the source of `selectionContext.personaIds[]`.
-- [`13-skills.md`](./13-skills.md) — the source of the skill Areas `namespace-skills`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3` (per skill, with `skillId` in the envelope).
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — separation of the two systems and their version namespaces.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that underlie the `determinism` and `gradingTier` fields.
+- [`09-security-and-development.md`](/grading/security-and-development/) — the Categorical-Veto trigger definitions and the API-key-hygiene rules.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the source of `selectionContext.domainDocId`.
+- [`12-personas-contract.md`](/grading/personas-contract/) — the source of `selectionContext.personaIds[]`.
+- [`13-skills.md`](/grading/skills/) — the source of the skill Areas `namespace-skills`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3` (per skill, with `skillId` in the envelope).
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
+- **Related:** [`09-security-and-development.md`](/grading/security-and-development/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`19-folder-layout.md`](/grading/folder-layout/)
+- **Annex:** [`08-grading-model.schema.json`](./08-grading-model.schema.json) — JSON-Schema 2020-12 of the grading entry
+

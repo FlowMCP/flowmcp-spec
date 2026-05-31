@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Specification"
 normative: false
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/spec/v4.2.0/00-overview.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/spec/v4.2.0/00-overview.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "spec/v4.2.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/00-overview.md."
@@ -298,6 +298,29 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 | 3.0.0 | 1.0 | 2026-03 | Four primitives: Tools (renamed from Routes), Resources (SQLite), Prompts (model-neutral/model-specific guidance), Skills (`.mjs` instructional workflows). `main.routes` deprecated in favor of `main.tools`. `flowmcp-skill/1.0.0` versioning for skills. Group type discriminators for resources and skills. |
 | 3.0.0 | 8.0 | 2026-03 | Three-level architecture (Root/Provider/Agent). Groups renamed to Agents with `agent.mjs` manifest format (`export const agent`). Prompt architecture with Provider-Prompts (model-neutral) and Agent-Prompts (model-specific). Catalog with registry.json. Unified placeholder syntax `{{type:name}}` (replaces deprecated `[[...]]`). ID schema `namespace/type/name`. Test minimum increased to 3. Agent tests with `expectedTools`/`expectedContent`. |
 | 3.1.0 | 1.0 | 2026-03 | Resources: Two SQLite modes (`in-memory` with `readonly: true`, `file-based` with WAL). Origin system (`global`, `project`, `inline`) replaces pseudo-paths. `better-sqlite3` replaces `sql.js`. `getSchema` MUST for both modes. `runSql` auto-injected. Max queries increased to 8. Block patterns removed. `source: 'markdown'` resource type with parameter-based access. Folder renamed `data/` to `resources/`. All fields required. Prompts: `contentFile` field for Provider-Prompts (content in external file). `references` field required (empty array when none). `about` convention (SHOULD) for Provider-Schemas and Agent-Manifests. |
+
+---
+
+## What Changed in v4.2.0
+
+The v4.2.0 release adds remote-data resources, a fifth primitive, and richer agent validation:
+
+- **HTTP Resources** — `source: 'http'` references remote files (typically SQLite databases) fetched via HTTPS and cached locally. Validated by RES024 (HTTPS required). See `13-resources.md`.
+- **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.
+- **Extended Agent rules** — `agent.selections` references MUST resolve to valid Selection IDs (AGT030). `elicitation.maxRounds` MUST be a positive integer (AGT031). See `06-agents.md`.
+
+---
+
+## What Changed in v4.0.0
+
+The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integration layer:
+
+- **Required `meta` block per Tool** — Every Tool MUST declare `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). Missing `meta` is a validation error.
+- **Skills as a scoped primitive** — `main.skills` is removed. Skills are namespace-, selection-, or agent-scoped instead. See `14-skills.md`.
+- **Enum / Shared List enforcement** — Enum values matching a Shared List MUST use `{{listName:alias}}` rather than hardcoded duplicates (VAL107).
+- **Unified spec version** — Skills and agents adopt `flowmcp/4.0.0` as the unified version identifier.
+
+The migration path from v3.0.0 to v4.0.0 is documented in `08-migration.md`.
 
 ---
 

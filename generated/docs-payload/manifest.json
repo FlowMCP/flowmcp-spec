@@ -1,6 +1,6 @@
 {
     "spec_version": "4.2.0",
-    "generated_at": "2026-05-31T17:32:40.982Z",
+    "generated_at": "2026-05-31T22:19:21.468Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -135,7 +135,7 @@
             "filename": "08-migration.md",
             "slug": "migration",
             "title": "Migration Guide",
-            "description": "This guide covers migrating schemas between FlowMCP versions. Section 1 covers v2.0.0 to v3.0.0 migration. Section 2 preserves the v1.2.0 to v2.0.0 guide for reference.",
+            "description": "This guide covers migrating schemas between FlowMCP versions in chronological order. Section 1 covers v1.2.0 to v2.0.0 migration, Section 2 covers v2.0.0 to v3.0.0, and Section 3 covers v3.0.0 to...",
             "order": 8,
             "section": "Specification",
             "normative": false,
@@ -279,7 +279,7 @@
             "filename": "17-selections.md",
             "slug": "selections",
             "title": "Selections",
-            "description": "**Version:** FlowMCP 4.2.0",
+            "description": "**Primitive:** Selection (5th primitive)",
             "order": 17,
             "section": "Specification",
             "normative": true,
@@ -295,7 +295,7 @@
             "filename": "18-prefill.md",
             "slug": "prefill",
             "title": "Prefill and Placeholders",
-            "description": "**Version:** FlowMCP 4.2.0",
+            "description": "**Placeholders** are template tokens embedded in Skill content that are resolved at runtime. **Prefill** is a mechanism to pre-execute a tool and embed its result into the Skill before delivery.",
             "order": 18,
             "section": "Specification",
             "normative": true,
@@ -311,7 +311,7 @@
             "filename": "19-mcp-integration.md",
             "slug": "mcp-integration",
             "title": "MCP Server Integration",
-            "description": "**Version:** FlowMCP 4.2.0",
+            "description": "When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific metadata. The `meta` block in every Tool definition provides this metadata.",
             "order": 19,
             "section": "Specification",
             "normative": true,
@@ -327,7 +327,7 @@
             "filename": "20-validation-strategy.md",
             "slug": "validation-strategy",
             "title": "Validation Strategy",
-            "description": "**Version:** FlowMCP 4.2.0",
+            "description": "FlowMCP v4.2.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).",
             "order": 20,
             "section": "Specification",
             "normative": true,
@@ -343,7 +343,7 @@
             "filename": "21-schema-lifecycle.md",
             "slug": "schema-lifecycle",
             "title": "Schema Lifecycle",
-            "description": "**Version:** 4.0.0",
+            "description": "Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas,...",
             "order": 21,
             "section": "Specification",
             "normative": false,
@@ -429,7 +429,9 @@
                 "description": "The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specification v4.2.0 defines what a schema is, what a selection is, and which primitives exist. This Grading-Spec describes...",
                 "order": 0,
                 "section": "Grading",
-                "normative": false
+                "normative": false,
+                "sidebar_group": "introduction",
+                "collapsed": false
             },
             {
                 "filename": "01-default-journey.md",
@@ -438,7 +440,9 @@
                 "description": "This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main...",
                 "order": 1,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "introduction",
+                "collapsed": false
             },
             {
                 "filename": "02-eligibility.md",
@@ -447,7 +451,9 @@
                 "description": "This chapter defines **what is allowed to be part of a gradable schema**. Eligibility is the upstream gate: an endpoint that is not eligible MUST NOT appear in a schema. The maximalism principle in...",
                 "order": 2,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "03-tos.md",
@@ -456,7 +462,9 @@
                 "description": "This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer (`Sorgfaltspflicht`), not part of the eligibility gate. A missing...",
                 "order": 3,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "04-phases-single.md",
@@ -465,7 +473,9 @@
                 "description": "This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model...",
                 "order": 4,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "05-phases-selection.md",
@@ -474,7 +484,9 @@
                 "description": "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification...",
                 "order": 5,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "06-determinism-and-tier.md",
@@ -483,7 +495,9 @@
                 "description": "The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but...",
                 "order": 6,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "07-scoring-vs-grading.md",
@@ -492,7 +506,9 @@
                 "description": "The terms **\"Scoring\"** and **\"Grading\"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update...",
                 "order": 7,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "08-grading-model.md",
@@ -501,7 +517,9 @@
                 "description": "A grading is an **array of evaluations** that carries **veto power**, a **tier trim** (autonomous max `B` / group max `A`), and can be **re-triggered by the user**. It is described as **one data...",
                 "order": 8,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "core-model",
+                "collapsed": false
             },
             {
                 "filename": "09-security-and-development.md",
@@ -510,7 +528,9 @@
                 "description": "Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md)...",
                 "order": 9,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "10-domain-knowledge.md",
@@ -519,7 +539,9 @@
                 "description": "A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation....",
                 "order": 10,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "11-about-convention.md",
@@ -528,7 +550,9 @@
                 "description": "This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows.",
                 "order": 11,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "12-personas-contract.md",
@@ -537,16 +561,20 @@
                 "description": "The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the...",
                 "order": 12,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "13-skills.md",
                 "slug": "skills",
                 "title": "Skills: Namespace Skill vs. Selection Skill",
-                "description": "A skill carries a `type` (§2). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a...",
+                "description": "A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection...",
                 "order": 13,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "14-kanban-data-contract.md",
@@ -555,34 +583,42 @@
                 "description": "The earlier `1.1.0` Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. The `2.0.0` break replaces this with a single derived...",
                 "order": 14,
                 "section": "Grading",
-                "normative": false
+                "normative": false,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "15-versioning-axes.md",
                 "slug": "versioning-axes",
-                "title": "Versioning + Canonical Hash (§10)",
+                "title": "Versioning + Canonical Hash",
                 "description": "Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in...",
                 "order": 15,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "16-selection-lockfile.md",
                 "slug": "selection-lockfile",
-                "title": "Selection Definition + `index.json.lockSnapshot` (§11)",
+                "title": "Selection Definition + `index.json.lockSnapshot`",
                 "description": "In 1.1.0 the member pins lived in a standalone `selection.lock.json` and the provider unit was described by an authored `namespace.json`. Both files are removed in 2.0.0. The pins are folded into the...",
                 "order": 16,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "17-scope-whitelist.md",
                 "slug": "scope-whitelist",
-                "title": "Scope Whitelist + Public-only Principle (§12)",
+                "title": "Scope Whitelist + Public-only Principle",
                 "description": "This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by...",
                 "order": 17,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "18-flywheel-loop.md",
@@ -591,34 +627,42 @@
                 "description": "The grading process is a **round-trip** between the source repository and the workbench:",
                 "order": 18,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             },
             {
                 "filename": "19-folder-layout.md",
                 "slug": "folder-layout",
-                "title": "Folder Layout (§17)",
-                "description": "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` §19...",
+                "title": "Folder Layout",
+                "description": "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` (About-Pages),...",
                 "order": 19,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "20-entry-point-prompt.md",
                 "slug": "entry-point-prompt",
-                "title": "Entry-Point Prompt + Personas Obligation (§18)",
-                "description": "Empty context (see [`02-eligibility.md`](./02-eligibility.md) §3.5) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts...",
+                "title": "Entry-Point Prompt + Personas Obligation",
+                "description": "Empty context (see [`02-eligibility.md`](./02-eligibility.md)) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts...",
                 "order": 20,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "21-pre-conditions.md",
                 "slug": "pre-conditions",
-                "title": "Universal Pre-Condition Obligation (§20)",
+                "title": "Universal Pre-Condition Obligation",
                 "description": "This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks...",
                 "order": 21,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "22-workbench-island.md",
@@ -627,7 +671,9 @@
                 "description": "The grading data directory (`grading-data/`) is a **workbench island**: an internal working area where schemas and selections are hammered on day after day. It is deliberately separate from the...",
                 "order": 22,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "23-index-json.md",
@@ -636,7 +682,9 @@
                 "description": "Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the...",
                 "order": 23,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "24-selection-aggregate.md",
@@ -645,7 +693,9 @@
                 "description": "Grading is organised into **areas** — one rubric per primitive type. Ten areas already exist with output schemas under `prompts/output-schemas/`: `single-test`, `tools-aggregate-schema`,...",
                 "order": 24,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "reference",
+                "collapsed": true
             },
             {
                 "filename": "25-harness-and-goal.md",
@@ -654,7 +704,9 @@
                 "description": "Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with...",
                 "order": 25,
                 "section": "Grading",
-                "normative": true
+                "normative": true,
+                "sidebar_group": "process-contracts",
+                "collapsed": true
             }
         ]
     }

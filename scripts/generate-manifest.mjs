@@ -177,6 +177,31 @@ const versionAddedFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 087 PRD-P2-C (F4=A): grading sidebar groups. The grading spec rendered as
+// a flat list; group it like the spec does. Mapping by chapter order:
+//   00-01 introduction · 02-08 core-model · 09-14,18,25 process-contracts
+//   15-17,19-24 reference
+const GRADING_PROCESS_CONTRACTS = new Set( [ 9, 10, 11, 12, 13, 14, 18, 25 ] )
+
+const gradingSidebarGroupFromFilename = ( { filename } ) => {
+    const match = filename.match( /^(\d{2})-/ )
+    if( !match ) return 'reference'
+    const order = parseInt( match[ 1 ], 10 )
+    if( order <= 1 ) return 'introduction'
+    if( order <= 8 ) return 'core-model'
+    if( GRADING_PROCESS_CONTRACTS.has( order ) ) return 'process-contracts'
+    return 'reference'
+}
+
+
+const GRADING_COLLAPSED_DEFAULT = {
+    introduction: false,
+    'core-model': false,
+    'process-contracts': true,
+    reference: true
+}
+
+
 // Memo 086 PRD-06: additive grading block. Scans the grading payload subdir
 // (a SECOND input) and returns { version, files[] }. Returns null if absent —
 // manifest.files stays spec-only and byte-compatible (081 F8=A).
@@ -205,6 +230,7 @@ const buildGradingBlock = async () => {
             continue
         }
         if( !version && typeof fm.grading_version === 'string' ) version = fm.grading_version
+        const sidebarGroup = gradingSidebarGroupFromFilename( { filename } )
         entries.push( {
             filename,
             slug: slugFromFilename( { filename } ),
@@ -212,7 +238,9 @@ const buildGradingBlock = async () => {
             description: fm.description,
             order: fm.order,
             section: fm.section,
-            normative: fm.normative
+            normative: fm.normative,
+            sidebar_group: sidebarGroup,
+            collapsed: GRADING_COLLAPSED_DEFAULT[ sidebarGroup ] ?? false
         } )
     }
 

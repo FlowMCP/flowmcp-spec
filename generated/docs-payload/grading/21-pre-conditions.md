@@ -1,51 +1,40 @@
 ---
-title: "Universal Pre-Condition Obligation (§20)"
+title: "Universal Pre-Condition Obligation"
 description: "This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks..."
 grading_version: "2.0.0"
 spec_file: "21-pre-conditions.md"
 order: 21
 section: "Grading"
 normative: true
-source_commit: "5971378"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/5971378/grading/2.0.0/21-pre-conditions.md"
-generated_at: "2026-05-31T17:32:40.771Z"
+source_commit: "410fe47"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/21-pre-conditions.md"
+generated_at: "2026-05-31T22:19:21.234Z"
 generated_from: "grading/2.0.0/21-pre-conditions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/21-pre-conditions.md."
 ---
 
-| Field | Value |
-|-------|-------|
-| Status | Normative — NEW in 1.1.0 |
-| Version | `gradingSpec/1.1.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md) |
-| Related | [`11-about-convention.md`](./11-about-convention.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
-
-> **Spec:** `gradingSpec/1.1.0`
-> **Status:** stable (additive extension of 1.0.0)
-> **Changes vs. 1.0.0:** entirely new section §20 (universal pre-condition obligation). Central anchoring point for a rule referenced in §11 and §19.
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
 
 ---
 
-## §20 Pre-Conditions
+## Pre-Conditions
 
 This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`.
 
-### §20.1 Universal Rule
+### Universal Rule
 
 > Aggregated checks (all checks that operate across multiple schemas — namely Selection-Gradings and About verifications) are blocked until ALL member schemas in the current `index.json.lockSnapshot` carry `gradingStatus: "stable"`.
 
 The member status is read from the frozen `lockSnapshot` block of the selection's `index.json` (the point-in-time snapshot written once at grading start), not from a separate lockfile. Each member's `gradingStatus` is one of the five-status enum: `pending`, `blocked`, `graded`, `stable`, `rejected`. Only `stable` passes the gate; every other status (including the terminal `rejected`) blocks the aggregated check.
 
-This rule is universal. It is made concrete in §11.3 (Selection workflow step 0) and §19.3 (About verification step 0), but anchored here.
+This rule is universal. It is made concrete in [`16-selection-lockfile.md`](/grading/selection-lockfile/) (Selection workflow step 0) and [`11-about-convention.md`](/grading/about-convention/) (About verification step 0), but anchored here.
 
-### §20.2 Stable Definition
+### Stable Definition
 
-A schema has `gradingStatus: "stable"` when the last operation in its `_gradings/` folder was a `mode: "full"` grading with `aggregateGrade` in `{A, B}` (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2).
+A schema has `gradingStatus: "stable"` when the last operation in its `_gradings/` folder was a `mode: "full"` grading with `aggregateGrade` in `{A, B}` (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
 
-Schema bumps (`schemaHash` changes, see [`15-versioning-axes.md`](./15-versioning-axes.md) §10) invalidate `stable` — the status falls back to `"pending"`. Rationale: a new `schemaHash` means, by definition, that the schema object was changed — the previous evaluation no longer applies.
+Schema bumps (`schemaHash` changes, see [`15-versioning-axes.md`](/grading/versioning-axes/)) invalidate `stable` — the status falls back to `"pending"`. Rationale: a new `schemaHash` means, by definition, that the schema object was changed — the previous evaluation no longer applies.
 
 | Condition | Result |
 |-----------|--------|
@@ -59,7 +48,7 @@ Schema bumps (`schemaHash` changes, see [`15-versioning-axes.md`](./15-versionin
 
 Only `stable` passes the pre-condition gate. `pending`, `blocked`, `graded`, and the terminal `rejected` all block the aggregated check.
 
-### §20.3 Scope of Application
+### Scope of Application
 
 The pre-condition applies to **aggregated checks**, not to tier-level checks:
 
@@ -72,7 +61,7 @@ The pre-condition applies to **aggregated checks**, not to tier-level checks:
 
 Four check classes, three of them subject to the pre-condition.
 
-### §20.4 Block Behaviour
+### Block Behaviour
 
 When the pre-condition is not met:
 
@@ -92,11 +81,17 @@ Non-stable Members:
 Follow-up action: complete the Single-Gradings, then rebuild the index and refreeze the lockSnapshot.
 ```
 
-### §20.5 Cross-Refs
+### Cross-Refs
 
-- Tier trim — full vs. partial → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8
-- Selection workflow step 0 → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.3
-- About verification step 0 → [`11-about-convention.md`](./11-about-convention.md) §19.3
-- Version bump invalidates `stable` → [`15-versioning-axes.md`](./15-versioning-axes.md) §10.4
-- Flywheel loop (pre-condition as a gate) → [`18-flywheel-loop.md`](./18-flywheel-loop.md) §16
+- Tier trim — full vs. partial → [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- Selection workflow step 0 → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- About verification step 0 → [`11-about-convention.md`](/grading/about-convention/)
+- Version bump invalidates `stable` → [`15-versioning-axes.md`](/grading/versioning-axes/)
+- Flywheel loop (pre-condition as a gate) → [`18-flywheel-loop.md`](/grading/flywheel-loop/)
 - Pre-condition validator implementation (shared between the About and Selection paths) — a later-stage concern
+
+## Related
+
+- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`08-grading-model.md`](/grading/grading-model/), [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- **Related:** [`11-about-convention.md`](/grading/about-convention/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+

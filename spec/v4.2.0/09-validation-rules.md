@@ -146,6 +146,7 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values MUST pass the corresponding `z` validation. |
 | RES023 | error | Test objects MUST be JSON-serializable. |
+| RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.2.0) |
 
 See `13-resources.md` for the complete resource specification.
 
@@ -260,6 +261,8 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT016 | error | Referenced prompt/skill files MUST exist and be `.mjs` files |
 | AGT017 | error | Prompt files MUST have `export const prompt` (with `content` or `contentFile`) |
 | AGT018 | error | Skill files MUST have `export const skill` (with `name`, `version`, `content`/`contentFile`, `requires`, `input`, `output`) |
+| AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs (added in v4.2.0) |
+| AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) (added in v4.2.0) |
 
 See `06-agents.md` for the complete agent specification.
 
@@ -292,25 +295,6 @@ See `19-mcp-integration.md` for the complete meta block specification.
 | SEL003 | error | All Primitive references in a Selection MUST be resolvable within the catalog |
 
 See `17-selections.md` for the complete Selection specification.
-
----
-
-## Extended Agent Validation Rules (v4.2.0)
-
-| Code | Severity | Rule |
-|------|----------|------|
-| AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs |
-| AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) |
-
----
-
-## HTTP Resource Validation Rules (v4.2.0)
-
-| Code | Severity | Rule |
-|------|----------|------|
-| RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. |
-
-See `13-resources.md` for the complete HTTP resource specification.
 
 ---
 

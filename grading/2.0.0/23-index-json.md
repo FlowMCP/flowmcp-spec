@@ -12,23 +12,23 @@
 
 ---
 
-## 1. Purpose
+## Purpose
 
 Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the rollup: a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status.
 
-This chapter supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)). The two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Section 5](#5-salvaged-rules-audit-trail--irreversible-veto).
+This chapter supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)). The two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
 
 ---
 
-## 2. Two Natures: Live-Rollup and Frozen `lockSnapshot`
+## Two Natures: Live-Rollup and Frozen `lockSnapshot`
 
 `index.json` has **two distinct parts** with different lifecycles. Conflating them is an error.
 
-### 2.1 Live-Rollup (recomputed)
+### Live-Rollup (recomputed)
 
 Everything outside `lockSnapshot` is a **live rollup**: it is **recomputed on every rebuild**. `rebuildNamespaceIndex` / `rebuildSelectionIndex` walks the folder, runs `resolveLatest` on each `_gradings/`, builds the tree, and writes the file. The live rollup is the **only overwritable artifact** in the island — it is derived and 100% reproducible from the underlying grading entries and snapshots, which are themselves never overwritten. The rebuild MUST run after every grading write.
 
-### 2.2 Frozen `lockSnapshot` (written once, preserved)
+### Frozen `lockSnapshot` (written once, preserved)
 
 `lockSnapshot` is **written exactly once, at grading start**, and is **preserved by every subsequent rebuild** (the rebuild MUST NOT recompute it). It is a point-in-time pin of the member set. The pre-condition gate ([`21-pre-conditions.md`](./21-pre-conditions.md)) reads **only** the frozen `lockSnapshot` — otherwise an aggregate would be computed over members whose status drifts mid-run.
 
@@ -36,11 +36,11 @@ Everything outside `lockSnapshot` is a **live rollup**: it is **recomputed on ev
 
 ---
 
-## 3. Two Status Vocabularies (do not mix)
+## Two Status Vocabularies (do not mix)
 
 There are **two separate status vocabularies**. They MUST NOT be interchanged.
 
-### 3.1 Node status (the 5-status enum)
+### Node status (the 5-status enum)
 
 Each primitive node (a tool, a schema, an about, a skill, a member) carries one of **five** status values:
 
@@ -50,11 +50,11 @@ Each primitive node (a tool, a schema, an about, a skill, a member) carries one 
 | `blocked` | Cannot be graded right now; carries a `reason` (e.g. fewer than three tests, no about, API down). Repairable. |
 | `graded` | A grade exists. |
 | `stable` | Fully graded **and** above threshold; ready to use. |
-| `rejected` | Veto — **terminal and irreversible** (see [Section 5.2](#52-irreversible-veto--terminal-status-rejected)). |
+| `rejected` | Veto — **terminal and irreversible** (see [Irreversible veto — terminal status `rejected`](#irreversible-veto--terminal-status-rejected)). |
 
 `graded` and `stable` are **node** values.
 
-### 3.2 Rollup status (operational vocabulary)
+### Rollup status (operational vocabulary)
 
 The top-level namespace/selection rollup summarises its nodes with a **different** vocabulary:
 
@@ -70,25 +70,25 @@ The top-level namespace/selection rollup summarises its nodes with a **different
 
 ---
 
-## 4. Member-Resolution-Manifest (SEL003)
+## Member-Resolution-Manifest (SEL003)
 
 For a selection, the rollup carries a **member-resolution manifest** — the heart of selection grading. For each member it records `schemaId → resolved provider artifact + grade + status`. Without this manifest the selection aggregate cannot reproduce its "M of N members PASS" verdict, because the member IDs in `selection.json` are logical and must be resolved (via `resolveLatest`) to a concrete graded provider artifact. The manifest makes that resolution explicit and auditable.
 
 ---
 
-## 5. Salvaged Rules: Audit Trail + Irreversible Veto
+## Salvaged Rules: Audit Trail + Irreversible Veto
 
-### 5.1 Audit trail — never delete, newest is current
+### Audit trail — never delete, newest is current
 
 Grading entries and source snapshots MUST NOT be deleted or overwritten. A re-grading writes a **new** entry alongside the previous one. The current status of a node is always the **newest** entry (by timestamp; the rollup uses `resolveLatest`). Only the live part of `index.json` is rewritten on rebuild; the underlying entries, snapshots, and the frozen `lockSnapshot` are preserved.
 
-### 5.2 Irreversible veto — terminal status `rejected`
+### Irreversible veto — terminal status `rejected`
 
 A categorical veto maps to the node status `rejected`, which is **terminal**. The index derivation maps an `aggregateGrade` of `REJECTED` to status `rejected`. A `rejected` node MUST NOT be moved back to any other status by editing or deleting its entry; a veto can only be lifted by a fully new evaluation that writes a new entry, with the original veto entry preserved in the audit trail. The four closed veto triggers are defined in [`09-security-and-development.md`](./09-security-and-development.md).
 
 ---
 
-## 6. Example `index.json` (namespace)
+## Example `index.json` (namespace)
 
 ```json
 {
@@ -134,7 +134,7 @@ A selection `index.json` is analogous, with a `lockSnapshot` block and a `member
 
 ---
 
-## 7. Rebuild Contract
+## Rebuild Contract
 
 - `rebuildNamespaceIndex` / `rebuildSelectionIndex` produces the live rollup from the folder.
 - The rebuild preserves the frozen `lockSnapshot` byte-for-byte.

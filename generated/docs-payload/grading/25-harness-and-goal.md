@@ -1,14 +1,14 @@
 ---
-title: "25 — Harness and `/goal`"
+title: "Harness and `/goal`"
 description: "Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with..."
 grading_version: "2.0.0"
 spec_file: "25-harness-and-goal.md"
 order: 25
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/25-harness-and-goal.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/25-harness-and-goal.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/25-harness-and-goal.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/25-harness-and-goal.md."

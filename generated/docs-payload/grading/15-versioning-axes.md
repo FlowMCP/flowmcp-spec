@@ -1,14 +1,14 @@
 ---
-title: "15 — Versioning + Canonical Hash (§10)"
+title: "Versioning + Canonical Hash (§10)"
 description: "Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in..."
 grading_version: "2.0.0"
 spec_file: "15-versioning-axes.md"
 order: 15
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/15-versioning-axes.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/15-versioning-axes.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/15-versioning-axes.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/15-versioning-axes.md."

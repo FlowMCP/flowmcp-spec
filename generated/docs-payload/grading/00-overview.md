@@ -1,14 +1,14 @@
 ---
-title: "Grading-Spec `gradingSpec/2.0.0`"
-description: "This document uses the key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"NOT RECOMMENDED\", \"MAY\", and \"OPTIONAL\" as defined in BCP 14 [RFC2119]..."
+title: "Overview"
+description: "The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specification v4.2.0 defines what a schema is, what a selection is, and which primitives exist. This Grading-Spec describes..."
 grading_version: "2.0.0"
 spec_file: "00-overview.md"
 order: 0
 section: "Grading"
 normative: false
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/00-overview.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/00-overview.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/00-overview.md."

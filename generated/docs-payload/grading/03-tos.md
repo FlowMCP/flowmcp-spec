@@ -1,14 +1,14 @@
 ---
-title: "03 — Terms of Service"
+title: "Terms of Service"
 description: "This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer (`Sorgfaltspflicht`), not part of the eligibility gate. A missing..."
 grading_version: "2.0.0"
 spec_file: "03-tos.md"
 order: 3
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/03-tos.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/03-tos.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/03-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/03-tos.md."

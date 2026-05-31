@@ -1,14 +1,14 @@
 ---
-title: "13 — Skills: Namespace Skill vs. Selection Skill"
+title: "Skills: Namespace Skill vs. Selection Skill"
 description: "A skill carries a `type` (§2). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a..."
 grading_version: "2.0.0"
 spec_file: "13-skills.md"
 order: 13
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/13-skills.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/13-skills.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/13-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/13-skills.md."

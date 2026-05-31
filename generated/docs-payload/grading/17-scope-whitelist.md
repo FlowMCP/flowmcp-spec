@@ -1,14 +1,14 @@
 ---
-title: "17 — Scope Whitelist + Public-only Principle (§12)"
+title: "Scope Whitelist + Public-only Principle (§12)"
 description: "This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by..."
 grading_version: "2.0.0"
 spec_file: "17-scope-whitelist.md"
 order: 17
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/17-scope-whitelist.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/17-scope-whitelist.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/17-scope-whitelist.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/17-scope-whitelist.md."

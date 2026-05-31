@@ -1,14 +1,14 @@
 ---
-title: "20 — Entry-Point Prompt + Personas Obligation (§18)"
+title: "Entry-Point Prompt + Personas Obligation (§18)"
 description: "Empty context (see [`02-eligibility.md`](./02-eligibility.md) §3.5) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts..."
 grading_version: "2.0.0"
 spec_file: "20-entry-point-prompt.md"
 order: 20
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/20-entry-point-prompt.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/20-entry-point-prompt.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/20-entry-point-prompt.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/20-entry-point-prompt.md."

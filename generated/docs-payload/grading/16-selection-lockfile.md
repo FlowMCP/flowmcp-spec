@@ -1,14 +1,14 @@
 ---
-title: "16 — Selection Definition + `index.json.lockSnapshot` (§11)"
+title: "Selection Definition + `index.json.lockSnapshot` (§11)"
 description: "In 1.1.0 the member pins lived in a standalone `selection.lock.json` and the provider unit was described by an authored `namespace.json`. Both files are removed in 2.0.0. The pins are folded into the..."
 grading_version: "2.0.0"
 spec_file: "16-selection-lockfile.md"
 order: 16
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/16-selection-lockfile.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "2d44cb7"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2d44cb7/grading/2.0.0/16-selection-lockfile.md"
+generated_at: "2026-05-31T17:29:02.778Z"
 generated_from: "grading/2.0.0/16-selection-lockfile.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/16-selection-lockfile.md."

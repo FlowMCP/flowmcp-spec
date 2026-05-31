@@ -1,17 +1,17 @@
 ---
 title: "Skills"
 description: "Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown..."
-spec_version: "4.1.0"
+spec_version: "4.2.0"
 spec_file: "14-skills.md"
 order: 14
 section: "Specification"
 normative: true
-source_commit: "dbbe036"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/14-skills.md"
-generated_at: "2026-05-29T13:35:54.422Z"
-generated_from: "spec/v4.1.0/14-skills.md"
+source_commit: "6152b7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/spec/v4.2.0/14-skills.md"
+generated_at: "2026-05-31T16:18:50.290Z"
+generated_from: "spec/v4.2.0/14-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.1.0/14-skills.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.2.0/14-skills.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -158,7 +158,7 @@ The `export const skill` object contains all metadata and instructions for the s
 | `input` | `object[]` | `[]` | See below | Parameters the user provides when invoking the skill. |
 | `prefill` | `array` | `[]` | **New in v4.** Array of tool call specifications to execute before delivering the Skill. See `18-prefill.md`. |
 
-### Skill Types (v4.1.0)
+### Skill Types (v4.2.0)
 
 The `type` field classifies the skill's intended scope. Values are bare strings without `-skill` suffix.
 
@@ -168,7 +168,7 @@ The `type` field classifies the skill's intended scope. Values are bare strings 
 | `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
 | `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
 
-Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.1.0** — that pattern is forbidden (see VAL016).
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.2.0** — that pattern is forbidden (see VAL016).
 
 ### Field Details
 
@@ -205,7 +205,7 @@ version: '1.0.0'               // missing prefix
 version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Unified versioning in v4.1.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
+Unified versioning in v4.2.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -380,9 +380,9 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ---
 
-## Skill Registration (v4.1.0)
+## Skill Registration (v4.2.0)
 
-Skills in v4.1.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.1.0 (see VAL016).
+Skills in v4.2.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.2.0 (see VAL016).
 
 ### Three Registration Scopes
 
@@ -546,7 +546,7 @@ The following aspects cannot be checked by static validation. They depend on AI 
 
 ---
 
-## One-Shot Design Principle (v4.1.0)
+## One-Shot Design Principle (v4.2.0)
 
 A Skill MUST be written so that an AI agent can execute the complete workflow in a single pass — without requiring additional ToolSearch roundtrips for disambiguation or parameter discovery.
 
@@ -789,7 +789,7 @@ flowchart TD
     L --> M[Register as MCP prompts]
 ```
 
-The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.1.0.
+The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.2.0.
 
 ### Step-by-Step
 

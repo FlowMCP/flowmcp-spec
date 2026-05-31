@@ -1,0 +1,51 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://flowmcp.org/grading/1.1.0/namespace.schema.json",
+    "title": "FlowMCP Grading Namespace Payload (DEPRECATED in gradingSpec 2.0.0)",
+    "deprecated": true,
+    "description": "DEPRECATED in gradingSpec/2.0.0. The authored namespace.json is removed and folded into the derived index.json (see 16-selection-lockfile.md §11.5 and 19-folder-layout.md §17). Retained for historical reference only — new tooling MUST NOT validate against this schema.",
+    "type": "object",
+    "required": [
+        "namespace",
+        "namespaceHash",
+        "aboutHash",
+        "members"
+    ],
+    "properties": {
+        "namespace": {
+            "type": "string",
+            "pattern": "^[a-z0-9_-]+$",
+            "description": "Namespace identifier (lowercase, digits, underscores, dashes)."
+        },
+        "namespaceHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}$",
+            "description": "Sha256-8 deterministic hash over sorted members[] plus aboutHash. See 15-versioning-axes.md §10.5."
+        },
+        "aboutHash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{8}$",
+            "description": "Reference to the namespace about-page file. See 11-about-convention.md §19."
+        },
+        "members": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["schemaId", "schemaVersion", "schemaHash"],
+                "properties": {
+                    "schemaId": { "type": "string" },
+                    "schemaVersion": {
+                        "type": "string",
+                        "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+                    },
+                    "schemaHash": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{8}$"
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}

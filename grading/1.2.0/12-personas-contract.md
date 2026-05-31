@@ -15,7 +15,7 @@
 
 The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the **single source of truth** for persona identity, goals, scenarios, and success criteria.
 
-At spec version `gradingSpec/1.1.0`, the personas folder contains **four generalised personas** plus a set of helper documents:
+At this spec version, the personas folder contains **four generalised personas** plus a set of helper documents:
 
 | Persona | Slug | Short description |
 |---------|------|-------------------|
@@ -38,31 +38,29 @@ Implementers MUST read the personas in `repos/flowmcp-spec/personas/` before pro
 
 ## 2. Persona Reference Contract for Grading Entries
 
-A grading entry's `selectionContext.personaIds[]` field (see [`08-grading-model.md`](./08-grading-model.md) §4) carries one or more persona references. The contract for each reference is defined by the following four fields. Implementers MAY model them as a single string (the slug) when the other three can be resolved by lookup against the personas folder + the relevant Domain-Knowledge document.
+A grading entry's `persona` field (see [`08-grading-model.md`](./08-grading-model.md)) carries a persona reference. The contract is the pair `{basePersonaId, lensId}`. Implementers MAY model the reference as the `basePersonaId` slug alone when no Lens applies.
 
 | Field | Type | Required | Description |
-|-------|------|---------|-------------|
-| `personaId` | `string` | MUST | Slug as listed in §1 (`ai-engineer`, `decision-maker`, `hackathon-builder`, `schema-maintainer`). The slug MUST be one of the four — new generalised slugs require a spec version bump. |
-| `goals` | `string[]` | MUST | The goals the persona pursues under the current Selection. Resolved either inline or via the Domain-Knowledge document's Personas Reference section (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 sec. 6). |
-| `groupId` | `string` | MUST | The `groupId` of the topic group to which this persona binding applies (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §2). |
-| `lens` | `string` | SHOULD | The domain-specific Lens identifier (§4). When present, narrows the generalised persona to the group's domain. |
+|-------|------|----------|-------------|
+| `basePersonaId` | `string` | MUST | Slug as listed in §1 (`ai-engineer`, `decision-maker`, `hackathon-builder`, `schema-maintainer`). The slug MUST be one of the four — new generalised slugs require a spec version bump. |
+| `lensId` | `string` | SHOULD | The domain-specific Lens identifier (§4). When present, narrows the generalised base persona to the group's domain. |
 
-A grading entry that carries `determinism = non-deterministic` and does NOT supply at least one `personaId` is INVALID (see [`08-grading-model.md`](./08-grading-model.md) §13 and the JSON-Schema's `if/then` conditional). Error code `GRD-005` (see [`08-grading-model.md`](./08-grading-model.md) §13) is raised by the validator.
+The persona reference is attached to the **persona-bearing Areas** (see [`04-phases-single.md`](./04-phases-single.md) and [`05-phases-selection.md`](./05-phases-selection.md)): the `about-*`, `*-skills`, and `selection-aggregate` Areas carry a persona; the tool-level Areas (`single-test`, `tools-aggregate-*`, `namespace-description`) do not. The persona reference is **not coupled to the determinism axis** — a non-deterministic dimension does not by itself require a persona; the persona obligation follows the Area, not the determinism value.
 
-The four-field contract maps to the persona-template structure in `repos/flowmcp-spec/personas/_template.md`: **identity** (persona slug), **goal** (`goals[]`), **scenario** (the group / domain context provided by `groupId` + Domain-Knowledge document), **success criteria** (resolvable from the persona file + the Domain-Knowledge document's Use Cases section).
+The pair maps to the persona-template structure in `repos/flowmcp-spec/personas/_template.md`: **identity** (`basePersonaId`), **scenario** (the group / domain context provided by the Lens and the Domain-Knowledge content), **success criteria** (resolvable from the persona file + the Domain-Knowledge content's Use Cases section).
 
 ---
 
 ## 3. Persona Template (Derived)
 
-The persona-template structure (`_template.md`) is the source for the four-field contract above. The four template fields and their mapping to the grading contract:
+The persona-template structure (`_template.md`) is the source for the contract above. The template fields and their mapping to the grading contract:
 
 | Template field | Maps to | Source |
 |----------------|---------|--------|
-| Identity | `personaId` | `repos/flowmcp-spec/personas/<slug>.md` header |
-| Goal | `goals[]` | Persona file + Domain-Knowledge document's Personas Reference |
-| Scenario | (`groupId` + Lens) | Domain-Knowledge document; Lens narrows the scenario to the domain |
-| Success criteria | (resolved by aggregator) | Domain-Knowledge document's Use Cases + Personas Reference |
+| Identity | `basePersonaId` | `repos/flowmcp-spec/personas/<slug>.md` header |
+| Goal | (resolved by aggregator) | Persona file + Domain-Knowledge content's Personas Reference |
+| Scenario | `lensId` | Domain-Knowledge content; the Lens narrows the scenario to the domain |
+| Success criteria | (resolved by aggregator) | Domain-Knowledge content's Use Cases + Personas Reference |
 
 The mapping is the binding interpretation of the template. Implementers MUST NOT introduce additional persona fields without a `gradingSystem` bump.
 
@@ -70,23 +68,21 @@ The mapping is the binding interpretation of the template. Implementers MUST NOT
 
 ## 4. Lens Concept
 
-The Lens concept — described in detail in `repos/flowmcp-spec/personas/persona-lens.md` — is the **hybrid generalisation model** of `gradingSpec/1.1.0`. Two design choices live behind it:
+The Lens concept — described in detail in `repos/flowmcp-spec/personas/persona-lens.md` — is the **hybrid generalisation model** of this spec. Two design choices live behind it:
 
 1. **Generalised personas as the base.** The four personas in §1 are deliberately abstract; they apply across every domain.
-2. **Domain-specific Lenses as optional refinements.** A group's Domain-Knowledge document (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 sec. 6) MAY define one or more Lenses, each narrowing a generalised persona to a domain-specific shape.
+2. **Domain-specific Lenses as optional refinements.** A group's Domain-Knowledge content (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 section 6) MAY define one or more Lenses, each narrowing a generalised base persona to a domain-specific shape.
 
-A Lens is a **named refinement** identified by a slug (e.g. `crypto-trader`, `mobility-planner`). The Lens slug is carried in the optional `lens` field of the persona reference contract (§2).
+A Lens is a **named refinement** identified by a slug (e.g. `crypto-trader`, `mobility-planner`). The Lens slug is carried in the optional `lensId` field of the persona reference contract (§2).
 
 ### 4.1 Example — Crypto (`crypto-trader` Lens)
 
-A crypto Selection's Domain-Knowledge document defines a Lens `crypto-trader` over the base persona `decision-maker`. The Lens narrows the abstract decision-maker into someone who decides to buy, sell, or hold a token based on price, liquidity, and on-chain signals. A grading entry that uses this Lens carries:
+A crypto selection's Domain-Knowledge content defines a Lens `crypto-trader` over the base persona `decision-maker`. The Lens narrows the abstract decision-maker into someone who decides to buy, sell, or hold a token based on price, liquidity, and on-chain signals. A grading entry that uses this Lens carries:
 
 ```json
 {
-    "personaId": "decision-maker",
-    "groupId": "crypto",
-    "lens": "crypto-trader",
-    "goals": ["evaluate whether to enter or exit a position", "estimate liquidity risk"]
+    "basePersonaId": "decision-maker",
+    "lensId": "crypto-trader"
 }
 ```
 
@@ -94,42 +90,40 @@ The Lens makes the persona's expectations concrete (price endpoints, slippage es
 
 ### 4.2 Example — Mobility (`mobility-planner` Lens)
 
-The Mobility group's Domain-Knowledge document defines a Lens `mobility-planner` over the **same** base persona `decision-maker`. The Lens narrows the abstract decision-maker into someone who decides between transport options based on time, cost, and reliability:
+The Mobility group's Domain-Knowledge content defines a Lens `mobility-planner` over the **same** base persona `decision-maker`. The Lens narrows the abstract decision-maker into someone who decides between transport options based on time, cost, and reliability:
 
 ```json
 {
-    "personaId": "decision-maker",
-    "groupId": "mobility",
-    "lens": "mobility-planner",
-    "goals": ["choose between train, bus, and car for a given route", "estimate delay risk"]
+    "basePersonaId": "decision-maker",
+    "lensId": "mobility-planner"
 }
 ```
 
-The two examples demonstrate the **re-use of the base persona** across domains. The Lens is what changes; the persona slug remains `decision-maker` in both cases.
+The two examples demonstrate the **re-use of the base persona** across domains. The Lens is what changes; the base persona slug remains `decision-maker` in both cases.
 
 ---
 
 ## 5. Where Lenses are Defined
 
-Lenses are defined in the **Domain-Knowledge document** of the relevant group, not in this spec and not in the personas folder of `flowmcp-spec`. The reasoning is:
+Lenses are defined in the **Domain-Knowledge content** of the relevant group, not in this spec and not in the personas folder of `flowmcp-spec`. The reasoning is:
 
 - Lenses are domain-specific and change with domain knowledge — they belong with the rest of the group's conventions.
 - The personas folder of `flowmcp-spec` is generalised and stable across domains.
 - A new group can define its Lenses without coordinating a change in the Grading-Spec.
 
-See [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 sec. 6 for the binding obligation that a Domain-Knowledge document carries a Personas Reference section that lists the Lenses applicable to the group.
+See [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 section 6 for the binding obligation that the Domain-Knowledge content carries a Personas Reference section that lists the Lenses applicable to the group.
 
 ---
 
 ## 6. Grading Effect
 
-| Dimension | Determinism | Tier | Source |
-|-----------|-------------|------|--------|
-| `personaUseCaseFit` | non-deterministic | group-bound | Selection S4 |
+| Dimension | Determinism | Tier | Source (Area) |
+|-----------|-------------|------|----------------|
+| `personaUseCaseFit` | non-deterministic | group-bound | `selection-aggregate` |
 
-**Binding rule.** At least one persona reference MUST be present in `selectionContext.personaIds[]` for every `group-bound` grading entry. A `group-bound` entry without a persona reference is INVALID and the validator raises error code `GRD-005` (see [`08-grading-model.md`](./08-grading-model.md) §13).
+**Binding rule.** A persona reference (`basePersonaId`, optionally narrowed by `lensId`) MUST be present for every **persona-bearing Area** (see §2). The obligation follows the Area, not the determinism value: a persona-bearing Area without a `basePersonaId` is INVALID.
 
-The Lens (when present) refines the persona but does NOT replace it. A grading entry MAY carry `lens` without a `groupId` only in degenerate cases (cross-group meta-evaluation); the JSON-Schema requires `groupId` together with the persona reference in the typical group-bound case.
+The Lens (`lensId`) when present refines the base persona but does NOT replace it. A grading entry MAY carry `basePersonaId` without a `lensId` when no domain Lens applies.
 
 ---
 
@@ -144,7 +138,7 @@ The Lens (when present) refines the persona but does NOT replace it. A grading e
 ### 7.1 Definition
 
 The spec recognises a tier of **technical Schema-Personas** that apply to the autonomous
-Single-Schema phases (P1–P7, `gradingTier = autonomous`). Unlike the four generalised base
+provider-side Areas (`gradingTier = autonomous`). Unlike the four generalised base
 personas — which describe end users and contributors of the corpus — technical Schema-Personas
 describe the **review lenses** applied while a schema is being prepared for the corpus. They are
 maintained at the repository level in `repos/flowmcp-grading/personas/`, not in
@@ -182,9 +176,9 @@ content (identity, review focus, sign-off / block criteria) lives in the grading
 - `repos/flowmcp-spec/personas/` — the single source of truth for the four generalised personas and the Lens concept.
 - `repos/flowmcp-spec/personas/persona-lens.md` — detailed description of the Lens concept.
 - `repos/flowmcp-grading/personas/` — the technical Schema-Persona tier (§7), owned by the grading repository.
-- [`08-grading-model.md`](./08-grading-model.md) §4, §13 — `selectionContext.personaIds[]` field and the Personas obligation rule.
-- [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 sec. 6 — Lens definition lives in the Domain-Knowledge document.
-- [`13-skills.md`](./13-skills.md) — Selection-Skills MUST carry persona focus on all three levels.
+- [`08-grading-model.md`](./08-grading-model.md) — the `persona` field and the persona obligation per Area.
+- [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3 section 6 — Lens definition lives in the Domain-Knowledge content.
+- [`13-skills.md`](./13-skills.md) — selection skills MUST carry persona focus on all three levels.
 
 ---
 

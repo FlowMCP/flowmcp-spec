@@ -1,0 +1,88 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://flowmcp.org/spec/grading/1.1.0/kanban-data-contract.schema.json",
+    "title": "FlowMCP Kanban Phase-Status Response (DEPRECATED, gradingSpec/1.1.0)",
+    "deprecated": true,
+    "description": "DEPRECATED in gradingSpec/2.0.0. Superseded by index.schema.json (the namespace/selection rollup). Retained as valid JSON for reference only; this phase-status response is no longer normative. See 14-kanban-data-contract.md and 23-index-json.md.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "phaseId",
+        "status",
+        "dimensionsConsidered"
+    ],
+    "properties": {
+        "phaseId": {
+            "type": "string",
+            "enum": [
+                "P1",
+                "P2",
+                "P3",
+                "P4",
+                "P5",
+                "P6",
+                "P7",
+                "S1",
+                "S2",
+                "S3",
+                "S4"
+            ],
+            "description": "Phase identifier (P1-P7 single-schema, S1-S4 selection)."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "passed",
+                "failed",
+                "pending",
+                "stale"
+            ],
+            "description": "Phase status. Aging produces 'stale', not 'failed'."
+        },
+        "dimensionsConsidered": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+                "type": "string",
+                "minLength": 1
+            },
+            "description": "Dimension names considered when deriving the phase status. Empty array allowed for phases driven by a pipeline result."
+        },
+        "stalestDimensionAge": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Optional. Age (in days) of the oldest stale dimension when status='stale'."
+        },
+        "laneType": {
+            "type": "string",
+            "enum": ["single", "selection"],
+            "description": "NEW in 1.1.0. Lane type per §14. Single-Gradings and Selection-Gradings are on separate Kanban lanes."
+        },
+        "laneId": {
+            "type": "string",
+            "description": "NEW in 1.1.0. Lane identifier; pattern depends on laneType (see allOf below)."
+        },
+        "dataSource": {
+            "type": "string",
+            "description": "NEW in 1.1.0. Source path for the lane data (e.g. single/<ns>--<tool>/gradings/ or selection/<id>/gradings/)."
+        }
+    },
+    "allOf": [
+        {
+            "if": { "properties": { "laneType": { "const": "single" } }, "required": ["laneType"] },
+            "then": {
+                "properties": {
+                    "laneId": { "pattern": "^single/[a-zA-Z0-9_-]+--[a-zA-Z0-9_-]+$" }
+                }
+            }
+        },
+        {
+            "if": { "properties": { "laneType": { "const": "selection" } }, "required": ["laneType"] },
+            "then": {
+                "properties": {
+                    "laneId": { "pattern": "^selection/[a-zA-Z0-9_-]+$" }
+                }
+            }
+        }
+    ]
+}

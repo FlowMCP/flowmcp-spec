@@ -26,7 +26,7 @@ Empty context (see [`02-eligibility.md`](./02-eligibility.md) §3.5) is a conven
 | Empty context | Convention: no relevant prior information | No, trust-based |
 | Entry-point prompt | First prompt after `/clear` = grading start | No, organisational |
 
-The spec requires: the README in the grading repository provides a prompt template. The grader runs `/clear`, copies the prompt, and fills in persona, selection/single-schema, mode, and lockfile hash.
+The spec requires: the README in the grading repository provides a prompt template. The grader runs `/clear`, copies the prompt, and fills in persona, selection/single-schema, mode, and the `lockSnapshot` hash from the selection's `index.json`.
 
 ### §18.2 Prompt Template
 
@@ -36,21 +36,21 @@ The binding prompt template is:
 You are performing a FlowMCP grading. Instructions:
 
 1. Persona: crypto-trader-2026
-2. Selection: crypto-domain-full, lockfile hash: <sha>
+2. Selection: crypto-domain-full, lockSnapshot hash: <sha>
 3. Mode: Full (initial baseline)
-4. Spec version: gradingSpec/1.1.0
+4. Spec version: gradingSpec/1.2.0
 5. Pre-condition: all member schemas have gradingStatus: stable
-6. Output format: gradings/<selection-hash>--<timestamp>.json
+6. Output format: _gradings/<area>--<timestamp>.json
 ```
 
 Six numbered lines. For Single-Gradings, line 2 is replaced and line 5 is dropped:
 
 ```
 1. Persona: crypto-trader-2026
-2. Single-Schema: etherscan.getContractEthereum, schemaHash: a1b2c3d4
+2. Single-Schema: etherscan.getContractEthereum, area: single-test
 3. Mode: Full (initial baseline)
-4. Spec version: gradingSpec/1.1.0
-6. Output format: gradings/<schema-hash>--<timestamp>.json
+4. Spec version: gradingSpec/1.2.0
+6. Output format: _gradings/<area>--<timestamp>.json
 ```
 
 (Line 5 is dropped — the pre-condition applies only to aggregated checks, see [`21-pre-conditions.md`](./21-pre-conditions.md) §20.)
@@ -81,4 +81,4 @@ The README in the grading repository contains the ready-to-use prompt with examp
 - Personas contract (Lens, four personas) → [`12-personas-contract.md`](./12-personas-contract.md)
 - Selection `personaIds[]` obligation → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.1
 - Pre-condition (line 5 of the prompt) → [`21-pre-conditions.md`](./21-pre-conditions.md) §20
-- Output format (line 6 of the prompt) → [`19-folder-layout.md`](./19-folder-layout.md) §17.3
+- Output format `_gradings/` (line 6 of the prompt) → [`19-folder-layout.md`](./19-folder-layout.md) §17.3

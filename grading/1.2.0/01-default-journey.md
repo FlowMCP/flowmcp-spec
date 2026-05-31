@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0` |
+| Version | `gradingSpec/1.2.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`02-eligibility.md`](./02-eligibility.md), [`04-phases-single.md`](./04-phases-single.md) |
 
@@ -13,7 +13,7 @@
 
 ## 1. Purpose
 
-This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** as a contribution to phases P2 and P3 (see [`04-phases-single.md`](./04-phases-single.md)).
+This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** as a contribution to the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)).
 
 The default position is unambiguous: **more tools = better interoperability**. Reduction below the documented endpoint set MUST be justified, or it MUST cost points.
 
@@ -36,10 +36,10 @@ When the entry path is a documentation URL, the resulting schema (or schema set)
 
 **Reduction rule (MUST):** A schema that implements **fewer tools than the documentation supports** MUST either
 
-1. carry an explicit, machine-readable justification per omitted endpoint (e.g. "endpoint excluded under [`02-eligibility.md`](./02-eligibility.md) §3.2"), **or**
-2. accept a proportional point deduction in the **completeness validation** of phases P2/P3 (see [`04-phases-single.md`](./04-phases-single.md)).
+1. carry an explicit, machine-readable justification per omitted endpoint, recorded in the grading JSON of the affected schema (e.g. "endpoint excluded under [`02-eligibility.md`](./02-eligibility.md) §3.2"), **or**
+2. accept a proportional point deduction in the **completeness validation** of the `single-test` / `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)).
 
-No silent reduction. An omission without justification is a finding.
+No silent reduction. An omission without a justification recorded in the grading JSON is a finding.
 
 ---
 
@@ -63,15 +63,15 @@ This is the **deep cause** for the maximalism principle: a schema that omits end
 
 ---
 
-## 6. Completeness Validation (P2/P3 contribution)
+## 6. Completeness Validation (Area contribution)
 
-The **completeness validation** is a deterministic phase contribution graded in P2 (endpoint-list extraction) and P3 (schema draft) of [`04-phases-single.md`](./04-phases-single.md).
+The **completeness validation** is a deterministic contribution graded in the `single-test` and `tools-aggregate-schema` Areas of [`04-phases-single.md`](./04-phases-single.md).
 
-- The **original documentation** — or the endpoint list extracted in P2 — is the **validation baseline**.
+- The **original documentation** — or the endpoint list extracted while authoring the schema — is the **validation baseline**.
 - The grader MUST report any gap between the baseline and the implemented schema. Example: if a schema implements only 70% of the baseline-admitted endpoints, the grader MUST log the gap.
-- The **point deduction MUST be proportional to the gap**, except where a per-endpoint justification under [`02-eligibility.md`](./02-eligibility.md) is present.
+- The **point deduction MUST be proportional to the gap**, except where a per-endpoint justification under [`02-eligibility.md`](./02-eligibility.md) is recorded in the grading JSON.
 
-Gap reporting is mandatory; gap penalisation is conditional on the absence of an eligibility-based justification.
+Gap reporting is mandatory; gap penalisation is conditional on the absence of an eligibility-based justification recorded in the grading JSON.
 
 ---
 
@@ -79,4 +79,4 @@ Gap reporting is mandatory; gap penalisation is conditional on the absence of an
 
 - [`00-overview.md`](./00-overview.md) — Conformance language, interoperability as the main focus.
 - [`02-eligibility.md`](./02-eligibility.md) — Which endpoints are admitted (the maximalism boundary).
-- [`04-phases-single.md`](./04-phases-single.md) — Phases P2/P3 carry the completeness-validation grading.
+- [`04-phases-single.md`](./04-phases-single.md) — the `single-test` / `tools-aggregate-schema` Areas carry the completeness-validation grading.

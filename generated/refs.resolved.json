@@ -1,15 +1,15 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-05-24T19:09:39.145Z",
-        "fromCommit": "069df88",
+        "at": "2026-05-31T16:27:53.770Z",
+        "fromCommit": "6152b7e",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
-        "currentVersion": "4.1.0",
-        "recommendedRelease": "v4.1.0",
-        "specDir": "spec/v4.1.0",
-        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.1.0/spec/v4.1.0",
+        "currentVersion": "4.2.0",
+        "recommendedRelease": "v4.2.0",
+        "specDir": "spec/v4.2.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.2.0/spec/v4.2.0",
         "llmsTxtUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt",
         "miniSkillTemplate": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/data/mini-skill.template.md"
     },
@@ -98,5 +98,12 @@
                 "ok": true
             }
         ]
+    },
+    "grading": {
+        "currentVersion": "2.0.0",
+        "recommendedRelease": "2.0.0",
+        "specDir": "grading/2.0.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/grading/2.0.0",
+        "url": "https://flowmcp.github.io/grading/overview/"
     }
 }

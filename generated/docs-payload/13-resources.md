@@ -1,17 +1,17 @@
 ---
 title: "Resources"
 description: "Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This..."
-spec_version: "4.1.0"
+spec_version: "4.2.0"
 spec_file: "13-resources.md"
 order: 13
 section: "Specification"
 normative: true
-source_commit: "dbbe036"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/13-resources.md"
-generated_at: "2026-05-29T13:35:54.422Z"
-generated_from: "spec/v4.1.0/13-resources.md"
+source_commit: "6152b7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/spec/v4.2.0/13-resources.md"
+generated_at: "2026-05-31T16:18:50.290Z"
+generated_from: "spec/v4.2.0/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.1.0/13-resources.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.2.0/13-resources.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -357,7 +357,7 @@ A minimal POC schema demonstrating `sqlite-gtfs`:
 export const schema = {
     namespace: 'gtfsde',
     name: 'gtfsde-transit-v2',
-    version: '4.1.0',
+    version: '4.2.0',
     main: {
         resources: [
             {
@@ -666,7 +666,7 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 
 ---
 
-## HTTP Resources (v4.1.0)
+## HTTP Resources (v4.2.0)
 
 HTTP Resources allow schemas to reference remote files (typically SQLite databases) that are fetched via HTTPS and cached locally. They combine the rich query interface of SQLite resources with the distribution flexibility of remote hosting.
 

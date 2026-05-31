@@ -1,92 +1,101 @@
-# 18 — Flywheel Loop (§16)
+# 18 — Flywheel Loop
 
 | Field | Value |
 |-------|-------|
-| Status | Normative — NEW in 1.1.0 |
-| Version | `gradingSpec/1.1.0` |
-| Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md) |
-| Related | [`14-kanban-data-contract.md`](./14-kanban-data-contract.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`11-about-convention.md`](./11-about-convention.md) |
-
-> **Spec:** `gradingSpec/1.1.0`
-> **Status:** stable (additive extension of 1.0.0)
-> **Changes vs. 1.0.0:** entirely new section §16 (flywheel loop with Mermaid diagram).
+| Status | Normative |
+| Version | `gradingSpec/1.2.0` |
+| Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
+| Related | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`11-about-convention.md`](./11-about-convention.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
 
 ---
 
-## §16 Flywheel Loop
+## 1. The Flywheel as an IN/OUT Round-Trip
 
-The grading process follows an iteration pattern: Single-Grading → evaluation →
-schema fix (bump) → re-grade → stable → Selection pre-condition met. The
-pattern is self-reinforcing — every improvement raises the aggregate quality
-of the Selections that contain the schema.
+The grading process is a **round-trip** between the source repository and the workbench:
 
-### §16.1 Mermaid Diagram
+- **IN** — a provider folder (or selection definition) is imported into the workbench, snapshotted, and normalised.
+- **Grade** — the provider-side and selection-side Areas grade the imported primitives, writing `_gradings/` and rolling them up into `index.json`.
+- **OUT** — the graded state, primarily the `index.json`, is exported back to the source.
+
+The pattern is self-reinforcing: every improvement raises the aggregate quality of the selections that contain the schema, and every selection run identifies the weakest schemas in a namespace. The loop is iteration over the same artefacts; the workbench `index.json` carries the current graded state across rounds.
+
+---
+
+## 2. Mermaid Diagram
 
 ```mermaid
 flowchart TD
-    NS[schemas/etherscan/<br/>namespace.json<br/>about/ef56--about.md]
-    NS --> SCHEMA[Schemas in the namespace<br/>a1b2--v1.0.0.mjs<br/>e5f6--v1.1.0.mjs]
-    SCHEMA --> SINGLE[single/etherscan--getContract/<br/>gradings/a1b2--T1.json]
-    SCHEMA --> SELECTION[selection/crypto-domain-full/<br/>selection.lock.json]
-    SELECTION --> PRECOND{Pre-condition:<br/>all members stable?}
-    PRECOND -->|no| BLOCK[Selection blocked<br/>Single-Gradings first]
-    BLOCK --> SINGLE
-    PRECOND -->|yes| SLOCK[Lockfile binds:<br/>a1b2 etherscan v1.0.0<br/>c3d4 jupiter v1.0.0]
-    SLOCK --> SGRADE[selection/.../gradings/<br/>sel-hash--T1.json]
+    SRC[Source: providers/<ns>/*.mjs<br/>or selections/<sel>] --> IMPORT[IN: import<br/>validate + snapshot + normalise]
+    IMPORT --> NS[providers/etherscan/<br/>schema files + resources/about/]
+    NS --> SCHEMA[Schemas in the namespace<br/>getContract--ts--a1b2.mjs]
+    SCHEMA --> SINGLE[providers/etherscan/getContract/tools/.../_gradings/<br/>single-test--ts.json]
     SINGLE --> CHECK{Grade A/B?}
     CHECK -->|no| FIX[Improve schema]
-    FIX --> V[schemaVersion bump<br/>v1.0.0 → v1.1.0]
-    V --> NEWHASH[New schemaHash: e5f6]
-    NEWHASH --> SCHEMA
-    CHECK -->|partial| PART[gradings/e5f6--T2--partial.json]
+    FIX --> NEWSNAP[New snapshot:<br/>getContract--newts--e5f6.mjs]
+    NEWSNAP --> SCHEMA
+    CHECK -->|partial| PART[partial grading<br/>aggregate unchanged]
     PART --> CHECK
-    CHECK -->|yes, Full| STABLE[gradingStatus: stable]
-    STABLE --> PRECOND
-    NS --> ABOUT[About verification:<br/>pre-condition + consistency check]
+    CHECK -->|yes, full| STABLE[node status: stable]
+    STABLE --> IDXN[providers/etherscan/index.json<br/>rollup + 5-status]
+    IDXN --> GATE{Selection pre-condition:<br/>all members stable?<br/>index.json lockSnapshot}
+    GATE -->|no| RESOLVE[Dependency resolver]
+    RESOLVE --> SINGLE
+    GATE -->|yes| SGRADE[selections/crypto/_gradings/<br/>selection-aggregate--ts.json<br/>+ about-selection + selection-skills]
+    SGRADE --> IDXS[selections/crypto/index.json]
+    NS --> ABOUT[about-namespace:<br/>resources/about/ route-exists + content]
     SCHEMA --> ABOUT
+    IDXN --> OUT[OUT: export index.json to source]
+    IDXS --> OUT
 ```
 
-### §16.2 Reading Direction
+---
 
-**Reading direction:** top-down (`flowchart TD`) follows the iteration flow.
-The pre-condition gate and the stable back-reference make the flywheel effect
-visible: every new stable Single opens the door for Selection-Gradings, and
-every Selection run identifies the weakest schemas in the namespace.
+## 3. Reading Direction
 
-### §16.3 Reference Fields per Node
+**Reading direction:** top-down (`flowchart TD`) follows the iteration flow. The pre-condition gate and the `stable` back-reference make the flywheel effect visible: every new `stable` provider-side grade opens the door for selection-side grading, and every selection run identifies the weakest schemas in the namespace.
+
+---
+
+## 4. Reference Fields per Node
 
 | Node | Reference |
 |------|-----------|
-| NS | [`19-folder-layout.md`](./19-folder-layout.md) §17 folder layout, [`11-about-convention.md`](./11-about-convention.md) §19 About-Pages |
-| SCHEMA | [`08-grading-model.md`](./08-grading-model.md) §5 data model, [`15-versioning-axes.md`](./15-versioning-axes.md) §10 version axes |
-| SINGLE/SGRADE | [`14-kanban-data-contract.md`](./14-kanban-data-contract.md) §14 Kanban lanes |
-| PRECOND | [`21-pre-conditions.md`](./21-pre-conditions.md) §20 pre-conditions |
-| STABLE | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8 tier trim (partial vs. full) |
-| FIX/V/NEWHASH | [`15-versioning-axes.md`](./15-versioning-axes.md) §10 bump tables |
-| SLOCK | [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.2 lockfile schema |
-| ABOUT | [`11-about-convention.md`](./11-about-convention.md) §19, [`21-pre-conditions.md`](./21-pre-conditions.md) §20.3 |
+| IMPORT / OUT | [`19-folder-layout.md`](./19-folder-layout.md) — the IN/OUT round-trip and folder layout |
+| NS / SCHEMA | [`04-phases-single.md`](./04-phases-single.md) — provider-side Areas; [`08-grading-model.md`](./08-grading-model.md) — data model |
+| SINGLE / SGRADE | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md) — Area `_gradings/` placement |
+| IDXN / IDXS | [`19-folder-layout.md`](./19-folder-layout.md) — the `index.json` rollup (live rollup + frozen lockSnapshot, 5-status) |
+| GATE | [`21-pre-conditions.md`](./21-pre-conditions.md) — pre-conditions (only `stable` members pass) |
+| STABLE / PART | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8 — partial vs. full and the five node statuses |
+| ABOUT | [`11-about-convention.md`](./11-about-convention.md) — About as a schema Resource |
 
-### §16.4 Self-Reinforcing Effect
+---
+
+## 5. Self-Reinforcing Effect
 
 The flywheel is self-reinforcing along three loops:
 
-1. **Quality loop per schema**: SINGLE → CHECK → FIX → V → NEWHASH → SCHEMA → SINGLE. Each iteration bumps `schemaVersion`, produces a new `schemaHash`, and the next Single-Grading tests the improved schema variant.
-2. **Aggregation loop per Selection**: SLOCK → SGRADE → (on member change) PRECOND → SLOCK. Every re-grading of a member invalidates the old lockfile; a new lockfile binds the current hashes.
-3. **About-verification loop**: ABOUT (pre-condition + consistency check) → on change a new `aboutHash` → new `namespaceHash` → re-check.
+1. **Quality loop per schema**: SINGLE → CHECK → FIX → NEWSNAP → SCHEMA → SINGLE. Each iteration writes a new versioned snapshot (timestamp + hash in the file name); the next grading tests the improved schema variant. The hash binding lives in `index.json`, never in the source (see [`19-folder-layout.md`](./19-folder-layout.md)).
+2. **Aggregation loop per selection**: SGRADE → (on member change) GATE → SGRADE. Every re-grading of a member updates the namespace `index.json`; the selection's frozen `lockSnapshot` is refreshed at the next selection-grading start.
+3. **About-verification loop**: ABOUT (route-exists + content check) → on change a new About snapshot → re-check; the namespace `index.json` records the new About grade.
 
-### §16.5 Anti-Patterns
+---
+
+## 6. Anti-Patterns
 
 The following patterns break the flywheel and are excluded by the spec:
 
-- **Partial gradings without a concluding full grading**: `gradingStatus` stays `pending`, the Selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2)
-- **Schema edit without a version bump**: the consistency check (see [`15-versioning-axes.md`](./15-versioning-axes.md) §10.4) blocks the commit
-- **Selection grading with `pending` members**: the pre-condition (see [`21-pre-conditions.md`](./21-pre-conditions.md) §20) blocks step 0
+- **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2).
+- **Schema edit without a new snapshot**: a source edit MUST produce a new versioned snapshot file; editing in place breaks the latest-resolution and the hash binding (see [`19-folder-layout.md`](./19-folder-layout.md)).
+- **Selection grading with non-`stable` members**: the pre-condition (see [`21-pre-conditions.md`](./21-pre-conditions.md)) blocks the selection run before any Area runs.
 
-### §16.6 Cross-Refs
+---
 
-- Iteration pattern → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8.2 (partial vs. full)
-- Version bump → [`15-versioning-axes.md`](./15-versioning-axes.md) §10
-- Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md) §20
-- Folder layout (iteration file names) → [`19-folder-layout.md`](./19-folder-layout.md) §17.2
+## 7. Cross-References
+
+- Round-trip and folder layout → [`19-folder-layout.md`](./19-folder-layout.md)
+- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §8
+- Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md)
+- Provider-side Areas → [`04-phases-single.md`](./04-phases-single.md)
+- Selection-side Areas → [`05-phases-selection.md`](./05-phases-selection.md)

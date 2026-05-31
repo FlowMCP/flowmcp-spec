@@ -1,4 +1,4 @@
-# FlowMCP Specification v4.1.0
+# FlowMCP Specification v4.2.0
 > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
 >
 > This file concatenates all 23 specification documents into a single file for LLM consumption.
@@ -32,14 +32,14 @@
 
 ---
 
-# FlowMCP Specification v4.1.0 — Overview
+# FlowMCP Specification v4.2.0 — Overview
 
 FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:
 
 1. **CLI** — Direct access to Tools, Resources, Prompts, and Skills
 2. **MCP/A2A Server** — Agents and MCP clients can use FlowMCP as a server (compatible with OpenClaw)
 
-This document provides the conceptual foundation, positioning, terminology, and document index for the v4.1.0 specification.
+This document provides the conceptual foundation, positioning, terminology, and document index for the v4.2.0 specification.
 
 ---
 
@@ -47,7 +47,7 @@ This document provides the conceptual foundation, positioning, terminology, and 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-Some specification files in `spec/v4.1.0/` are intentionally written in prose without normative keywords because they describe history, lifecycle, or conceptual background (this overview document, the migration guide, the schema lifecycle document). All other specification files use normative language and assume this conformance interpretation.
+Some specification files in `spec/v4.2.0/` are intentionally written in prose without normative keywords because they describe history, lifecycle, or conceptual background (this overview document, the migration guide, the schema lifecycle document). All other specification files use normative language and assume this conformance interpretation.
 
 References:
 - [RFC2119](https://www.rfc-editor.org/rfc/rfc2119) — Key words for use in RFCs to Indicate Requirement Levels
@@ -383,7 +383,7 @@ The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 
 ---
 
-# FlowMCP Specification v4.1.0 — Schema Format
+# FlowMCP Specification v4.2.0 — Schema Format
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -455,9 +455,33 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `namespace` | `string` | Provider identifier, lowercase letters and hyphens (`/^[a-z][a-z0-9-]*$/`). Groups schemas by data source. |
 | `name` | `string` | Human-readable schema name in PascalCase (e.g. `SmartContractExplorer`). |
 | `description` | `string` | What this schema does, 1-2 sentences. Appears in tool discovery. |
-| `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major MUST be `4`). Version `3.\d+.\d+` is accepted during migration. |
+| `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major MUST be `4`). Version `3.\d+.\d+` is accepted during migration. **FlowMCP-Spec-Version** (frozen by Major). |
+| `schemaVersion` | `string` | **NEW in v4.1.1.** Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
+| `schemaHash` | `string` | **NEW in v4.1.1.** 8-character sha256-prefix (`[0-9a-f]{8}`) of canonical-JSON-serialised schema (excluding the `schemaHash` field itself). Used as stable identifier in `grading-data/schemas/<namespace>/<hash>--v<X.Y.Z>.mjs` snapshots. Automatically generated. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
+
+#### Two Version Axes (v4.1.1+)
+
+| Axis | Field | Range | Meaning |
+|------|-------|-------|---------|
+| Spec-Version | `version` | `4.\d+.\d+` (Major frozen) | FlowMCP-Spec-Version |
+| Schema-Version | `schemaVersion` | `\d+.\d+.\d+` (semver, free) | Schema-Content-Version |
+
+Example header (v4.1.1):
+
+```javascript
+export const main = {
+    namespace: 'etherscan',
+    name: 'GetContractEthereum',
+    description: 'Fetch verified contract source by address',
+    version: '4.0.0',
+    schemaVersion: '1.0.0',
+    schemaHash: 'a1b2c3d4',
+    root: 'https://api.etherscan.io',
+    tools: { /* ... */ }
+}
+```
 
 ### Optional Fields
 
@@ -1016,7 +1040,7 @@ export const handlers = ( { sharedLists } ) => ({
 
 ---
 
-# FlowMCP Specification v4.1.0 — Parameters
+# FlowMCP Specification v4.2.0 — Parameters
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -1646,7 +1670,7 @@ See `14-skills.md` for the complete skill specification.
 
 ---
 
-# FlowMCP Specification v4.1.0 — Shared Lists
+# FlowMCP Specification v4.2.0 — Shared Lists
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -2191,7 +2215,7 @@ Each `.mjs` file contains exactly one shared list. Combining multiple lists in a
 
 ---
 
-# FlowMCP Specification v4.1.0 — Output Schema
+# FlowMCP Specification v4.2.0 — Output Schema
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -2698,7 +2722,7 @@ The diagram shows the non-blocking validation flow: mismatches produce warnings 
 
 ---
 
-# FlowMCP Specification v4.1.0 — Security Model
+# FlowMCP Specification v4.2.0 — Security Model
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -3034,7 +3058,7 @@ All violations in a single file are reported together (the scan does not stop at
 
 ---
 
-# FlowMCP Specification v4.1.0 — Agents
+# FlowMCP Specification v4.2.0 — Agents
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -4094,7 +4118,7 @@ export const agent = {
 
 ---
 
-# FlowMCP Specification v4.1.0 — MCP Tasks
+# FlowMCP Specification v4.2.0 — MCP Tasks
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -4130,7 +4154,7 @@ Schema authors MAY include an `async` field in route definitions for forward com
 
 ---
 
-# FlowMCP Specification v4.1.0 — Migration Guide
+# FlowMCP Specification v4.2.0 — Migration Guide
 
 This guide covers migrating schemas between FlowMCP versions. Section 1 covers v2.0.0 to v3.0.0 migration. Section 2 preserves the v1.2.0 to v2.0.0 guide for reference.
 
@@ -4724,13 +4748,13 @@ Per schema:
 
 ---
 
-# FlowMCP Specification v4.1.0 — Validation Rules
+# FlowMCP Specification v4.2.0 — Validation Rules
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
-This file is the **central code registry** for FlowMCP v4.1.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
+This file is the **central code registry** for FlowMCP v4.2.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
 ---
 
@@ -4991,7 +5015,7 @@ See `06-agents.md` for the complete agent specification.
 
 ---
 
-## MCP Integration Meta Rules (v4.1.0)
+## MCP Integration Meta Rules (v4.2.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -5009,7 +5033,7 @@ See `19-mcp-integration.md` for the complete meta block specification.
 
 ---
 
-## Selection Validation Rules (v4.1.0)
+## Selection Validation Rules (v4.2.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -5021,7 +5045,7 @@ See `17-selections.md` for the complete Selection specification.
 
 ---
 
-## Extended Agent Validation Rules (v4.1.0)
+## Extended Agent Validation Rules (v4.2.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -5030,7 +5054,7 @@ See `17-selections.md` for the complete Selection specification.
 
 ---
 
-## HTTP Resource Validation Rules (v4.1.0)
+## HTTP Resource Validation Rules (v4.2.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -5164,7 +5188,7 @@ flowmcp validate --security etherscan/contracts.mjs
 
 ---
 
-# FlowMCP Specification v4.1.0 — Tests
+# FlowMCP Specification v4.2.0 — Tests
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -5756,7 +5780,7 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
-## Skill Tests (v4.1.0)
+## Skill Tests (v4.2.0)
 
 Skills have two test types: structural and one-shot.
 
@@ -5840,7 +5864,7 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 
 ---
 
-# FlowMCP Specification v4.1.0 — Preload & Caching
+# FlowMCP Specification v4.2.0 — Preload & Caching
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -6047,7 +6071,7 @@ The output schema (`04-output-schema.md`) describes the response shape regardles
 
 ---
 
-# FlowMCP Specification v4.1.0 — Prompt Architecture
+# FlowMCP Specification v4.2.0 — Prompt Architecture
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -6956,7 +6980,7 @@ agents/
 
 ---
 
-# FlowMCP Specification v4.1.0 — Resources
+# FlowMCP Specification v4.2.0 — Resources
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -7301,7 +7325,7 @@ A minimal POC schema demonstrating `sqlite-gtfs`:
 export const schema = {
     namespace: 'gtfsde',
     name: 'gtfsde-transit-v2',
-    version: '4.1.0',
+    version: '4.2.0',
     main: {
         resources: [
             {
@@ -7610,7 +7634,7 @@ These access parameters are auto-injected by the runtime. Schema authors do not 
 
 ---
 
-## HTTP Resources (v4.1.0)
+## HTTP Resources (v4.2.0)
 
 HTTP Resources allow schemas to reference remote files (typically SQLite databases) that are fetched via HTTPS and cached locally. They combine the rich query interface of SQLite resources with the distribution flexibility of remote hosting.
 
@@ -8342,7 +8366,7 @@ The SQLite database `duneanalytics-templates.db` is not in the schema directory 
 
 ---
 
-# FlowMCP Specification v4.1.0 — Skills
+# FlowMCP Specification v4.2.0 — Skills
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -8488,7 +8512,7 @@ The `export const skill` object contains all metadata and instructions for the s
 | `input` | `object[]` | `[]` | See below | Parameters the user provides when invoking the skill. |
 | `prefill` | `array` | `[]` | **New in v4.** Array of tool call specifications to execute before delivering the Skill. See `18-prefill.md`. |
 
-### Skill Types (v4.1.0)
+### Skill Types (v4.2.0)
 
 The `type` field classifies the skill's intended scope. Values are bare strings without `-skill` suffix.
 
@@ -8498,7 +8522,7 @@ The `type` field classifies the skill's intended scope. Values are bare strings 
 | `'selection'` | Skill bound to a specific Selection (curated tool subset) | `selections/{selectionName}/skills/{name}.mjs` |
 | `'agent'` | Agent-specific skill, tested with a specific LLM | `agents/{agentName}/skills/{name}.mjs` |
 
-Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.1.0** — that pattern is forbidden (see VAL016).
+Skills are registered into their parent scope via the parent's manifest (`selection.skills`, `agent.skills`) or by being placed in the namespace's `skills/` directory. **There is no `main.skills` field on schemas in v4.2.0** — that pattern is forbidden (see VAL016).
 
 ### Field Details
 
@@ -8535,7 +8559,7 @@ version: '1.0.0'               // missing prefix
 version: '4.0.0'               // must include flowmcp/ prefix
 ```
 
-Unified versioning in v4.1.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
+Unified versioning in v4.2.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
 #### `description`
 
@@ -8710,9 +8734,9 @@ If a placeholder references a name that does not exist in the schema, the valida
 
 ---
 
-## Skill Registration (v4.1.0)
+## Skill Registration (v4.2.0)
 
-Skills in v4.1.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.1.0 (see VAL016).
+Skills in v4.2.0 are **top-level entities** that live outside the schema's `main` block. Each skill `.mjs` file is registered into one of three scopes via the parent's manifest or by directory placement. **The `main.skills` field is forbidden** in v4.2.0 (see VAL016).
 
 ### Three Registration Scopes
 
@@ -8876,7 +8900,7 @@ The following aspects cannot be checked by static validation. They depend on AI 
 
 ---
 
-## One-Shot Design Principle (v4.1.0)
+## One-Shot Design Principle (v4.2.0)
 
 A Skill MUST be written so that an AI agent can execute the complete workflow in a single pass — without requiring additional ToolSearch roundtrips for disambiguation or parameter discovery.
 
@@ -9119,7 +9143,7 @@ flowchart TD
     L --> M[Register as MCP prompts]
 ```
 
-The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.1.0.
+The diagram shows how skill loading collects from three scope sources and runs the same validation pipeline on each. There is no `main.skills` step in v4.2.0.
 
 ### Step-by-Step
 
@@ -9269,7 +9293,7 @@ etherscan/
 
 ---
 
-# FlowMCP Specification v4.1.0 — Catalog
+# FlowMCP Specification v4.2.0 — Catalog
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -9323,7 +9347,7 @@ schemas/v3.0.0/
     │   │   ├── simple-price.mjs
     │   │   └── prompts/             <- Provider prompts (model-neutral)
     │   └── ...
-    ├── selections/                  <- Curated tool subsets (v4.1.0)
+    ├── selections/                  <- Curated tool subsets (v4.2.0)
     │   ├── evm-research/
     │   │   └── selection.mjs
     │   └── defi-monitor/
@@ -9350,7 +9374,7 @@ schemas/v3.0.0/
 | `_lists/` | Root | Shared value lists consumed by all providers and agents |
 | `_shared/` | Root | Shared helper modules consumed by provider schemas |
 | `providers/` | Root | Provider schema directories, one per namespace |
-| `selections/` | Root | Curated tool subsets for agent context loading (v4.1.0). See `17-selections.md`. |
+| `selections/` | Root | Curated tool subsets for agent context loading (v4.2.0). See `17-selections.md`. |
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |
@@ -9662,7 +9686,7 @@ The command runs all CAT rules and reports errors and warnings. A catalog with a
 
 ---
 
-# FlowMCP Specification v4.1.0 — ID Schema
+# FlowMCP Specification v4.2.0 — ID Schema
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
@@ -9757,7 +9781,7 @@ Namespace rules:
 
 #### Resource Type
 
-The resource type discriminates between the seven kinds of addressable primitives in v4.1.0:
+The resource type discriminates between the seven kinds of addressable primitives in v4.2.0:
 
 | Type | Maps To | Defined In |
 |------|---------|-----------|
@@ -10042,11 +10066,11 @@ The ID schema provides a single, consistent format that replaces these context-s
 
 ---
 
-# FlowMCP Specification v4.1.0 — Selections
+# FlowMCP Specification v4.2.0 — Selections
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.1.0  
+**Version:** FlowMCP 4.2.0  
 **Status:** Active  
 **Primitive:** Selection (5th primitive)
 
@@ -10173,11 +10197,11 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 
 ---
 
-# FlowMCP Specification v4.1.0 — Prefill and Placeholders
+# FlowMCP Specification v4.2.0 — Prefill and Placeholders
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.1.0  
+**Version:** FlowMCP 4.2.0  
 **Status:** Active
 
 ---
@@ -10256,11 +10280,11 @@ This ensures the Skill is always delivered — even if some references are broke
 
 ---
 
-# FlowMCP Specification v4.1.0 — MCP Server Integration
+# FlowMCP Specification v4.2.0 — MCP Server Integration
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.1.0  
+**Version:** FlowMCP 4.2.0  
 **Status:** Active
 
 ---
@@ -10273,7 +10297,7 @@ When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific
 
 ## Meta Block (Required per Tool)
 
-Every Tool in v4.1.0 MUST have a `meta` block:
+Every Tool in v4.2.0 MUST have a `meta` block:
 
 ```javascript
 export const schema = {
@@ -10348,24 +10372,24 @@ Empty array `[]` is valid — means no aliases.
 
 ---
 
-# FlowMCP Specification v4.1.0 — Validation Strategy
+# FlowMCP Specification v4.2.0 — Validation Strategy
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-**Version:** FlowMCP 4.1.0  
+**Version:** FlowMCP 4.2.0  
 **Status:** Active
 
 ---
 
 ## Overview
 
-FlowMCP v4.1.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+FlowMCP v4.2.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
 
 ---
 
 ## See also — Grading-Spec in `flowmcp-grading`
 
-A separate **Grading-Spec** (`gradingSpec/1.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.1.0 remains the highest instance.
+A separate **Grading-Spec** (`gradingSpec/1.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.2.0 remains the highest instance.
 
 Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
 
@@ -10466,7 +10490,7 @@ A Language Model calling `flowmcp add etherscan-io/contracts` receives the tool 
 
 ---
 
-# FlowMCP Specification v4.1.0 — Schema Lifecycle
+# FlowMCP Specification v4.2.0 — Schema Lifecycle
 
 **Version:** 4.0.0  
 **Status:** Active
@@ -10500,7 +10524,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 
-**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the schema quality standards for grading criteria.
+**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the [Grading-Spec 2.0.0](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md) for the grading criteria — FlowMCP delegates the grading model to this standard.
 
 **`stage:production`** — The schema is moved from `tests/new-schemas/` to `providers/{namespace}/` in the production catalog and registered in `registry.json`.
 
@@ -10612,11 +10636,13 @@ CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via J
 
 ---
 
-## See also — Grading-Spec in `flowmcp-grading`
+## Delegation — the grading model lives in the Grading-Spec
 
-A separate **Grading-Spec** (`gradingSpec/1.0.0`) exists in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. It describes Single-Schema and Selection grading, Scoring System, Grading System, Veto, Tier, and skill families. The Schemas-Spec v4.1.0 remains the highest instance; the Scoring Protocol v1 defined in this file is **sub-consumed** by the Grading-Spec, not delegated to it.
+FlowMCP is the highest instance and **delegates the grading model** to a separate, independently versioned standard: the **Grading-Spec** (`gradingSpec/2.0.0`), published as a dedicated docs area. The Grading-Spec owns the grading model — score-to-grade thresholds, the extended dimension set, Scoring System, Grading System, Categorical-Veto, Tier-trim, and skill families.
 
-Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
+This file owns the **upstream scoring transport** only: the deterministic `prompts.json` / `scores.json` artefact pair exchanged between the CLI and an external Grader. The Grading-Spec **sub-consumes** this transport and treats it as the highest instance for the artefact pair — it does not redefine it.
+
+Entry point: [Grading-Spec 2.0.0 — Overview](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md).
 
 ---
 
@@ -10637,20 +10663,13 @@ Each schema is evaluated on 2 dimensions:
 | `whenToUse` | Clarity and specificity of the schema description (does an LLM know when to use this schema?) |
 | `parameters` | How well the parameter descriptions enable correct tool invocation |
 
-Each dimension yields a score on a 1.0-5.0 scale (floating point).
+Each dimension yields a score on a 1.0-5.0 scale (floating point). These two are the **base transport dimensions**; the Grading-Spec ([`08-grading-model.md` §Dimension Enum](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/08-grading-model.md)) extends this set with the additional grading dimensions it owns.
 
 ---
 
-## Grade Thresholds
+## Grade Thresholds — delegated to the Grading-Spec
 
-| Grade | Score Range | Action |
-|-------|-------------|--------|
-| A | >= 4.5 | Production-ready |
-| B | 3.5 <= s < 4.5 | Production-ready |
-| C | 2.5 <= s < 3.5 | Hold (improvement plan) |
-| D / F | < 2.5 | Blocked (no deploy) |
-
-Production-Gate: Score >= 3.5 required for deployment.
+The score-to-grade banding, the production gate, the tier-trim rule and the Categorical-Veto list are **owned by the Grading-Spec** (`gradingSystem/1.0.0`), not by this transport protocol. See [Grading-Spec 2.0.0 — §4.1 Score-to-Grade Thresholds](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/07-scoring-vs-grading.md). Changing any threshold or the numeric mapping bumps the `gradingSystem` version independently of `scoringProtocol`.
 
 ---
 

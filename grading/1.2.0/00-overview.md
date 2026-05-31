@@ -1,8 +1,8 @@
 # Grading-Spec `gradingSpec/1.2.0`
 
 > **Spec:** `gradingSpec/1.2.0`
-> **Status:** stable (additive extension of 1.1.0)
-> **Changes vs. 1.1.0:** the technical Schema-Persona tier added in [`12-personas-contract.md`](./12-personas-contract.md) §7; see [`CHANGELOG.md`](./CHANGELOG.md) for the full version history.
+> **Status:** stable (v2 — a clean break from the 1.0.0/1.1.0 line)
+> **Changes vs. 1.1.0:** `1.2.0` is the **v2 break**. The earlier 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises grading around eleven areas, a five-status model, the workbench island, the derived `index.json` rollup, and a `/goal`-driven harness. Breaking changes are permitted; there is no backwards-compatibility promise toward the 1.0.0/1.1.0 phase model (`P1`–`P7` / `S1`–`S4`). See [`CHANGELOG.md`](./CHANGELOG.md) for the version history.
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.1.0 [00-overview.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/00-overview.md) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.
 
@@ -55,9 +55,9 @@ This Grading-Spec is a **living document**. It begins minimally with the chapter
 
 This repository tracks **three** independent versions. None of them is coupled to the others; bumping one does **not** imply bumping the others.
 
-### `gradingSpec/1.1.0`
+### `gradingSpec/1.2.0`
 
-The specification documents under `spec/1.1.0/`. This is the document set you are reading. Version is bumped when the normative content (MUST/SHOULD/MAY rules, phases, chapters, data contracts) changes in a way that affects compliance. `1.1.0` is an additive minor bump from `1.0.0` (no breaking changes; existing `1.0.0` schemas and `1.0.0` gradings remain valid).
+The specification documents under `grading/1.2.0/`. This is the document set you are reading. Version is bumped when the normative content (MUST/SHOULD/MAY rules, areas, chapters, data contracts) changes in a way that affects compliance. `1.2.0` is the **v2 break**: it replaces the 1.0.0/1.1.0 phase model with the eleven-area model, the five-status node enum, the workbench island, and the `index.json` rollup. Existing 1.0.0/1.1.0 gradings are treated as legacy.
 
 ### `scoringSystem/1.0.0`
 
@@ -82,63 +82,71 @@ This Grading-Spec relies on definitions from the Schemas-Spec. The following cha
 
 ---
 
-## Spec Structure — chapters to be filled
+## The Workbench Island (v2 category)
 
-The following chapters are placeholders for content delivered in later stages of the rollout. Order and naming MAY be adjusted as the spec matures.
+v2 introduces the **workbench island** as a first-class spec category. The grading data directory (`grading-data/`) is an internal working area, separate from the shipped repositories. Inside the island, names are deliberately **verbose** — a logical name plus a timestamp plus a content hash — which buys predictability, linkability, and version tracking. On the way **out** to the real repositories, names are **stripped to clean spec names**: the outside world sees a namespace (or a selection) under its plain logical name, not the internal snapshots.
 
-| Chapter | Topic | Status |
-|---------|-------|--------|
-| `01-default-journey.md` | Default journey & maximalism principle | planned (later stage) |
-| `02-completeness.md` | Completeness validation rules | planned (later stage) |
-| `03-phases-single-schema.md` | Single-Schema phases P1–P7 | planned (later stage) |
-| `04-phases-selection.md` | Selection phases S1–S4 | planned (later stage) |
-| `05-scoring-system.md` | Scoring System (dimensions, scales) | planned (later stage) |
-| `06-grading-system.md` | Grading System (mapping scores → grades) | planned (later stage) |
-| `07-veto.md` | Categorical Veto rules | planned (later stage) |
-| `08-tier.md` | Tier assignment | planned (later stage) |
-| `09-aging-and-retention.md` | Aging (14 d API, 30 d ToS), 180 d retention | planned (later stage) |
-| `10-skills.md` | Two skill families (Single-Schema, Selection) | planned (later stage) |
-| `11-personas.md` | Personas contract & Lens concept | planned (later stage) |
-| `12-domain-knowledge.md` | Domain knowledge sources | planned (later stage) |
-| `13-error-codes.md` | Error codes (GRD-*, SCO-*, VET-*) | planned (later stage) |
-| `14-kanban-data-contract.md` | Kanban data contract (follow-up) | planned (later stage) |
+The island is connected by a two-way, non-destructive **IN/OUT round-trip**:
 
-Each chapter is delivered as a standalone unit; none of the placeholders carry binding content yet. Implementers MUST NOT rely on the chapter naming above until the corresponding chapter is merged.
+- **IN — `grading import`:** source → workbench. Validate, assert a single namespace, snapshot any changed source alongside the old one (never overwrite), normalise into the island structure, rebuild `index.json`.
+- **OUT — `grading export`:** workbench → source. The primary hand-off is the `index.json` (the complete graded state); clean stripped `.mjs` files MAY accompany it. The export never overwrites the source.
+
+The full category is defined in [`22-workbench-island.md`](./22-workbench-island.md); the derived rollup it produces is defined in [`23-index-json.md`](./23-index-json.md).
 
 ---
 
-## Extensions since 1.0.0
+## Spec Structure — chapter map
 
-The following table lists all new or updated chapters that `gradingSpec/1.1.0` introduces over `gradingSpec/1.0.0`. The extension is **additive** — there are no breaking changes.
+The spec is organised as a set of standalone chapters. Each is delivered as a standalone unit.
 
-| Chapter | Status | Content |
-|---------|--------|---------|
-| `02-eligibility.md` | Update | §3 extended with the empty-context convention (§3.5) |
-| `06-determinism-and-tier.md` | Update | §8 tier trim extended with the partial-grading clarification (§8.2) |
-| `08-grading-model.md` | Update | §5 extended with 5 new mandatory fields (`schemaHash`, `schemaVersion`, `gradingId`, `gradingMode`, `aboutHash`); §5.1 separates Single dimensions (P1-P7, 17 total) from Selection dimensions (S1-S4) |
-| `08-grading-model.schema.json` | Update | New required fields + Selection-dimension $defs |
-| `11-about-convention.md` | Update | §19 NEW — About-Pages schema for namespace and selection with hash convention |
-| `14-kanban-data-contract.md` | Update | §14 extended with the single-vs-selection lane separation |
-| `14-kanban-data-contract.schema.json` | Update | `laneType` enum + pattern constraints |
-| `15-versioning-axes.md` | **NEW** | §10 Two version axes + bump tables (`schemaVersion`, `selectionVersion`) + consistency check + canonical representation |
-| `16-selection-lockfile.md` | **NEW** | §11 `selection.json` + `selection.lock.json` + `namespace.json` + workflow with pre-condition |
-| `selection.schema.json` | **NEW** | JSON-Schema for §11.1 |
-| `selection.lock.schema.json` | **NEW** | JSON-Schema for §11.2 with the `gradingStatus` enum |
-| `namespace.schema.json` | **NEW** | JSON-Schema for §11.4 (no `namespaceVersion` field) |
-| `17-scope-whitelist.md` | **NEW** | §12 Scope whitelist (Tools + Shared Lists) + public-only principle |
-| `18-flywheel-loop.md` | **NEW** | §16 Flywheel loop with Mermaid diagram (`flowchart TD`) |
-| `19-folder-layout.md` | **NEW** | §17 Binding folder layout + source-of-truth rule + naming conventions |
-| `20-entry-point-prompt.md` | **NEW** | §18 Entry-point prompt template + personas obligation (spec vs convention) |
-| `21-pre-conditions.md` | **NEW** | §20 Universal pre-condition obligation (aggregated checks require all members stable) |
-| `CHANGELOG.md` | NEW | Version history |
-
-Seven new chapters (`15`-`21`), three new JSON-Schemas (`selection.*`, `namespace.*`), and five update chapters (`02`, `06`, `08`, `11`, `14`).
+| Chapter | Topic |
+|---------|-------|
+| `00-overview.md` | This overview (history, interoperability, namespaces) |
+| `01-default-journey.md` | Default journey & maximalism principle |
+| `02-eligibility.md` | Eligibility, exclusions, access classes |
+| `03-tos.md` | Terms-of-service due diligence |
+| `04-phases-single.md` | Single-schema grading areas |
+| `05-phases-selection.md` | Selection grading areas |
+| `06-determinism-and-tier.md` | Determinism axis + tier (autonomous / group-bound) |
+| `07-scoring-vs-grading.md` | Scoring vs. grading separation |
+| `08-grading-model.md` | Grading data model (envelope, veto, tier, aging) |
+| `09-security-and-development.md` | Security, veto triggers, key hygiene |
+| `10-domain-knowledge.md` | Domain knowledge (= the About) |
+| `11-about-convention.md` | About as a schema resource |
+| `12-personas-contract.md` | Personas contract & Lens concept |
+| `13-skills.md` | Skill types, levels, per-skill grading |
+| `14-kanban-data-contract.md` | **Superseded** by `23-index-json.md` (salvaged rules only) |
+| `15-versioning-axes.md` | Naming grammar (date-before-hash), `resolveLatest` |
+| `16-selection-lockfile.md` | Lock snapshot fields (folded into `index.json`) |
+| `17-scope-whitelist.md` | Scope whitelist (public-only) |
+| `18-flywheel-loop.md` | Flywheel = the IN/OUT round-trip |
+| `19-folder-layout.md` | Binding folder layout (`providers/`, `selections/`, `shared-lists/`) |
+| `20-entry-point-prompt.md` | Entry-point prompt + personas obligation |
+| `21-pre-conditions.md` | Pre-condition gate (all members stable) |
+| `22-workbench-island.md` | **NEW** — Workbench island category + IN/OUT round-trip |
+| `23-index-json.md` | **NEW** — `index.json` rollup (5-status, two natures, member resolution) |
+| `24-selection-aggregate.md` | **NEW** — the 11th area `selection-aggregate` |
+| `25-harness-and-goal.md` | **NEW** — harness + `/goal` + surfacing convention |
 
 ---
 
-## Out of Scope for `gradingSpec/1.1.0`
+## New in v2
 
-- GitHub Kanban v2 wiring — deferred to a follow-up specification.
-- Migration of the legacy error codes (Grade A/B/C/F) onto the new model — deferred to a follow-up specification.
-- Reorganisation of v4.1 sections beyond the small cross-reference blocks introduced in the first rollout stage.
-- Deep consolidation of earlier grading-related documents — deferred to a follow-up specification.
+The following are the headline additions of the v2 break over the 1.0.0/1.1.0 line:
+
+| Item | Content |
+|------|---------|
+| Workbench island category | [`22-workbench-island.md`](./22-workbench-island.md) — internal verbose names, stripped on mirror-out, IN/OUT round-trip |
+| `index.json` rollup | [`23-index-json.md`](./23-index-json.md) — one per namespace/selection; five-status node enum + operational rollup vocabulary; live-rollup + frozen `lockSnapshot`; member-resolution manifest |
+| `index.schema.json` | JSON-Schema for the rollup |
+| Eleven grading areas | the per-phase `P*`/`S*` model is replaced by eleven areas; the 11th, `selection-aggregate` ([`24-selection-aggregate.md`](./24-selection-aggregate.md)), is new |
+| `/goal` harness | [`25-harness-and-goal.md`](./25-harness-and-goal.md) — transcript-only evaluator + mandatory `[GRADING]` surfacing convention + idempotent turns |
+| Kanban data contract | superseded by `index.json`; only the audit-trail and irreversible-veto rules are salvaged ([`14-kanban-data-contract.md`](./14-kanban-data-contract.md)) |
+
+---
+
+## Out of Scope for `gradingSpec/1.2.0`
+
+- The GitHub Kanban wiring (columns, board UI) — superseded by `index.json`; not part of this spec.
+- The actual grading-module and CLI implementation — derived from this spec, delivered in the grading and CLI repositories.
+- Migration tooling for legacy 1.0.0/1.1.0 gradings — those are treated as legacy.

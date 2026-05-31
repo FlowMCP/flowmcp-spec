@@ -1,5 +1,36 @@
 # Changelog
 
+## v4.2.0 — 2026-05-31 (delegation)
+
+The Schemas-Spec remains the highest instance and now **delegates** schema grading to a separate, independently versioned standard — the **Grading-Spec** (`gradingSpec/2.0.0`), published as Navigation point 5 in the docs. This delegation is the substance of the `4.2.0` bump; the schema format itself is unchanged.
+
+### Changed
+
+- **`22-scoring-protocol.md`** — **delegates the grading model** (score-to-grade thresholds, the extended dimension set, Veto/Tier) to the Grading-Spec, while **retaining the upstream scoring transport** (the `prompts.json` / `scores.json` artefact pair) that the Grading-Spec sub-consumes and treats as the highest instance.
+- **`20-validation-strategy.md`** — references the Grading-Spec (`gradingSpec/2.0.0`) as the extended grading layer above the deterministic A–F baseline.
+- Spec folder hardcopied to `spec/v4.2.0/`; version constants in `package.json` and `data/refs.manual.json` aligned.
+
+## v4.1.1 — 2026-05-29 (additive)
+
+Additive release introducing two new schema-header fields that ride alongside the existing `version` field. Grading-System Iteration 2 requires deterministic schema identification across iterations.
+
+### Added
+
+- **`schemaVersion`** (required, semver pattern `\d+\.\d+\.\d+`). Schema-Content-Version. Decouples schema content evolution from the FlowMCP spec version. Initial value for all migrated schemas: `1.0.0`.
+- **`schemaHash`** (required, regex `[0-9a-f]{8}`). 8-character sha256-prefix of canonical-JSON-serialized schema (excluding the `schemaHash` field itself). Used as stable identifier in `grading-data/schemas/<namespace>/<hash>--v<X.Y.Z>.mjs` snapshots.
+
+### Migration
+
+- Migration script in `flowmcp-schemas-private`: `scripts/add-schema-version-field.mjs` (additive, idempotent, dry-run capable).
+- 406 production schemas in `schemas/v4.0.0/providers/` migrated. Skill-files under `<namespace>/skills/` excluded (no `main`/`schema` export, by design).
+- Verification: `tests/manual/check-schemas-have-schema-version.mjs` asserts 100 % coverage and recomputes hash to ensure consistency.
+
+### Bump-Rule
+
+- Same `schemaVersion` + different `schemaHash` = bump-rule violation (bump rules defined in the grading specification). Detected by `BumpHelper.checkVersionHashConsistency` in `flowmcp-grading`.
+
+---
+
 ## v4.1.0 — 2026-05-24
 
 Additive, non-breaking release introducing the `sqlite-gtfs` resource source type, six new validation codes, the first FlowMCP add-on, and the `FLOWMCP_*` path variable family.

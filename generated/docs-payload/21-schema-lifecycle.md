@@ -1,17 +1,17 @@
 ---
 title: "Schema Lifecycle"
 description: "**Version:** 4.0.0"
-spec_version: "4.1.0"
+spec_version: "4.2.0"
 spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "dbbe036"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/21-schema-lifecycle.md"
-generated_at: "2026-05-29T13:35:54.422Z"
-generated_from: "spec/v4.1.0/21-schema-lifecycle.md"
+source_commit: "6152b7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/spec/v4.2.0/21-schema-lifecycle.md"
+generated_at: "2026-05-31T16:18:50.290Z"
+generated_from: "spec/v4.2.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.1.0/21-schema-lifecycle.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.2.0/21-schema-lifecycle.md."
 ---
 
 **Version:** 4.0.0  
@@ -46,7 +46,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 
-**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the schema quality standards for grading criteria.
+**`stage:grade`** — The schema receives a quality grade. Grade B or better is required for production deployment. See the [Grading-Spec 2.0.0](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md) for the grading criteria — FlowMCP delegates the grading model to this standard.
 
 **`stage:production`** — The schema is moved from `tests/new-schemas/` to `providers/{namespace}/` in the production catalog and registered in `registry.json`.
 

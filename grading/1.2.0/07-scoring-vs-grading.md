@@ -52,9 +52,27 @@ The third namespace `gradingSpec/X.Y.Z` (the document set you are reading) is ve
 
 The following rules are **binding** for every grader, scorer, and aggregator that conforms to `gradingSpec/1.1.0`.
 
-1. **Both version strings MUST be present in every grading entry.** Every grading entry (defined in [`08-grading-model.md`](./08-grading-model.md)) MUST carry both `scoringSystem` and `gradingSystem` as top-level version fields. A grading entry that lacks either field is INVALID.
+1. **Both version strings MUST be present in every grading entry.** Every grading entry (defined in [`08-grading-model.md`](./08-grading-model.md)) MUST carry both `scoringSystem` and `gradingSystem` as top-level version fields. A grading entry that lacks either field is INVALID. The same two version strings are additionally surfaced in the `index.json` rollup (per namespace and per selection), so the version under which an aggregated node was last scored and graded is visible without opening each grading entry.
 2. **Scoring-System bump and Grading-System bump are independent triggers.** A change in the Scoring System triggers a **re-scoring** at the next re-grading run, but does NOT automatically bump the Grading System. A change in the Grading System triggers a **re-grading** but does NOT automatically bump the Scoring System. Implementers MUST NOT couple the two version namespaces.
 3. **Example (HTTP-429 heuristic).** Suppose the current versions are `scoringSystem/1.0.0` and `gradingSystem/1.0.0`. A maintainer decides that HTTP `429` ("rate-limited, retry") MUST be scored as a transient defect (not `fail`). The Scoring System advances to `scoringSystem/1.1.0`. The Grading System remains at `gradingSystem/1.0.0` because the score-to-grade mapping is unchanged. New grading entries record `scoringSystem/1.1.0` + `gradingSystem/1.0.0`; old entries remain at `1.0.0/1.0.0` until they are re-scored.
+
+---
+
+## 4.1 Score-to-Grade Thresholds (`gradingSystem/1.0.0`)
+
+The aggregate grade is derived from the weighted mean of the per-answer scores. Each answer contributes a numeric value on the `1.0`–`5.0` scale: `pass` maps to `5.0`, `fail` to `1.0`, numeric scores as-is. `n/a` and `stale` answers are excluded from the mean (an all-excluded set yields no grade, i.e. a `pending` node). The mean is then banded:
+
+| Weighted mean | Grade |
+|---------------|-------|
+| ≥ 4.5 | A |
+| ≥ 3.5 | B |
+| ≥ 2.5 | C |
+| ≥ 1.5 | D |
+| < 1.5 | F |
+
+**Tier trim.** The banded grade is capped at the tier maximum: `autonomous` → `B`, `group-bound` → `A`. A score that would band to `A` on an `autonomous`-tier node is recorded as `B` (the pre-trim band is preserved as `rawGrade`). A Categorical Veto overrides the entire computation with `REJECTED`.
+
+Changing any threshold, the tier-trim rule, or the numeric mapping bumps the `gradingSystem` version.
 
 ---
 

@@ -1,21 +1,23 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://flowmcp.org/spec/grading/1.1.0/16-selection-lockfile.schema.json",
-    "title": "FlowMCP Selection-Lockfile Annex Index (gradingSpec/1.1.0)",
-    "description": "Pointer/index document for the three sibling schemas of spec/1.1.0/16-selection-lockfile.md §11: selection.schema.json, selection.lock.schema.json, namespace.schema.json. Use the individual sibling files for actual validation.",
+    "title": "FlowMCP Selection Annex Index (gradingSpec/1.2.0)",
+    "description": "Pointer/index document for the annex schemas of 16-selection-lockfile.md §11. In gradingSpec/1.2.0 only selection.schema.json (the neutral selection definition) is active. selection.lock.schema.json and namespace.schema.json are DEPRECATED — the standalone selection.lock.json is folded into index.json.lockSnapshot and the authored namespace.json is removed (see §11.5).",
     "type": "object",
     "additionalProperties": false,
     "properties": {
         "selection": {
-            "description": "Pointer to selection.schema.json (selection definition, §11.1).",
+            "description": "Pointer to selection.schema.json (neutral selection definition, §11.1).",
             "$ref": "./selection.schema.json"
         },
         "lockfile": {
-            "description": "Pointer to selection.lock.schema.json (lockfile snapshot, §11.2).",
+            "deprecated": true,
+            "description": "DEPRECATED in 1.2.0. selection.lock.json is removed; pins live in index.json.lockSnapshot (§11.2).",
             "$ref": "./selection.lock.schema.json"
         },
         "namespace": {
-            "description": "Pointer to namespace.schema.json (namespace payload, §11.4).",
+            "deprecated": true,
+            "description": "DEPRECATED in 1.2.0. The authored namespace.json is removed and folded into index.json (§11.4/§11.5).",
             "$ref": "./namespace.schema.json"
         }
     }

@@ -1,8 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://flowmcp.org/grading/1.1.0/selection.lock.schema.json",
-    "title": "FlowMCP Grading Selection Lockfile (gradingSpec 1.1.0)",
-    "description": "JSON-Schema for selection.lock.json as defined in spec/1.1.0/16-selection-lockfile.md §11.2. NEW in 1.1.0. Pins members on concrete (schemaVersion, schemaHash) and carries gradingStatus for pre-condition check (see 21-pre-conditions.md §20).",
+    "title": "FlowMCP Grading Selection Lockfile (DEPRECATED in gradingSpec 1.2.0)",
+    "deprecated": true,
+    "description": "DEPRECATED in gradingSpec/1.2.0. The standalone selection.lock.json is removed; member pins now live in index.json.lockSnapshot (see 16-selection-lockfile.md §11.2 and §11.5). Retained for historical reference only — new tooling MUST NOT validate against this schema.",
     "type": "object",
     "required": [
         "selectionId",

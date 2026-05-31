@@ -1,0 +1,175 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://flowmcp.org/grading/1.2.0/index.schema.json",
+    "title": "FlowMCP Grading Index Rollup (gradingSpec 1.2.0)",
+    "description": "JSON-Schema for index.json as defined in spec/1.2.0/23-index-json.md. One per namespace and one per selection. The live rollup is recomputed on every rebuild; the frozen lockSnapshot is written once at grading start and preserved. Node status uses the 5-status enum; the rollup status uses the operational vocabulary.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "indexVersion",
+        "status",
+        "updatedAt"
+    ],
+    "$defs": {
+        "nodeStatus": {
+            "type": "string",
+            "enum": ["pending", "blocked", "graded", "stable", "rejected"],
+            "description": "Node-level 5-status enum for an individual primitive (tool, schema, about, skill, member). graded/stable are node values; rejected is terminal and irreversible."
+        },
+        "rollupStatus": {
+            "type": "string",
+            "enum": ["operational", "partial", "blocked", "pending", "rejected"],
+            "description": "Rollup-level operational vocabulary summarising the nodes. operational/partial are rollup values; never applied to a single node."
+        },
+        "grade": {
+            "type": "string",
+            "enum": ["A", "B", "C", "D", "F", "REJECTED"],
+            "description": "Resolved grade of the node or rollup."
+        },
+        "node": {
+            "type": "object",
+            "required": ["status"],
+            "properties": {
+                "status": { "$ref": "#/$defs/nodeStatus" },
+                "grade": { "$ref": "#/$defs/grade" },
+                "ref": {
+                    "type": "string",
+                    "description": "Relative path to the resolved (newest) grading entry under a _gradings/ folder."
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "Required when status is blocked or pending; human-readable cause."
+                },
+                "snapshot": {
+                    "type": "object",
+                    "properties": {
+                        "file": { "type": "string" },
+                        "hash": { "type": "string", "pattern": "^[a-f0-9]{8}$" }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "properties": {
+        "indexVersion": {
+            "type": "integer",
+            "minimum": 2,
+            "description": "Index schema generation. 2 for gradingSpec/1.2.0."
+        },
+        "namespace": {
+            "type": "string",
+            "description": "Present for a namespace (provider) index."
+        },
+        "selectionId": {
+            "type": "string",
+            "description": "Present for a selection index."
+        },
+        "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of the last rebuild (island timestamp grammar YYYY-MM-DDTHH-MM-SSZ)."
+        },
+        "status": {
+            "$ref": "#/$defs/rollupStatus",
+            "description": "Rolled-up status of the whole namespace/selection (operational vocabulary)."
+        },
+        "grade": { "$ref": "#/$defs/grade" },
+        "summary": {
+            "type": "object",
+            "description": "Live rollup counters. Recomputed on every rebuild.",
+            "additionalProperties": true
+        },
+        "about": { "$ref": "#/$defs/node" },
+        "namespaceAggregate": { "$ref": "#/$defs/node" },
+        "schemas": {
+            "type": "object",
+            "description": "Provider rollup: schema -> { node fields, tools }. Recomputed on every rebuild.",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "status": { "$ref": "#/$defs/nodeStatus" },
+                    "grade": { "$ref": "#/$defs/grade" },
+                    "reason": { "type": "string" },
+                    "snapshot": {
+                        "type": "object",
+                        "properties": {
+                            "file": { "type": "string" },
+                            "hash": { "type": "string", "pattern": "^[a-f0-9]{8}$" }
+                        },
+                        "additionalProperties": false
+                    },
+                    "toolsAggregate": { "$ref": "#/$defs/node" },
+                    "tools": {
+                        "type": "object",
+                        "additionalProperties": { "$ref": "#/$defs/node" }
+                    }
+                },
+                "additionalProperties": true
+            }
+        },
+        "members": {
+            "type": "object",
+            "description": "Selection member-resolution manifest (SEL003): schemaId -> resolved provider artifact + grade + status. Live rollup part.",
+            "additionalProperties": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                    "status": { "$ref": "#/$defs/nodeStatus" },
+                    "grade": { "$ref": "#/$defs/grade" },
+                    "resolvedArtifact": {
+                        "type": "string",
+                        "description": "Path to the resolved provider snapshot the member ID points at."
+                    },
+                    "ref": { "type": "string" }
+                },
+                "additionalProperties": true
+            }
+        },
+        "selectionAggregate": { "$ref": "#/$defs/node" },
+        "lockSnapshot": {
+            "type": "object",
+            "description": "FROZEN. Written once at grading start; preserved by every rebuild. The pre-condition gate reads only this part.",
+            "required": ["selectionId", "generatedAt", "members"],
+            "properties": {
+                "selectionId": { "type": "string" },
+                "selectionVersion": { "type": "string" },
+                "selectionHash": { "type": "string", "pattern": "^[a-f0-9]{8}$" },
+                "generatedAt": { "type": "string" },
+                "members": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": ["schemaId", "gradingStatus"],
+                        "properties": {
+                            "schemaId": { "type": "string" },
+                            "schemaVersion": { "type": "string" },
+                            "schemaHash": { "type": "string", "pattern": "^[a-f0-9]{8}$" },
+                            "gradingStatus": { "$ref": "#/$defs/nodeStatus" },
+                            "override": {
+                                "type": "object",
+                                "description": "Whitelisted override fields (name, description).",
+                                "additionalProperties": true
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "blockers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["node", "reason"],
+                "properties": {
+                    "node": { "type": "string" },
+                    "reason": { "type": "string" }
+                },
+                "additionalProperties": false
+            }
+        }
+    }
+}

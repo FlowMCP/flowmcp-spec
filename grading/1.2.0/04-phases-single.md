@@ -1,11 +1,11 @@
-# 04 — Single-Schema Phases (P1–P7)
+# 04 — Provider-Side Grading Areas
 
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0` |
+| Version | `gradingSpec/1.2.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
-| Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) |
+| Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`11-about-convention.md`](./11-about-convention.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
 
@@ -13,166 +13,104 @@
 
 ## 1. Introduction
 
-This chapter is the **normative source for Skill-Family 1 (Single-Schema-Validator)**. It defines the seven phases (P1–P7) of the Single-Schema level — from research over a documentation URL to the output-contract verification of a finished schema.
+This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model of earlier spec versions with an **Area model**: each Area is a self-contained grading rubric attached to the primitive it evaluates, written to a `_gradings/` folder next to that primitive (see [`19-folder-layout.md`](./19-folder-layout.md)).
 
-The Single-Schema level produces the **base unit** of the FlowMCP corpus: **one namespace** with one or more schemas, a Namespace-Skill, and an About-Convention. Higher-level grouping (Selection level) is defined separately in [`05-phases-selection.md`](./05-phases-selection.md).
+The provider side produces the **base unit** of the FlowMCP corpus: **one namespace** with one or more schemas, namespace skills, and an About Resource. Higher-level grouping (selection side) is defined separately in [`05-phases-selection.md`](./05-phases-selection.md).
 
-A schema graded only on the Single-Schema level has `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the **maximum attainable grade** on this tier is **B**. Grade A requires a `group-bound` contribution from the Selection level.
-
----
-
-## 2. Phase Overview (P1–P7)
-
-| # | Phase | Input | Output | Autonomous? | Grading Dimensions |
-|---|-------|-------|--------|-------------|---------------------|
-| P1 | Research | Documentation URL (or alternative) | Documentation extract, ToS-link candidate | Yes | Source conformance, ToS match |
-| P2 | Analysis | Documentation extract | Endpoint list, eligibility classification, splitting decision | Yes | Endpoint-list completeness |
-| P3 | Schema Draft (maximalist) | Endpoint list | `.unfinished/schema.mjs` with v4.1 mandatory fields | Yes | Structural validation (deterministic), completeness |
-| P4 | Live Test | Schema + API keys | Test-run report (HTTP status, sample responses) | Yes | HTTP-status classes, API availability (time-dependent) |
-| P5 | Description Cascade | Schema + tests + sample responses | Validated descriptions per test, tool, resource, prompt | Partial | `whenToUse`, `parameters`, description conformance, description neutrality |
-| P6 | Namespace Aggregation | Multiple schemas of one provider | Consistent namespace + Namespace-Skill (Ch. 12) + About-Convention (Ch. 11) | Partial | Namespace coherence, About-Convention fulfilment |
-| P7 | Output Contracts | Schema + sample responses | Output schema, jq-pipe sub-contract, MCP-Resource contract | Yes | Output-schema conformance (deterministic) |
+A schema graded only on the provider side has `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the **maximum attainable grade** on this tier is **B**. Grade A requires a `group-bound` contribution from the selection side.
 
 ---
 
-## 3. Phase Details
+## 2. The Provider-Side Areas
 
-### 3.1 P1 — Research
+The grading system defines **eleven Areas** in total (see [`05-phases-selection.md`](./05-phases-selection.md) and [`19-folder-layout.md`](./19-folder-layout.md)). Of these, the following **six** are provider-side (everything except the selection Areas):
 
-- **Goal:** establish the documentation extract and a ToS-link candidate as starting artefacts.
-- **Input:** documentation URL (default per [`01-default-journey.md`](./01-default-journey.md)) or a permitted alternative (network inspection, manual authoring — flagged as exception).
-- **Output:** verbatim documentation extract; ToS-link candidate URL.
-- **Autonomy:** Yes.
-- **Grading dimensions written:** source conformance, ToS match (per [`03-tos.md`](./03-tos.md) §4 Root-Domain-Match).
-- **Typical failure modes:** unreachable documentation (network/DNS), ToS link present but root-domain mismatch.
+| # | Area | Evaluates | `_gradings/` location | Persona | Det/Non-Det |
+|---|------|-----------|------------------------|---------|-------------|
+| 1 | `single-test` | one tool | `providers/<ns>/<schema>/tools/<tool>/_gradings/` | no | deterministic gate + non-deterministic |
+| 2 | `tools-aggregate-schema` | the tools collection of one schema | `providers/<ns>/<schema>/_gradings/` | no | both |
+| 3 | `tools-aggregate-namespace` | tools across the namespace | `providers/<ns>/_gradings/` | no | both |
+| 4 | `namespace-description` | namespace metadata | `providers/<ns>/_gradings/` | no | non-deterministic |
+| 5 | `namespace-skills` | one namespace skill (per skill) | `providers/<ns>/<schema>/skills/<skill>/_gradings/` | yes | non-deterministic |
+| 6 | `about-namespace` | the About Resource (declared in one schema) | `providers/<ns>/<schema>/resources/about/_gradings/` | yes | deterministic (route-exists) + non-deterministic |
 
-### 3.2 P2 — Analysis
+The remaining five Areas (`about-selection`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3`, `selection-aggregate`) are selection-side and live in [`05-phases-selection.md`](./05-phases-selection.md).
 
-- **Goal:** convert the documentation extract into a structured endpoint list with eligibility classification and splitting decisions.
-- **Input:** documentation extract from P1.
-- **Output:** endpoint list; per-endpoint eligibility classification under [`02-eligibility.md`](./02-eligibility.md); decision whether to split (free vs. API-key per `02-eligibility.md` §5).
-- **Autonomy:** Yes.
-- **Grading dimensions written:** completeness of the endpoint list (baseline for the maximalism check in P3).
-- **Typical failure modes:** missed endpoints (manual omission), mixed-eligibility schemas not split.
-
-### 3.3 P3 — Schema Draft (maximalist)
-
-- **Goal:** produce a v4.1-conformant `.unfinished/schema.mjs` that is maximalist over the P2 endpoint list.
-- **Input:** endpoint list from P2.
-- **Output:** `.unfinished/schema.mjs` containing all mandatory v4.1 fields.
-- **Autonomy:** Yes.
-- **Grading dimensions written:** structural validation (deterministic — schema-shape, mandatory fields); completeness (gap against P2 baseline).
-- **Typical failure modes:** reduced schema without justification (penalised proportionally per [`01-default-journey.md`](./01-default-journey.md) §6); v4.1 mandatory fields missing.
-
-### 3.4 P4 — Live Test
-
-- **Goal:** execute live calls against the API and record HTTP responses and sample payloads.
-- **Input:** schema from P3 + API keys (per [`02-eligibility.md`](./02-eligibility.md) §4 access classes).
-- **Output:** test-run report containing HTTP status per tool and sample responses.
-- **Autonomy:** Yes.
-- **Grading dimensions written:** HTTP-status classes (per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5 — 200 is pass, 4xx MUST NOT be auth-pass), API availability (time-dependent dimension).
-- **Typical failure modes:** HTTP 4xx (treated as fail/defect, never as "auth-pass"), HTTP 5xx, schema-runtime mismatch.
-
-### 3.5 P5 — Description Cascade
-
-- **Goal:** validate that every tool, resource, and prompt has a description that matches the observed responses and that descriptions are neutral.
-- **Input:** schema, tests, and sample responses from P4.
-- **Output:** validated descriptions per test, tool, resource, and prompt.
-- **Autonomy:** Partial — deterministic checks (neutrality heuristic, structural completeness) run autonomously; semantic checks (`whenToUse` clarity, `parameters` understandability) are non-deterministic and run via LLM grader.
-- **Grading dimensions written:** `whenToUse`, `parameters`, description conformance, description neutrality.
-
-**The P5 Cascade is a mandatory ordered procedure (see §4 below).**
-
-### 3.6 P6 — Namespace Aggregation
-
-- **Goal:** aggregate multiple schemas of one provider into a consistent namespace, equipped with a Namespace-Skill and an About-Convention.
-- **Input:** one or more schemas of the same provider (post-P5).
-- **Output:** namespace with a Namespace-Skill (Ch. 12, forthcoming) and an About-Convention (Ch. 11, forthcoming).
-- **Autonomy:** Partial — name and routing checks deterministic; semantic Namespace-Skill validation non-deterministic.
-- **Grading dimensions written:** namespace coherence, About-Convention fulfilment.
-
-### 3.7 P7 — Output Contracts
-
-- **Goal:** verify the output-schema contract — including the jq-pipe sub-contract and the MCP-Resource contract — per schema.
-- **Input:** schema + sample responses from P4.
-- **Output:** output schema, jq-pipe sub-contract, MCP-Resource contract.
-- **Autonomy:** Yes.
-- **Grading dimensions written:** output-schema conformance (deterministic).
-- **Note:** the jq-pipe contract is **one sub-dimension** of output-schema conformance, not the endpoint of the pipeline. The cross-schema composability check belongs to the Selection level ([`05-phases-selection.md`](./05-phases-selection.md) §5.5).
+Each Area is graded **independently**. There is no fixed linear order between Areas; the only ordering obligations are the **cascade and veto procedures** (§3) and the deterministic-first rule of [`06-determinism-and-tier.md`](./06-determinism-and-tier.md).
 
 ---
 
-## 4. P5 Description Cascade — Mandatory Order
+## 3. Area Procedures
 
-The P5 cascade MUST be executed in the following order. Skipping or reordering steps is a finding.
+The Area model retains four procedures that previously lived inside the phase model. They are now expressed as **rules that apply across the provider-side Areas**.
 
-1. **Run tests against the endpoint.** SHOULD: at least **3 tests per tool**, covering the breadth of the parameter space.
+### 3.1 Description Cascade (within `single-test` and `tools-aggregate-*`)
+
+The description cascade is a **mandatory ordered procedure** for validating tool descriptions. It MUST be executed in the following order; skipping or reordering steps is a finding.
+
+1. **Run tests against the endpoint.** SHOULD: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)).
 2. **Check the responses** and validate the tool description against the actual responses.
 3. **Normalise / update the tool description** to match the validated responses.
 4. **All tools, resources, and prompts MUST have descriptions** — and each description MUST be individually checked.
-5. **Descriptions MUST be neutral** — they describe **only what the tool can do**, NOT what it should be used for. Application scenarios belong in the About-Convention (Ch. 11, forthcoming), not in the tool description.
+5. **Descriptions MUST be neutral** — see §4.
 
-The cascade is a contract: outputs of step *n* are inputs of step *n+1*. A failure in any step halts the cascade for the affected tool and is recorded as a finding.
+The cascade is a contract: outputs of step *n* are inputs of step *n+1*. A failure in any step halts the cascade for the affected tool and is recorded as a finding. `single-test` carries the per-tool cascade result; `tools-aggregate-schema` and `tools-aggregate-namespace` aggregate the per-tool cascade outcomes.
 
----
+### 3.2 Description Neutrality (cross-cutting)
 
-## 5. Description Neutrality
-
-The neutrality rule (P5 cascade step 5) is normative and worth restating:
+The neutrality rule (cascade step 5) is normative and worth restating:
 
 - A tool description states **what** the tool does (capabilities, parameters, return shape).
 - A tool description MUST NOT state **what for** it should be used (application scenarios, persona use cases, "good for X").
-- Application scenarios and persona use cases belong in the **About-Convention** (Ch. 11, forthcoming) — not in the tool description.
+- Application scenarios and persona use cases belong in the **About Resource** ([`11-about-convention.md`](./11-about-convention.md)) — not in the tool description.
 
-This separation is essential for LLM grader reproducibility: neutral descriptions can be deterministically compared to the observed API behaviour; mixed descriptions cannot.
+This separation is essential for LLM-grader reproducibility: neutral descriptions can be deterministically compared to the observed API behaviour; mixed descriptions cannot.
 
----
+### 3.3 Cascade Stop / Veto (cross-cutting)
 
-## 6. Cascade Stop (Veto)
+A failed gate **MUST halt the dependent grading** for the affected schema. A categorical veto raised in any Area **MUST stop** further grading for that schema. Examples:
 
-A failed gate **MUST halt the downstream phases** for the affected schema. A categorical veto raised in any phase **MUST stop the pipeline** for that schema.
+- **`api-key-domain-mismatch` veto** — when the API key declared in the schema metadata does not match the API root domain, the veto is raised and the `single-test` live tests for the affected tools MUST NOT be treated as pass.
+- **HTTP 4xx** — when a tool returns HTTP 4xx (including 401/403), the response MUST NOT be treated as "auth-pass" (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5). The description cascade for that tool **cannot be completed** and is recorded as a finding.
+- **Eligibility violation** — when an endpoint fails an exclusion criterion under [`02-eligibility.md`](./02-eligibility.md) §3 and the schema author insists on including it, the schema is rejected and dependent Areas do not run for it.
 
-Examples:
+Cascade-stop events are recorded in the grading entry. They do not lower the grade silently — a categorical veto replaces the aggregate grade with `REJECTED`, which the index derivation maps to the terminal status `rejected` (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §6 and [`19-folder-layout.md`](./19-folder-layout.md)).
 
-- **P3 veto `api-key-domain-mismatch`** — when the API key declared in the schema metadata does not match the API root domain, P3 raises the veto and **P4 live tests MUST NOT run**.
-- **P4 HTTP 4xx** — when a tool returns HTTP 4xx (including 401/403), the response MUST NOT be treated as "auth-pass" (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §5). The P5 description cascade for that tool **cannot be completed** and is recorded as a finding.
-- **P2 eligibility violation** — when an endpoint fails an exclusion criterion under [`02-eligibility.md`](./02-eligibility.md) §3 and the schema author insists on including it, the schema is rejected in P3 and no subsequent phase runs for it.
+### 3.4 Base Unit (cross-cutting)
 
-Cascade-stop events are recorded in the grading entry. They do not lower the grade silently — they produce a categorical finding (Veto, see forthcoming `07-veto.md`).
-
----
-
-## 7. End of the Single-Schema Level
-
-After **P6**, the artefact set is complete:
+When the provider-side Areas are complete, the artefact set is the **base unit** of the corpus:
 
 - one **namespace**,
 - one or more **schemas** under that namespace,
-- a **Namespace-Skill**, and
-- an **About-Convention**.
+- one or more **namespace skills**, and
+- an **About Resource** declared in one schema.
 
-This is the **base unit**. The Schema-level grade is **closed** at this point. Downstream grading (Selection level) operates on aggregations of base units and is defined in [`05-phases-selection.md`](./05-phases-selection.md).
-
----
-
-## 8. Skill Family
-
-The Single-Schema phases are written by **Skill-Family 1 — Single-Schema-Validator**. Its grading-tier output is:
-
-```
-gradingTier = autonomous
-```
-
-Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the maximum attainable grade on `autonomous` is **B**. A schema that should be eligible for grade **A** must additionally be graded at the Selection level (`group-bound`, see [`05-phases-selection.md`](./05-phases-selection.md)).
+The provider-side grade is **closed** at this point. Selection-side grading (see [`05-phases-selection.md`](./05-phases-selection.md)) operates on aggregations of base units and never re-grades a base unit's schemas.
 
 ---
 
-## 9. Cross-References
+## 4. About as a Schema Resource
 
-- [`02-eligibility.md`](./02-eligibility.md) — Endpoint eligibility (P2/P3 input).
-- [`03-tos.md`](./03-tos.md) — ToS check (P1 output).
-- [`05-phases-selection.md`](./05-phases-selection.md) — Selection-level phases S1–S4 (consume Single-Schema outputs).
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — Tier and determinism rules (max-grade-B on `autonomous`).
-- Ch. 11 — About-Convention (forthcoming).
-- Ch. 12 — Namespace-Skill (forthcoming).
-- Ch. 13 — Skills (forthcoming).
+The About Resource is graded by the `about-namespace` Area. It is a **markdown Resource declared in one schema** of the namespace (`main.resources`), stored under `providers/<ns>/<schema>/resources/about/`, **not** a namespace route. The full content contract and the deterministic / non-deterministic split are defined in [`11-about-convention.md`](./11-about-convention.md).
+
+A Resource technically never lives at namespace level — there is no namespace object to attach it to, only schemas. About is therefore inserted into **one** schema, and the detector searches for it **namespace-wide**.
+
+---
+
+## 5. Tier
+
+The provider-side Areas produce `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the maximum attainable grade on `autonomous` is **B**. A schema that should be eligible for grade **A** must additionally be graded on the selection side (`group-bound`, see [`05-phases-selection.md`](./05-phases-selection.md)).
+
+---
+
+## 6. Cross-References
+
+- [`01-default-journey.md`](./01-default-journey.md) — maximalism and the completeness contribution to `single-test` / `tools-aggregate-schema`.
+- [`02-eligibility.md`](./02-eligibility.md) — endpoint eligibility (input to schema authoring).
+- [`03-tos.md`](./03-tos.md) — ToS check.
+- [`05-phases-selection.md`](./05-phases-selection.md) — selection-side Areas (consume provider-side base units).
+- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — tier and determinism rules (max-grade-B on `autonomous`).
+- [`11-about-convention.md`](./11-about-convention.md) — About Resource content contract.
+- [`12-personas-contract.md`](./12-personas-contract.md) — personas referenced by persona-bearing Areas.
+- [`13-skills.md`](./13-skills.md) — namespace skills and selection skills.
+- [`19-folder-layout.md`](./19-folder-layout.md) — `_gradings/` placement and the `index.json` rollup.

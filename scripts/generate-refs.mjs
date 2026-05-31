@@ -107,6 +107,18 @@ const main = async () => {
         }
     }
 
+    // Memo 086 PRD-08: additive grading refs (the grading spec is a second,
+    // independently versioned standard). Only emitted when present in manual.
+    if( manual.grading ) {
+        resolved.grading = {
+            currentVersion: manual.grading.currentVersion,
+            recommendedRelease: manual.grading.recommendedRelease || manual.grading.currentVersion,
+            specDir: manual.grading.specDir,
+            specDirAbsoluteUrl: `https://github.com/FlowMCP/flowmcp-spec/tree/main/${ manual.grading.specDir }`,
+            url: manual.grading.url
+        }
+    }
+
     await mkdir( dirname( RESOLVED_PATH ), { recursive: true } )
     await writeFile( RESOLVED_PATH, JSON.stringify( resolved, null, 4 ) + '\n', 'utf-8' )
 

@@ -1,8 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://flowmcp.org/spec/grading/1.1.0/kanban-data-contract.schema.json",
-    "title": "FlowMCP Kanban Phase-Status Response (gradingSpec/1.1.0)",
-    "description": "JSON-Schema for the phase-status response of the minimal Kanban data contract (defined in §14, extended with the single-vs-selection lane separation). Implementation lives in the follow-up Kanban v2 specification.",
+    "title": "FlowMCP Kanban Phase-Status Response (DEPRECATED, gradingSpec/1.1.0)",
+    "deprecated": true,
+    "description": "DEPRECATED in gradingSpec/1.2.0. Superseded by index.schema.json (the namespace/selection rollup). Retained as valid JSON for reference only; this phase-status response is no longer normative. See 14-kanban-data-contract.md and 23-index-json.md.",
     "type": "object",
     "additionalProperties": false,
     "required": [

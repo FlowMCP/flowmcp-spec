@@ -1,17 +1,17 @@
 ---
 title: "Catalog"
 description: "A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions..."
-spec_version: "4.1.0"
+spec_version: "4.2.0"
 spec_file: "15-catalog.md"
 order: 15
 section: "Specification"
 normative: true
-source_commit: "dbbe036"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/dbbe036/spec/v4.1.0/15-catalog.md"
-generated_at: "2026-05-29T13:35:54.422Z"
-generated_from: "spec/v4.1.0/15-catalog.md"
+source_commit: "6152b7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6152b7e/spec/v4.2.0/15-catalog.md"
+generated_at: "2026-05-31T16:18:50.290Z"
+generated_from: "spec/v4.2.0/15-catalog.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.1.0/15-catalog.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.2.0/15-catalog.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -66,7 +66,7 @@ schemas/v3.0.0/
     │   │   ├── simple-price.mjs
     │   │   └── prompts/             <- Provider prompts (model-neutral)
     │   └── ...
-    ├── selections/                  <- Curated tool subsets (v4.1.0)
+    ├── selections/                  <- Curated tool subsets (v4.2.0)
     │   ├── evm-research/
     │   │   └── selection.mjs
     │   └── defi-monitor/
@@ -93,7 +93,7 @@ schemas/v3.0.0/
 | `_lists/` | Root | Shared value lists consumed by all providers and agents |
 | `_shared/` | Root | Shared helper modules consumed by provider schemas |
 | `providers/` | Root | Provider schema directories, one per namespace |
-| `selections/` | Root | Curated tool subsets for agent context loading (v4.1.0). See `17-selections.md`. |
+| `selections/` | Root | Curated tool subsets for agent context loading (v4.2.0). See `17-selections.md`. |
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |

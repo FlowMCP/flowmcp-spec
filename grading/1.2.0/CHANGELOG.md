@@ -1,14 +1,33 @@
 # Changelog gradingSpec
 
-## 1.2.0 — 2026-05-30 (additive)
+## 1.2.0 — 2026-05-31 (v2 break)
 
-Additive extension of 1.1.0. No breaking changes; existing 1.1.0 schemas and 1.1.0 gradings
-remain valid.
+`1.2.0` is the **v2 break**. The 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises
+grading around eleven areas, a five-status node model, the workbench island, the derived
+`index.json` rollup, and a `/goal`-driven harness. Breaking changes are permitted; legacy
+1.0.0/1.1.0 gradings are treated as legacy.
+
+**New chapters:**
 
 | Spec chapter | Change |
 |--------------|--------|
-| `12-personas-contract.md` | NEW §7 — Technical Schema-Persona tier. The spec now recognises repository-level technical Schema-Personas (`security-reviewer`, `api-integration-engineer`, `documentation-dx-reviewer`) for autonomous Task-A schema grading (`gradingTier = autonomous`, max grade B). The existing four generalised base personas and the Lens model (§1–§6) are unchanged. Cross-Reference section renumbered §7 → §8. |
-| `00-overview.md` | Version reference bumped to `gradingSpec/1.2.0`; status/changes header rephrased as additive extension of 1.1.0. |
+| `22-workbench-island.md` | NEW — the workbench island as a spec category: internally verbose names (date + hash), stripped to clean spec names on mirror-out; namespace as the outside view; the IN/OUT round-trip (`grading import` / `grading export`). |
+| `23-index-json.md` | NEW — the `index.json` rollup, one per namespace and per selection. Five-status node enum (`pending`/`blocked`/`graded`/`stable`/`rejected`) plus the operational rollup vocabulary; the two natures (live-rollup recomputed each rebuild + frozen `lockSnapshot` written once at grading start); the member-resolution manifest (SEL003). Supersedes `14-kanban-data-contract.md`. |
+| `24-selection-aggregate.md` | NEW — the 11th area `selection-aggregate`: output schema, template, skill triad, carried dimensions (soft `>=5` / hard `>=7` thresholds, topic coherence, `domainConformance`, `personaUseCaseFit`, group-bound tier path to Grade A, cascade-stop). Stored at `selections/<sel>/_gradings/`. |
+| `25-harness-and-goal.md` | NEW — harness (`claude-code`) + `/goal`: the evaluator reads only the transcript and calls no tools, so the `[GRADING]` surfacing convention is mandatory; idempotent turns; harness-agnostic artifacts. |
+
+**Changed chapters and annexes:**
+
+| Spec chapter | Change |
+|--------------|--------|
+| `00-overview.md` | Version story rephrased to the v2 break; the workbench-island category and IN/OUT round-trip added to the overview; chapter map refreshed; interoperability/maximalism and the three-namespaces model retained. |
+| `14-kanban-data-contract.md` | Rewritten to a "superseded by `index.json`" note carrying the two salvaged rules (audit trail: never delete, newest is current; irreversible veto: terminal status `rejected`). |
+| `14-kanban-data-contract.schema.json` | Marked `deprecated` (kept as valid JSON for reference only). |
+| `12-personas-contract.md` | §7 — Technical Schema-Persona tier (`security-reviewer`, `api-integration-engineer`, `documentation-dx-reviewer`) for autonomous schema grading. |
+
+**New JSON-Schema:**
+
+- `index.schema.json` — NEW (annex for `23-index-json.md`): five-status node enum, operational rollup enum, frozen `lockSnapshot`, member-resolution manifest, `additionalProperties: false` on the envelope.
 
 The technical Schema-Personas are owned by `repos/flowmcp-grading/personas/`; this spec recognises
 the tier and its three slugs while the persona content lives in the grading repository.

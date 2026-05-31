@@ -1,15 +1,11 @@
-# 11 — About Convention on the Resource-Route Level
+# 11 — About Convention as a Schema Resource
 
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0` |
+| Version | `gradingSpec/1.2.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | Schemas-Spec v4.1.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
-
-> **Spec:** `gradingSpec/1.1.0`
-> **Status:** stable (additive extension of 1.0.0)
-> **Changes vs. 1.0.0:** see [`CHANGELOG.md`](./CHANGELOG.md) — §19 adds the About-Pages schema for namespace and selection with a hash convention.
+| Related | Schemas-Spec v4.1.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.1.0.
 
@@ -17,39 +13,55 @@
 
 ## 1. Scope Statement
 
-This chapter is **NOT a new primitive**, **NOT a schema break**, and **NOT a change to the Schemas-Spec v4.1.0 validation rules**. It is a **convention**: the reservation of a single route name and a content contract for what that route delivers when it exists.
+This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows.
 
-The convention has three parts:
+The About Resource is **a schema Resource**, not a namespace route. It is:
 
-1. The **route name `about`** is reserved on the Namespace level (§3).
-2. The **content contract** of an `about` Resource (§4) defines what MUST, SHOULD, and MAY be present when a namespace exposes the route.
-3. The **Selection-level SHOULD** (§7) recommends that every Selection expose a `selection.about` resource of its own.
+- declared in the schema as a Resource named `about` in `main.resources`,
+- a markdown source (`.md`), **not** a `.mjs` module,
+- stored under `resources/about/` of the primitive it belongs to (see [`19-folder-layout.md`](./19-folder-layout.md)).
 
-The convention takes effect only when a namespace exposes the route. A namespace that does NOT expose `about` is **not** in violation; it simply does not benefit from the score boost on `aboutConventionCompliance`.
+The chapter has three parts:
+
+1. The **declaration contract** — how About is declared in a schema (§3).
+2. The **content contract** — what an About Resource MUST, SHOULD, and MAY carry (§4).
+3. The **detection and grading** of About on the namespace and selection levels (§5–§7).
 
 ---
 
 ## 2. Purpose
 
-The convention exists because consumers — LLM graders, Skill authors, third-party tools, dashboards — repeatedly need a uniform way to ask: *"What does this namespace do, what doesn't it do, which conventions does it follow?"* When every namespace uses a different route name (`overview`, `info`, `meta`, `readme`), the consumer has to look up the name per namespace before any other interaction is possible. When the route name is **guessable**, the consumer can ask directly.
+The About Resource exists because consumers — LLM graders, skill authors, third-party tools, dashboards — repeatedly need a uniform way to ask: *"What does this namespace do, what doesn't it do, which conventions does it follow?"* A single, conventionally named, declared Resource answers that question without the consumer having to read the schema source first.
 
-This is the **guessability argument**. It is the deep cause for the route-name reservation; the content contract (§4) is what makes the reserved name worth asking against.
+This is the **guessability argument**. It is the deep cause for reserving the name `about`; the content contract (§4) is what makes the reserved name worth asking against.
 
 ---
 
-## 3. Route-Name Reservation (Namespace Level)
+## 3. Declaration Contract
 
-The Resource route name `about` MUST be **reserved** by every namespace that follows `gradingSpec/1.0.0`. A namespace MAY expose a Resource at this route name; if it does, the Resource MUST conform to the content contract (§4). A namespace MUST NOT use the route name `about` for any Resource that is **not** an About Resource per this contract.
+The About Resource MUST be declared in the schema under `main.resources` with the reserved name `about`:
 
-The reservation is the **only** binding rule at this level. It does NOT obligate a namespace to expose an About Resource; it forbids re-purposing the name.
+```text
+resources.about = {
+    source: 'markdown',
+    origin: 'inline',
+    name: '<namespace>-about.md',
+    description: '<one-line summary>'
+}
+```
 
-**Examples.** Namespaces conformant to the reservation expose their About Resource at the conventional path:
+- `source: 'markdown'` — the Resource body is markdown.
+- `origin: 'inline'` — the content is authored as part of the schema's resource set (inline-normalised on import).
+- `name` — the logical file name; the versioned file lives in `resources/about/` (see [`19-folder-layout.md`](./19-folder-layout.md)). There is no flat `<namespace>-about.md`; only the versioned file exists, and the latest-resolution rule picks the newest.
+- `description` — a one-line summary.
 
-- `Moralis.Resource.About`
-- `Alchemy.Resource.About`
-- `Etherscan.Resource.About`
+A Resource declared at the name `about` MUST conform to the content contract (§4). A schema MUST NOT use the name `about` for any Resource that is **not** an About Resource per this contract.
 
-A consumer that wants the Moralis About Resource asks for `Moralis.Resource.About` without needing to consult the Moralis schema first.
+Only the `about` Resource is grading-relevant; **all other Resources are ignored** by the grader.
+
+### 3.1 Why a Schema Resource and Not a Namespace Route
+
+A Resource technically never lives at namespace level — there is no namespace object to attach a Resource to, only schemas. About is therefore inserted into **one** schema of the namespace. The grader does not require a particular schema to carry it; the detector **searches namespace-wide** (§5).
 
 ---
 
@@ -58,28 +70,27 @@ A consumer that wants the Moralis About Resource asks for `Moralis.Resource.Abou
 The content of an About Resource is governed by the following MUST / SHOULD / MAY contract.
 
 | Element | Required | Description |
-|---------|---------|-------------|
+|---------|----------|-------------|
 | Capability summary — *what the namespace can do* | MUST | A short tool inventory in human-readable form: which tools are exposed, what each tool does at a glance. |
 | Limitations — *what the namespace cannot do* | MUST | Explicit limitations. The user MUST be able to learn from the About Resource what they should NOT expect. |
-| Tools with their conventions | MUST | Which tools follow which conventions (Shared Lists, naming, casing). A pointer to the relevant Domain-Knowledge document is sufficient. |
+| Tools with their conventions | MUST | Which tools follow which conventions (Shared Lists, naming, casing). A pointer to the relevant Domain-Knowledge content is sufficient. |
 | Personas reference | MUST | Pointer to the personas (see [`12-personas-contract.md`](./12-personas-contract.md)) for which the namespace is built. The pointer MAY be a Lens identifier. |
 | Use cases / application areas | MUST | Concrete scenarios in which the namespace adds value, written so that a decision-maker can read them without prior context. |
 | Version / freshness metadata | SHOULD | Last-updated timestamp, source pointers for the inventory (test outputs, manual curation notes). |
 | Background and motivation | MAY | History of the namespace, provider relationship, sponsorship. |
 
-A namespace About Resource that lacks any MUST element scores low on `aboutConventionCompliance` (non-deterministic sub-part); the deterministic sub-part of the dimension (the route-name match) still passes as long as the route exists.
+An About Resource that lacks any MUST element scores low on the **content (non-deterministic) sub-part**; the **deterministic sub-part** (the route-exists check) still passes as long as the declared Resource and its file exist.
 
 ---
 
-## 5. Production Obligation (SHOULD)
+## 5. Detection (Deterministic)
 
-The Single-Schema phase **P6** (see [`04-phases-single.md`](./04-phases-single.md)) is the natural production point for the namespace About Resource. After P6, a generator SHOULD produce an About Resource for the namespace. The generator synthesises content from three sources:
+The detector runs as the deterministic sub-part of the `about-namespace` Area (provider side) and `about-selection` Area (selection side). It performs two checks:
 
-1. Test responses gathered in earlier phases (P4 / P5),
-2. The tool descriptions and `whenToUse` strings of each tool in the namespace,
-3. Manual curation by the namespace maintainer.
+1. Is a Resource named `about` declared in **one** schema of the namespace (or in the selection definition)?
+2. Does the backing markdown file exist under `resources/about/`?
 
-The SHOULD is deliberate. A namespace that has the inventory but chooses not to publish an About Resource is NOT in violation of the convention; it simply does not benefit from the score boost on `aboutConventionCompliance`. The generation step itself is an implementation concern (out of scope here).
+If either check fails, the result is `about: false` and the dependent content grading does not run. For the provider side the detector searches **namespace-wide** — the About Resource may be declared in any one schema of the namespace.
 
 ---
 
@@ -89,48 +100,44 @@ The About Resource is consumed by three classes of actor:
 
 | Consumer | Use |
 |----------|-----|
-| Skills (see [`13-skills.md`](./13-skills.md)) | The Namespace-Skill MUST link the namespace's own About Resource. The Selection-Skill MAY reference multiple About Resources via `selection.resources[]` (Schemas-Spec v4.1.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md)). |
-| Graders | The Selection-Validator reads the About Resource as the source of truth for `personaUseCaseFit` reasoning. |
+| Skills (see [`13-skills.md`](./13-skills.md)) | A namespace skill MUST reference the namespace's About Resource. A selection skill MAY reference multiple About Resources. |
+| Graders | The selection-side grader reads the About Resource as the source of truth for `personaUseCaseFit` reasoning, and as the Domain-Knowledge content for `domainConformance`. |
 | Third parties | External tools (registry dashboards, agent runtimes, IDE plugins) can consume the About Resource as the *README of the namespace*. |
 
 ---
 
-## 7. Selection Level (SHOULD)
+## 7. Selection-Level About (= Domain-Knowledge)
 
-Every Selection SHOULD expose its own `selection.about` Resource. The technical realisation uses `selection.resources[]` defined in the Schemas-Spec v4.1.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md): the Selection's `resources[]` MAY reference either a dedicated `selection.about` resource or the About Resources of the contained namespaces.
+Every selection SHOULD expose its own About Resource under `selections/<selection>/resources/about/`. On the selection level the About Resource **doubles as the Domain-Knowledge content** of the group: it carries the seven mandatory sections defined in [`10-domain-knowledge.md`](./10-domain-knowledge.md) §3. It is graded by the `about-selection` Area.
 
-**Score consequence.** Absence of a `selection.about` is **NOT** a Categorical Veto. It IS a score deduction on `aboutConventionCompliance` at the `group-bound` sub-part. A Selection without a Selection-level About Resource cannot reach the top of `aboutConventionCompliance` even when each contained namespace has its own About Resource.
+**Score consequence.** Absence of a selection-level About Resource is **NOT** a Categorical Veto. It IS a score deduction at the `group-bound` level: a selection without its own About Resource cannot reach the top of the About grading even when each contained namespace has its own About Resource. Because the selection-level About also carries the Domain-Knowledge content, its absence additionally blocks `domainConformance` from being scored above `stale` / `n/a` (see [`10-domain-knowledge.md`](./10-domain-knowledge.md) §7).
 
 ### 7.1 Why SHOULD and Not MUST
 
-A MUST at the Selection level would over-burden small Selections. A Selection composed of two tools and intended for ad-hoc use should not be forced to maintain its own About Resource — the cost outweighs the benefit. The MUST level is reserved for the namespace-level route-name reservation (§3), where the burden is minimal (one resource per namespace).
+A MUST at the selection level would over-burden small selections. A selection composed of two tools and intended for ad-hoc use should not be forced to maintain its own About Resource — the cost outweighs the benefit.
 
 ### 7.2 Why SHOULD and Not MAY
 
-A MAY at the Selection level would surrender the guessability argument from §2. A Selection's About Resource is precisely what an agent asks for when entering the Selection; if it MAY be present or absent without consequence, agents cannot rely on it. SHOULD preserves guessability (consumers can ask blind) while still allowing for the small-Selection exception (no veto).
+A MAY at the selection level would surrender the guessability argument from §2. A selection's About Resource is precisely what an agent asks for when entering the selection; if it MAY be present or absent without consequence, agents cannot rely on it. SHOULD preserves guessability (consumers can ask blind) while still allowing for the small-selection exception (no veto).
 
 ---
 
 ## 8. Grading Effect
 
-| Dimension | Determinism | Tier | Source |
-|-----------|-------------|------|--------|
-| `aboutConventionCompliance` (route-name match) | deterministic | autonomous | Single-Schema P6 |
-| `aboutConventionCompliance` (content quality) | non-deterministic | autonomous | Single-Schema P6 / Selection S2 |
-| `personaUseCaseFit` (consumes About) | non-deterministic | group-bound | Selection S4 |
+| Dimension | Determinism | Tier | Source (Area) |
+|-----------|-------------|------|----------------|
+| About Resource compliance (route-exists) | deterministic | autonomous | `about-namespace` |
+| About Resource compliance (content quality) | non-deterministic | autonomous | `about-namespace` |
+| About Resource compliance (selection content + Domain-Knowledge) | deterministic + non-deterministic | group-bound | `about-selection` |
+| `personaUseCaseFit` (consumes About) | non-deterministic | group-bound | `selection-aggregate` |
 
-The deterministic sub-part of `aboutConventionCompliance` is binary: the route `about` exists (pass) or it does not (fail). The non-deterministic sub-part scores the content of the resource against the contract (§4). The mixed-form handling rule from [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §2.3 applies.
+The deterministic sub-part is binary: the declared `about` Resource and its file exist (pass) or they do not (fail). The non-deterministic sub-part scores the content against the contract (§4). The mixed-form handling rule from [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) §2.3 applies.
 
 ---
 
 ## 9. Relationship to the Schemas-Spec v4.1.0
 
-The Schemas-Spec v4.1.0 — particularly [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md) — does NOT enforce the `about` route-name reservation as a validation rule. The reservation is **forward-looking convention**, applied by graders that conform to `gradingSpec/1.0.0`. A small additive sub-paragraph in `13-resources.md` points consumers at this Grading-Spec for the binding content contract.
-
-The two documents are mutually consistent:
-
-- v4.1 `13-resources.md` reserves the route name and points here.
-- This chapter binds the content contract and the production obligation.
+The Schemas-Spec v4.1.0 — particularly [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
 
 A schema-validator at v4.1 MUST NOT reject a schema for failing the About convention; the convention's enforcement lives entirely in the grader.
 
@@ -139,73 +146,9 @@ A schema-validator at v4.1 MUST NOT reject a schema for failing the About conven
 ## 10. Cross-References
 
 - Schemas-Spec v4.1.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/13-resources.md) — the external Resource primitive against which the convention is defined.
-- Schemas-Spec v4.1.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md) — `selection.resources[]` field that carries Selection-level About Resources.
-- [`12-personas-contract.md`](./12-personas-contract.md) — the Personas reference required by §4.
-- [`13-skills.md`](./13-skills.md) — Skill obligation to link the About Resource.
-- The additive note in v4.1 `13-resources.md` that points consumers here.
-
----
-
-## §19 About-Pages Schema (NEW in 1.1.0)
-
-This section extends the resource-route level (§3-§7) with a **file layout** for About-Pages, anchored in the folder layout (see [`19-folder-layout.md`](./19-folder-layout.md) §17). The `aboutHash` (see [`08-grading-model.md`](./08-grading-model.md) §3.X) is the link between the grading entry, the namespace/selection payload, and the actual About file.
-
-### §19.1 Two Levels
-
-| Level | Container | Payload | Verification |
-|-------|-----------|---------|--------------|
-| Namespace-About | `schemas/<namespace>/about/<hash>--about.md` | `namespace.json` | Pre-condition ([`21-pre-conditions.md`](./21-pre-conditions.md) §20) + consistency check |
-| Selection-About | `selection/<id>/about/<hash>--about.md` | `selection.json` + `selection.lock.json` | Pre-condition ([`21-pre-conditions.md`](./21-pre-conditions.md) §20) + consistency check |
-
-### §19.2 Hash Link
-
-About file → sha256 hash (8 chars) → filename `<aboutHash>--about.md` → `namespace.json` / `selection.json` references `aboutHash`. Changing the About file → new `aboutHash` → new `namespaceHash` / `selectionHash` → automatic re-verification obligation.
-
-Schematically:
-
-```
-about/<aboutHash>--about.md
-        |
-        | sha256 (8 chars)
-        v
-   aboutHash: ef56gh78
-        |
-        | referenced by
-        v
-   namespace.json.aboutHash  or  selection.json.aboutHash
-        |
-        | feeds into
-        v
-   namespaceHash / selectionHash (see 16-selection-lockfile.md §11.4)
-```
-
-### §19.3 Verification Mechanics
-
-```
-Step 0: Pre-condition check (all members stable? — see 21-pre-conditions.md §20)
-  If no: BLOCK
-  If yes: continue
-
-Step 1: Consistency check (About text vs. real schemas)
-  - Check tool names, descriptions, parameter lists
-  - For Selection-About: additionally check persona / domain relation
-
-Step 2: Hash update (aboutHash marked as verified)
-  - Change of the About file → new aboutHash → re-check
-```
-
-The pre-condition is a cheap gate check (lockfile lookup); the consistency check is a cheap text-vs-schema check. The expensive work (tool tests) has already been done in the Single-Gradings.
-
-### §19.4 Relationship to the Content Convention (§4)
-
-§4 above defines **which content** (MUST/SHOULD/MAY elements) the About file must carry. §19 defines **where and how the file is referenced** in the folder layout. Both conventions work together:
-
-- Content convention (§4) → evaluated via `aboutConventionCompliance` (see §8 above)
-- File/hash convention (§19) → operational anchor for versioning and pre-conditions
-
-Cross-Refs:
-
-- Folder path → [`19-folder-layout.md`](./19-folder-layout.md) §17 (`schemas/<ns>/about/`, `selection/<id>/about/`)
-- Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md) §20.3 (About verification as a mandatory check)
-- `aboutHash` field → [`08-grading-model.md`](./08-grading-model.md) §3.X (grading-entry top-level)
-- `namespace.json` schema → [`16-selection-lockfile.md`](./16-selection-lockfile.md) §11.4
+- Schemas-Spec v4.1.0 [`17-selections.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.1.0/17-selections.md) — the selection primitive.
+- [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the selection-level About Resource as the Domain-Knowledge content (seven mandatory sections).
+- [`12-personas-contract.md`](./12-personas-contract.md) — the personas reference required by §4.
+- [`13-skills.md`](./13-skills.md) — the skill obligation to reference the About Resource.
+- [`19-folder-layout.md`](./19-folder-layout.md) — the `resources/about/` placement and the versioned-file naming.
+- [`21-pre-conditions.md`](./21-pre-conditions.md) — About detection as part of the pre-condition gate.

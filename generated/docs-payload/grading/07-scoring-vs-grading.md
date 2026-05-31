@@ -1,14 +1,14 @@
 ---
-title: "07 — Scoring System vs. Grading System"
+title: "Scoring System vs. Grading System"
 description: "The terms **\"Scoring\"** and **\"Grading\"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update..."
 grading_version: "2.0.0"
 spec_file: "07-scoring-vs-grading.md"
 order: 7
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/07-scoring-vs-grading.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/07-scoring-vs-grading.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/07-scoring-vs-grading.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/07-scoring-vs-grading.md."

@@ -92,6 +92,14 @@ const extractDescription = ( { content } ) => {
         if( line.startsWith( '---' ) ) continue
         if( line.startsWith( '|' ) ) continue
         if( line.startsWith( '```' ) ) continue
+        // Memo 087 PRD-01: skip the RFC2119/BCP-14 conformance-language boilerplate
+        // so it never becomes the description. Grading chapters lead with metadata +
+        // a conformance section (no intro paragraph), so without this they grabbed
+        // "This document uses the key words ...". Spec chapters lead with a real
+        // intro, so this skip never triggers for them.
+        if( /^this document uses the key words/i.test( line ) ) continue
+        if( /\bBCP ?14\b/i.test( line ) || /\bRFC ?2119\b/i.test( line ) ) continue
+        if( /\bconformance interpretation\b/i.test( line ) ) continue
         // First substantive paragraph
         candidates.push( line )
         break
@@ -148,6 +156,30 @@ const orderFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 087 PRD-01: spec titles are already stripped of "FlowMCP Specification vX — "
+// by extractTitle. Grading titles carry an "NN — " prefix (and chapter 00 a
+// code-fenced "gradingSpec/..." string). Normalize grading to a clean Starlight
+// title so both families render the same.
+const identityTitle = ( { title } ) => title
+
+const cleanGradingTitle = ( { title, filename } ) => {
+    if( filename === '00-overview.md' ) return 'Overview'
+    return title.replace( /^\d+\s*[—–-]\s*/, '' ).trim()
+}
+
+
+// Memo 087 PRD-01: spec uses the PROSAIC_FILES set for the `normative` flag.
+// Grading chapters declare their status in the metadata table; derive `normative`
+// from "| Status | Normative |", falling back to the prosaic set when absent.
+const specNormativeFn = ( { filename, prosaicFiles } ) => !prosaicFiles.has( filename )
+
+const gradingNormativeFn = ( { filename, content, prosaicFiles } ) => {
+    const statusMatch = content.match( /^\|\s*Status\s*\|\s*([^|]+?)\s*\|/m )
+    if( statusMatch ) return /normative/i.test( statusMatch[ 1 ] )
+    return !prosaicFiles.has( filename )
+}
+
+
 const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } ) => {
     const relativeSourcePath = `${ sourceRelBase }/${ filename }`
     const sourceUrl = `https://github.com/FlowMCP/flowmcp-spec/blob/${ sourceCommit }/${ relativeSourcePath }`
@@ -171,13 +203,14 @@ const buildFrontmatter = ( { filename, title, description, normative, now, sourc
 }
 
 
-const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase } ) => {
+const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn } ) => {
     const sourcePath = join( sourceDir, filename )
     const content = await readFile( sourcePath, 'utf-8' )
 
-    const title = extractTitle( { content } ) || filename
+    const rawTitle = extractTitle( { content } ) || filename
+    const title = titleTransform( { title: rawTitle, filename } )
     const description = extractDescription( { content } )
-    const normative = !prosaicFiles.has( filename )
+    const normative = normativeFn( { filename, content, prosaicFiles } )
 
     const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } )
     const bodyRewritten = rewriteCrossRefs( { content } )
@@ -197,7 +230,7 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
 }
 
 
-const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit } ) => {
+const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit, titleTransform, normativeFn } ) => {
     await mkdir( targetDir, { recursive: true } )
     const allFiles = await readdir( sourceDir )
     const docFiles = allFiles
@@ -207,7 +240,7 @@ const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, sectio
     console.log( `Generating ${ label } payload from ${ docFiles.length } files (version=${ version }, source_commit=${ sourceCommit })...` )
     const results = []
     for( const filename of docFiles ) {
-        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase } )
+        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn } )
         results.push( result )
         console.log( `  ✓ ${ filename } → ${ result.title }` )
     }
@@ -241,7 +274,9 @@ const main = async () => {
         version: SPEC_VERSION,
         sourceRelBase: `spec/v${ SPEC_VERSION }`,
         now,
-        sourceCommit
+        sourceCommit,
+        titleTransform: identityTitle,
+        normativeFn: specNormativeFn
     } )
 
     console.log( `\nGenerated ${ specResults.length } spec files in ${ PAYLOAD_DIR }` )
@@ -268,7 +303,9 @@ const main = async () => {
             version: gradingVersion,
             sourceRelBase: `grading/${ gradingVersion }`,
             now,
-            sourceCommit
+            sourceCommit,
+            titleTransform: cleanGradingTitle,
+            normativeFn: gradingNormativeFn
         } )
         console.log( `\nGenerated ${ gradingResults.length } grading files in ${ GRADING_PAYLOAD_DIR } (grading_version=${ gradingVersion })` )
     } else {

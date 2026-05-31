@@ -1,14 +1,14 @@
 ---
-title: "02 — Eligibility"
+title: "Eligibility"
 description: "This chapter defines **what is allowed to be part of a gradable schema**. Eligibility is the upstream gate: an endpoint that is not eligible MUST NOT appear in a schema. The maximalism principle in..."
 grading_version: "2.0.0"
 spec_file: "02-eligibility.md"
 order: 2
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/02-eligibility.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/02-eligibility.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/02-eligibility.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/02-eligibility.md."

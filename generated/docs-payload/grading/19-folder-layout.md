@@ -1,14 +1,14 @@
 ---
-title: "19 — Folder Layout (§17)"
+title: "Folder Layout (§17)"
 description: "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` §19..."
 grading_version: "2.0.0"
 spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/19-folder-layout.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/19-folder-layout.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/19-folder-layout.md."

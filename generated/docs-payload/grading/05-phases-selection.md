@@ -1,14 +1,14 @@
 ---
-title: "05 — Selection-Side Grading Areas"
+title: "Selection-Side Grading Areas"
 description: "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification..."
 grading_version: "2.0.0"
 spec_file: "05-phases-selection.md"
 order: 5
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/05-phases-selection.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/05-phases-selection.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/05-phases-selection.md."

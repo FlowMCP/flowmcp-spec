@@ -1,14 +1,14 @@
 ---
-title: "10 — Domain Knowledge and Group Definition"
+title: "Domain Knowledge and Group Definition"
 description: "A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation...."
 grading_version: "2.0.0"
 spec_file: "10-domain-knowledge.md"
 order: 10
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/10-domain-knowledge.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/10-domain-knowledge.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/10-domain-knowledge.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/10-domain-knowledge.md."

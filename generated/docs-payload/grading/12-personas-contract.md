@@ -1,14 +1,14 @@
 ---
-title: "12 — Personas Contract"
+title: "Personas Contract"
 description: "The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the..."
 grading_version: "2.0.0"
 spec_file: "12-personas-contract.md"
 order: 12
 section: "Grading"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/grading/2.0.0/12-personas-contract.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/grading/2.0.0/12-personas-contract.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "grading/2.0.0/12-personas-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/12-personas-contract.md."

@@ -6,9 +6,9 @@ spec_file: "11-preload.md"
 order: 11
 section: "Specification"
 normative: true
-source_commit: "4a4d7c2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/4a4d7c2/spec/v4.2.0/11-preload.md"
-generated_at: "2026-05-31T16:52:18.836Z"
+source_commit: "078413e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/078413e/spec/v4.2.0/11-preload.md"
+generated_at: "2026-05-31T17:31:38.492Z"
 generated_from: "spec/v4.2.0/11-preload.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/11-preload.md."

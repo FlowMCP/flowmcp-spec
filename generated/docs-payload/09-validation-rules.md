@@ -6,9 +6,9 @@ spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-source_commit: "410fe47"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/spec/v4.2.0/09-validation-rules.md"
-generated_at: "2026-05-31T22:19:21.234Z"
+source_commit: "534fa4c"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/534fa4c/spec/v4.2.0/09-validation-rules.md"
+generated_at: "2026-05-31T22:36:18.559Z"
 generated_from: "spec/v4.2.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/09-validation-rules.md."

@@ -6,9 +6,9 @@ spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "410fe47"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/410fe47/grading/2.0.0/23-index-json.md"
-generated_at: "2026-05-31T22:19:21.234Z"
+source_commit: "534fa4c"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/534fa4c/grading/2.0.0/23-index-json.md"
+generated_at: "2026-05-31T22:36:18.559Z"
 generated_from: "grading/2.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/23-index-json.md."

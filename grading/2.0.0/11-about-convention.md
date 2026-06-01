@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
 | Related | Schemas-Spec v4.2.0 [`13-resources.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/13-resources.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
 

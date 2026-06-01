@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`04-phases-single.md`](./04-phases-single.md) |
 | Related | [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`13-skills.md`](./13-skills.md) |
 

@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`02-eligibility.md`](./02-eligibility.md), [`04-phases-single.md`](./04-phases-single.md) |
 

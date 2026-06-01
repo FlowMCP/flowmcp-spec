@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`19-folder-layout.md`](./19-folder-layout.md) |
 | Related | [`14-kanban-data-contract.md`](./14-kanban-data-contract.md) (superseded by this chapter), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`08-grading-model.md`](./08-grading-model.md) |
 | Annex | [`index.schema.json`](./index.schema.json) — JSON-Schema 2020-12 for `index.json` |
@@ -97,11 +97,23 @@ A categorical veto maps to the node status `rejected`, which is **terminal**. Th
   "updatedAt": "2026-05-31T12-30Z",
   "status": "partial",
   "grade": "B",
-  "summary": { "schemas": 2, "tools": 12, "toolsStable": 8, "about": "graded", "skills": 0 },
+  "summary": { "schemas": 2, "tools": 12, "toolsStable": 8, "about": "graded", "description": "graded", "skills": 1 },
   "about": {
     "status": "graded",
     "grade": "B",
     "ref": "prices/resources/about/_gradings/about-namespace--2026-05-31T11-20-00Z.json"
+  },
+  "description": {
+    "status": "graded",
+    "grade": "B",
+    "ref": "_gradings/namespace-description--2026-05-31T11-21-00Z.json"
+  },
+  "skills": {
+    "prices.summarizePrices": {
+      "status": "graded",
+      "grade": "B",
+      "ref": "prices/skills/summarizePrices/_gradings/namespace-skills--2026-05-31T11-23-00Z.json"
+    }
   },
   "namespaceAggregate": {
     "status": "graded",

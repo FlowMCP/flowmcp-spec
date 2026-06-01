@@ -1,5 +1,23 @@
 # Changelog gradingSpec
 
+## 2.0.1 — 2026-06-01 — Full 6-area namespace rollup
+
+Additive patch. The namespace `index.json` rollup now carries **all six** provider areas.
+Previously only four areas (`single-test`, `tools-aggregate-schema`,
+`tools-aggregate-namespace`, `about-namespace`) were rolled up; the two areas
+`namespace-description` and `namespace-skills` were graded and written by the harness but
+**dropped** at rollup time. They now appear in `index.json`:
+
+- A top-level `description` node (single node, status + grade).
+- A top-level `skills` subtree (`{ '<schema>.<skill>': node }`), recomputed on every rebuild.
+- `summary.description` (status string) and `summary.skills` (count of graded skill entries,
+  no longer hardcoded `0`).
+
+The `index.schema.json` annex gains the `description` and `skills` top-level properties.
+No breaking change: existing four-area indexes remain valid; the new fields are additive.
+The `grading/2.0.0/` directory is retained — a patch bump does not create a new version
+directory.
+
 ## 2.0.0 — 2026-05-31 (v2 break)
 
 `2.0.0` is the **v2 break**. The 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises

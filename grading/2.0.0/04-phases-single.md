@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`11-about-convention.md`](./11-about-convention.md) |
 

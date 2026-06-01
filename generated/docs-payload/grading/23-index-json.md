@@ -6,9 +6,9 @@ spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/23-index-json.md"
-generated_at: "2026-06-01T01:39:52.471Z"
+source_commit: "7d4a5d2"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7d4a5d2/grading/2.0.0/23-index-json.md"
+generated_at: "2026-06-01T01:54:15.513Z"
 generated_from: "grading/2.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/23-index-json.md."
@@ -103,11 +103,23 @@ A categorical veto maps to the node status `rejected`, which is **terminal**. Th
   "updatedAt": "2026-05-31T12-30Z",
   "status": "partial",
   "grade": "B",
-  "summary": { "schemas": 2, "tools": 12, "toolsStable": 8, "about": "graded", "skills": 0 },
+  "summary": { "schemas": 2, "tools": 12, "toolsStable": 8, "about": "graded", "description": "graded", "skills": 1 },
   "about": {
     "status": "graded",
     "grade": "B",
     "ref": "prices/resources/about/_gradings/about-namespace--2026-05-31T11-20-00Z.json"
+  },
+  "description": {
+    "status": "graded",
+    "grade": "B",
+    "ref": "_gradings/namespace-description--2026-05-31T11-21-00Z.json"
+  },
+  "skills": {
+    "prices.summarizePrices": {
+      "status": "graded",
+      "grade": "B",
+      "ref": "prices/skills/summarizePrices/_gradings/namespace-skills--2026-05-31T11-23-00Z.json"
+    }
   },
   "namespaceAggregate": {
     "status": "graded",

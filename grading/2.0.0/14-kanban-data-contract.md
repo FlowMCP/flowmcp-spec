@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | **Superseded** by [`23-index-json.md`](./23-index-json.md) |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Replaced by | [`23-index-json.md`](./23-index-json.md) — the namespace/selection rollup `index.json` |
 | Annex | [`14-kanban-data-contract.schema.json`](./14-kanban-data-contract.schema.json) — **deprecated** (kept as valid JSON for reference only) |
 

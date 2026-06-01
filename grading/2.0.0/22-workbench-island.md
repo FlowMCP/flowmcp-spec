@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`19-folder-layout.md`](./19-folder-layout.md) |
 | Related | [`15-versioning-axes.md`](./15-versioning-axes.md), [`23-index-json.md`](./23-index-json.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
 

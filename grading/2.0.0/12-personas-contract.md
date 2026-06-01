@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/2.0.0` |
+| Version | `gradingSpec/2.0.1` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md) |
 | Related | Schemas-Spec sister-repo personas folder `repos/flowmcp-spec/personas/`, [`13-skills.md`](./13-skills.md) |
 

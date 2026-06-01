@@ -6,15 +6,15 @@ spec_file: "00-overview.md"
 order: 0
 section: "Grading"
 normative: false
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/00-overview.md"
-generated_at: "2026-06-01T01:39:52.471Z"
+source_commit: "7d4a5d2"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7d4a5d2/grading/2.0.0/00-overview.md"
+generated_at: "2026-06-01T01:54:15.513Z"
 generated_from: "grading/2.0.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/00-overview.md."
 ---
 
-> **Spec:** `gradingSpec/2.0.0`
+> **Spec:** `gradingSpec/2.0.1`
 > **Status:** stable (v2 — a clean break from the 1.0.0/1.1.0 line)
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.2.0 [00-overview.md](/specification/overview/) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.

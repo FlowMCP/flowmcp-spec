@@ -1,6 +1,6 @@
-# Grading-Spec `gradingSpec/2.0.0`
+# Grading-Spec `gradingSpec/2.0.1`
 
-> **Spec:** `gradingSpec/2.0.0`
+> **Spec:** `gradingSpec/2.0.1`
 > **Status:** stable (v2 — a clean break from the 1.0.0/1.1.0 line)
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.2.0 [00-overview.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/00-overview.md) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.

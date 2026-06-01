@@ -6,9 +6,9 @@ spec_file: "03-shared-lists.md"
 order: 3
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/03-shared-lists.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/03-shared-lists.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/03-shared-lists.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/03-shared-lists.md."
@@ -554,3 +554,9 @@ _lists/
 ### One List Per File
 
 Each `.mjs` file contains exactly one shared list. Combining multiple lists in a single file is not supported.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
+- **Related:** [15-catalog.md](/specification/catalog/), [16-id-schema.md](/specification/id-schema/), [09-validation-rules.md](/specification/validation-rules/)
+

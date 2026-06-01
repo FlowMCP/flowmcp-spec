@@ -2,7 +2,6 @@
 
 > **Spec:** `gradingSpec/2.0.0`
 > **Status:** stable (v2 — a clean break from the 1.0.0/1.1.0 line)
-> **Changes vs. 1.1.0:** `2.0.0` is the **v2 break**. The earlier 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises grading around eleven areas, a five-status model, the workbench island, the derived `index.json` rollup, and a `/goal`-driven harness. Breaking changes are permitted; there is no backwards-compatibility promise toward the 1.0.0/1.1.0 phase model (`P1`–`P7` / `S1`–`S4`). See [`CHANGELOG.md`](./CHANGELOG.md) for the version history.
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification v4.2.0 [00-overview.md](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.2.0/00-overview.md) (Conformance Language). This Grading-Spec is a separate, independently versioned document; it does not re-define normative keywords.
 
@@ -142,6 +141,14 @@ The following are the headline additions of the v2 break over the 1.0.0/1.1.0 li
 | Eleven grading areas | the per-phase `P*`/`S*` model is replaced by eleven areas; the 11th, `selection-aggregate` ([`24-selection-aggregate.md`](./24-selection-aggregate.md)), is new |
 | `/goal` harness | [`25-harness-and-goal.md`](./25-harness-and-goal.md) — transcript-only evaluator + mandatory `[GRADING]` surfacing convention + idempotent turns |
 | Kanban data contract | superseded by `index.json`; only the audit-trail and irreversible-veto rules are salvaged ([`14-kanban-data-contract.md`](./14-kanban-data-contract.md)) |
+
+---
+
+## What Changed
+
+### 2.0.0
+
+`2.0.0` is the **v2 break**. The earlier 1.0.0/1.1.0 line was a short-lived experiment; v2 reorganises grading around eleven areas, a five-status model, the workbench island, the derived `index.json` rollup, and a `/goal`-driven harness. Breaking changes are permitted; there is no backwards-compatibility promise toward the 1.0.0/1.1.0 phase model (`P1`–`P7` / `S1`–`S4`). See [`CHANGELOG.md`](./CHANGELOG.md) for the version history.
 
 ---
 

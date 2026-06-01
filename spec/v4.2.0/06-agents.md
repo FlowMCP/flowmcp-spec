@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Agents
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [14-skills.md](./14-skills.md), [17-selections.md](./17-selections.md), [16-id-schema.md](./16-id-schema.md), [10-tests.md](./10-tests.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, prompts, skills, and optional resources. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
@@ -869,9 +874,7 @@ The `maxRounds` field limits how many times the agent can request user input in 
 
 This prevents infinite elicitation loops and ensures that agents remain responsive even when users are unavailable.
 
-### Validation Rules
-
-**AGT031:** `elicitation.maxRounds` must be a positive integer (value ≥ 1). Zero, negative values, and non-integers are rejected.
+`elicitation.maxRounds` must be a positive integer (value ≥ 1); zero, negative values, and non-integers are rejected (AGT031, see the canonical table below).
 
 ---
 
@@ -899,6 +902,7 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 | AGT018 | error | Skill files MUST export `export const skill` |
 | AGT019 | error | Inline tool keys (without `/`) must have a valid tool definition object as value (with `method`, `path`, `description`) |
 | AGT020 | error | Keys containing `/` with a non-`null` value are forbidden (slash keys MUST always be `null`) |
+| AGT031 | error | `elicitation.maxRounds` must be a positive integer (value ≥ 1). Zero, negative values, and non-integers are rejected. |
 
 ### Rule Details
 

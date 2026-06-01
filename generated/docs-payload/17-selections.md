@@ -6,9 +6,9 @@ spec_file: "17-selections.md"
 order: 17
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/17-selections.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/17-selections.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/17-selections.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/17-selections.md."
@@ -84,6 +84,7 @@ Directory `selections/` is at root level, alongside `providers/` and `agents/`.
 | SEL001 | error | `whenToUse` is required and MUST NOT be empty |
 | SEL002 | error | At least one array (tools/skills/resources/prompts) must be non-empty |
 | SEL003 | error | All referenced Primitive-IDs MUST be resolvable |
+| SEL004 | info | If a Selection includes inline-skill objects, SkillValidator runs on each. Recorded in the validation report. Optional — present only when inline skills exist. |
 
 ## Selection as Test-Trigger
 
@@ -129,8 +130,6 @@ When a Selection defines inline skills (`selection.skills[]` entries that are fu
 └─ Selection Aggregat: 4/4 Members PASS
 ```
 
-### New Validation Code: SEL004 (Inline-Skill Sanity)
-
 If a Selection includes inline-skill objects, the SelectionValidator additionally runs SkillValidator on each. This is recorded as SEL004 in the validation report. Optional — present only when inline skills exist.
 
 ## Runtime Behavior
@@ -138,3 +137,9 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 - If a referenced Primitive-ID is unresolvable, the Selection fails to load with a clear error message.
 - Example: `"Selection evm-research/selection/contract-analysis: Reference 'etherscan-io/tool/getSmartContractAbi' not found"`
 - AGT030: Agent startup fails if a referenced Selection cannot be loaded.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [16-id-schema.md](/specification/id-schema/)
+- **Related:** [06-agents.md](/specification/agents/), [18-prefill.md](/specification/prefill/), [14-skills.md](/specification/skills/), [12-prompt-architecture.md](/specification/prompt-architecture/)
+

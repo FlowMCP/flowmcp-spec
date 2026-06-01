@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Schema Format
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md) |
+| Related | [02-parameters.md](./02-parameters.md), [04-output-schema.md](./04-output-schema.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [16-id-schema.md](./16-id-schema.md), [19-mcp-integration.md](./19-mcp-integration.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 This document defines the structure of a FlowMCP schema file, the two named exports (`main` and `handlers`), tool definitions, resource declarations, skill references, naming conventions, and constraints.

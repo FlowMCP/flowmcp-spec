@@ -6,9 +6,9 @@ spec_file: "05-security.md"
 order: 5
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/05-security.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/05-security.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/05-security.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/05-security.md."
@@ -345,3 +345,9 @@ All violations in a single file are reported together (the scan does not stop at
 | SEC202 | Async/await keyword found in shared list |
 | SEC203 | Template literal with expression found in shared list |
 | SEC204 | Forbidden pattern (same as SEC001-SEC011) found in shared list |
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [09-validation-rules.md](/specification/validation-rules/), [13-resources.md](/specification/resources/), [23-license-and-tos.md](/specification/license-and-tos/)
+

@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Selections
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [16-id-schema.md](./16-id-schema.md) |
+| Related | [06-agents.md](./06-agents.md), [18-prefill.md](./18-prefill.md), [14-skills.md](./14-skills.md), [12-prompt-architecture.md](./12-prompt-architecture.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 **Primitive:** Selection (5th primitive)
@@ -70,6 +75,7 @@ Directory `selections/` is at root level, alongside `providers/` and `agents/`.
 | SEL001 | error | `whenToUse` is required and MUST NOT be empty |
 | SEL002 | error | At least one array (tools/skills/resources/prompts) must be non-empty |
 | SEL003 | error | All referenced Primitive-IDs MUST be resolvable |
+| SEL004 | info | If a Selection includes inline-skill objects, SkillValidator runs on each. Recorded in the validation report. Optional — present only when inline skills exist. |
 
 ## Selection as Test-Trigger
 
@@ -114,8 +120,6 @@ When a Selection defines inline skills (`selection.skills[]` entries that are fu
 │
 └─ Selection Aggregat: 4/4 Members PASS
 ```
-
-### New Validation Code: SEL004 (Inline-Skill Sanity)
 
 If a Selection includes inline-skill objects, the SelectionValidator additionally runs SkillValidator on each. This is recorded as SEL004 in the validation report. Optional — present only when inline skills exist.
 

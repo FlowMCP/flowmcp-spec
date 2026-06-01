@@ -6,9 +6,9 @@ spec_file: "23-license-and-tos.md"
 order: 23
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/23-license-and-tos.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/23-license-and-tos.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/23-license-and-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/23-license-and-tos.md."
@@ -112,5 +112,11 @@ ToS change. FlowMCP recommends:
 
 ## See Also
 
-- [`01-schema-format.md`](./01-schema-format.md) — Schema field reference
-- [`19-mcp-integration.md`](./19-mcp-integration.md) — Meta block (per-tool metadata)
+- [`01-schema-format.md`](/specification/schema-format/) — Schema field reference
+- [`19-mcp-integration.md`](/specification/mcp-integration/) — Meta block (per-tool metadata)
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [19-mcp-integration.md](/specification/mcp-integration/), [05-security.md](/specification/security/), [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+

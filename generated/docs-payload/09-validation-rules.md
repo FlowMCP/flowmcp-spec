@@ -6,9 +6,9 @@ spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/09-validation-rules.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/09-validation-rules.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/09-validation-rules.md."
@@ -54,7 +54,7 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | VAL013 | error | `main.description` is required and MUST be a string |
 | VAL014 | error | `main.version` is required and MUST match `^4\.\d+\.\d+$` (version `^3\.\d+\.\d+$` accepted with deprecation warning) |
 | VAL015 | error | `main.root` is required when `main.tools` is non-empty. Optional for resource-only or skill-only schemas. |
-| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` is defined. `main.skills` is forbidden in v4.0.0 — skills are namespace-, selection-, or agent-scoped (see [14-skills](./14-skills.md)). |
+| VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` is defined. `main.skills` is forbidden in v4.0.0 — skills are namespace-, selection-, or agent-scoped (see [14-skills](/specification/skills/)). |
 | VAL017 | error | Schema MUST NOT define both `main.tools` and `main.routes` simultaneously |
 | VAL018 | warning | `main.routes` is deprecated. Use `main.tools` instead. |
 
@@ -227,7 +227,7 @@ Async fields are reserved for future versions. If present, they are ignored by t
 
 | Code | Severity | Rule |
 |------|----------|------|
-| SEC001 | error | Forbidden pattern found in schema file — no `import` statements allowed (see [05-security.md](./05-security.md)) |
+| SEC001 | error | Forbidden pattern found in schema file — no `import` statements allowed (see [05-security.md](/specification/security/)) |
 | SEC002 | error | `main` block contains non-serializable value (function, symbol, etc.) |
 | SEC003 | error | Shared list file contains forbidden pattern |
 | SEC004 | error | Shared list file contains executable code |
@@ -307,6 +307,7 @@ See `19-mcp-integration.md` for the complete meta block specification.
 | SEL001 | error | `selection.whenToUse` is required and MUST be a non-empty string |
 | SEL002 | error | A Selection MUST reference at least 1 Primitive (tool, resource, prompt, or skill) |
 | SEL003 | error | All Primitive references in a Selection MUST be resolvable within the catalog |
+| SEL004 | info | If a Selection includes inline-skill objects, SkillValidator runs on each (recorded in the validation report). Optional — present only when inline skills exist. |
 
 See `17-selections.md` for the complete Selection specification.
 
@@ -433,3 +434,9 @@ flowmcp validate --security etherscan/contracts.mjs
   2 errors, 0 warnings
   Schema cannot be loaded (has errors)
 ```
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [05-security.md](/specification/security/), [02-parameters.md](/specification/parameters/), [06-agents.md](/specification/agents/), [13-resources.md](/specification/resources/), [14-skills.md](/specification/skills/), [16-id-schema.md](/specification/id-schema/), [17-selections.md](/specification/selections/), [20-validation-strategy.md](/specification/validation-strategy/)
+

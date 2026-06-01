@@ -6,9 +6,9 @@ spec_file: "01-schema-format.md"
 order: 1
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/01-schema-format.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/01-schema-format.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/01-schema-format.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/01-schema-format.md."
@@ -33,7 +33,7 @@ export const main = {
     version: '4.0.0',
     root: 'https://api.provider.com',
     tools: { /* ... */ },
-    resources: { /* optional, see [13-resources](./13-resources.md) */ }
+    resources: { /* optional, see [13-resources](/specification/resources/) */ }
 }
 
 // 2. Factory function — receives injected dependencies, returns handler objects
@@ -171,7 +171,7 @@ root: 'https://api.etherscan.io/'   // no trailing slash
 
 #### `requiredServerParams`
 
-Declares environment variables that MUST be available at runtime. The runtime checks for their presence before exposing the schema's tools. Values are injected into parameters via the `{{SERVER_PARAM:KEY_NAME}}` syntax (see [02-parameters](./02-parameters.md)).
+Declares environment variables that MUST be available at runtime. The runtime checks for their presence before exposing the schema's tools. Values are injected into parameters via the `{{SERVER_PARAM:KEY_NAME}}` syntax (see [02-parameters](/specification/parameters/)).
 
 ```javascript
 requiredServerParams: [ 'ETHERSCAN_API_KEY' ]
@@ -230,8 +230,8 @@ tools: {
         method: 'GET',
         path: '/api',
         description: 'Returns the ABI of a verified smart contract',
-        parameters: [ /* see [02-parameters](./02-parameters.md) */ ],
-        output: { /* see [04-output-schema](./04-output-schema.md) */ }
+        parameters: [ /* see [02-parameters](/specification/parameters/) */ ],
+        output: { /* see [04-output-schema](/specification/output-schema/) */ }
     },
     getSourceCode: {
         method: 'GET',
@@ -632,7 +632,6 @@ export const main = {
     }
 }
 
-
 export const handlers = ( { sharedLists } ) => ({
     getSourceCode: {
         postRequest: async ( { response, struct, payload } ) => {
@@ -666,3 +665,9 @@ export const handlers = ( { sharedLists } ) => ({
 9. **No handler** on `getContractAbi` — the raw API response is returned directly.
 10. **An output schema** on `getContractAbi` declaring the expected response shape.
 11. **Zero import statements** — the schema file has no imports. Dependencies (`sharedLists`) are injected through the factory function.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/)
+- **Related:** [02-parameters.md](/specification/parameters/), [04-output-schema.md](/specification/output-schema/), [13-resources.md](/specification/resources/), [14-skills.md](/specification/skills/), [16-id-schema.md](/specification/id-schema/), [19-mcp-integration.md](/specification/mcp-integration/)
+

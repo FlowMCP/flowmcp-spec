@@ -6,9 +6,9 @@ spec_file: "07-tasks.md"
 order: 7
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/07-tasks.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/07-tasks.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/07-tasks.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/07-tasks.md."
@@ -45,3 +45,9 @@ v2.1.0 will define:
 ## Reserved Fields
 
 Schema authors MAY include an `async` field in route definitions for forward compatibility. In v2.0.0, this field is **ignored** by the runtime but preserved for future use.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [04-output-schema.md](/specification/output-schema/), [10-tests.md](/specification/tests/)
+

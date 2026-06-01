@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Resources
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
+| Related | [04-output-schema.md](./04-output-schema.md), [11-preload.md](./11-preload.md), [05-security.md](./05-security.md), [19-mcp-integration.md](./19-mcp-integration.md), [14-skills.md](./14-skills.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.

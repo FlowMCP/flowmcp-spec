@@ -6,9 +6,9 @@ spec_file: "19-mcp-integration.md"
 order: 19
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/19-mcp-integration.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/19-mcp-integration.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/19-mcp-integration.md."
@@ -98,3 +98,9 @@ Empty array `[]` is valid — means no aliases.
 | VAL104 | error | `meta.searchHint` required (string, not empty) |
 | VAL105 | error | `meta.aliases` required (string[]) |
 | VAL106 | error | `meta.alwaysLoad` required (boolean) |
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [09-validation-rules.md](/specification/validation-rules/), [13-resources.md](/specification/resources/), [14-skills.md](/specification/skills/), [04-output-schema.md](/specification/output-schema/)
+

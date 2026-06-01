@@ -6,9 +6,9 @@ spec_file: "16-selection-lockfile.md"
 order: 16
 section: "Grading"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/grading/2.0.0/16-selection-lockfile.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/16-selection-lockfile.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "grading/2.0.0/16-selection-lockfile.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/2.0.0/16-selection-lockfile.md."

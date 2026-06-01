@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — MCP Server Integration
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [09-validation-rules.md](./09-validation-rules.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [04-output-schema.md](./04-output-schema.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 ---

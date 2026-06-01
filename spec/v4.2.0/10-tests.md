@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Tests
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
+| Related | [04-output-schema.md](./04-output-schema.md), [06-agents.md](./06-agents.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [13-resources.md](./13-resources.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.

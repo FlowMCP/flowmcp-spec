@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Skills
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [18-prefill.md](./18-prefill.md), [16-id-schema.md](./16-id-schema.md), [06-agents.md](./06-agents.md), [17-selections.md](./17-selections.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown instructions with typed metadata. This document defines the skill file format, field specifications, placeholder syntax, schema integration, scope rules, security constraints, and validation rules.

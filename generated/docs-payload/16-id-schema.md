@@ -6,9 +6,9 @@ spec_file: "16-id-schema.md"
 order: 16
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/16-id-schema.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/16-id-schema.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/16-id-schema.md."
@@ -121,7 +121,7 @@ The resource type discriminates between the seven kinds of addressable primitive
 
 #### Name
 
-The name identifies the specific primitive within its namespace and type. Naming conventions follow the same rules as schema element names (see [01-schema-format](./01-schema-format.md)):
+The name identifies the specific primitive within its namespace and type. Naming conventions follow the same rules as schema element names (see [01-schema-format](/specification/schema-format/)):
 
 | Primitive | Convention | Example |
 |-----------|-----------|---------|
@@ -225,7 +225,7 @@ The diagram shows the resolution flow from receiving an ID string through parsin
 
 ## Usage in Placeholders
 
-The ID schema connects to the `{{type:name}}` placeholder syntax used in skill content (see [14-skills](./14-skills.md)). Skill content uses typed placeholders with a `type:` prefix to reference tools, resources, skills, and input parameters.
+The ID schema connects to the `{{type:name}}` placeholder syntax used in skill content (see [14-skills](/specification/skills/)). Skill content uses typed placeholders with a `type:` prefix to reference tools, resources, skills, and input parameters.
 
 | Placeholder | Interpretation |
 |-------------|---------------|
@@ -388,4 +388,10 @@ The ID schema unifies several existing identification mechanisms:
 | Skill `requires.tools` entries | `namespace/tool/name` | Add namespace prefix |
 | Shared list `ref` field | `shared/list/name` | Wrap in `shared/list/` prefix |
 
-The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see [08-migration](./08-migration.md).
+The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see [08-migration](/specification/migration/).
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [18-prefill.md](/specification/prefill/), [12-prompt-architecture.md](/specification/prompt-architecture/), [14-skills.md](/specification/skills/), [17-selections.md](/specification/selections/), [15-catalog.md](/specification/catalog/)
+

@@ -6,9 +6,9 @@ spec_file: "13-resources.md"
 order: 13
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/13-resources.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/13-resources.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/13-resources.md."
@@ -924,7 +924,7 @@ Each query defines a SQL prepared statement, its parameters, output schema, and 
 | `sql` | `string` | Yes | SQL prepared statement with `?` placeholders for parameter binding. |
 | `description` | `string` | Yes | What this query does. Appears in the MCP resource description. |
 | `parameters` | `array` | Yes | Parameter definitions using the `position` + `z` system. Can be empty `[]` for no-parameter queries. |
-| `output` | `object` | Yes | Output schema declaring expected result shape. Uses the same format as tool output schemas (see [04-output-schema](./04-output-schema.md)). |
+| `output` | `object` | Yes | Output schema declaring expected result shape. Uses the same format as tool output schemas (see [04-output-schema](/specification/output-schema/)). |
 | `tests` | `array` | Yes | Executable test cases. At least 1 per query. |
 
 ### SQL Field
@@ -961,7 +961,7 @@ This is used by the auto-injected `runSql`. Schema authors do not normally need 
 
 ## Parameters
 
-Resource parameters use the same `position` + `z` system as tool parameters (see [02-parameters](./02-parameters.md)), with one key difference: **resource parameters have no `location` field**.
+Resource parameters use the same `position` + `z` system as tool parameters (see [02-parameters](/specification/parameters/)), with one key difference: **resource parameters have no `location` field**.
 
 ### Why No `location`
 
@@ -1075,7 +1075,7 @@ Resource handlers only support `postRequest`. There is no `preRequest` for resou
 
 ## Tests
 
-Resource queries use the same test format as tool tests (see [10-tests](./10-tests.md)). Each test provides parameter values for a query execution against the database.
+Resource queries use the same test format as tool tests (see [10-tests](/specification/tests/)). Each test provides parameter values for a query execution against the database.
 
 ```javascript
 tests: [
@@ -1395,3 +1395,9 @@ providers/
 ```
 
 The SQLite database `duneanalytics-templates.db` is not in the schema directory — its `origin: 'global'` places it at `~/.flowmcp/resources/duneanalytics-templates.db`.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
+- **Related:** [04-output-schema.md](/specification/output-schema/), [11-preload.md](/specification/preload/), [05-security.md](/specification/security/), [19-mcp-integration.md](/specification/mcp-integration/), [14-skills.md](/specification/skills/)
+

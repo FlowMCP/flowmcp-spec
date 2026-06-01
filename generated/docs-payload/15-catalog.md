@@ -6,9 +6,9 @@ spec_file: "15-catalog.md"
 order: 15
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/15-catalog.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/15-catalog.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/15-catalog.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/15-catalog.md."
@@ -402,3 +402,9 @@ flowmcp validate-catalog <catalog-directory>
 ```
 
 The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be imported or published.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [03-shared-lists.md](/specification/shared-lists/), [06-agents.md](/specification/agents/), [16-id-schema.md](/specification/id-schema/), [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+

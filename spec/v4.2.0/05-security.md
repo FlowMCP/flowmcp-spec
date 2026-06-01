@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Security Model
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [09-validation-rules.md](./09-validation-rules.md), [13-resources.md](./13-resources.md), [23-license-and-tos.md](./23-license-and-tos.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.

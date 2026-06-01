@@ -6,9 +6,9 @@ spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/21-schema-lifecycle.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/21-schema-lifecycle.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/21-schema-lifecycle.md."
@@ -134,3 +134,9 @@ A primitive fails the API test when:
 - The tool times out consistently (> 30 seconds)
 
 A primitive passes when at least one of its test cases returns a 2xx response with a parseable body that matches the declared output shape.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/)
+- **Related:** [20-validation-strategy.md](/specification/validation-strategy/), [22-scoring-protocol.md](/specification/scoring-protocol/), [10-tests.md](/specification/tests/), [09-validation-rules.md](/specification/validation-rules/), [15-catalog.md](/specification/catalog/)
+

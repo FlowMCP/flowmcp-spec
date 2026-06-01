@@ -7,7 +7,13 @@
 // generated/docs-payload/grading/{NN}-{slug}.md (grading).
 //
 // Single-Payload (Memo 081/086): the grading spec is a SECOND INPUT, not a second
-// output. Spec output is unchanged; grading is emitted additively into a subdir.
+// output. Grading is emitted additively into a subdir.
+//
+// Memo 088 (PRD-Related-Spec / PRD-SpecLinks): the spec pass now mirrors the
+// grading pass — it relocates the per-chapter Depends-on/Related metadata table
+// to a "## Related" footer and rewrites relative ./NN-name.md links to
+// /specification/<slug>/ routes. The spec output is therefore no longer
+// byte-identical to the pre-Memo-088 output.
 //
 // Output format documented in:
 //   generated/docs-payload/README.md
@@ -176,7 +182,8 @@ const gradingLinkRewrite = ( { content } ) => {
 // Annex relocate to a "## Related" footer at the end (AI-navigation value kept).
 // The conformance-language blockquote stays. `normative` is derived upstream by
 // gradingNormativeFn (reads the table BEFORE this strip), so dropping it here is
-// safe. Spec pass uses the identity transform — its output is unchanged.
+// safe. Memo 088: the spec pass reuses this same footer mechanism (its chapters
+// now carry a Depends-on/Related table after the H1).
 const FOOTER_LABELS = new Set( [ 'depends on', 'related', 'annex', 'replaced by' ] )
 
 const gradingMetadataFooter = ( { content } ) => {
@@ -210,6 +217,29 @@ const gradingMetadataFooter = ( { content } ) => {
 
 
 const gradingBodyTransform = ( { content } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+
+
+// Memo 088 PRD-SpecLinks: spec link rewrite. The spec source uses relative
+// sibling links "[text](./NN-name.md)" which 404 on the site (rendered at
+// /specification/<slug>/). Rewrite them to the in-site route. Anchors are
+// preserved. slug = filename without the leading "NN-". Mirrors the grading
+// pendant (gradingLinkRewrite) so both families behave consistently.
+const specLinkRewrite = ( { content } ) => {
+    const result = content.replace(
+        /\]\(\.\/(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
+        ( match, fname, anchor ) => `](/specification/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
+    )
+    return result
+}
+
+
+// Memo 088 PRD-Related-Spec + PRD-SpecLinks: spec body transform. First
+// gradingMetadataFooter relocates the per-chapter Depends-on/Related table to a
+// "## Related" footer (reusing the grading mechanism + FOOTER_LABELS), then
+// specLinkRewrite rewrites the relative ./NN-name.md links — including those in
+// the new footer — to /specification/<slug>/ routes. Order matters: footer first
+// so its links are caught by the rewrite (mirrors gradingBodyTransform).
+const specBodyTransform = ( { content } ) => specLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
 
 
 const identityBodyTransform = ( { content } ) => content
@@ -285,9 +315,9 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
     const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } )
     const bodyRewritten = rewriteCrossRefs( { content } )
 
-    // Memo 087 PRD-P2-A/B: pass-specific body transform (grading relocates
-    // metadata to a footer + rewrites relative links to /grading/ routes; spec
-    // uses identity so its output stays byte-compatible).
+    // Memo 087 PRD-P2-A/B + Memo 088: pass-specific body transform. Grading
+    // relocates metadata to a footer + rewrites relative links to /grading/
+    // routes; the spec pass (Memo 088) does the same to /specification/ routes.
     const bodyTransformed = bodyTransform( { content: bodyRewritten, filename } )
 
     // Memo 059 PRD-008 (D1 + D2 + D5): Strip the leading H1 — Starlight
@@ -338,7 +368,7 @@ const main = async () => {
 
     const now = new Date().toISOString()
 
-    // --- Spec pass (unchanged output) ---
+    // --- Spec pass (Memo 088: Related footer + /specification/ link rewrite) ---
     const specResults = await generatePass( {
         label: 'spec',
         sourceDir: SPEC_DIR,
@@ -352,7 +382,7 @@ const main = async () => {
         sourceCommit,
         titleTransform: identityTitle,
         normativeFn: specNormativeFn,
-        bodyTransform: identityBodyTransform
+        bodyTransform: specBodyTransform
     } )
 
     console.log( `\nGenerated ${ specResults.length } spec files in ${ PAYLOAD_DIR }` )

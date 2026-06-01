@@ -6,9 +6,9 @@ spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/22-scoring-protocol.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/22-scoring-protocol.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/22-scoring-protocol.md."
@@ -224,5 +224,11 @@ A Grader MUST NOT:
 
 ## References
 
-- [`20-validation-strategy.md`](./20-validation-strategy.md) — overall validation strategy
-- [`21-schema-lifecycle.md`](./21-schema-lifecycle.md) — when grading happens in the lifecycle
+- [`20-validation-strategy.md`](/specification/validation-strategy/) — overall validation strategy
+- [`21-schema-lifecycle.md`](/specification/schema-lifecycle/) — when grading happens in the lifecycle
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [20-validation-strategy.md](/specification/validation-strategy/)
+- **Related:** [21-schema-lifecycle.md](/specification/schema-lifecycle/), [10-tests.md](/specification/tests/), [04-output-schema.md](/specification/output-schema/), [09-validation-rules.md](/specification/validation-rules/)
+

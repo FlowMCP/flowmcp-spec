@@ -1,5 +1,10 @@
 # License & Terms of Services
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [19-mcp-integration.md](./19-mcp-integration.md), [05-security.md](./05-security.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 > Defines how FlowMCP handles third-party API Terms of Services (ToS) and data licensing.

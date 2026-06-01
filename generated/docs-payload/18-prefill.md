@@ -6,9 +6,9 @@ spec_file: "18-prefill.md"
 order: 18
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/18-prefill.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/18-prefill.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/18-prefill.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/18-prefill.md."
@@ -89,3 +89,9 @@ If a placeholder cannot be resolved, the error message replaces the placeholder:
 ```
 
 This ensures the Skill is always delivered — even if some references are broken.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [16-id-schema.md](/specification/id-schema/), [14-skills.md](/specification/skills/)
+- **Related:** [12-prompt-architecture.md](/specification/prompt-architecture/), [17-selections.md](/specification/selections/), [02-parameters.md](/specification/parameters/)
+

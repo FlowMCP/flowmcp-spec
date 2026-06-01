@@ -6,9 +6,9 @@ spec_file: "02-parameters.md"
 order: 2
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/02-parameters.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/02-parameters.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/02-parameters.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/02-parameters.md."
@@ -639,3 +639,9 @@ input: [
 | Constraints | `min()`, `max()`, `length()`, `optional()`, `default()` | Same as tools | None (description only) |
 
 See `14-skills.md` for the complete skill specification.
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [03-shared-lists.md](/specification/shared-lists/), [04-output-schema.md](/specification/output-schema/), [18-prefill.md](/specification/prefill/)
+

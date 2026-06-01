@@ -1,5 +1,10 @@
 # Scoring Protocol v1
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [20-validation-strategy.md](./20-validation-strategy.md) |
+| Related | [21-schema-lifecycle.md](./21-schema-lifecycle.md), [10-tests.md](./10-tests.md), [04-output-schema.md](./04-output-schema.md), [09-validation-rules.md](./09-validation-rules.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).

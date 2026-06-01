@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Prefill and Placeholders
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [16-id-schema.md](./16-id-schema.md), [14-skills.md](./14-skills.md) |
+| Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [17-selections.md](./17-selections.md), [02-parameters.md](./02-parameters.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 ---

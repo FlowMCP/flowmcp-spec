@@ -1,5 +1,9 @@
 # FlowMCP Specification v4.2.0 — Overview
 
+| Field | Value |
+|-------|-------|
+| Related | [01-schema-format.md](./01-schema-format.md), [06-agents.md](./06-agents.md), [17-selections.md](./17-selections.md), [15-catalog.md](./15-catalog.md) |
+
 FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:
 
 1. **CLI** — Direct access to Tools, Resources, Prompts, and Skills
@@ -287,7 +291,9 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 
 ---
 
-## What Changed in v4.2.0
+## What Changed
+
+### v4.2.0
 
 The v4.2.0 release adds remote-data resources, a fifth primitive, and richer agent validation:
 
@@ -295,9 +301,7 @@ The v4.2.0 release adds remote-data resources, a fifth primitive, and richer age
 - **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.
 - **Extended Agent rules** — `agent.selections` references MUST resolve to valid Selection IDs (AGT030). `elicitation.maxRounds` MUST be a positive integer (AGT031). See `06-agents.md`.
 
----
-
-## What Changed in v4.0.0
+### v4.0.0
 
 The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integration layer:
 
@@ -308,13 +312,11 @@ The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integra
 
 The migration path from v3.0.0 to v4.0.0 is documented in `08-migration.md`.
 
----
-
-## What Changed in v3.1.0
+### v3.1.0
 
 The v3.1.0 release enhances Resources and Prompts with production-ready features:
 
-### Resources
+#### Resources
 
 - **Two SQLite modes** — `mode: 'in-memory'` (readonly via `better-sqlite3` `readonly: true`) and `mode: 'file-based'` (writable via WAL mode). Clear separation instead of implicit read-only.
 - **Origin system** — `origin: 'global'`, `origin: 'project'`, `origin: 'inline'` replace pseudo-paths (`~/.flowmcp/data/`, `./data/`). Explicit storage locations with clear resolution rules.
@@ -328,7 +330,7 @@ The v3.1.0 release enhances Resources and Prompts with production-ready features
 - **All fields required** — No defaults, no optional fields.
 - **Backup strategy** — Automatic `.bak` copy before first write for file-based databases.
 
-### Prompts
+#### Prompts
 
 - **`contentFile` for Provider-Prompts** — Provider-Prompt definitions live in `main.prompts`. Content is loaded from external `.mjs` files via the new `contentFile` field. Content files export `export const content`.
 - **`references` required** — The `references` field is now required for both prompt types. Empty array `[]` when no references.
@@ -336,9 +338,7 @@ The v3.1.0 release enhances Resources and Prompts with production-ready features
 
 The migration path for existing resources is documented in the schema migration notes. Existing schemas using `database` paths and `data/` folders need to adopt the origin system.
 
----
-
-## What Changed in v3.0.0
+### v3.0.0
 
 The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API knowledge platform covering all four primitives (Tools, Resources, Prompts, Skills):
 
@@ -356,9 +356,7 @@ The v3.0.0 release transforms FlowMCP from a tool catalog into a complete API kn
 
 The migration path from v2.0.0 to v3.0.0 is documented in `08-migration.md`.
 
----
-
-## What Changed in v2.0.0
+### v2.0.0
 
 The v2.0.0 release restructures the schema format around a fundamental insight: **the declarative parts of a schema SHOULD be separable from the executable parts**. This enables:
 

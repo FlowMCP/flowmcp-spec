@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Schema Lifecycle
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md) |
+| Related | [20-validation-strategy.md](./20-validation-strategy.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [10-tests.md](./10-tests.md), [09-validation-rules.md](./09-validation-rules.md), [15-catalog.md](./15-catalog.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 ---

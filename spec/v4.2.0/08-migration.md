@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Migration Guide
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [06-agents.md](./06-agents.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
+
 This guide covers migrating schemas between FlowMCP versions in chronological order. Section 1 covers v1.2.0 to v2.0.0 migration, Section 2 covers v2.0.0 to v3.0.0, and Section 3 covers v3.0.0 to v4.0.0.
 
 ---

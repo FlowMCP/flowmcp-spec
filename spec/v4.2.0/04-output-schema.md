@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Output Schema
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
+| Related | [10-tests.md](./10-tests.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [19-mcp-integration.md](./19-mcp-integration.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output declaration format, supported types, the response envelope, handler interaction, and validation rules.

@@ -6,9 +6,9 @@ spec_file: "06-agents.md"
 order: 6
 section: "Specification"
 normative: true
-source_commit: "7094662"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7094662/spec/v4.2.0/06-agents.md"
-generated_at: "2026-05-31T23:03:59.972Z"
+source_commit: "b25ff5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/06-agents.md"
+generated_at: "2026-06-01T01:39:52.471Z"
 generated_from: "spec/v4.2.0/06-agents.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.2.0/06-agents.md."
@@ -364,7 +364,7 @@ The diagram shows how each external tool reference (slash key with `null` value)
 ### Resolution Steps
 
 1. **Partition** — separate tool keys into external (contains `/`, value is `null`) and inline (no `/`, value is object)
-2. **Parse external** — split each external key on `/` into namespace, type, and name (see [16-id-schema](./16-id-schema.md))
+2. **Parse external** — split each external key on `/` into namespace, type, and name (see [16-id-schema](/specification/id-schema/))
 3. **Find namespace** — locate the provider namespace in the catalog's `registry.json`
 4. **Find schema** — within the namespace, find the schema file that contains the named tool
 5. **Load tool** — extract the tool definition from the provider schema's `main.tools[name]`
@@ -470,7 +470,7 @@ The system prompt works alongside prompts and skills but serves a different purp
 | Prompts | Explanatory | No | How providers and agent work |
 | Skills | Instructional | Yes | Tool combinatorics, chaining, workflows |
 
-At runtime, the system prompt is always included. Prompts and skills are loaded and made available via MCP — see [12-prompt-architecture](./12-prompt-architecture.md) and `14-skills.md`.
+At runtime, the system prompt is always included. Prompts and skills are loaded and made available via MCP — see [12-prompt-architecture](/specification/prompt-architecture/) and `14-skills.md`.
 
 ---
 
@@ -812,7 +812,7 @@ export const agent = {
 
 ### Selection Loading Behavior
 
-- Each Selection ID MUST follow the `namespace/selection/name` format (see [17-selections](./17-selections.md))
+- Each Selection ID MUST follow the `namespace/selection/name` format (see [17-selections](/specification/selections/))
 - Selections are loaded at agent startup as part of the activation sequence
 - If a referenced Selection cannot be loaded (missing file, resolution error), agent startup fails with validation rule AGT030
 
@@ -883,9 +883,7 @@ The `maxRounds` field limits how many times the agent can request user input in 
 
 This prevents infinite elicitation loops and ensures that agents remain responsive even when users are unavailable.
 
-### Validation Rules
-
-**AGT031:** `elicitation.maxRounds` must be a positive integer (value ≥ 1). Zero, negative values, and non-integers are rejected.
+`elicitation.maxRounds` must be a positive integer (value ≥ 1); zero, negative values, and non-integers are rejected (AGT031, see the canonical table below).
 
 ---
 
@@ -913,6 +911,7 @@ This prevents infinite elicitation loops and ensures that agents remain responsi
 | AGT018 | error | Skill files MUST export `export const skill` |
 | AGT019 | error | Inline tool keys (without `/`) must have a valid tool definition object as value (with `method`, `path`, `description`) |
 | AGT020 | error | Keys containing `/` with a non-`null` value are forbidden (slash keys MUST always be `null`) |
+| AGT031 | error | `elicitation.maxRounds` must be a positive integer (value ≥ 1). Zero, negative values, and non-integers are rejected. |
 
 ### Rule Details
 
@@ -1069,3 +1068,9 @@ export const agent = {
     hash: 'sha256:a1b2c3d4e5f6789...'
 }
 ```
+
+## Related
+
+- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
+- **Related:** [12-prompt-architecture.md](/specification/prompt-architecture/), [14-skills.md](/specification/skills/), [17-selections.md](/specification/selections/), [16-id-schema.md](/specification/id-schema/), [10-tests.md](/specification/tests/)
+

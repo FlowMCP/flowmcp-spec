@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Validation Rules
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [05-security.md](./05-security.md), [02-parameters.md](./02-parameters.md), [06-agents.md](./06-agents.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [16-id-schema.md](./16-id-schema.md), [17-selections.md](./17-selections.md), [20-validation-strategy.md](./20-validation-strategy.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
@@ -293,6 +298,7 @@ See `19-mcp-integration.md` for the complete meta block specification.
 | SEL001 | error | `selection.whenToUse` is required and MUST be a non-empty string |
 | SEL002 | error | A Selection MUST reference at least 1 Primitive (tool, resource, prompt, or skill) |
 | SEL003 | error | All Primitive references in a Selection MUST be resolvable within the catalog |
+| SEL004 | info | If a Selection includes inline-skill objects, SkillValidator runs on each (recorded in the validation report). Optional — present only when inline skills exist. |
 
 See `17-selections.md` for the complete Selection specification.
 

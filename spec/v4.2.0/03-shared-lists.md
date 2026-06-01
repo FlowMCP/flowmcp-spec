@@ -1,5 +1,10 @@
 # FlowMCP Specification v4.2.0 — Shared Lists
 
+| Field | Value |
+|-------|-------|
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
+| Related | [15-catalog.md](./15-catalog.md), [16-id-schema.md](./16-id-schema.md), [09-validation-rules.md](./09-validation-rules.md) |
+
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list. This document defines the list format, field definitions, dependency model, schema referencing, runtime injection, and validation rules.

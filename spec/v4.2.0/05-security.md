@@ -141,7 +141,7 @@ The runtime loads libraries through a strict sequence:
 flowchart TD
     A[Read main.requiredLibraries] --> B{Each library on allowlist?}
     B -->|Yes| C["Load via dynamic import()"]
-    B -->|No| D[Reject schema — SEC013]
+    B -->|No| D[Reject schema — SEC020]
     C --> E[Package into libraries object]
     E --> F["Inject into handlers( { sharedLists, libraries } )"]
 ```
@@ -150,7 +150,7 @@ flowchart TD
 
 1. **Read `main.requiredLibraries`** — extract the list of declared packages.
 2. **Check each against the allowlist** — every entry MUST appear in the default or user-extended allowlist.
-3. **Reject unapproved libraries** — if any library is not on the allowlist, the schema is rejected with error code SEC013.
+3. **Reject unapproved libraries** — if any library is not on the allowlist, the schema is rejected with error code SEC020.
 4. **Load approved libraries** — each approved library is loaded via dynamic `import()`.
 5. **Package into `libraries` object** — loaded modules are keyed by package name.
 6. **Inject into factory function** — the `libraries` object is passed to `handlers( { sharedLists, libraries } )`.
@@ -260,7 +260,7 @@ This ensures that even a compromised handler (one that somehow bypasses the stat
 | Threat | Mitigation |
 |--------|------------|
 | Schema imports a module | Static scan blocks `import`/`require` — schema files have zero imports |
-| Schema requests unapproved library | Blocked by allowlist — SEC013 error, schema rejected |
+| Schema requests unapproved library | Blocked by allowlist — SEC020 error, schema rejected |
 | Schema reads filesystem | Static scan blocks `fs`, `node:fs`, `fs/promises` |
 | Schema executes shell commands | Static scan blocks `child_process` |
 | Schema accesses environment | Static scan blocks `process.` |
@@ -307,15 +307,21 @@ All violations in a single file are reported together (the scan does not stop at
 | SEC002 | Forbidden `require()` call found |
 | SEC003 | Forbidden `eval()` call found |
 | SEC004 | Forbidden `Function()` constructor found |
-| SEC005 | Forbidden filesystem access (`fs.`, `node:fs`, `fs/promises`) |
+| SEC005 | Forbidden `new Function` found |
 | SEC006 | Forbidden `process.` access found |
 | SEC007 | Forbidden `child_process` access found |
-| SEC008 | Forbidden global scope access (`globalThis.`, `global.`) |
-| SEC009 | Forbidden path variable (`__dirname`, `__filename`) |
-| SEC010 | Forbidden `new Function` found |
-| SEC011 | Forbidden timer (`setTimeout`, `setInterval`) |
-| SEC012 | Reserved |
-| SEC013 | Unapproved library in `requiredLibraries` — not on allowlist |
+| SEC008 | Forbidden `fs.` access found |
+| SEC009 | Forbidden `node:fs` import found |
+| SEC010 | Forbidden `fs/promises` import found |
+| SEC011 | Forbidden `globalThis.` access found |
+| SEC012 | Forbidden `global.` access found |
+| SEC013 | Forbidden `__dirname` path variable found |
+| SEC014 | Forbidden `__filename` path variable found |
+| SEC015 | Forbidden `setTimeout` timer found |
+| SEC016 | Forbidden `setInterval` timer found |
+| SEC020 | Unapproved library in `requiredLibraries` — not on allowlist |
+
+> `SEC017`–`SEC019` are pipeline-level checks defined in [09-validation-rules.md](./09-validation-rules.md).
 
 **SEC100-SEC199 — Runtime Constraint Violations**
 
@@ -335,4 +341,4 @@ All violations in a single file are reported together (the scan does not stop at
 | SEC201 | Arrow function found in shared list |
 | SEC202 | Async/await keyword found in shared list |
 | SEC203 | Template literal with expression found in shared list |
-| SEC204 | Forbidden pattern (same as SEC001-SEC011) found in shared list |
+| SEC204 | Forbidden pattern (same as SEC001-SEC016) found in shared list |

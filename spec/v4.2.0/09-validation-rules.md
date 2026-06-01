@@ -152,6 +152,9 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | RES022 | error | Test parameter values MUST pass the corresponding `z` validation. |
 | RES023 | error | Test objects MUST be JSON-serializable. |
 | RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.2.0) |
+| RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.2.0) |
+
+`RES001` and `RES036` are enforced by core (`ResourceDatabaseManager`); all other RES codes are pipeline-level validation checks.
 
 See `13-resources.md` for the complete resource specification.
 
@@ -218,11 +221,11 @@ Async fields are reserved for future versions. If present, they are ignored by t
 
 | Code | Severity | Rule |
 |------|----------|------|
-| SEC001 | error | Forbidden pattern found in schema file — no `import` statements allowed (see [05-security.md](./05-security.md)) |
-| SEC002 | error | `main` block contains non-serializable value (function, symbol, etc.) |
-| SEC003 | error | Shared list file contains forbidden pattern |
-| SEC004 | error | Shared list file contains executable code |
-| SEC005 | error | `requiredLibraries` contains unapproved package |
+| SEC001 | error | Static-scan codes (SEC001–SEC016, SEC020) are defined in [05-security.md](./05-security.md). See that table for the canonical static-scan and library-allowlist codes. |
+| SEC017 | error | `main` block contains non-serializable value (function, symbol, etc.) |
+| SEC018 | error | Shared list file contains forbidden pattern |
+| SEC019 | error | Shared list file contains executable code |
+| SEC020 | error | `requiredLibraries` contains unapproved package (see [05-security.md](./05-security.md)) |
 
 ---
 
@@ -268,6 +271,8 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT018 | error | Skill files MUST have `export const skill` (with `name`, `version`, `content`/`contentFile`, `requires`, `input`, `output`) |
 | AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs (added in v4.2.0) |
 | AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) (added in v4.2.0) |
+
+`AGT004`, `AGT030`, and `AGT031` are enforced by core at agent load/startup time; all other AGT codes are pipeline-level validation checks.
 
 See `06-agents.md` for the complete agent specification.
 
@@ -420,7 +425,7 @@ With security flag:
 flowmcp validate --security etherscan/contracts.mjs
 
   SEC001 error   Line 3: Forbidden pattern "import" detected
-  SEC002 error   main.handlers.preRequest: Non-serializable value (function)
+  SEC017 error   main.handlers.preRequest: Non-serializable value (function)
 
   2 errors, 0 warnings
   Schema cannot be loaded (has errors)

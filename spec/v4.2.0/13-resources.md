@@ -1235,21 +1235,18 @@ This is a **forward-looking convention**, not a v4.1 validation rule. The Schema
 
 The following rules are enforced when validating resource definitions:
 
+Resource validation codes are shared with [09-validation-rules.md](./09-validation-rules.md), which is the canonical RES code catalog. Codes `RES001`–`RES024` carry the same meaning in both chapters. Codes `RES025`+ are SQLite/markdown/sqlite-gtfs-specific rules defined locally here. `RES001` and `RES036` are enforced by core (`ResourceDatabaseManager`); all other RES codes are pipeline-level validation checks.
+
 | Code | Severity | Rule |
 |------|----------|------|
-| RES001 | error | `source` must be `'sqlite'` or `'markdown'`. |
+| RES001 | error | `source` must be `'sqlite'`, `'markdown'`, or `'http'`. |
 | RES002 | error | `description` must be a non-empty string. |
-| RES003 | error | `mode` is required for `source: 'sqlite'` and MUST be `'in-memory'` or `'file-based'`. |
-| RES004 | error | `origin` is required and MUST be `'global'`, `'project'`, or `'inline'`. |
-| RES005 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
-| RES006 | error | Maximum 2 resources per schema. |
-| RES007 | error | Maximum 7 schema-defined queries per SQLite resource (9 total with auto-injected runSql + describeTables). |
-| RES008 | error | Each query MUST have a `sql` field of type string. |
-| RES009 | error | Each query MUST have a `description` field of type string. |
-| RES010 | error | Each query MUST have a `parameters` array. |
-| RES011 | error | Each query MUST have an `output` object with `mimeType` and `schema`. |
-| RES012 | error | Each query MUST have at least 1 test. |
-| RES013 | error | For `mode: 'in-memory'`, schema-defined SQL MUST begin with `SELECT` or `WITH` (CTE). |
+| RES005 | error | Maximum 2 resources per schema. |
+| RES007 | error | Each query MUST have a `sql` field of type string. |
+| RES008 | error | Each query MUST have a `description` field of type string. |
+| RES009 | error | Each query MUST have a `parameters` array. |
+| RES010 | error | Each query MUST have an `output` object with `mimeType` and `schema`. |
+| RES011 | error | Each query MUST have at least 1 test. |
 | RES014 | error | Number of parameters MUST match number of `?` placeholders in the SQL statement. |
 | RES015 | error | Resource parameters MUST NOT have a `location` field in `position`. |
 | RES016 | error | Resource parameters MUST NOT use `{{SERVER_PARAM:...}}` values. |
@@ -1260,18 +1257,25 @@ The following rules are enforced when validating resource definitions:
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values MUST pass the corresponding `z` validation. |
 | RES023 | error | Test objects MUST be JSON-serializable. |
-| RES024 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
-| RES025 | error | `mode: 'file-based'` requires `origin: 'project'`. |
-| RES026 | error | `source: 'markdown'` MUST NOT have a `mode` field. |
-| RES027 | error | `source: 'markdown'` MUST NOT have a `queries` field. |
-| RES028 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
-| RES029 | error | All resource fields are required. No field MAY be omitted. |
+| RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.2.0) |
+| RES025 | error | `mode` is required for `source: 'sqlite'` and MUST be `'in-memory'` or `'file-based'`. |
+| RES026 | error | `origin` is required and MUST be `'global'`, `'project'`, or `'inline'`. |
+| RES027 | error | `name` is required, must be a non-empty string with the correct extension (`.db` for sqlite, `.md` for markdown). |
+| RES028 | error | Maximum 7 schema-defined queries per SQLite resource (9 total with auto-injected runSql + describeTables). |
+| RES029 | error | For `mode: 'in-memory'`, schema-defined SQL MUST begin with `SELECT` or `WITH` (CTE). |
 | RES030 | error | `source: 'sqlite-gtfs'` requires `mode: 'file-based'`. `in-memory` is not allowed. |
 | RES031 | error | `source: 'sqlite-gtfs'` requires the `addon` field (add-on name). |
 | RES032 | error | Database at `path` does not contain `meta.qualitySeal === 'sqlite-gtfs'`. Schema rejected. |
 | RES033 | error | Database at `path` cannot be opened (file missing or corrupt). |
 | RES034 | warning | Database `meta.specRevision` is outside the expected range. |
 | RES035 | error | Path variable in `path` (e.g. `${FLOWMCP_RESOURCES}`) cannot be resolved (environment variable not set AND no default available). |
+| RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.2.0) |
+| RES037 | error | `mode: 'file-based'` requires `origin: 'project'`. |
+| RES038 | error | `source: 'markdown'` MUST NOT have a `mode` field. |
+| RES039 | error | `source: 'markdown'` MUST NOT have a `queries` field. |
+| RES040 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
+| RES041 | error | All resource fields are required. No field MAY be omitted. |
+| RES042 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
 
 ---
 

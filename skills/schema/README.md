@@ -22,15 +22,8 @@ each stage.
 | [`flowmcp-schema-fix`](./flowmcp-schema-fix/SKILL.md) | 8 · Improvement | Apply diagnosis fixes — the repairer (no cheat) |
 | [`flowmcp-schema-inspect`](./flowmcp-schema-inspect/SKILL.md) | 8 · Improvement | Independently audit applied fixes — the inspector (fresh context) |
 | [`flowmcp-schema-tos`](./flowmcp-schema-tos/SKILL.md) | 5 · ToS/robots | Terms-of-Service URL + robots.txt legal gate, sets `main.*` fields |
-
-## Tracked gaps (Memo 097 Kap. 9.3, PRD-Skill-Gaps)
-
-These stage skills are planned but not yet implemented:
-
-| Skill | Stage | Interim |
-|-------|-------|---------|
-| `flowmcp-schema-test` | 3 · Live-Test (≥3 fixtures/tool) | use `flowmcp dev test single` directly |
-| `flowmcp-schema-deploy` | 9 · Deploy/Mirror (→ `schemas/v4.0.0/` + A/B mirror) | use `mirror-from-private.mjs` |
+| [`flowmcp-schema-test`](./flowmcp-schema-test/SKILL.md) | 3 · Live-Test | Build / verify ≥3 working test fixtures per tool, run static + live tests |
+| [`flowmcp-schema-deploy`](./flowmcp-schema-deploy/SKILL.md) | 9 · Deploy/Mirror | Move to `schemas/v4.0.0/<PROVIDER>/`, trigger Grade A/B public mirror |
 
 ## Distribution
 

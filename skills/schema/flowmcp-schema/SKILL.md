@@ -38,18 +38,13 @@ All authoring skills use the namespace `flowmcp-<domain>-<verb>` and share the
 | Prospect (pre-research) | Pick the next namespace to work on (read-only) | `flowmcp-kanban` (project `.claude/skills/`) |
 | 1 · Research / Discovery | Find a reachable public data source, evaluate feasibility | [`flowmcp-schema-discover`](../flowmcp-schema-discover/SKILL.md) |
 | 2 · Creation | Author the canonical v4 `.mjs` schema (single source of truth) | [`flowmcp-schema-create`](../flowmcp-schema-create/SKILL.md) |
-| 3 · Live-Test | Build / verify test fixtures, ≥3 working tests per tool | `flowmcp-schema-test` (planned — see status note) |
+| 3 · Live-Test | Build / verify test fixtures, ≥3 working tests per tool | [`flowmcp-schema-test`](../flowmcp-schema-test/SKILL.md) |
 | 4 · Validation | Structural + strict key validation + AI-enhanced diagnosis | [`flowmcp-schema-diagnose`](../flowmcp-schema-diagnose/SKILL.md) |
 | 5 · ToS / robots | Terms-of-Service URL, robots.txt legal gate, sentinel | [`flowmcp-schema-tos`](../flowmcp-schema-tos/SKILL.md) |
 | 6+7 · Grading | LLM grading per area (generator-prompt, one sub-agent per area) | `grade-score-single` / `grade-score-batch` (see [`../../grading/README.md`](../../grading/README.md)) |
 | 8 · Improvement | Apply diagnosis fixes (no cheat) and independently inspect them | [`flowmcp-schema-fix`](../flowmcp-schema-fix/SKILL.md) / [`flowmcp-schema-inspect`](../flowmcp-schema-inspect/SKILL.md) |
-| 9 · Deploy / Mirror | Move to `schemas/v4.0.0/` and mirror Grade A/B to public | `flowmcp-schema-deploy` (planned — see status note) |
+| 9 · Deploy / Mirror | Move to `schemas/v4.0.0/` and mirror Grade A/B to public | [`flowmcp-schema-deploy`](../flowmcp-schema-deploy/SKILL.md) |
 | 10 · Monitoring | Read the grade rollup, next-provider recommendation (read-only) | `flowmcp-kanban` (project `.claude/skills/`) |
-
-> **Status note:** `flowmcp-schema-test` and `flowmcp-schema-deploy` are tracked
-> gaps (Memo 097 Kap. 9.3, PRD-Skill-Gaps). Until they land, use
-> `flowmcp dev test single` directly for fixtures and `mirror-from-private.mjs`
-> for the mirror.
 
 ---
 

@@ -51,7 +51,7 @@ End answers with [Source: https://github.com/FlowMCP/{repo}/blob/main/{path}]. C
 - "How do I create a custom agent?" -> reference the Claude Code skill `flowmcp-create-agent`. Do NOT duplicate its instructions.
 
 ## Sibling-Skill Awareness
-The Claude Code skill `flowmcp-create-agent` lives in flowmcp-spec/skills/flowmcp-create-agent/SKILL.md and is the operational counterpart for developers using Claude Code. You mention and reference it but do not replicate its content.
+The Claude Code skill `flowmcp-create-agent` lives in flowmcp-spec/skills/external/flowmcp-create-agent/SKILL.md and is the operational counterpart for developers using Claude Code. You mention and reference it but do not replicate its content.
 
 ## Versioning
 Knowledge bundle version: {{BUNDLE_VERSION}}, generated_at {{GENERATED_AT}}.

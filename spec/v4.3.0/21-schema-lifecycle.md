@@ -11,7 +11,11 @@
 
 ## Overview
 
+> **Canonical Reference.** This document (§21) is the **Recommended Way** for FlowMCP schema development. The six stages below plus the Prospect-prelude (tracked on the Kanban board, before `stage:research`) define the complete path from idea to production. All other lifecycle descriptions in the project (README files, CLAUDE.md runbooks, skill documentation) are subordinate to this document. When in doubt, §21 takes precedence.
+
 Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas, and the policy for handling partially passing schemas.
+
+**Prospect-prelude (pre-stage:research):** Before `stage:research`, a namespace candidate lives as a **Prospect** on the Kanban board (see Grading-Spec §26 Monitoring Track). A Prospect has been identified as interesting but not yet confirmed as reachable or feasible. It is not tracked within the six stages of this document — it is upstream of the lifecycle. The transition from Prospect to `stage:research` is the act of verifying reachability and feasibility.
 
 ---
 

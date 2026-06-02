@@ -96,7 +96,18 @@
         },
         "blockers": {
             "type": "array",
-            "additionalProperties": true
+            "items": {
+                "type": "object",
+                "properties": {
+                    "reason": { "$ref": "#/$defs/blockedReason" },
+                    "schemaFile": { "type": "string" },
+                    "tool": { "type": "string" },
+                    "message": { "type": "string" }
+                },
+                "required": [ "reason" ],
+                "additionalProperties": true
+            }
         }
-    }
+    },
+    "required": [ "proofVersion", "namespace", "status" ]
 }

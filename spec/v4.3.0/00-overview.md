@@ -223,6 +223,9 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Catalog** | A named directory containing a `registry.json` manifest with shared lists, provider schemas, and agent definitions. The top-level organizational unit. |
 | **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `prompts`. Hashable for integrity verification. Schemas use `export const main`; agents use `export const agent` (see Agent). |
 | **Handlers Export** | `export const handlers = ({ sharedLists, libraries }) => ({...})` — factory function receiving injected dependencies. Subject to security scanning. |
+| **Agent-Skill** | A `SKILL.md` file — a Claude Code skill that runs in the IDE harness (e.g. `create-flowmcp-schema`, `schema-diagnose`). These are **not** part of the FlowMCP schema format. They live in `flowmcp-spec/skills/` or a project `.claude/skills/` directory and are invoked by the developer's AI coding assistant. Do not confuse with Schema-Skills. |
+| **Schema-Skill** | A `.mjs` file with `export const skill` — a FlowMCP first-class primitive (see `14-skills.md`) that maps to the MCP `server.prompt` interface. Schema-Skills live inside the schema catalog (`providers/{ns}/skills/`, etc.) and are invoked via `flowmcp call` or by an MCP client. Do not confuse with Agent-Skills. |
+| **lens** | Overloaded term with two distinct meanings depending on context. (1) **Grading context:** a Persona sub-facet forming the second part of the `<base>--<lens>` Persona slug (e.g. `mira-tanaka--domain`). It is a structural parameter that selects which Grading persona variant to use. (2) **Spec-Documentation context:** one of the per-persona review questions defined in `personas/persona-lens.md` — a review-checklist item, not a structural field. |
 
 ---
 

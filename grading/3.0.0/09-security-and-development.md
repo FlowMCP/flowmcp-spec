@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0`, `gradingSystem/1.0.0` |
+| Version | `gradingSpec/3.0.0`, `gradingSystem/1.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md) |
 | Related | [`10-domain-knowledge.md`](./10-domain-knowledge.md), Schemas-Spec v4.3.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/11-preload.md), `node-formatting` skill, `node-error-codes` skill |
 

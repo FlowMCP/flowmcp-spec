@@ -63,6 +63,8 @@ This file is the **central code registry** for FlowMCP v4.3.0. All validation, s
 | VAL024 | error | `main.sharedLists` (if present) must be an array of objects |
 | VAL025 | error | `main.requiredLibraries` (if present) must be an array of strings |
 | VAL026 | error | Each entry in `requiredLibraries` must be on the runtime allowlist |
+| VAL027 | **warning** | `main.docs` MUST be a non-empty array of strings. An empty array or absent field is a validation warning. **Will escalate to error in a future release.** Every API has documentation — this field must be filled by the schema author. |
+| VAL028 | **warning** | `main.termsOfService` MUST be present and MUST be either a URL string or the sentinel `"no-tos-found"`. A `null` value or absent field is a validation warning. **Will escalate to error in a future release.** The sentinel signals a conscious author decision that no ToS was found. |
 
 ---
 
@@ -154,6 +156,9 @@ This file is the **central code registry** for FlowMCP v4.3.0. All validation, s
 | RES023 | error | Test objects MUST be JSON-serializable. |
 | RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.3.0) |
 | RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.3.0) |
+| RES043 | error | `mode: 'url'` is only valid for `source: 'sqlite-geojson'` or `'sqlite-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
+| RES044 | error | `mode: 'url'` requires `url` (HTTPS) and `addon`. `mode` MUST be explicit (no default). (added in v4.3.0) |
+| RES045 | error | `source: 'sqlite-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
 
 `RES001` and `RES036` are enforced by core (`ResourceDatabaseManager`); all other RES codes are pipeline-level validation checks.
 

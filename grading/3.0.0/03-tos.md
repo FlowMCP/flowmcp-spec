@@ -3,7 +3,7 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0` |
+| Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`02-eligibility.md`](./02-eligibility.md), `08-grading-model.md` (forthcoming) |
 

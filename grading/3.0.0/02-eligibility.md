@@ -3,11 +3,11 @@
 | Field | Value |
 |-------|-------|
 | Status | Normative |
-| Version | `gradingSpec/1.1.0` |
+| Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`01-default-journey.md`](./01-default-journey.md), [`04-phases-single.md`](./04-phases-single.md), [`20-entry-point-prompt.md`](./20-entry-point-prompt.md) |
 
-> **Spec:** `gradingSpec/1.1.0`
+> **Spec:** `gradingSpec/3.0.0`
 > **Status:** stable (additive extension of 1.0.0)
 > **Changes vs. 1.0.0:** see [`CHANGELOG.md`](./CHANGELOG.md) — [Exclusion Criteria](#exclusion-criteria-must-not-appear-in-a-schema) extended with the empty-context convention.
 

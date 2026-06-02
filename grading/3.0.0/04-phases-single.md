@@ -48,7 +48,7 @@ The Area model retains four procedures that previously lived inside the phase mo
 
 The description cascade is a **mandatory ordered procedure** for validating tool descriptions. It MUST be executed in the following order; skipping or reordering steps is a finding.
 
-1. **Run tests against the endpoint.** SHOULD: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)).
+1. **Run tests against the endpoint.** MUST: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)).
 2. **Check the responses** and validate the tool description against the actual responses.
 3. **Normalise / update the tool description** to match the validated responses.
 4. **All tools, resources, and prompts MUST have descriptions** — and each description MUST be individually checked.

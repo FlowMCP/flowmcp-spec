@@ -51,6 +51,14 @@
         "indexVersion": {
             "const": 2
         },
+        "proofVersion": {
+            "type": "string",
+            "description": "Provider-proof envelope field (providers/<ns>/grade.json only). Absent on island index.json."
+        },
+        "generatedAt": {
+            "type": "string",
+            "description": "Provider-proof envelope timestamp (providers/<ns>/grade.json only). Absent on island index.json."
+        },
         "namespace": { "type": "string" },
         "selectionId": { "type": "string" },
         "updatedAt": { "type": "string" },

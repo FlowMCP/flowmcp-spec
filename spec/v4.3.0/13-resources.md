@@ -384,6 +384,78 @@ The synthetic Mini-GTFS fixture shipped with `gtfs-sqlite-toolkit` (under a CC0 
 
 ---
 
+## Add-on URL Mode (`mode: 'url'`)
+
+Add-on resources (`source: 'sqlite-geojson'`, `source: 'sqlite-csv'`) support a second access mode, `mode: 'url'`, in addition to the file-based mode used by `sqlite-gtfs`. In URL mode the schema carries only a thin reference — `source`, `mode`, `url`, `addon` (and, for CSV, a mandatory `parseConfig`). At schema activation the add-on fetches the **complete** dataset in a **single** request, parses it, validates it on load, and holds it **in memory** for the lifetime of the process. There is no SQLite file, no on-disk artifact, and no quality seal.
+
+### How it Differs from `source: 'http'`
+
+`source: 'http'` (see below) downloads a **SQLite file**, caches it on disk, and exposes it through `runSql`/`queries`. `mode: 'url'` on an add-on source downloads a **complete GeoJSON or CSV document**, holds it **in memory**, and exposes it through the add-on's central default methods (`featuresInBBox`, `nearPoint`, `byType`) — not through hand-written SQL. The two are deliberately distinct: file-cache + `runSql` versus in-memory + add-on methods.
+
+### Required Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `source` | `'sqlite-geojson'` \| `'sqlite-csv'` | Yes | Add-on resource type. `sqlite-gtfs` does NOT support URL mode (`RES043`). |
+| `mode` | `'url'` | Yes | Access mode. Explicit — there is no default mode (`RES044`). |
+| `url` | `string` | Yes | HTTPS URL of the complete dataset. MUST use HTTPS (`RES044`). |
+| `addon` | `string` | Yes | Add-on package that owns the parser and default methods (e.g. `geojson-sqlite-toolkit`). |
+
+### Conditional Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `parseConfig` | `object` | For `sqlite-csv`: Yes | Parse configuration (delimiter, header, column types, lat/lon columns). For CSV this is **mandatory** — there is no silent default (`RES045`). For GeoJSON, omit (structure is self-describing). |
+
+### Lifecycle
+
+1. **Init (`flowmcp add`):** the CLI loads the add-on declared in `addon`, calls its consumer API to fetch the full file from `url` in one request, parse it, and **validate it on load** (valid GeoJSON / required CSV columns) — replacing the file-based seal check. The parsed records are held in memory, keyed by URL.
+2. **Runtime:** queries are served from the in-memory store via the add-on's default methods. Spatial queries (`nearPoint`, `featuresInBBox`) use a pure-`Math` Haversine implementation; no external module is required.
+3. **Central maintenance:** the add-on owns the methods. A fix in the add-on propagates to every schema that references it.
+
+### Scope
+
+URL mode is for **complete datasets downloadable in a single step** — small static GeoJSON files and tabular CSV (Memo-090 class K3). Paginated or windowed sources (e.g. WFS) are out of scope and require a dedicated adapter.
+
+### Schema Example
+
+A minimal `mode: 'url'` GeoJSON schema:
+
+```javascript
+resources: {
+    berlinPois: {
+        source: 'sqlite-geojson',
+        mode: 'url',
+        url: 'https://example.org/berlin-pois.geojson',   // HTTPS only
+        addon: 'geojson-sqlite-toolkit',                   // owns nearPoint / featuresInBBox / byType
+        description: 'Berlin points of interest — fetched and held in memory'
+    }
+}
+```
+
+For CSV the `parseConfig` field is mandatory:
+
+```javascript
+resources: {
+    stations: {
+        source: 'sqlite-csv',
+        mode: 'url',
+        url: 'https://example.org/stations.csv',
+        addon: 'csv-tsv-sqlite-toolkit',
+        parseConfig: {                                     // mandatory — no silent default
+            delimiter: ',',
+            header: true,
+            columns: { name: 'string', lat: 'number', lon: 'number' },
+            latColumn: 'lat',
+            lonColumn: 'lon'
+        },
+        description: 'Charging stations — in-memory, spatial queries via lat/lon'
+    }
+}
+```
+
+---
+
 ## Origin System
 
 ### Three Locations, Explicitly Defined
@@ -1276,6 +1348,9 @@ Resource validation codes are shared with [09-validation-rules.md](./09-validati
 | RES040 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
 | RES041 | error | All resource fields are required. No field MAY be omitted. |
 | RES042 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
+| RES043 | error | `mode: 'url'` is only valid for `source: 'sqlite-geojson'` or `'sqlite-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
+| RES044 | error | `mode: 'url'` requires `url` (HTTPS) and `addon`. The URL MUST use HTTPS. `mode` MUST be explicit (no default). (added in v4.3.0) |
+| RES045 | error | `source: 'sqlite-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
 
 ---
 

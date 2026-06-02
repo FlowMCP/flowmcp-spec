@@ -51,6 +51,16 @@
             "name": "gtfs-sqlite-toolkit",
             "import": "github:FlowMCP/gtfs-sqlite-toolkit",
             "description": "Convert GTFS Schedule feeds to queryable SQLite"
+        },
+        {
+            "name": "geojson-sqlite-toolkit",
+            "import": "github:FlowMCP/geojson-sqlite-toolkit",
+            "description": "Convert GeoJSON FeatureCollections to sealed, spatially queryable SQLite"
+        },
+        {
+            "name": "csv-tsv-sqlite-toolkit",
+            "import": "github:FlowMCP/csv-tsv-sqlite-toolkit",
+            "description": "Convert geo CSV/TSV to sealed SQLite with a mandatory parse config"
         }
     ]
 }

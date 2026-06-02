@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-02T13:42:06.614Z",
-        "fromCommit": "f6d4c56",
+        "at": "2026-06-02T13:54:26.272Z",
+        "fromCommit": "e68f8ea",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -67,6 +67,16 @@
             "name": "gtfs-sqlite-toolkit",
             "import": "github:FlowMCP/gtfs-sqlite-toolkit",
             "description": "Convert GTFS Schedule feeds to queryable SQLite"
+        },
+        {
+            "name": "geojson-sqlite-toolkit",
+            "import": "github:FlowMCP/geojson-sqlite-toolkit",
+            "description": "Convert GeoJSON FeatureCollections to sealed, spatially queryable SQLite"
+        },
+        {
+            "name": "csv-tsv-sqlite-toolkit",
+            "import": "github:FlowMCP/csv-tsv-sqlite-toolkit",
+            "description": "Convert geo CSV/TSV to sealed SQLite with a mandatory parse config"
         }
     ],
     "validation": {

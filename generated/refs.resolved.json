@@ -1,15 +1,15 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-05-31T22:21:57.496Z",
-        "fromCommit": "410fe47",
+        "at": "2026-06-02T13:42:06.614Z",
+        "fromCommit": "f6d4c56",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
-        "currentVersion": "4.2.0",
-        "recommendedRelease": "v4.2.0",
-        "specDir": "spec/v4.2.0",
-        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.2.0/spec/v4.2.0",
+        "currentVersion": "4.3.0",
+        "recommendedRelease": "v4.3.0",
+        "specDir": "spec/v4.3.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.3.0/spec/v4.3.0",
         "llmsTxtUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt",
         "miniSkillTemplate": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/data/mini-skill.template.md"
     },
@@ -100,10 +100,10 @@
         ]
     },
     "grading": {
-        "currentVersion": "2.0.0",
-        "recommendedRelease": "2.0.0",
-        "specDir": "grading/2.0.0",
-        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/grading/2.0.0",
+        "currentVersion": "3.0.0",
+        "recommendedRelease": "3.0.0",
+        "specDir": "grading/3.0.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/grading/3.0.0",
         "url": "https://flowmcp.github.io/grading/overview/"
     }
 }

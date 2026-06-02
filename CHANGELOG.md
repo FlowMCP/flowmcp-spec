@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.3.0 — 2026-06-02 (two-track lifecycle)
+
+The Schemas-Spec delegates grading to the now-`gradingSpec/3.0.0` standard (a **BREAKING** grading release) and decouples the development lifecycle from the grading-monitoring track. The schema *format* is unchanged; the substance of the `4.3.0` bump is the lifecycle split and the alignment to Grading-Spec 3.0.0.
+
+### Changed
+
+- **`21-schema-lifecycle.md`** — **two-track split.** The six development-lifecycle stages stay in this spec; *monitoring, issue tracking, and the grade rollup* move to the Grading-Spec (new `26-monitoring-track.md`). Validate-before-grade is relaxed for the monitoring track only: a grading record MAY exist in a `blocked` state (`reason: validation-failed`) for a schema that has not cleared `stage:validation` (**emit-on-failure**). The development gate is unchanged — `flowmcp validate` → 0 errors is still required before `stage:production`.
+- **Grading delegation now targets `gradingSpec/3.0.0`** (was `2.0.0`). The grading import contract flips from hard-abort to emit-`blocked`-node-and-continue; this is a MAJOR grading bump. The legacy `grading/2.0.0/` directory is retained unchanged.
+
+### Added
+
+- **`09-validation-rules.md` — VAL019.** Folder↔namespace invariant: a `providers/<dir>/` directory name MUST equal the `main.namespace` of every schema it contains (sibling of `CAT002` / `AGT001` / `SKL003`), with an unparseable-folder fallback and rename-on-parse lifecycle.
+
+### Released
+
+- Spec folder hardcopied to `spec/v4.3.0/`; `package.json` and `data/refs.manual.json` aligned (`spec` → `4.3.0`, `grading` → `3.0.0`). Tag `v4.3.0`.
+
 ## v4.2.0 — 2026-05-31 (delegation)
 
 The Schemas-Spec remains the highest instance and now **delegates** schema grading to a separate, independently versioned standard — the **Grading-Spec** (`gradingSpec/2.0.0`), published as Navigation point 5 in the docs. This delegation is the substance of the `4.2.0` bump; the schema format itself is unchanged.

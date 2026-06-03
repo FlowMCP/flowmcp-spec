@@ -54,6 +54,30 @@ For mixed forms, implementers MAY:
 
 ---
 
+## Deterministic Pretest — Test-Leiter (Working-Test Bar)
+
+Before any non-deterministic (LLM) grading runs, a deterministic **data-pretest** executes every tool's declared tests live and counts the **working** ones. A working test is a downloadable primitive (`tool` / `resource`) that returns HTTP 200 **and** a non-empty payload; HTTP 4xx, `status:false`, or an empty payload is a FAIL — never a pass.
+
+The working-test count per tool maps to a **Test-Leiter** rung. This is the deterministic readiness ladder that gates `deterministic-green`:
+
+| Working tests / tool | Rung (`testDepth`) | Meaning |
+|----------------------|--------------------|---------|
+| 0 | `unavailable` | No working test — `blocked` (repairable). In practice does not occur (every tool declares ≥ 1 test). |
+| 1 | `reachable` | Minimum, **INSUFFICIENT** — the deterministic test does NOT pass. The tool is reachable but its output schema cannot be validated against repeated evidence. |
+| 2 | `schema-validatable` | **Pass bar — the deterministic test PASSES.** Two working responses make the output schema validatable; the schema is **deterministic-green**. |
+| ≥ 3 | `data-analyzable` | Ideal gradient (a later wave). Not a second gate. |
+
+**Binding rules:**
+
+1. **The pass bar is `2` working tests per tool, applied per tool (not as a schema-file total).** A schema reaches `deterministic-green` only when **every** downloadable tool independently has ≥ 2 working tests. (MUST)
+2. **The bar is binary at 2.** Reaching 3+ does not change the pass/fail decision; it only raises the `testDepth` rung from `schema-validatable` to `data-analyzable`. (MUST)
+3. **A tool with exactly 1 working test is NOT `deterministic-green`, but is NOT `rejected`.** It is a repairable `blocked`/not-green state, resolved by adding a second working test — never a terminal rejection. (MUST)
+4. **`testDepth` is its own deterministic dimension**, recorded on the tool node in the index rollup, and is **independent** of the LLM `outputSchemaMatch` dimension. The two are never conflated: `testDepth` measures *how many* working responses exist; `outputSchemaMatch` judges *whether* the declared output schema matches a response. (MUST)
+
+> **Rationale.** A single working response cannot distinguish a correct output schema from a coincidentally-shaped one. Two independent working responses are the minimum deterministic evidence that the declared output schema holds. Raising coverage is **work** (add tests), not grounds for lowering the bar.
+
+---
+
 ## Axis 2 — Tier
 
 ### `autonomous`
@@ -148,7 +172,7 @@ The node status of a graded primitive is one of **five** values, derived by the 
 | Status | Meaning |
 |--------|---------|
 | `pending` | Not yet graded. |
-| `blocked` | Cannot be graded right now, with a `reason` (`validation-failed`, fewer than 3 working tests, no About Resource, API unreachable) — repairable. |
+| `blocked` | Cannot be graded right now, with a `reason` (`validation-failed`, fewer than 2 working tests, no About Resource, API unreachable) — repairable. |
 | `graded` | A grade exists. |
 | `stable` | Fully graded via a `mode: "full"` operation and above threshold — ready for use; only this status passes the selection pre-condition. |
 | `rejected` | Veto raised — **terminal and irreversible**. |

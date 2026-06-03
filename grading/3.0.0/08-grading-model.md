@@ -193,6 +193,12 @@ Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `p
 
 Each Area defines how many answers its grading entry must carry, split into a deterministic block (computed by code) and a non-deterministic block (produced by the harness sub-agent). A deterministic block alone is not a valid Area grading — the two blocks are merged into one entry. The per-Area answer counts and question sets are normative in the Area output schemas.
 
+#### `single-test` deterministic gate — `testDepth` (Test-Leiter)
+
+The `single-test` Area (Area 1) opens with a **deterministic gate**: the data-pretest counts the working tests per tool and assigns the Test-Leiter rung (see [`06-determinism-and-tier.md` — Deterministic Pretest](./06-determinism-and-tier.md#deterministic-pretest--test-leiter-working-test-bar)). The gate's pass bar is **2 working tests per tool**; a schema is `deterministic-green` only when every downloadable tool clears it.
+
+The rung is surfaced as the deterministic dimension **`testDepth`** (`unavailable` / `reachable` / `schema-validatable` / `data-analyzable`), recorded on the tool node in `index.json`. `testDepth` is **independent** of the non-deterministic `outputSchemaMatch` dimension and MUST NOT be folded into it: `testDepth` measures *how many* working responses exist (deterministic count), while `outputSchemaMatch` judges *whether* the declared output schema matches a response (LLM judgement). A tool at `reachable` (1 working test) is not green but is repairable — never `rejected`.
+
 ### Score Values
 
 The `score` field is one of:

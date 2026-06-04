@@ -80,7 +80,7 @@ Each segment serves a distinct purpose: the namespace identifies the owner, the 
 
 #### Namespace
 
-The namespace identifies the owner of the primitive. It is derived from the provider's domain name or agent name and MUST be globally unique within a FlowMCP registry.
+The namespace identifies the owner of the primitive. It is derived from the provider's domain name or agent name and MUST be unique within its own `schemaFolder` — each folder is its own registry (see [Namespace Rules](#namespace-rules)). The CLI aggregates multiple folders into one catalog, so the same namespace MAY appear in more than one aggregated folder; cross-folder collisions are disambiguated by the optional source coordinate `<source>:<namespace>` (see [Source Coordinate](#source-coordinate)).
 
 ```
 coingecko          ← provider namespace
@@ -182,6 +182,17 @@ The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to 
 
 This mapping is internal. Users and agents always use full Spec-IDs.
 
+### Source Coordinate in the MCP Tool Name
+
+When the CLI aggregates several `schemaFolders[]` and two folders expose the same namespace, the bare `routeName_namespace` tool name would collide at the MCP layer (the MCP protocol requires unique tool names). To let both folders coexist, the source coordinate (see [Source Coordinate](#source-coordinate)) is carried through `#buildToolName()` and appended to the internal MCP tool name on collision, so each tool stays addressable:
+
+| External Spec-ID | Internal MCP Tool Name |
+|------------------|------------------------|
+| `folder-a:coingecko/tool/simplePrice` | `simplePrice_coingecko` (uncontested source kept bare) |
+| `folder-b:coingecko/tool/simplePrice` | `simplePrice_coingecko_folder-b` (source appended to break the collision) |
+
+Without this propagation, two equally-named folders cannot both be served — the MCP layer aborts on the duplicate tool name (the `serve` dedup/rename/error path). The CLI applies a deterministic dedup-or-rename so the source disambiguation reaches all the way into the served tool name; a genuine duplicate that cannot be disambiguated is reported, never silently dropped.
+
 ---
 
 ## No Short Form
@@ -220,7 +231,7 @@ The diagram shows the resolution flow from receiving an ID string through parsin
 ### Resolution Steps
 
 1. **Parse** — split the ID string on `/` to extract segments. Three segments required: namespace, type, name. Any other count: validation error ID001 (Short Form is not supported).
-2. **Find** — look up the namespace in the loaded registry or schema catalog. The registry maps namespaces to schema file locations.
+2. **Find** — look up the namespace in the loaded catalog. The catalog is the aggregation of the per-folder registries from `schemaFolders[]`; each folder maps its namespaces to schema file locations. When more than one aggregated folder owns the namespace, a qualified reference (`<source>:<namespace>/...`, see [Source Coordinate](#source-coordinate)) selects the exact folder, while an unqualified reference resolves first-wins (first folder in `schemaFolders[]` order) plus a visible collision warning.
 3. **Match** — within the namespace, find the schema, tool, resource, or prompt with the matching name and type.
 4. **Return** — produce the resolved reference: file path to the schema file and the internal key path (e.g., `main.tools.simplePrice`).
 
@@ -251,7 +262,34 @@ The ID schema provides the canonical identifier format (`namespace/type/name`) u
 
 ## Namespace Rules
 
-Namespaces are the top-level organizational unit. They must be unique within a registry and follow strict governance rules.
+Namespaces are the top-level organizational unit. They must be unique within a folder — each `schemaFolder` is its own registry. The CLI aggregates multiple folders into one catalog; across aggregated folders the same namespace is allowed and is disambiguated by the optional source coordinate (see [Source Coordinate](#source-coordinate)). Namespaces follow strict governance rules.
+
+### One Folder, One Registry
+
+A `schemaFolder` is a self-contained registry: namespace uniqueness is required **within** a folder, not across all folders the CLI knows about. The folder↔namespace invariant `VAL019` (see [Directory Mapping](#directory-mapping)) already operates per folder — the folder name MUST equal `main.namespace` of every schema in that folder.
+
+The CLI aggregates the folders listed in `schemaFolders[]` into a single catalog at load time. Two different folders MAY each carry a schema with the same namespace; this is not an error. References are resolved as follows:
+
+- **Qualified** — a reference prefixed with the source coordinate (`<source>:<namespace>/...`, see [Source Coordinate](#source-coordinate)) selects exactly one folder's namespace.
+- **Unqualified** — a reference without a source coordinate resolves first-wins across the aggregated folders (the first folder in `schemaFolders[]` order that owns the namespace), and the CLI emits a visible collision warning so the ambiguity is never silent.
+
+### Source Coordinate
+
+When the CLI aggregates several `schemaFolders[]`, two folders may expose the same namespace. The **source coordinate** is an optional prefix that qualifies a reference to exactly one folder:
+
+```
+<source>:<namespace>[/<type>/<name>]
+```
+
+```
+folder-a:coingecko/tool/simplePrice
+folder-b:coingecko/tool/simplePrice
+```
+
+- `<source>` identifies the originating `schemaFolder` (the source key the CLI assigns to that folder).
+- The separator is a **colon** (`:`), chosen so it does not disturb the slash grammar of the ID: the namespace/type/name segments are still split on `/` exactly as before, and the three-segment count is unchanged. The colon prefix is parsed off before the slash resolution runs.
+- The coordinate applies to all referenceable primitives — `tool`, `resource`, `prompt`, `skill`, `list`, `selection`, and `agent`.
+- **Unqualified** references (no `<source>:` prefix) resolve first-wins across the aggregated folders plus a visible collision warning; the source coordinate is the way to pin the exact folder.
 
 ### Namespace Assignment
 

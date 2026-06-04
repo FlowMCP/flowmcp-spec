@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-02T22:37:36.057Z",
-        "fromCommit": "921e34c",
+        "at": "2026-06-04T12:51:00.915Z",
+        "fromCommit": "a12ff9b",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -64,19 +64,24 @@
     },
     "addons": [
         {
-            "name": "gtfs-sqlite-toolkit",
+            "name": "geo-gtfs-toolkit",
             "import": "github:FlowMCP/gtfs-sqlite-toolkit",
-            "description": "Convert GTFS Schedule feeds to queryable SQLite"
+            "description": "Convert GTFS Schedule feeds to a sealed SQLite database (source-key: sqlite-gtfs)"
         },
         {
-            "name": "geojson-sqlite-toolkit",
+            "name": "geo-geojson-toolkit",
             "import": "github:FlowMCP/geojson-sqlite-toolkit",
-            "description": "Convert GeoJSON FeatureCollections to sealed, spatially queryable SQLite"
+            "description": "Load a GeoJSON FeatureCollection from a URL into memory for spatial queries (source-key: geo-geojson)"
         },
         {
-            "name": "csv-tsv-sqlite-toolkit",
+            "name": "geo-csv-tsv-toolkit",
             "import": "github:FlowMCP/csv-tsv-sqlite-toolkit",
-            "description": "Convert geo CSV/TSV to sealed SQLite with a mandatory parse config"
+            "description": "Load geo CSV/TSV from a URL into memory with a mandatory parse config (source-key: geo-csv)"
+        },
+        {
+            "name": "geo-overpass-toolkit",
+            "import": "github:FlowMCP/geo-overpass-toolkit",
+            "description": "Run live HTTP Overpass queries against OpenStreetMap with caching (source-key: geo-overpass)"
         }
     ],
     "validation": {

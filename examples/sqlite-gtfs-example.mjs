@@ -14,7 +14,7 @@ export const schema = {
                 source: 'sqlite-gtfs',
                 mode: 'file-based',
                 path: '${FLOWMCP_RESOURCES}/gtfs-de.db',
-                addon: 'gtfs-sqlite-toolkit',
+                addon: 'geo-gtfs-toolkit',
                 addonVersion: '>=0.1.0',
                 addonSource: 'github:FlowMCP/gtfs-sqlite-toolkit'
             }

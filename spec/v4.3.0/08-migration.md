@@ -512,7 +512,7 @@ Per schema:
 - [ ] `routes` renamed to `tools`
 - [ ] `version` updated to `'3.0.0'`
 - [ ] Validation passes (`flowmcp validate`)
-- [ ] Tests pass (`flowmcp test single`)
+- [ ] Tests pass (`flowmcp grading deterministic`)
 - [ ] (Optional) Resources added if applicable
 - [ ] (Optional) Skills added if applicable
 
@@ -538,7 +538,7 @@ The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every 
 | 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
 | 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
 | 5 | Validate | `flowmcp validate` → PASS |
-| 6 | API-Test | `flowmcp test single` → min. 1 response |
+| 6 | API-Test | `flowmcp grading deterministic` → min. 1 response |
 
 ### Breaking Changes
 

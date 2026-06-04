@@ -121,6 +121,6 @@ Score range: 0.0 (unusable) to 5.0 (excellent).
 
 Before Production deploy, all failing Primitives MUST be removed from the schema file.
 
-A Language Model calling `flowmcp add etherscan-io/contracts` receives the tool list and assumes all tools work. A failing tool in Production causes unpredictable errors.
+A Language Model calling tools from `etherscan-io/contracts` receives the tool list and assumes all tools work. A failing tool in Production causes unpredictable errors.
 
 **Rule:** 1 failing primitive gets removed — regardless of how many others pass.

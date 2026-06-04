@@ -197,7 +197,7 @@ Without this propagation, two equally-named folders cannot both be served — th
 
 ## No Short Form
 
-Short Form is not supported in FlowMCP v4. `flowmcp add getTokenBalance` (without namespace/type) is not allowed.
+Short Form is not supported in FlowMCP v4. `flowmcp call getTokenBalance` (without namespace/type) is not allowed.
 
 **Reason:** Ambiguity and hidden data provenance. `moralis/tool/getTokenBalance` is explicit — the namespace immediately shows the data source. For LLMs especially, full Spec-IDs are semantically unambiguous.
 

@@ -99,29 +99,29 @@ export const schema = {
 
 | # | Document | Description |
 |---|----------|-------------|
-| 00 | [Overview](spec/v4.0.0/00-overview.md) | Vision, three-level architecture, LLM-First philosophy, terminology |
-| 01 | [Schema Format](spec/v4.0.0/01-schema-format.md) | `main` + five primitives, optional `meta` block, naming conventions |
-| 02 | [Parameters](spec/v4.0.0/02-parameters.md) | Position/z blocks, shared list interpolation, `{{type:name}}` syntax |
-| 03 | [Shared Lists](spec/v4.0.0/03-shared-lists.md) | Reusable value lists, dependencies, filtering, registry |
-| 04 | [Output Schema](spec/v4.0.0/04-output-schema.md) | Output definitions, MIME-Types, response envelope |
-| 05 | [Security](spec/v4.0.0/05-security.md) | Zero-import policy, library allowlist, static scan |
-| 06 | [Agents](spec/v4.0.0/06-agents.md) | Agent manifests, model binding, system prompts, tool cherry-picking |
-| 07 | [Tasks](spec/v4.0.0/07-tasks.md) | MCP Tasks async fields (reserved) |
-| 08 | [Migration](spec/v4.0.0/08-migration.md) | v1.2.0 → v2.0.0 → v3.0.0 → v4.0.0 migration guides |
-| 09 | [Validation Rules](spec/v4.0.0/09-validation-rules.md) | Complete validation checklist across all categories |
-| 10 | [Tests](spec/v4.0.0/10-tests.md) | Tool tests, resource tests, agent tests, response capture |
-| 11 | [Preload](spec/v4.0.0/11-preload.md) | Schema initialization with startup data |
-| 12 | [Prompt Architecture](spec/v4.0.0/12-prompt-architecture.md) | Provider-Prompts, Agent-Prompts, composable references |
-| 13 | [Resources](spec/v4.0.0/13-resources.md) | SQLite resources, queries, runSql/describeTables, parameter binding |
-| 14 | [Skills](spec/v4.0.0/14-skills.md) | Skill .mjs format, placeholders, versioning |
-| 15 | [Catalog](spec/v4.0.0/15-catalog.md) | Catalog manifest, registry.json, import flow |
-| 16 | [ID Schema](spec/v4.0.0/16-id-schema.md) | Unified `namespace/type/name` format |
-| 17 | [Selections](spec/v4.0.0/17-selections.md) | Cross-provider compositions with prefill |
-| 18 | [Prefill](spec/v4.0.0/18-prefill.md) | Schema-side parameter pre-population |
-| 19 | [MCP Integration](spec/v4.0.0/19-mcp-integration.md) | MCP server bindings, primitive mapping |
-| 20 | [Validation Strategy](spec/v4.0.0/20-validation-strategy.md) | Multi-layer validation: structure, lifecycle, grade |
-| 21 | [Schema Lifecycle](spec/v4.0.0/21-schema-lifecycle.md) | Stages, gates, hold/blocked states |
-| 22 | [Scoring Protocol](spec/v4.0.0/22-scoring-protocol.md) | GradeReporter scoring v1 — whenToUse + parameters dimensions |
+| 00 | [Overview](spec/v4.3.0/00-overview.md) | Vision, three-level architecture, LLM-First philosophy, terminology |
+| 01 | [Schema Format](spec/v4.3.0/01-schema-format.md) | `main` + five primitives, optional `meta` block, naming conventions |
+| 02 | [Parameters](spec/v4.3.0/02-parameters.md) | Position/z blocks, shared list interpolation, `{{type:name}}` syntax |
+| 03 | [Shared Lists](spec/v4.3.0/03-shared-lists.md) | Reusable value lists, dependencies, filtering, registry |
+| 04 | [Output Schema](spec/v4.3.0/04-output-schema.md) | Output definitions, MIME-Types, response envelope |
+| 05 | [Security](spec/v4.3.0/05-security.md) | Zero-import policy, library allowlist, static scan |
+| 06 | [Agents](spec/v4.3.0/06-agents.md) | Agent manifests, model binding, system prompts, tool cherry-picking |
+| 07 | [Tasks](spec/v4.3.0/07-tasks.md) | MCP Tasks async fields (reserved) |
+| 08 | [Migration](spec/v4.3.0/08-migration.md) | v1.2.0 → v2.0.0 → v3.0.0 → v4.0.0 migration guides |
+| 09 | [Validation Rules](spec/v4.3.0/09-validation-rules.md) | Complete validation checklist across all categories |
+| 10 | [Tests](spec/v4.3.0/10-tests.md) | Tool tests, resource tests, agent tests, response capture |
+| 11 | [Preload](spec/v4.3.0/11-preload.md) | Schema initialization with startup data |
+| 12 | [Prompt Architecture](spec/v4.3.0/12-prompt-architecture.md) | Provider-Prompts, Agent-Prompts, composable references |
+| 13 | [Resources](spec/v4.3.0/13-resources.md) | SQLite resources, queries, runSql/describeTables, parameter binding |
+| 14 | [Skills](spec/v4.3.0/14-skills.md) | Skill .mjs format, placeholders, versioning |
+| 15 | [Catalog](spec/v4.3.0/15-catalog.md) | Catalog manifest, registry.json, import flow |
+| 16 | [ID Schema](spec/v4.3.0/16-id-schema.md) | Unified `namespace/type/name` format |
+| 17 | [Selections](spec/v4.3.0/17-selections.md) | Cross-provider compositions with prefill |
+| 18 | [Prefill](spec/v4.3.0/18-prefill.md) | Schema-side parameter pre-population |
+| 19 | [MCP Integration](spec/v4.3.0/19-mcp-integration.md) | MCP server bindings, primitive mapping |
+| 20 | [Validation Strategy](spec/v4.3.0/20-validation-strategy.md) | Multi-layer validation: structure, lifecycle, grade |
+| 21 | [Schema Lifecycle](spec/v4.3.0/21-schema-lifecycle.md) | Stages, gates, hold/blocked states |
+| 22 | [Scoring Protocol](spec/v4.3.0/22-scoring-protocol.md) | GradeReporter scoring v1 — whenToUse + parameters dimensions |
 
 ## Legacy Specifications
 

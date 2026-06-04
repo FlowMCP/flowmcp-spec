@@ -156,9 +156,9 @@ This file is the **central code registry** for FlowMCP v4.3.0. All validation, s
 | RES023 | error | Test objects MUST be JSON-serializable. |
 | RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.3.0) |
 | RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.3.0) |
-| RES043 | error | `mode: 'url'` is only valid for `source: 'sqlite-geojson'` or `'sqlite-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
+| RES043 | error | `mode: 'url'` is only valid for `source: 'geo-geojson'` or `'geo-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
 | RES044 | error | `mode: 'url'` requires `url` (HTTPS) and `addon`. `mode` MUST be explicit (no default). (added in v4.3.0) |
-| RES045 | error | `source: 'sqlite-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
+| RES045 | error | `source: 'geo-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
 
 `RES001` and `RES036` are enforced by core (`ResourceDatabaseManager`); all other RES codes are pipeline-level validation checks.
 

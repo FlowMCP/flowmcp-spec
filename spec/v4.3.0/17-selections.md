@@ -82,7 +82,7 @@ Directory `selections/` is at root level, alongside `providers/` and `agents/`.
 A Selection-File can be used as a transitive test trigger via:
 
 ```
-flowmcp dev test single <selection-file>
+flowmcp grading deterministic <selection-id>
 ```
 
 This:

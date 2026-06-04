@@ -285,7 +285,7 @@ Intermediate modes (append-only, insert-but-no-delete) are intentionally omitted
 
 ### Overview
 
-The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`** (Design C — top-level with inheritance). It denotes a SQLite database that has been produced by a FlowMCP add-on (such as `gtfs-sqlite-toolkit`) and carries a verified quality seal in its `meta` table. The seal guarantees that the database structure, validation status, and discoverable capabilities are conformant with a known add-on contract — which allows FlowMCP-CLI to automatically inject standard tools without the schema author writing any SQL by hand.
+The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`** (Design C — top-level with inheritance). It denotes a SQLite database that has been produced by a FlowMCP add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/gtfs-sqlite-toolkit`) and carries a verified quality seal in its `meta` table. The seal guarantees that the database structure, validation status, and discoverable capabilities are conformant with a known add-on contract — which allows FlowMCP-CLI to automatically inject standard tools without the schema author writing any SQL by hand.
 
 `sqlite-gtfs` is **not** a fallback for `sqlite`. A database without a valid seal is rejected (see [Validation Rules](#validation-rules) — `RES032`). Users who want full manual control over a SQLite database continue to use `source: 'sqlite'`.
 
@@ -296,7 +296,7 @@ The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`*
 | `source` | `'sqlite-gtfs'` | Yes | Resource type. Must be `'sqlite-gtfs'`. |
 | `mode` | `'file-based'` | Yes | Access mode. Only `'file-based'` is allowed. `'in-memory'` is rejected (`RES030`) because the seal verification depends on the persisted `meta` table. |
 | `path` | `string` | Yes | Absolute path to the converted SQLite database. May contain the path variable `${FLOWMCP_RESOURCES}` (see [Path Variable Support](#path-variable-support)). |
-| `addon` | `string` | Yes | Name of the FlowMCP add-on responsible for producing and interpreting the database (e.g. `gtfs-sqlite-toolkit`). The add-on is the authority over which standard tools are auto-injected. |
+| `addon` | `string` | Yes | Name of the FlowMCP add-on responsible for producing and interpreting the database (e.g. `geo-gtfs-toolkit`). The add-on is the authority over which standard tools are auto-injected. |
 
 ### Optional Fields
 
@@ -309,7 +309,7 @@ The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`*
 
 Every `sqlite-gtfs` resource MUST point to a database whose `meta` table contains the entry `qualitySeal === 'sqlite-gtfs'`. This is a hard requirement enforced by the validator (`RES032`). A database that does not carry the seal — whether because it was produced by an unverified converter, manually edited, or partially converted — is rejected at schema activation time.
 
-The seal is written by the converter (e.g. `MetaWriter` in `gtfs-sqlite-toolkit`) only when the conversion completes successfully and all pre-validation checks pass strictly. A failed or partial conversion produces `qualitySeal: null` and the database is not usable as a `sqlite-gtfs` resource.
+The seal is written by the converter (e.g. `MetaWriter` in `github:FlowMCP/gtfs-sqlite-toolkit`) only when the conversion completes successfully and all pre-validation checks pass strictly. A failed or partial conversion produces `qualitySeal: null` and the database is not usable as a `sqlite-gtfs` resource.
 
 ### Required Meta Keys
 
@@ -320,7 +320,7 @@ The `meta` table of a sealed database MUST contain the following ten keys. They 
 | `qualitySeal` | Add-on identifier (here: `'sqlite-gtfs'`). The seal value. |
 | `specRevision` | FlowMCP spec revision the converter targeted (e.g. `'2026-04-27'`). Used for spec-drift warnings (`RES034`). |
 | `specUrl` | URL of the spec revision document. |
-| `converterVersion` | SemVer of the add-on that produced the database (e.g. `gtfs-sqlite-toolkit@0.1.0`). |
+| `converterVersion` | SemVer of the add-on that produced the database (e.g. `github:FlowMCP/gtfs-sqlite-toolkit@0.1.0`). |
 | `capabilities` | JSON-encoded map of capability booleans (e.g. `basicLookup`, `routing`, `shapesVisualization`, `flexService`). Drives auto-injection. |
 | `validationReport` | JSON-encoded summary of pre-validation results (counts of errors / warnings / info). |
 | `buildDate` | ISO-8601 timestamp of the conversion run. |
@@ -355,7 +355,7 @@ export const schema = {
                 source: 'sqlite-gtfs',                              // Design C
                 mode: 'file-based',
                 path: '${FLOWMCP_RESOURCES}/gtfs-de.db',            // User-configurable
-                addon: 'gtfs-sqlite-toolkit',                       // Authority over default methods
+                addon: 'geo-gtfs-toolkit',                          // Authority over default methods
                 addonVersion: '>=0.1.0',                            // optional
                 addonSource: 'github:FlowMCP/gtfs-sqlite-toolkit'   // NPM is not supported
             }
@@ -368,11 +368,11 @@ export const schema = {
 }
 ```
 
-When the FlowMCP-CLI activates this schema via `flowmcp add`, it (1) resolves the path variable, (2) verifies the seal, (3) reads `capabilities` from the `meta` table, (4) loads the add-on declared in `addon`, and (5) injects the standard toolset that the add-on derives from the active capabilities.
+When the FlowMCP-CLI initializes this resource schema (on first use — there is no separate activation command), it (1) resolves the path variable, (2) verifies the seal, (3) reads `capabilities` from the `meta` table, (4) loads the add-on declared in `addon`, and (5) injects the standard toolset that the add-on derives from the active capabilities.
 
 ### Add-on Authority
 
-The `sqlite-gtfs` resource type **delegates the definition of standard tools to the add-on**. The spec describes the resource contract; the add-on (e.g. `gtfs-sqlite-toolkit`) owns the catalog of default methods — `searchStops`, `searchRoutes`, `getDepartures`, `getShapeForRoute`, `getFlexBookingRules`, and so on — and decides which ones become available based on the `capabilities` map.
+The `sqlite-gtfs` resource type **delegates the definition of standard tools to the add-on**. The spec describes the resource contract; the add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/gtfs-sqlite-toolkit`) owns the catalog of default methods — `searchStops`, `searchRoutes`, `getDepartures`, `getShapeForRoute`, `getFlexBookingRules`, and so on — and decides which ones become available based on the `capabilities` map.
 
 This split keeps the spec stable while letting add-ons evolve independently. New add-ons (for example a future `sqlite-netex` or `sqlite-trias`) follow the same `Design C` pattern: top-level source value, seal requirement, add-on reference, capability-driven auto-injection.
 
@@ -380,13 +380,13 @@ This split keeps the spec stable while letting add-ons evolve independently. New
 
 **Provider GTFS data MUST NOT be committed to the spec repository, the add-on repository, or any other public FlowMCP repository.** GTFS feeds carry third-party licensing terms that typically prohibit redistribution. Users provide their own GTFS data locally — either by downloading from the provider directly or by using the add-on's converter against a local source archive. The converted database lives under the user-controlled `${FLOWMCP_RESOURCES}` directory and is never published.
 
-The synthetic Mini-GTFS fixture shipped with `gtfs-sqlite-toolkit` (under a CC0 license) is the only GTFS-shaped data permitted in any public FlowMCP repository. It exists exclusively for testing and CI.
+The synthetic Mini-GTFS fixture shipped with `github:FlowMCP/gtfs-sqlite-toolkit` (under a CC0 license) is the only GTFS-shaped data permitted in any public FlowMCP repository. It exists exclusively for testing and CI.
 
 ---
 
 ## Add-on URL Mode (`mode: 'url'`)
 
-Add-on resources (`source: 'sqlite-geojson'`, `source: 'sqlite-csv'`) support a second access mode, `mode: 'url'`, in addition to the file-based mode used by `sqlite-gtfs`. In URL mode the schema carries only a thin reference — `source`, `mode`, `url`, `addon` (and, for CSV, a mandatory `parseConfig`). At schema activation the add-on fetches the **complete** dataset in a **single** request, parses it, validates it on load, and holds it **in memory** for the lifetime of the process. There is no SQLite file, no on-disk artifact, and no quality seal.
+Add-on resources (`source: 'geo-geojson'`, `source: 'geo-csv'`) support a second access mode, `mode: 'url'`, in addition to the file-based mode used by `sqlite-gtfs`. In URL mode the schema carries only a thin reference — `source`, `mode`, `url`, `addon` (and, for CSV, a mandatory `parseConfig`). At schema activation the add-on fetches the **complete** dataset in a **single** request, parses it, validates it on load, and holds it **in memory** for the lifetime of the process. There is no SQLite file, no on-disk artifact, and no quality seal.
 
 ### How it Differs from `source: 'http'`
 
@@ -396,20 +396,20 @@ Add-on resources (`source: 'sqlite-geojson'`, `source: 'sqlite-csv'`) support a 
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `source` | `'sqlite-geojson'` \| `'sqlite-csv'` | Yes | Add-on resource type. `sqlite-gtfs` does NOT support URL mode (`RES043`). |
+| `source` | `'geo-geojson'` \| `'geo-csv'` | Yes | Add-on resource type. `sqlite-gtfs` does NOT support URL mode (`RES043`). |
 | `mode` | `'url'` | Yes | Access mode. Explicit — there is no default mode (`RES044`). |
 | `url` | `string` | Yes | HTTPS URL of the complete dataset. MUST use HTTPS (`RES044`). |
-| `addon` | `string` | Yes | Add-on package that owns the parser and default methods (e.g. `geojson-sqlite-toolkit`). |
+| `addon` | `string` | Yes | Add-on package that owns the parser and default methods (e.g. `geo-geojson-toolkit`). |
 
 ### Conditional Fields
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `parseConfig` | `object` | For `sqlite-csv`: Yes | Parse configuration (delimiter, header, column types, lat/lon columns). For CSV this is **mandatory** — there is no silent default (`RES045`). For GeoJSON, omit (structure is self-describing). |
+| `parseConfig` | `object` | For `geo-csv`: Yes | Parse configuration (delimiter, header, column types, lat/lon columns). For CSV this is **mandatory** — there is no silent default (`RES045`). For GeoJSON, omit (structure is self-describing). |
 
 ### Lifecycle
 
-1. **Init (`flowmcp add`):** the CLI loads the add-on declared in `addon`, calls its consumer API to fetch the full file from `url` in one request, parse it, and **validate it on load** (valid GeoJSON / required CSV columns) — replacing the file-based seal check. The parsed records are held in memory, keyed by URL.
+1. **Init (on first use):** the CLI loads the add-on declared in `addon`, calls its consumer API to fetch the full file from `url` in one request, parse it, and **validate it on load** (valid GeoJSON / required CSV columns) — replacing the file-based seal check. The parsed records are held in memory, keyed by URL.
 2. **Runtime:** queries are served from the in-memory store via the add-on's default methods. Spatial queries (`nearPoint`, `featuresInBBox`) use a pure-`Math` Haversine implementation; no external module is required.
 3. **Central maintenance:** the add-on owns the methods. A fix in the add-on propagates to every schema that references it.
 
@@ -424,10 +424,10 @@ A minimal `mode: 'url'` GeoJSON schema:
 ```javascript
 resources: {
     berlinPois: {
-        source: 'sqlite-geojson',
+        source: 'geo-geojson',
         mode: 'url',
         url: 'https://example.org/berlin-pois.geojson',   // HTTPS only
-        addon: 'geojson-sqlite-toolkit',                   // owns nearPoint / featuresInBBox / byType
+        addon: 'geo-geojson-toolkit',                      // owns nearPoint / featuresInBBox / byType
         description: 'Berlin points of interest — fetched and held in memory'
     }
 }
@@ -438,10 +438,10 @@ For CSV the `parseConfig` field is mandatory:
 ```javascript
 resources: {
     stations: {
-        source: 'sqlite-csv',
+        source: 'geo-csv',
         mode: 'url',
         url: 'https://example.org/stations.csv',
-        addon: 'csv-tsv-sqlite-toolkit',
+        addon: 'geo-csv-tsv-toolkit',
         parseConfig: {                                     // mandatory — no silent default
             delimiter: ',',
             header: true,
@@ -1348,9 +1348,9 @@ Resource validation codes are shared with [09-validation-rules.md](./09-validati
 | RES040 | warning | `source: 'sqlite'` with `origin: 'inline'` is not recommended (data privacy). |
 | RES041 | error | All resource fields are required. No field MAY be omitted. |
 | RES042 | info | SQLite resources MAY include a `getSchema` query for CLI bootstrap (file-based) or downstream tooling. Not required. |
-| RES043 | error | `mode: 'url'` is only valid for `source: 'sqlite-geojson'` or `'sqlite-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
+| RES043 | error | `mode: 'url'` is only valid for `source: 'geo-geojson'` or `'geo-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
 | RES044 | error | `mode: 'url'` requires `url` (HTTPS) and `addon`. The URL MUST use HTTPS. `mode` MUST be explicit (no default). (added in v4.3.0) |
-| RES045 | error | `source: 'sqlite-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
+| RES045 | error | `source: 'geo-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
 
 ---
 

@@ -25,7 +25,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 |-------|-------|-----------------|----------------|
 | 1 | `stage:research` | API endpoint discovered | API reachable, schema creation is feasible |
 | 2 | `stage:creation` | Research complete | Schema file created in `tests/new-schemas/` |
-| 3 | `stage:api-test` | Schema created | `flowmcp test single` → min. 1 PASS (see Special Rule) |
+| 3 | `stage:api-test` | Schema created | `flowmcp grading deterministic` → min. 1 PASS (see Special Rule) |
 | 4 | `stage:validation` | API test passed | `flowmcp validate` → 0 errors |
 | 5 | `stage:grade` | Validation passed | `namespaceAggregate` grade B or better |
 | 6 | `stage:production` | `namespaceAggregate` grade B+ confirmed | Deployed to `providers/` in production catalog |
@@ -38,7 +38,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:creation`** — The schema file is written and placed in `tests/new-schemas/{provider}/`. This stage covers the authoring process — defining tools, parameters, shared list references, handlers, and test cases.
 
-**`stage:api-test`** — The schema is tested against the live API using `flowmcp test single <path>`. At least one tool must return a PASS result. See the [API-Test Special Rule](#api-test-special-rule-for-static-schemas) below for schemas with no HTTP tools.
+**`stage:api-test`** — The schema is tested against the live API using `flowmcp grading deterministic <id>`. At least one tool must return a PASS result. See the [API-Test Special Rule](#api-test-special-rule-for-static-schemas) below for schemas with no HTTP tools.
 
 **`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 

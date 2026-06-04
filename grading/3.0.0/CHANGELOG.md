@@ -1,5 +1,18 @@
 # Changelog gradingSpec
 
+## 3.0.1 — 2026-06-04 (additive)
+
+Additive, non-breaking. The pinned `blockedReason` enum gains **`fewer-than-two-tests`** —
+the genuine "below 2 working tests" reason for the current Bar=2 minimum, which previously
+collapsed onto `fewer-than-three-tests`. A consumer that switch-cased the
+old set still validates; the new value only widens the closed set.
+
+| File | Change |
+|------|--------|
+| `index.schema.json` | `$defs/blockedReason` enum gains `fewer-than-two-tests` (now 7 values). |
+| `08-grading-model.md` | Canonical set widened to 7 values. |
+| `23-index-json.md` | New `reason` row defining `fewer-than-two-tests`. |
+
 ## 3.0.0 — 2026-06-02 (v3 break, BREAKING)
 
 `3.0.0` is the **v3 break**. It is **BREAKING**: the `grading import` contract changes from a

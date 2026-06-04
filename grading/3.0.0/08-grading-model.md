@@ -37,10 +37,10 @@ The grading entry is the **only** durable artefact emitted by a grader; it MUST 
 The canonical `blockedReason` set — shared by the grading module and `index.json` — is:
 
 ```
-"validation-failed" | "fewer-than-three-tests" | "no-about" | "api-down" | "all-schemas-unparseable" | "not-imported"
+"validation-failed" | "fewer-than-three-tests" | "fewer-than-two-tests" | "no-about" | "api-down" | "all-schemas-unparseable" | "not-imported"
 ```
 
-This 6-value set is the **single source of truth** (also encoded in `index.schema.json` `$defs/blockedReason`). Earlier versions of this document listed only `"validation-failed"` as the grading-module subset (`Grading.VALID_BLOCKED_REASONS`) — that narrower list is superseded by this canonical set. A free-text `blockedReason` is rejected (`GRD-038` when `status != 'blocked'`, `GRD-039` when the reason is outside the closed set). The full pinned reason set including prose definitions is in [`23-index-json.md`](./23-index-json.md).
+This 7-value set is the **single source of truth** (also encoded in `index.schema.json` `$defs/blockedReason`). Earlier versions of this document listed only `"validation-failed"` as the grading-module subset (`Grading.VALID_BLOCKED_REASONS`) — that narrower list is superseded by this canonical set. A free-text `blockedReason` is rejected (`GRD-038` when `status != 'blocked'`, `GRD-039` when the reason is outside the closed set). The full pinned reason set including prose definitions is in [`23-index-json.md`](./23-index-json.md).
 
 ---
 

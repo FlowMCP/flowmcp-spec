@@ -62,6 +62,7 @@ A `blocked` node MUST carry a `reason` from the following **closed set**. Free-t
 |----------|------|
 | `validation-failed` | The schema(s) failed the `grading import` validate gate (emit-on-failure, see [`22-workbench-island.md`](./22-workbench-island.md)). Matches the closed reason set in the grading module (`Grading.VALID_BLOCKED_REASONS`). |
 | `fewer-than-three-tests` | The schema has fewer than three working downloadable tests. |
+| `fewer-than-two-tests` | The schema has fewer than two working downloadable tests (the current Bar=2 minimum; the genuine "below 2" reason that previously collapsed onto `fewer-than-three-tests`). |
 | `no-about` | No About Resource is declared / found namespace-wide. |
 | `api-down` | The API is unreachable at grading time. |
 | `all-schemas-unparseable` | Every `.mjs` in the folder is unparseable (the namespace folder name is the fallback key — see [`19-folder-layout.md`](./19-folder-layout.md)). |

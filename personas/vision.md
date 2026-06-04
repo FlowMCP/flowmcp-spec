@@ -35,7 +35,7 @@ Dieser Satz ist die **Single Source** für Hero-Sub-Headline und About-Lead. Er 
 | **Sicherheits-Plus** | Schemas sind klein und auditierbar. API-Keys liegen in FlowMCP, **nicht in der AI** — AI sieht nie einen Key. Bei jedem direkten REST-Call durch eine AI würde der Key exposed. |
 | **Killer-Feature** | **Rückwärtssuche über Shared Lists** — Schemas tragen sich in geteilte Listen ein (z.B. "Ethereum Mainnet", "Berlin"). AI kann fragen: "Welche Schemas decken X ab?" — selbst wenn der Kontext leer ist. |
 | **v4-Erweiterung** | **Skills + Prefill + Selections + Output-Schema + Pipes** (siehe Blog-Artikel zu v4). |
-| **v4.1-Erweiterung** | **Add-on-Konzept** — externe Toolkits wie `gtfs-sqlite-toolkit` können FlowMCP erweitern. |
+| **v4.1-Erweiterung** | **Add-on-Konzept** — externe Toolkits wie `geo-gtfs-toolkit` können FlowMCP erweitern. |
 | **Datenklassen** | Crypto (EVM, Solana, DeFi, Identity, NFT), Open Data (DE/EU), Weather/Geo, Web3 Social, News, Dev-Tools. |
 
 ## Was FlowMCP NICHT (mehr) ist

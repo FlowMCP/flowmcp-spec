@@ -10,7 +10,7 @@ const repoGroups = [
     { group: 'Core', repos: [ 'flowmcp-cli', 'flowmcp-core', 'flowmcp-schemas-public', 'flowmcp-servers', 'flowmcp-spec' ] },
     { group: 'Payment', repos: [ 'x402-core', 'x402-mcp-middleware', 'x402-flowmcp-org' ] },
     { group: 'Agent Server', repos: [ 'mcp-agent-server' ] },
-    { group: 'Add-ons', repos: [ 'gtfs-sqlite-toolkit' ] }
+    { group: 'Add-ons', repos: [ 'geo-gtfs-toolkit' ] }
 ]
 
 const personaMap = {
@@ -23,7 +23,7 @@ const personaMap = {
     'x402-mcp-middleware': 'Daniel',
     'x402-flowmcp-org': 'Anders + Daniel',
     'mcp-agent-server': 'Daniel',
-    'gtfs-sqlite-toolkit': 'Domain-specific (Mobility)'
+    'geo-gtfs-toolkit': 'Domain-specific (Mobility)'
 }
 
 const sections = []

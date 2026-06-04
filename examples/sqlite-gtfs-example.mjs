@@ -16,11 +16,11 @@ export const schema = {
                 path: '${FLOWMCP_RESOURCES}/gtfs-de.db',
                 addon: 'geo-gtfs-toolkit',
                 addonVersion: '>=0.1.0',
-                addonSource: 'github:FlowMCP/gtfs-sqlite-toolkit'
+                addonSource: 'github:FlowMCP/geo-gtfs-toolkit'
             }
         ],
         tools: [
-            // Standard-GTFS-Tools werden auto-injiziert (siehe gtfs-sqlite-toolkit).
+            // Standard-GTFS-Tools werden auto-injiziert (siehe geo-gtfs-toolkit).
             // Schema-spezifische Tools koennen hier ergaenzt werden.
         ]
     }

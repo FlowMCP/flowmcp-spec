@@ -43,7 +43,7 @@ const body = [
     '',
     '## Companion Toolkit',
     '',
-    'For GTFS transit data, see the `gtfs-sqlite-toolkit` repository: https://github.com/FlowMCP/gtfs-sqlite-toolkit'
+    'For GTFS transit data, see the `geo-gtfs-toolkit` repository: https://github.com/FlowMCP/geo-gtfs-toolkit'
 ].join( '\n' )
 
 writeFileSync( join( guideRepo, 'knowledge', '08-schemas-public-catalog.md' ), frontmatter + body, 'utf8' )

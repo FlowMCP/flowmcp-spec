@@ -294,7 +294,7 @@ Intermediate modes (append-only, insert-but-no-delete) are intentionally omitted
 
 ### Overview
 
-The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`** (Design C — top-level with inheritance). It denotes a SQLite database that has been produced by a FlowMCP add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/gtfs-sqlite-toolkit`) and carries a verified quality seal in its `meta` table. The seal guarantees that the database structure, validation status, and discoverable capabilities are conformant with a known add-on contract — which allows FlowMCP-CLI to automatically inject standard tools without the schema author writing any SQL by hand.
+The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`** (Design C — top-level with inheritance). It denotes a SQLite database that has been produced by a FlowMCP add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/geo-gtfs-toolkit`) and carries a verified quality seal in its `meta` table. The seal guarantees that the database structure, validation status, and discoverable capabilities are conformant with a known add-on contract — which allows FlowMCP-CLI to automatically inject standard tools without the schema author writing any SQL by hand.
 
 `sqlite-gtfs` is **not** a fallback for `sqlite`. A database without a valid seal is rejected (see [Validation Rules](#validation-rules) — `RES032`). Users who want full manual control over a SQLite database continue to use `source: 'sqlite'`.
 
@@ -318,7 +318,7 @@ The `source: 'sqlite-gtfs'` resource type is a **top-level sub-type of `sqlite`*
 
 Every `sqlite-gtfs` resource MUST point to a database whose `meta` table contains the entry `qualitySeal === 'sqlite-gtfs'`. This is a hard requirement enforced by the validator (`RES032`). A database that does not carry the seal — whether because it was produced by an unverified converter, manually edited, or partially converted — is rejected at schema activation time.
 
-The seal is written by the converter (e.g. `MetaWriter` in `github:FlowMCP/gtfs-sqlite-toolkit`) only when the conversion completes successfully and all pre-validation checks pass strictly. A failed or partial conversion produces `qualitySeal: null` and the database is not usable as a `sqlite-gtfs` resource.
+The seal is written by the converter (e.g. `MetaWriter` in `github:FlowMCP/geo-gtfs-toolkit`) only when the conversion completes successfully and all pre-validation checks pass strictly. A failed or partial conversion produces `qualitySeal: null` and the database is not usable as a `sqlite-gtfs` resource.
 
 ### Required Meta Keys
 
@@ -329,7 +329,7 @@ The `meta` table of a sealed database MUST contain the following ten keys. They 
 | `qualitySeal` | Add-on identifier (here: `'sqlite-gtfs'`). The seal value. |
 | `specRevision` | FlowMCP spec revision the converter targeted (e.g. `'2026-04-27'`). Used for spec-drift warnings (`RES034`). |
 | `specUrl` | URL of the spec revision document. |
-| `converterVersion` | SemVer of the add-on that produced the database (e.g. `github:FlowMCP/gtfs-sqlite-toolkit@0.1.0`). |
+| `converterVersion` | SemVer of the add-on that produced the database (e.g. `github:FlowMCP/geo-gtfs-toolkit@0.1.0`). |
 | `capabilities` | JSON-encoded map of capability booleans (e.g. `basicLookup`, `routing`, `shapesVisualization`, `flexService`). Drives auto-injection. |
 | `validationReport` | JSON-encoded summary of pre-validation results (counts of errors / warnings / info). |
 | `buildDate` | ISO-8601 timestamp of the conversion run. |
@@ -366,7 +366,7 @@ export const schema = {
                 path: '${FLOWMCP_RESOURCES}/gtfs-de.db',            // User-configurable
                 addon: 'geo-gtfs-toolkit',                          // Authority over default methods
                 addonVersion: '>=0.1.0',                            // optional
-                addonSource: 'github:FlowMCP/gtfs-sqlite-toolkit'   // NPM is not supported
+                addonSource: 'github:FlowMCP/geo-gtfs-toolkit'   // NPM is not supported
             }
         ],
         tools: [
@@ -381,7 +381,7 @@ When the FlowMCP-CLI initializes this resource schema (on first use — there is
 
 ### Add-on Authority
 
-The `sqlite-gtfs` resource type **delegates the definition of standard tools to the add-on**. The spec describes the resource contract; the add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/gtfs-sqlite-toolkit`) owns the catalog of default methods — `searchStops`, `searchRoutes`, `getDepartures`, `getShapeForRoute`, `getFlexBookingRules`, and so on — and decides which ones become available based on the `capabilities` map.
+The `sqlite-gtfs` resource type **delegates the definition of standard tools to the add-on**. The spec describes the resource contract; the add-on (the `geo-gtfs-toolkit` package, cloned from `github:FlowMCP/geo-gtfs-toolkit`) owns the catalog of default methods — `searchStops`, `searchRoutes`, `getDepartures`, `getShapeForRoute`, `getFlexBookingRules`, and so on — and decides which ones become available based on the `capabilities` map.
 
 This split keeps the spec stable while letting add-ons evolve independently. New add-ons (for example a future `sqlite-netex` or `sqlite-trias`) follow the same `Design C` pattern: top-level source value, seal requirement, add-on reference, capability-driven auto-injection.
 
@@ -389,7 +389,7 @@ This split keeps the spec stable while letting add-ons evolve independently. New
 
 **Provider GTFS data MUST NOT be committed to the spec repository, the add-on repository, or any other public FlowMCP repository.** GTFS feeds carry third-party licensing terms that typically prohibit redistribution. Users provide their own GTFS data locally — either by downloading from the provider directly or by using the add-on's converter against a local source archive. The converted database lives under the user-controlled `${FLOWMCP_RESOURCES}` directory and is never published.
 
-The synthetic Mini-GTFS fixture shipped with `github:FlowMCP/gtfs-sqlite-toolkit` (under a CC0 license) is the only GTFS-shaped data permitted in any public FlowMCP repository. It exists exclusively for testing and CI.
+The synthetic Mini-GTFS fixture shipped with `github:FlowMCP/geo-gtfs-toolkit` (under a CC0 license) is the only GTFS-shaped data permitted in any public FlowMCP repository. It exists exclusively for testing and CI.
 
 ---
 

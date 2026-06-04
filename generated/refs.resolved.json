@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-04T13:26:38.542Z",
-        "fromCommit": "c9061ca",
+        "at": "2026-06-04T17:11:37.464Z",
+        "fromCommit": "35b650a",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -30,9 +30,9 @@
             "browseUrl": "https://github.com/FlowMCP/flowmcp-schemas-public/tree/main"
         },
         "gtfsToolkit": {
-            "github": "github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0",
-            "npmInstallCommand": "npm install -g github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0",
-            "browseUrl": "https://github.com/FlowMCP/gtfs-sqlite-toolkit/tree/v1.0.0"
+            "github": "github:FlowMCP/geo-gtfs-toolkit#v1.0.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/geo-gtfs-toolkit#v1.0.0",
+            "browseUrl": "https://github.com/FlowMCP/geo-gtfs-toolkit/tree/v1.0.0"
         }
     },
     "docs": {
@@ -65,17 +65,17 @@
     "addons": [
         {
             "name": "geo-gtfs-toolkit",
-            "import": "github:FlowMCP/gtfs-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-gtfs-toolkit",
             "description": "Convert GTFS Schedule feeds to a sealed SQLite database (source-key: sqlite-gtfs)"
         },
         {
             "name": "geo-geojson-toolkit",
-            "import": "github:FlowMCP/geojson-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-geojson-toolkit",
             "description": "Load a GeoJSON FeatureCollection from a URL into memory for spatial queries (source-key: geo-geojson)"
         },
         {
             "name": "geo-csv-tsv-toolkit",
-            "import": "github:FlowMCP/csv-tsv-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-csv-tsv-toolkit",
             "description": "Load geo CSV/TSV from a URL into memory with a mandatory parse config (source-key: geo-csv)"
         },
         {

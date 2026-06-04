@@ -53,8 +53,9 @@
             "const": 2
         },
         "proofVersion": {
-            "type": "string",
-            "description": "Provider-proof envelope field (providers/<ns>/grade.json only). Absent on island index.json."
+            "type": "integer",
+            "minimum": 1,
+            "description": "Provider-proof envelope field (providers/<ns>/grade.json only). Absent on island index.json. Integer (current value 1), distinct from the island indexVersion const 2."
         },
         "generatedAt": {
             "type": "string",
@@ -110,5 +111,17 @@
             }
         }
     },
-    "required": [ "proofVersion", "namespace", "status" ]
+    "required": [ "namespace", "status" ],
+    "oneOf": [
+        {
+            "title": "Island index.json (workbench, gitignored)",
+            "required": [ "indexVersion" ],
+            "not": { "required": [ "proofVersion" ] }
+        },
+        {
+            "title": "Provider-proof grade.json (exported, CI-visible)",
+            "required": [ "proofVersion", "generatedAt" ],
+            "not": { "required": [ "indexVersion" ] }
+        }
+    ]
 }

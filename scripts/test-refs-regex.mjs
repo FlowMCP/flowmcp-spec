@@ -4,7 +4,7 @@ const positives = [
     'github:FlowMCP/flowmcp-cli#v4.1.0',
     'github:FlowMCP/flowmcp-core#v4.1.0',
     'github:FlowMCP/flowmcp-schemas-public#main',
-    'github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0',
+    'github:FlowMCP/geo-gtfs-toolkit#v1.0.0',
     'github:FlowMCP/flowmcp-cli'
 ]
 

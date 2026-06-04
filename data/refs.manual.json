@@ -17,7 +17,7 @@
         "cli": "github:FlowMCP/flowmcp-cli#v4.1.0",
         "core": "github:FlowMCP/flowmcp-core#v4.1.0",
         "schemasPublic": "github:FlowMCP/flowmcp-schemas-public#main",
-        "gtfsToolkit": "github:FlowMCP/gtfs-sqlite-toolkit#v1.0.0"
+        "gtfsToolkit": "github:FlowMCP/geo-gtfs-toolkit#v1.0.0"
     },
     "docs": {
         "canonical": "https://flowmcp.github.io",
@@ -49,17 +49,17 @@
     "addons": [
         {
             "name": "geo-gtfs-toolkit",
-            "import": "github:FlowMCP/gtfs-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-gtfs-toolkit",
             "description": "Convert GTFS Schedule feeds to a sealed SQLite database (source-key: sqlite-gtfs)"
         },
         {
             "name": "geo-geojson-toolkit",
-            "import": "github:FlowMCP/geojson-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-geojson-toolkit",
             "description": "Load a GeoJSON FeatureCollection from a URL into memory for spatial queries (source-key: geo-geojson)"
         },
         {
             "name": "geo-csv-tsv-toolkit",
-            "import": "github:FlowMCP/csv-tsv-sqlite-toolkit",
+            "import": "github:FlowMCP/geo-csv-tsv-toolkit",
             "description": "Load geo CSV/TSV from a URL into memory with a mandatory parse config (source-key: geo-csv)"
         },
         {

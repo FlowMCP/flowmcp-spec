@@ -13,6 +13,12 @@
         "specDir": "grading/3.0.0",
         "url": "https://flowmcp.github.io/grading/overview/"
     },
+    "bestPractice": {
+        "currentVersion": "0.1.0",
+        "recommendedRelease": "0.1.0",
+        "specDir": "best-practice/0.1.0",
+        "url": "https://flowmcp.github.io/best-practice/introduction/"
+    },
     "imports": {
         "cli": "github:FlowMCP/flowmcp-cli#v4.1.0",
         "core": "github:FlowMCP/flowmcp-core#v4.1.0",

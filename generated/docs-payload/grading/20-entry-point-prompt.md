@@ -6,9 +6,9 @@ spec_file: "20-entry-point-prompt.md"
 order: 20
 section: "Grading"
 normative: true
-source_commit: "62b50d4"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/20-entry-point-prompt.md"
-generated_at: "2026-06-04T13:49:20.413Z"
+source_commit: "3979b97"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/grading/3.0.0/20-entry-point-prompt.md"
+generated_at: "2026-06-04T20:12:27.959Z"
 generated_from: "grading/3.0.0/20-entry-point-prompt.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/20-entry-point-prompt.md."

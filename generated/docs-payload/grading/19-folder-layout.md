@@ -6,9 +6,9 @@ spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "62b50d4"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/19-folder-layout.md"
-generated_at: "2026-06-04T13:49:20.413Z"
+source_commit: "3979b97"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/grading/3.0.0/19-folder-layout.md"
+generated_at: "2026-06-04T20:12:27.959Z"
 generated_from: "grading/3.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/19-folder-layout.md."
@@ -98,6 +98,23 @@ The full data flow (where each is born, where it is committed, what the board sy
 `<ts>` is in the format `YYYY-MM-DDTHH-MM-SSZ` (hyphens instead of colons for filesystem compatibility). `<hash8>` is the first 8 hex chars of the sha256 over the canonically serialised content (see [`15-versioning-axes.md`](/grading/versioning-axes/)). The hash appears in the filename and in `index.json` only — never inside the source.
 
 `resolveLatest(dir, logicalName)` is the single resolver for both primitives and gradings: it filters on the prefix, sorts, and takes the last entry as the newest version. Date-before-hash is what makes this naive sort correct — with `<name>--<hash>--<ts>` the random hash would dominate the sort and an older file could be picked as the "newest".
+
+### Addressing Grammar (NEW in 3.0.0)
+
+A grading target is addressed by a slash-delimited **id grammar** that maps one-to-one onto the folder layout above. Tooling (the CLI grading commands) parses these ids; the grammar is normative so that addressing is portable across implementations.
+
+| Id form | Resolves to | Layout path |
+|---------|-------------|-------------|
+| `<ns>` | whole namespace | `providers/<ns>/` |
+| `<ns>/<schema>` | one schema | `providers/<ns>/<schema>/` |
+| `<ns>/tool/<name>` | one tool | `providers/<ns>/<schema>/tools/<name>/` |
+| `<ns>/tool/<name>/tests/<N>` | one single recorded test of a tool | `providers/<ns>/<schema>/tools/<name>/tests/test-<N>.json` |
+
+`<N>` is the test index matching the `test-<N>.json` filename. An id MUST resolve to exactly one layout node; an unresolvable id is a hard error (never silently widened to a parent node). The per-test form `<ns>/tool/<name>/tests/<N>` is the finest addressing granularity and exists so that a single recorded test can be re-graded in isolation without touching its siblings, the schema, or the namespace rollup.
+
+### Conformance: sweep-only is non-conformant (NEW in 3.0.0)
+
+A schema folder that carries a `summary.json` (pretest data) but **no** `_gradings/` for its graded primitives is **non-conformant** — it has been *swept* (the data-pretest ran) but not *graded* (no deterministic Area entry was written). The universal `_gradings/` rule below is therefore machine-falsifiable: a conformance check MUST flag a `providers/<ns>/<schema>/` that has `summary.json` and `tools/<tool>/tests/` but lacks the corresponding `tools/<tool>/_gradings/` and `<schema>/_gradings/`. A conforming deterministic grading produces the full structure (`_gradings/` + the namespace `index.json` + the exported `grade.json`), never summary-only. The enforcing gate is specified on the consumer side (the grading `doctor` / layout conformance check).
 
 ### `shared-lists/`
 

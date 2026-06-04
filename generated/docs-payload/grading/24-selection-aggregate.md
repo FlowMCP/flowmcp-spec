@@ -6,9 +6,9 @@ spec_file: "24-selection-aggregate.md"
 order: 24
 section: "Grading"
 normative: true
-source_commit: "62b50d4"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/24-selection-aggregate.md"
-generated_at: "2026-06-04T13:49:20.413Z"
+source_commit: "3979b97"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/grading/3.0.0/24-selection-aggregate.md"
+generated_at: "2026-06-04T20:12:27.959Z"
 generated_from: "grading/3.0.0/24-selection-aggregate.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/24-selection-aggregate.md."

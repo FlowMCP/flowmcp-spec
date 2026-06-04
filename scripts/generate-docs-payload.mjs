@@ -45,6 +45,9 @@ const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const GRADING_ROOT = join( REPO, 'grading' )
 const GRADING_PAYLOAD_DIR = join( PAYLOAD_DIR, 'grading' )
+// Memo 108: third track — best-practice (advisory). Same additive shape as grading.
+const BEST_PRACTICE_ROOT = join( REPO, 'best-practice' )
+const BEST_PRACTICE_PAYLOAD_DIR = join( PAYLOAD_DIR, 'best-practice' )
 const GENERATOR = 'scripts/generate-docs-payload.mjs'
 
 
@@ -59,6 +62,15 @@ const PROSAIC_FILES = new Set( [
 // Grading prosaic files — the grading overview is conceptual prose.
 const GRADING_PROSAIC_FILES = new Set( [
     '00-overview.md'
+] )
+
+
+// Memo 108: best-practice prosaic files — the intro + overview are prose; the
+// five schema-creation areas are advisory recommendations (non-normative too,
+// derived from their "| Status | Recommendation |" table by gradingNormativeFn).
+const BEST_PRACTICE_PROSAIC_FILES = new Set( [
+    '00-introduction.md',
+    '01-overview.md'
 ] )
 
 
@@ -222,6 +234,23 @@ const gradingMetadataFooter = ( { content } ) => {
 const gradingBodyTransform = ( { content } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
 
 
+// Memo 108: best-practice link rewrite. The BP source uses relative sibling and
+// parent links — "./01-overview.md", "../01-overview.md",
+// "./schema-creation/10-readable-interface.md" — which 404 on the site (rendered
+// at /best-practice/<slug>/). Rewrite any relative .md link whose basename is an
+// NN-prefixed chapter to the in-site route. Absolute http(s) links are left
+// untouched (the ":" / "//" break the relative-prefix match). slug = basename
+// without the leading "NN-". Mirrors gradingLinkRewrite.
+const bestPracticeLinkRewrite = ( { content } ) => {
+    return content.replace(
+        /\]\((?:\.\.?\/)?(?:[a-z0-9-]+\/)*(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
+        ( match, fname, anchor ) => `](/best-practice/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
+    )
+}
+
+const bestPracticeBodyTransform = ( { content } ) => bestPracticeLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+
+
 // Memo 088 PRD-SpecLinks: spec link rewrite. The spec source uses relative
 // sibling links "[text](./NN-name.md)" which 404 on the site (rendered at
 // /specification/<slug>/). Rewrite them to the in-site route. Anchors are
@@ -271,6 +300,15 @@ const cleanGradingTitle = ( { title, filename } ) => {
 }
 
 
+// Memo 108: best-practice titles. 00/01 carry a "Best Practice — X" H1 → clean to
+// the bare nav label; the schema-creation pages carry an "NN — Title" prefix → strip it.
+const cleanBestPracticeTitle = ( { title, filename } ) => {
+    if( filename === '00-introduction.md' ) return 'Introduction'
+    if( filename === '01-overview.md' ) return 'Overview'
+    return title.replace( /^\d+\s*[—–-]\s*/, '' ).trim()
+}
+
+
 // Memo 087 PRD-01: spec uses the PROSAIC_FILES set for the `normative` flag.
 // Grading chapters declare their status in the metadata table; derive `normative`
 // from "| Status | Normative |", falling back to the prosaic set when absent.
@@ -283,8 +321,8 @@ const gradingNormativeFn = ( { filename, content, prosaicFiles } ) => {
 }
 
 
-const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } ) => {
-    const relativeSourcePath = `${ sourceRelBase }/${ filename }`
+const buildFrontmatter = ( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase, relPath } ) => {
+    const relativeSourcePath = `${ sourceRelBase }/${ relPath ?? filename }`
     const sourceUrl = `https://github.com/FlowMCP/flowmcp-spec/blob/${ sourceCommit }/${ relativeSourcePath }`
     const lines = []
     lines.push( '---' )
@@ -306,8 +344,8 @@ const buildFrontmatter = ( { filename, title, description, normative, now, sourc
 }
 
 
-const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } ) => {
-    const sourcePath = join( sourceDir, filename )
+const generateFile = async ( { filename, relPath, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } ) => {
+    const sourcePath = join( sourceDir, relPath ?? filename )
     const content = await readFile( sourcePath, 'utf-8' )
 
     const rawTitle = extractTitle( { content } ) || filename
@@ -315,7 +353,7 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
     const description = extractDescription( { content } )
     const normative = normativeFn( { filename, content, prosaicFiles } )
 
-    const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase } )
+    const frontmatter = buildFrontmatter( { filename, title, description, normative, now, sourceCommit, section, versionField, version, sourceRelBase, relPath } )
     const bodyRewritten = rewriteCrossRefs( { content } )
 
     // Memo 087 PRD-P2-A/B + Memo 088: pass-specific body transform. Grading
@@ -338,19 +376,39 @@ const generateFile = async ( { filename, now, sourceCommit, sourceDir, targetDir
 }
 
 
-const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit, titleTransform, normativeFn, bodyTransform } ) => {
-    await mkdir( targetDir, { recursive: true } )
-    const allFiles = await readdir( sourceDir )
-    const docFiles = allFiles
-        .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
-        .sort()
+// Memo 108: collect doc files for a pass. Non-recursive (spec/grading) returns the
+// top-level NN-*.md files. Recursive (best-practice) also descends one level into
+// subdirectories (e.g. schema-creation/) and flattens them into the payload — the
+// slug routing is by basename, so a flat payload mirrors the grading layout while
+// the source keeps the memo's explicit subfolder structure. relPath preserves the
+// subdir path for the frontmatter source_url / generated_from.
+const collectDocEntries = async ( { sourceDir, recursive } ) => {
+    const top = await readdir( sourceDir, { withFileTypes: true } )
+    const fileEntries = top
+        .filter( ( dirent ) => dirent.isFile() && /^\d{2}-/.test( dirent.name ) && dirent.name.endsWith( '.md' ) )
+        .map( ( dirent ) => ( { filename: dirent.name, relPath: dirent.name } ) )
+    const subDirs = recursive ? top.filter( ( dirent ) => dirent.isDirectory() ) : []
+    const subEntriesNested = await Promise.all( subDirs.map( async ( dirent ) => {
+        const subFiles = await readdir( join( sourceDir, dirent.name ) )
+        return subFiles
+            .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
+            .map( ( f ) => ( { filename: f, relPath: `${ dirent.name }/${ f }` } ) )
+    } ) )
+    return [ ...fileEntries, ...subEntriesNested.flat() ]
+        .sort( ( a, b ) => a.filename.localeCompare( b.filename ) )
+}
 
-    console.log( `Generating ${ label } payload from ${ docFiles.length } files (version=${ version }, source_commit=${ sourceCommit })...` )
+
+const generatePass = async ( { label, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, now, sourceCommit, titleTransform, normativeFn, bodyTransform, recursive } ) => {
+    await mkdir( targetDir, { recursive: true } )
+    const docEntries = await collectDocEntries( { sourceDir, recursive: recursive === true } )
+
+    console.log( `Generating ${ label } payload from ${ docEntries.length } files (version=${ version }, source_commit=${ sourceCommit })...` )
     const results = []
-    for( const filename of docFiles ) {
-        const result = await generateFile( { filename, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } )
+    for( const { filename, relPath } of docEntries ) {
+        const result = await generateFile( { filename, relPath, now, sourceCommit, sourceDir, targetDir, prosaicFiles, section, versionField, version, sourceRelBase, titleTransform, normativeFn, bodyTransform } )
         results.push( result )
-        console.log( `  ✓ ${ filename } → ${ result.title }` )
+        console.log( `  ✓ ${ relPath } → ${ result.title }` )
     }
     return results
 }
@@ -420,6 +478,37 @@ const main = async () => {
         console.log( `\nGenerated ${ gradingResults.length } grading files in ${ GRADING_PAYLOAD_DIR } (grading_version=${ gradingVersion })` )
     } else {
         console.warn( '\nNo semver grading folder — grading pass skipped.' )
+    }
+
+    // --- Best-practice pass (Memo 108 — additive third source, advisory) ---
+    let bestPracticeVersion = null
+    try {
+        const bpDirs = await readdir( BEST_PRACTICE_ROOT )
+        bestPracticeVersion = pickMaxSemverDir( { names: bpDirs } )
+    } catch( err ) {
+        console.warn( `\nNo best-practice/ folder found — skipping best-practice pass (${ err.message })` )
+    }
+
+    if( bestPracticeVersion ) {
+        const bpResults = await generatePass( {
+            label: 'best-practice',
+            sourceDir: join( BEST_PRACTICE_ROOT, bestPracticeVersion ),
+            targetDir: BEST_PRACTICE_PAYLOAD_DIR,
+            prosaicFiles: BEST_PRACTICE_PROSAIC_FILES,
+            section: 'Best Practice',
+            versionField: 'best_practice_version',
+            version: bestPracticeVersion,
+            sourceRelBase: `best-practice/${ bestPracticeVersion }`,
+            now,
+            sourceCommit,
+            titleTransform: cleanBestPracticeTitle,
+            normativeFn: gradingNormativeFn,
+            bodyTransform: bestPracticeBodyTransform,
+            recursive: true
+        } )
+        console.log( `\nGenerated ${ bpResults.length } best-practice files in ${ BEST_PRACTICE_PAYLOAD_DIR } (best_practice_version=${ bestPracticeVersion })` )
+    } else {
+        console.warn( '\nNo semver best-practice folder — best-practice pass skipped.' )
     }
 }
 

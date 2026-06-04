@@ -6,9 +6,9 @@ spec_file: "04-phases-single.md"
 order: 4
 section: "Grading"
 normative: true
-source_commit: "62b50d4"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/04-phases-single.md"
-generated_at: "2026-06-04T13:49:20.413Z"
+source_commit: "3979b97"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/grading/3.0.0/04-phases-single.md"
+generated_at: "2026-06-04T20:12:27.959Z"
 generated_from: "grading/3.0.0/04-phases-single.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/04-phases-single.md."
@@ -55,7 +55,7 @@ The Area model retains four procedures that previously lived inside the phase mo
 
 The description cascade is a **mandatory ordered procedure** for validating tool descriptions. It MUST be executed in the following order; skipping or reordering steps is a finding.
 
-1. **Run tests against the endpoint.** MUST: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
+1. **Run tests against the endpoint.** MUST meet the working-test **pass bar** defined in [`06-determinism-and-tier.md`](/grading/determinism-and-tier/): **2 working tests per tool** (status true and non-empty data) for a parameterised tool, **1** for a parameterless tool; **3 is the SHOULD target** (the `data-analyzable` rung) covering the breadth of the parameter space. A tool below its pass bar is a repairable `blocked`/not-green state recorded with a status reason — never a terminal rejection. ch06 is the single authoritative bar definition; this step references it and does not set a divergent threshold.
 2. **Check the responses** and validate the tool description against the actual responses.
 3. **Normalise / update the tool description** to match the validated responses.
 4. **All tools, resources, and prompts MUST have descriptions** — and each description MUST be individually checked.

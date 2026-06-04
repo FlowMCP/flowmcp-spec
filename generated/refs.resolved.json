@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-04T17:15:42.204Z",
-        "fromCommit": "8558e5c",
+        "at": "2026-06-04T20:23:18.363Z",
+        "fromCommit": "3979b97",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -120,5 +120,12 @@
         "specDir": "grading/3.0.0",
         "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/grading/3.0.0",
         "url": "https://flowmcp.github.io/grading/overview/"
+    },
+    "bestPractice": {
+        "currentVersion": "0.1.0",
+        "recommendedRelease": "0.1.0",
+        "specDir": "best-practice/0.1.0",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/best-practice/0.1.0",
+        "url": "https://flowmcp.github.io/best-practice/introduction/"
     }
 }

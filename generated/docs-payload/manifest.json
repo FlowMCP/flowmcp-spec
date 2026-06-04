@@ -1,6 +1,6 @@
 {
     "spec_version": "4.3.0",
-    "generated_at": "2026-06-04T13:49:20.532Z",
+    "generated_at": "2026-06-04T20:12:38.970Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -398,6 +398,11 @@
             "name": "Grading",
             "file_count": 27,
             "order": 2
+        },
+        {
+            "name": "Best Practice",
+            "file_count": 7,
+            "order": 3
         }
     ],
     "stats": {
@@ -718,6 +723,88 @@
                 "normative": true,
                 "sidebar_group": "reference",
                 "collapsed": true
+            }
+        ]
+    },
+    "bestPractice": {
+        "version": "0.1.0",
+        "files": [
+            {
+                "filename": "00-introduction.md",
+                "slug": "introduction",
+                "title": "Introduction",
+                "description": "The Best-Practice track is the **third** FlowMCP spec track, alongside the **Specification** (`spec/v4.3.0/`) and **Grading** (`grading/3.0.0/`). Both of those are normative — they define what a...",
+                "order": 0,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "introduction",
+                "collapsed": false
+            },
+            {
+                "filename": "01-overview.md",
+                "slug": "overview",
+                "title": "Overview",
+                "description": "This page explains how to read the Best-Practice track, how it is versioned, and bundles the one-liners that are too small for their own page.",
+                "order": 1,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "overview",
+                "collapsed": false
+            },
+            {
+                "filename": "10-readable-interface.md",
+                "slug": "readable-interface",
+                "title": "Readable Interface: Enums, Parameter Names & Handler Phases",
+                "description": "Make the schema readable for the **LLM**, not for the API. An API may speak in terse codes; the model should not have to. Three related levers turn a cryptic upstream into a self-explaining tool.",
+                "order": 10,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "schema-creation",
+                "collapsed": false
+            },
+            {
+                "filename": "11-reference-data.md",
+                "slug": "reference-data",
+                "title": "Reference Data Without Duplicates: Shared Lists & Canonical Values",
+                "description": "Maintain recurring lists and value formats **once**, and inherit them everywhere. Duplicated reference data drifts; a single canonical source does not.",
+                "order": 11,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "schema-creation",
+                "collapsed": false
+            },
+            {
+                "filename": "12-load-and-scale.md",
+                "slug": "load-and-scale",
+                "title": "Load & Scale: In-Memory, SQLite, Add-ons, Query Bundling",
+                "description": "Pick the load/store strategy by **data size** and by the **query ability** of the source. A small static file and a large queryable corpus do not deserve the same machinery.",
+                "order": 12,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "schema-creation",
+                "collapsed": false
+            },
+            {
+                "filename": "13-geo-conventions.md",
+                "slug": "geo-conventions",
+                "title": "Geo Conventions",
+                "description": "Use the established geo defaults instead of rolling your own. The geo entry point already settled these conventions; new geo schemas should inherit them.",
+                "order": 13,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "schema-creation",
+                "collapsed": false
+            },
+            {
+                "filename": "14-correctness-license.md",
+                "slug": "correctness-license",
+                "title": "Correctness, License & Provenance",
+                "description": "Assume nothing silently, fake nothing, and document where the data comes from and under which rights. Correctness and provenance are what separate a schema that *passes* from a schema that can be...",
+                "order": 14,
+                "section": "Best Practice",
+                "normative": false,
+                "sidebar_group": "schema-creation",
+                "collapsed": false
             }
         ]
     }

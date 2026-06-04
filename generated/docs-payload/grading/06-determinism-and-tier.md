@@ -6,9 +6,9 @@ spec_file: "06-determinism-and-tier.md"
 order: 6
 section: "Grading"
 normative: true
-source_commit: "62b50d4"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/06-determinism-and-tier.md"
-generated_at: "2026-06-04T13:49:20.413Z"
+source_commit: "3979b97"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/grading/3.0.0/06-determinism-and-tier.md"
+generated_at: "2026-06-04T20:12:27.959Z"
 generated_from: "grading/3.0.0/06-determinism-and-tier.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/06-determinism-and-tier.md."
@@ -70,7 +70,7 @@ The working-test count per tool maps to a **Test-Leiter** rung. This is the dete
 | Working tests / tool | Rung (`testDepth`) | Meaning |
 |----------------------|--------------------|---------|
 | 0 | `unavailable` | No working test — `blocked` (repairable). In practice does not occur (every tool declares ≥ 1 test). |
-| 1 | `reachable` | Minimum, **INSUFFICIENT** — the deterministic test does NOT pass. The tool is reachable but its output schema cannot be validated against repeated evidence. |
+| 1 | `reachable` | Minimum, **INSUFFICIENT** for a parameterised tool — the deterministic test does NOT pass; its output schema cannot be validated against repeated evidence. **Exception:** a **parameterless** tool (no required parameter) reaches its pass bar already at rung 1 — see binding rule 5. |
 | 2 | `schema-validatable` | **Pass bar — the deterministic test PASSES.** Two working responses make the output schema validatable; the schema is **deterministic-green**. |
 | ≥ 3 | `data-analyzable` | Ideal gradient (a later wave). Not a second gate. |
 
@@ -78,10 +78,33 @@ The working-test count per tool maps to a **Test-Leiter** rung. This is the dete
 
 1. **The pass bar is `2` working tests per tool, applied per tool (not as a schema-file total).** A schema reaches `deterministic-green` only when **every** downloadable tool independently has ≥ 2 working tests. (MUST)
 2. **The bar is binary at 2.** Reaching 3+ does not change the pass/fail decision; it only raises the `testDepth` rung from `schema-validatable` to `data-analyzable`. (MUST)
-3. **A tool with exactly 1 working test is NOT `deterministic-green`, but is NOT `rejected`.** It is a repairable `blocked`/not-green state, resolved by adding a second working test — never a terminal rejection. (MUST)
+3. **A *parameterised* tool with exactly 1 working test is NOT `deterministic-green`, but is NOT `rejected`.** It is a repairable `blocked`/not-green state, resolved by adding a second working test — never a terminal rejection. (MUST) A *parameterless* tool with 1 working test **is** `deterministic-green` (rule 5).
 4. **`testDepth` is its own deterministic dimension**, recorded on the tool node in the index rollup, and is **independent** of the LLM `outputSchemaMatch` dimension. The two are never conflated: `testDepth` measures *how many* working responses exist; `outputSchemaMatch` judges *whether* the declared output schema matches a response. (MUST)
+5. **Parameterless tools reach the pass bar at `1`.** A tool that declares **no required parameter** has a single deterministic input shape; a second working test could only repeat the identical request and would add no schema-validation evidence. For such a tool the pass bar is **`1`** working test (MUST), not `2`. For every tool that declares at least one required parameter the pass bar remains `2` (MUST), and `3` is the SHOULD target for the `data-analyzable` rung. Whether a tool is parameterless is itself a deterministic property of the schema. (MUST)
 
-> **Rationale.** A single working response cannot distinguish a correct output schema from a coincidentally-shaped one. Two independent working responses are the minimum deterministic evidence that the declared output schema holds. Raising coverage is **work** (add tests), not grounds for lowering the bar.
+> **Rationale.** A single working response cannot distinguish a correct output schema from a coincidentally-shaped one **when the parameter space has breadth** — so a parameterised tool needs two independent working responses as the minimum deterministic evidence that the declared output schema holds. A parameterless tool has no breadth to cover: one working response already exercises its only input shape. Raising coverage on a parameterised tool is **work** (add tests), not grounds for lowering the bar.
+
+---
+
+## Deterministic Response-Size Dimension
+
+Beyond the working-test count, the data-pretest records the **size** of each working response. Size is a deterministic property of a recorded test response and contributes to grading via **threshold-booleans**, while the raw measurements are carried as metadata.
+
+| Field | Kind | Definition |
+|-------|------|------------|
+| `responseBytes` | measurement metadatum | `Buffer.byteLength` of the serialised response payload (bytes, not characters). |
+| `recordCount` | measurement metadatum | Number of top-level records in the response when array-shaped (else omitted). |
+| `durationMs` | measurement metadatum | Wall-clock duration of the test request. |
+| `large` | deterministic, grade-effective | `responseBytes > 1 MB` (`1 * 1024 * 1024`). |
+| `extreme` | deterministic, grade-effective | `responseBytes > 10 MB` (`10 * 1024 * 1024`) — content-bloat signal. |
+
+**Binding rules:**
+
+1. `large` / `extreme` are **threshold-booleans** derived deterministically from `responseBytes`. `extreme` is **grade-effective**: an extreme response adds a deterministic fail on the `single-test` Area that downgrades the tool (content-bloat penalty). `large` is a **recorded warning flag** — surfaced, never silently dropped, but not an automatic fail (a within-threshold response adds no size grading, so it never dilutes the working-test bar). (MUST)
+2. The raw measurements (`responseBytes`, `recordCount`, `durationMs`) are recorded as metadata and are **not** themselves a pass/fail gate. (MUST)
+3. Thresholds are fixed at **1 MB** (`large`) and **10 MB** (`extreme`). A change is a `gradingSpec` bump. (MUST)
+
+> **Rationale.** An extreme payload signals a tool that returns un-paginated bulk data — a deterministic, reproducible quality signal independent of any LLM judgement. The byte thresholds are stable across runs because they are computed from the recorded response, not re-fetched.
 
 ---
 
@@ -109,6 +132,7 @@ The following table is the **non-exhaustive but canonical** mapping of grading d
 |-----------|-------------|------|----------------|
 | Schema structure (v4.2) | deterministic | autonomous | `tools-aggregate-schema` |
 | HTTP status (200 = pass) | deterministic | autonomous | `single-test` |
+| Response size `large` (> 1 MB) / `extreme` (> 10 MB) | deterministic (threshold-boolean) | autonomous | `single-test` |
 | Tool description neutrality | deterministic (heuristic) | autonomous | `single-test` / `tools-aggregate-schema` |
 | `whenToUse` clarity | non-deterministic | autonomous | `single-test` / `tools-aggregate-schema` |
 | `parameters` understandability | non-deterministic | autonomous | `single-test` |

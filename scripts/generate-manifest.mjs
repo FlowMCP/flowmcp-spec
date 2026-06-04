@@ -26,6 +26,7 @@ const SPEC_VERSION = JSON.parse( readFileSync( join( REPO, 'data/refs.manual.jso
 const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const GRADING_PAYLOAD_DIR = join( PAYLOAD_DIR, 'grading' )
+const BEST_PRACTICE_PAYLOAD_DIR = join( PAYLOAD_DIR, 'best-practice' )
 const MANIFEST_PATH = join( PAYLOAD_DIR, 'manifest.json' )
 const CHECKER = join( REPO, 'skills/spec-quality/evaluator-spec-rfc2119/check.mjs' )
 const GENERATOR = 'scripts/generate-manifest.mjs'
@@ -204,6 +205,25 @@ const GRADING_COLLAPSED_DEFAULT = {
 }
 
 
+// Memo 108: best-practice sidebar groups. Mapping by chapter order:
+//   00 introduction · 01 overview · 10+ schema-creation (the five areas)
+const bestPracticeSidebarGroupFromFilename = ( { filename } ) => {
+    const match = filename.match( /^(\d{2})-/ )
+    if( !match ) return 'schema-creation'
+    const order = parseInt( match[ 1 ], 10 )
+    if( order === 0 ) return 'introduction'
+    if( order === 1 ) return 'overview'
+    return 'schema-creation'
+}
+
+
+const BEST_PRACTICE_COLLAPSED_DEFAULT = {
+    introduction: false,
+    overview: false,
+    'schema-creation': false
+}
+
+
 // Memo 086 PRD-06: additive grading block. Scans the grading payload subdir
 // (a SECOND input) and returns { version, files[] }. Returns null if absent —
 // manifest.files stays spec-only and byte-compatible (081 F8=A).
@@ -247,6 +267,53 @@ const buildGradingBlock = async () => {
     }
 
     console.log( `Grading block: ${ entries.length } files (grading_version=${ version })` )
+    return { version, files: entries }
+}
+
+
+// Memo 108: additive best-practice block. Scans the best-practice payload subdir
+// (a THIRD input) and returns { version, files[] }. Returns null if absent —
+// manifest.files stays spec-only and byte-compatible. Mirrors buildGradingBlock.
+const buildBestPracticeBlock = async () => {
+    let bpFiles
+    try {
+        const allFiles = await readdir( BEST_PRACTICE_PAYLOAD_DIR )
+        bpFiles = allFiles
+            .filter( ( f ) => /^\d{2}-/.test( f ) && f.endsWith( '.md' ) )
+            .sort()
+    } catch( error ) {
+        console.warn( `No best-practice payload found — manifest.bestPractice omitted (${ error.message })` )
+        return null
+    }
+
+    if( bpFiles.length === 0 ) return null
+
+    const entries = []
+    let version = null
+    for( const filename of bpFiles ) {
+        const payloadPath = join( BEST_PRACTICE_PAYLOAD_DIR, filename )
+        const payloadContent = await readFile( payloadPath, 'utf-8' )
+        const fm = parseFrontmatter( { content: payloadContent } )
+        if( !fm ) {
+            console.warn( `  ! best-practice/${ filename } — could not parse frontmatter, skipping` )
+            continue
+        }
+        if( !version && typeof fm.best_practice_version === 'string' ) version = fm.best_practice_version
+        const sidebarGroup = bestPracticeSidebarGroupFromFilename( { filename } )
+        entries.push( {
+            filename,
+            slug: slugFromFilename( { filename } ),
+            title: fm.title,
+            description: fm.description,
+            order: fm.order,
+            section: fm.section,
+            normative: fm.normative,
+            sidebar_group: sidebarGroup,
+            collapsed: BEST_PRACTICE_COLLAPSED_DEFAULT[ sidebarGroup ] ?? false
+        } )
+    }
+
+    console.log( `Best-practice block: ${ entries.length } files (best_practice_version=${ version })` )
     return { version, files: entries }
 }
 
@@ -306,6 +373,7 @@ const main = async () => {
 
     const schemaStats = await getStats( { manifestPath: MANIFEST_PATH } )
     const gradingBlock = await buildGradingBlock()
+    const bestPracticeBlock = await buildBestPracticeBlock()
 
     const manifest = {
         spec_version: SPEC_VERSION,
@@ -330,6 +398,12 @@ const main = async () => {
     if( gradingBlock ) {
         manifest.grading = gradingBlock
         manifest.sections.push( { name: 'Grading', file_count: gradingBlock.files.length, order: 2 } )
+    }
+
+    // Memo 108: additive best-practice block (manifest.files above stays spec-only)
+    if( bestPracticeBlock ) {
+        manifest.bestPractice = bestPracticeBlock
+        manifest.sections.push( { name: 'Best Practice', file_count: bestPracticeBlock.files.length, order: 3 } )
     }
 
     await writeFile( MANIFEST_PATH, JSON.stringify( manifest, null, 4 ) + '\n', 'utf-8' )

@@ -119,6 +119,18 @@ const main = async () => {
         }
     }
 
+    // Memo 108: additive best-practice refs (the third, independently versioned
+    // track — advisory, not normative). Only emitted when present in manual.
+    if( manual.bestPractice ) {
+        resolved.bestPractice = {
+            currentVersion: manual.bestPractice.currentVersion,
+            recommendedRelease: manual.bestPractice.recommendedRelease || manual.bestPractice.currentVersion,
+            specDir: manual.bestPractice.specDir,
+            specDirAbsoluteUrl: `https://github.com/FlowMCP/flowmcp-spec/tree/main/${ manual.bestPractice.specDir }`,
+            url: manual.bestPractice.url
+        }
+    }
+
     await mkdir( dirname( RESOLVED_PATH ), { recursive: true } )
     await writeFile( RESOLVED_PATH, JSON.stringify( resolved, null, 4 ) + '\n', 'utf-8' )
 

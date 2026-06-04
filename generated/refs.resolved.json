@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-04T21:09:53.827Z",
-        "fromCommit": "49bda5d",
+        "at": "2026-06-04T21:13:27.424Z",
+        "fromCommit": "2e9a898",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -59,7 +59,8 @@
         "publishedLlmsFiles": [
             "/llms.txt",
             "/docs-llms.txt",
-            "/llms-full.txt"
+            "/llms-full.txt",
+            "/best-practices.txt"
         ]
     },
     "addons": [

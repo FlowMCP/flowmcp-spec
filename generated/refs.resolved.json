@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-04T20:34:15.694Z",
-        "fromCommit": "298e489",
+        "at": "2026-06-04T21:09:53.827Z",
+        "fromCommit": "49bda5d",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {
@@ -126,6 +126,6 @@
         "recommendedRelease": "0.1.0",
         "specDir": "best-practice/0.1.0",
         "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/best-practice/0.1.0",
-        "url": "https://flowmcp.github.io/best-practice/introduction/"
+        "url": "https://flowmcp.github.io/best-practice/overview/"
     }
 }

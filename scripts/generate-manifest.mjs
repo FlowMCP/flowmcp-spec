@@ -205,21 +205,20 @@ const GRADING_COLLAPSED_DEFAULT = {
 }
 
 
-// Memo 108: best-practice sidebar groups. Mapping by chapter order:
-//   00 introduction · 01 overview · 10+ schema-creation (the five areas)
+// Memo 108: best-practice sidebar groups. The overview lives under Introduction;
+// the five areas (10+) under Schema Creation.
+//   <10 introduction · 10+ schema-creation
 const bestPracticeSidebarGroupFromFilename = ( { filename } ) => {
     const match = filename.match( /^(\d{2})-/ )
     if( !match ) return 'schema-creation'
     const order = parseInt( match[ 1 ], 10 )
-    if( order === 0 ) return 'introduction'
-    if( order === 1 ) return 'overview'
+    if( order < 10 ) return 'introduction'
     return 'schema-creation'
 }
 
 
 const BEST_PRACTICE_COLLAPSED_DEFAULT = {
     introduction: false,
-    overview: false,
     'schema-creation': false
 }
 

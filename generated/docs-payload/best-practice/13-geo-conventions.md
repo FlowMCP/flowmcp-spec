@@ -1,48 +1,62 @@
 ---
 title: "Geo Conventions"
-description: "Use the established geo defaults instead of rolling your own. The geo entry point already settled these conventions; new geo schemas should inherit them."
+description: "Geo has a few conventions that everyone trips over once. Adopt the established defaults instead of inventing your own — it keeps schemas interoperable and spares the model a class of silent mistakes."
 best_practice_version: "0.1.0"
 spec_file: "13-geo-conventions.md"
 order: 13
 section: "Best Practice"
 normative: false
-source_commit: "3979b97"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
-generated_at: "2026-06-04T20:12:27.959Z"
+source_commit: "49bda5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/49bda5d/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
+generated_at: "2026-06-04T21:10:09.952Z"
 generated_from: "best-practice/0.1.0/schema-creation/13-geo-conventions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/13-geo-conventions.md."
 ---
 
-Use the established geo defaults instead of rolling your own. The geo entry point already settled these conventions; new geo schemas should inherit them.
+Geo has a few conventions that everyone trips over once. Adopt the established defaults instead of inventing your own — it keeps schemas interoperable and spares the model a class of silent mistakes.
 
 ---
 
-## Lon-first bounding boxes (RFC 7946)
+## Longitude-first bounding boxes
 
-A bounding box is `[minLon, minLat, maxLon, maxLat]` — longitude first. State the `axisOrder` (`lonlat` | `latlon`) **explicitly, never silently**.
+A bounding box is `[ minLon, minLat, maxLon, maxLat ]` — **longitude first** (RFC 7946 / GeoJSON order). Swapping the pair sends a query to the wrong hemisphere and returns plausible-but-wrong results, with no error to warn you. A bbox around Berlin:
 
-- Beleg: `schemas/v4.0.0/providers/geo/geo.mjs:276-299,:160,:166`
-- `geoExtent` is pure calculation — no network call.
+```js
+// [ minLon, minLat, maxLon, maxLat ]
+const berlin = [ 13.088, 52.338, 13.761, 52.675 ]
+```
 
-## Geo default methods
+If a schema must accept the other order, make it **explicit** — never guess:
 
-The geo handgriff tools are the canonical surface — prefer them over bespoke geo logic:
+```js
+{ position: { key: 'axisOrder', value: '{{USER_PARAM}}', location: 'query' },
+  z: { primitive: 'enum(lonlat,latlon)', options: [] } }   // no silent default
+```
 
-`geoResolve` (dispatcher), `geoForward`, `geoReverse`, `geoPostal`, `geoLookup`, `geoNearby`, `geoExtent`.
+## One selector per call
 
-Exactly **one selector per call** — otherwise `GEO-RESOLVE-001`.
+Geo tools that accept several ways to locate a place (free text, coordinates, a postal code, an OSM id) should take **exactly one** per call. Two selectors is ambiguous — reject it rather than picking one silently:
 
-## AGS = join key, PLZ = anchor
+```js
+// caller sends exactly one of: text | latlon | postalCode | osmId
+if( selectorCount !== 1 ) { throw new Error( 'GEO-RESOLVE-001: provide exactly one location selector' ) }
+```
 
-Join internally over the German **AGS** (`Amtlicher Gemeindeschlüssel`, Destatis, licensed dl-de/by-2-0). Use the **PLZ** (postal code, OpenPLZ) as the *human* anchor — never the other way around. (Memo 100 Kap. 6)
+## A join key vs. a human anchor
+
+Use a stable administrative code as the **join key** between datasets, and a human-friendly code only as a display **anchor**. For German data, that means joining on the municipality key (AGS) and showing the postal code (PLZ) — not the other way around:
+
+```text
+join on:   ags  = "11000000"   (stable, 1:1 with the municipality)
+show as:    plz = "10115"       (familiar, but many PLZ per municipality)
+```
 
 ## One-liner
 
-- **Events are not in OpenStreetMap.** For cultural events, go to a culture-data source, not OSM. (Memo 100 Kap. 8.6)
+- **Events are not in OpenStreetMap.** Querying OSM for concerts, markets, or exhibitions returns nothing useful — reach for a dedicated events/culture source instead.
 
 ## Related
 
-- **Depends on:** [`01-overview.md`](/best-practice/overview/)
 - **Related:** [`12-load-and-scale.md`](/best-practice/load-and-scale/)
 

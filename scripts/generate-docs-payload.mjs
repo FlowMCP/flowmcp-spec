@@ -65,11 +65,10 @@ const GRADING_PROSAIC_FILES = new Set( [
 ] )
 
 
-// Memo 108: best-practice prosaic files — the intro + overview are prose; the
-// five schema-creation areas are advisory recommendations (non-normative too,
-// derived from their "| Status | Recommendation |" table by gradingNormativeFn).
+// Memo 108: best-practice prosaic files — the overview is prose; the five
+// schema-creation areas are advisory recommendations (non-normative too, derived
+// from their "| Status | Recommendation |" table by gradingNormativeFn).
 const BEST_PRACTICE_PROSAIC_FILES = new Set( [
-    '00-introduction.md',
     '01-overview.md'
 ] )
 
@@ -300,10 +299,10 @@ const cleanGradingTitle = ( { title, filename } ) => {
 }
 
 
-// Memo 108: best-practice titles. 00/01 carry a "Best Practice — X" H1 → clean to
-// the bare nav label; the schema-creation pages carry an "NN — Title" prefix → strip it.
+// Memo 108: best-practice titles. The overview carries a "Best Practice — Overview"
+// H1 → clean to the bare nav label; the schema-creation pages carry an "NN — Title"
+// prefix → strip it.
 const cleanBestPracticeTitle = ( { title, filename } ) => {
-    if( filename === '00-introduction.md' ) return 'Introduction'
     if( filename === '01-overview.md' ) return 'Overview'
     return title.replace( /^\d+\s*[—–-]\s*/, '' ).trim()
 }

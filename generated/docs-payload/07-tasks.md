@@ -6,9 +6,9 @@ spec_file: "07-tasks.md"
 order: 7
 section: "Specification"
 normative: true
-source_commit: "3979b97"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/3979b97/spec/v4.3.0/07-tasks.md"
-generated_at: "2026-06-04T20:12:27.959Z"
+source_commit: "49bda5d"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/49bda5d/spec/v4.3.0/07-tasks.md"
+generated_at: "2026-06-04T21:10:09.952Z"
 generated_from: "spec/v4.3.0/07-tasks.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/07-tasks.md."

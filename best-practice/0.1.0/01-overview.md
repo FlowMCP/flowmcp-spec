@@ -4,10 +4,39 @@
 |-------|-------|
 | Status | Recommendation |
 | Version | `bestPracticeSpec/0.1.0` |
-| Depends on | [`00-introduction.md`](./00-introduction.md) |
 | Related | [`schema-creation/10-readable-interface.md`](./schema-creation/10-readable-interface.md) |
 
-This page explains how to read the Best-Practice track, how it is versioned, and bundles the one-liners that are too small for their own page.
+> Conformance language is intentionally absent here. Unlike the Schemas Specification and the Grading-Spec, the Best-Practice track is **advisory**: it collects recommendations and learnings. It uses "should", not "MUST".
+
+---
+
+## What this track is
+
+The Best-Practice track is the **third** FlowMCP spec track, alongside the **Specification** (`spec/v4.3.0/`) and **Grading** (`grading/3.0.0/`). Both of those are normative — they define what a schema *is* and how it is *evaluated*. This track is different in character:
+
+> **You don't have to, but you should.**
+
+It holds **recommendations and learnings**, not validation rules. Nothing here disqualifies a schema. The normative rules stay in the Specification and the Grading-Spec; this track raises quality *systematically*, beyond mere absence of errors.
+
+## The problem it solves — alignment
+
+Subagents that pick up a new prospect or build a new schema used to start **without a shared knowledge base**. Whatever one agent learned (a cryptic API key convention, a geo axis-order gotcha, a license trap) stayed with that agent. The next subagent rediscovered it — or didn't, and produced rework.
+
+The Best-Practice track is published as a single generated text file, **`best-practices.txt`**, that is attached to every schema-building subagent prompt as a **mandatory link**. So every subagent shares the same gotchas. It scales: thirty parallel subagents all append the same, **updatable** file → better schemas from the start, less rework.
+
+## Why it exists — a concrete learning
+
+When working through prospects, an agent once handed subagents **self-invented prompts** instead of reading the source first ("just search for something about IHK") to finish faster. Subagents are smart enough to produce output even from poor input — but the bad start cost roughly ten schemas of rework.
+
+The lesson — **read the source first** — is exactly why this track exists. The learning moves from *luck* (a capable agent happening to do the right thing) to *structure* (every subagent receives the best practices as a mandatory source).
+
+A second truth: **"no errors" is not a quality standard.** Error-freeness is the floor; real quality shows over weeks. Best practices lift quality systematically, not just the error count.
+
+## Character
+
+- **Recommendation, not rule** — "should", never "MUST".
+- **Living and extensible** — new patterns grow *into* an existing area, not into a new stub page.
+- **Source-first** — every recommendation is backed by a real code reference (`file:line`) or a memo.
 
 ---
 
@@ -27,7 +56,7 @@ The principle behind the cut is **few strong pages over many thin ones**: fiftee
 
 ## Versioning
 
-The Best-Practice track is independently versioned as `bestPracticeSpec/0.1.0`, recorded in `data/refs.manual.json` (`bestPractice.currentVersion` + `specDir`) — analogous to `spec` and `grading`. The doc-site surfaces the version as a sidebar badge.
+The Best-Practice track is independently versioned as `bestPracticeSpec/0.1.0` — analogous to the Specification and Grading tracks. The documentation site surfaces the version as a sidebar badge.
 
 `0.1.0` ships **schema-creation only**. Further categories (e.g. schema maintenance, grading hints) are deliberately a later backlog — first the scaffold, then the growth.
 
@@ -39,6 +68,6 @@ The source folder is `best-practice/` (singular, consistent with `spec/` and `gr
 
 Small, sharp learnings that do not warrant a full page:
 
-- **Events are not in OpenStreetMap.** Querying OSM for cultural events returns nothing useful — use a culture-data source instead (e.g. kulturdaten.berlin). (Memo 100 Kap. 8.6)
+- **Events are not in OpenStreetMap.** Querying OSM for concerts, markets, or exhibitions returns nothing useful — reach for a dedicated events/culture source instead.
 - **"No errors" is the floor, not the ceiling.** A schema that passes `flowmcp grading deterministic` is the *minimum* bar — real quality shows over weeks of use.
 - **Read the source first.** Never build from an invented prompt; the prospect issue's `URL` + `Typ` are the authoritative starting point.

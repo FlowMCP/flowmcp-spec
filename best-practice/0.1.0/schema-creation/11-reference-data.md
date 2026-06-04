@@ -4,28 +4,58 @@
 |-------|-------|
 | Status | Recommendation |
 | Version | `bestPracticeSpec/0.1.0` |
-| Depends on | [`01-overview.md`](../01-overview.md) |
 | Related | [`10-readable-interface.md`](./10-readable-interface.md) |
 
-Maintain recurring lists and value formats **once**, and inherit them everywhere. Duplicated reference data drifts; a single canonical source does not.
+Maintain recurring lists and value formats **once**, and inherit them everywhere. Duplicated reference data drifts: one copy gets a new entry, the others quietly fall behind. A single canonical source cannot drift against itself.
 
 ---
 
 ## Shared lists
 
-Declare `sharedLists` and reference entries with the token `{{listName:field}}`; the loader interpolates them when the schema is loaded.
+Say three tools in a schema all accept the same set of supported chains. Instead of repeating the enum in each tool, define the list once and reference it with an interpolation token. The loader expands the token at load time, so every tool always offers the current set:
 
-- Beleg: `flowmcp-core/.../Pipeline.mjs:277`, `SharedListResolver.interpolateEnum()` `:39-71`
-- Example: `schemas/v4.0.0/providers/taapi/indicators-part1.mjs:17-19,:30` (Memo 073)
+```js
+// Defined once (a shared list named "chains"):
+// values: [ { id: 'eth', label: 'Ethereum' }, { id: 'base', label: 'Base' } ]
 
-> **Gotcha:** the `_shared/` and `_lists/` directories are a pure **storage convention** — they are **not** loader-skipped. The mechanism that resolves shared lists is `SharedListResolver.mjs:74-99`; the schema field is `sharedLists`. (This corrects an earlier assumption that `_shared`/`_lists` were skipped by the loader.)
+main = {
+    sharedLists: [ 'chains' ],
+    tools: {
+        getBalance: {
+            parameters: [ {
+                position: { key: 'chain', value: '{{USER_PARAM}}', location: 'query' },
+                z: { primitive: 'enum({{chains:id}})', options: [] }   // → enum(eth,base) at load
+            } ]
+        }
+    }
+}
+```
 
-## ISO-8601 as canonical time
+Add a new chain in one place and all three tools gain it. (Directories like `_shared/` are just a tidy place to keep such lists — what makes a list shared is the `sharedLists` declaration, not the folder.)
 
-Keep time values internally in ISO-8601 (UTC). When the source carries its own time representation, preserve it **additively** as an `_ISO8601` shadow field — never overwrite the original. (Memo 106)
+## ISO-8601 as the canonical time format
+
+A fictional API returns `{ "ts": 1717000000 }` — epoch seconds. Don't overwrite it; **add** a canonical ISO-8601 field next to it, so the response stays faithful *and* becomes usable:
+
+```js
+postRequest: async ( { response } ) => {
+    return { response: {
+        ...response,
+        ts_ISO8601: new Date( response.ts * 1000 ).toISOString()   // keep ts, add "2024-05-29T18:13:20.000Z"
+    } }
+}
+```
+
+ISO-8601 sorts lexically, carries its own UTC offset, and parses without a format guess — keep time in it internally.
 
 ## Keyless-first ordering
 
-Order data sources by **descending reachability**: open APIs before key-bound ones. Never force a key at the very start of a journey — a keyless path should always exist first.
+When several providers can answer the same question, try the open ones first. A fictional geocoder should reach for a key-free service before a key-bound one, so a first-time user gets an answer before configuring anything:
 
-- Beleg: the provider ordering in `schemas/v4.0.0/providers/geo/geo.mjs` (Nominatim/OpenPLZ before Geoapify/GeoNames). (Memo 092/100)
+```js
+// order of attempts: open first, keyed as fallback
+const providers = [ 'nominatim',          // no key
+                    'acme-geo' ]           // needs ACME_GEO_KEY
+```
+
+Never force a key at the very start of a journey when a keyless path exists.

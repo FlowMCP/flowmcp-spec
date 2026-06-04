@@ -17,7 +17,7 @@
         "currentVersion": "0.1.0",
         "recommendedRelease": "0.1.0",
         "specDir": "best-practice/0.1.0",
-        "url": "https://flowmcp.github.io/best-practice/introduction/"
+        "url": "https://flowmcp.github.io/best-practice/overview/"
     },
     "imports": {
         "cli": "github:FlowMCP/flowmcp-cli#v4.1.0",

@@ -4,39 +4,56 @@
 |-------|-------|
 | Status | Recommendation |
 | Version | `bestPracticeSpec/0.1.0` |
-| Depends on | [`01-overview.md`](../01-overview.md) |
 | Related | [`14-correctness-license.md`](./14-correctness-license.md) |
 
-Make the schema readable for the **LLM**, not for the API. An API may speak in terse codes; the model should not have to. Three related levers turn a cryptic upstream into a self-explaining tool.
+Design the schema for the **model that calls it**, not for the API behind it. An upstream API often speaks in terse codes; the language model should not have to decode them. Translate at the edge so the surface the model sees is self-explaining.
 
 ---
 
 ## Human-readable enums
 
-Expose enum *values* that read in plain language (`enum(1-hour,1-day)` instead of `h1,d1`) and map them to the API codes in the `preRequest` handler.
+Say a fictional `AcmeWeather` API takes `?step=h1|d1|w1`. Those codes mean nothing to a model. Expose readable values and map them to the wire format in `preRequest`:
 
-- Beleg: `create-flowmcp-schema/SKILL.md:205-220`
-- Example: `schemas/v4.0.0/providers/blocknative/gasprice.mjs:28`
+```js
+// What the model sees — clear, guessable values:
+parameters: [ {
+    position: { key: 'interval', value: '{{USER_PARAM}}', location: 'query' },
+    z: { primitive: 'enum(1-hour,1-day,1-week)', options: [] }
+} ]
 
-The model picks a value it understands; the handler translates it on the way out.
+// preRequest translates to the API's codes (flat payload access):
+preRequest: async ( { struct, payload } ) => {
+    const wire = { '1-hour': 'h1', '1-day': 'd1', '1-week': 'w1' }
+    struct.url = struct.url.replace( `interval=${ payload.interval }`, `step=${ wire[ payload.interval ] }` )
+    return { struct }
+}
+```
 
-## Improve parameter names & keys
+The caller picks a value it understands; the handler does the translation. The API contract is unchanged — only the surface improves.
 
-When an API uses cryptic keys — `o/h/l/c/v` for open/high/low/close/volume, a bare `Z`, and so on — invent **speaking parameter names**, let the values be passed under those names, and write a `preRequest` handler that maps the readable names/keys onto the real API. This removes the friction between the LLM and the data source, and it is worth the effort.
+## Speaking parameter names
 
-- Beleg-Mechanismus: `schemas/v4.0.0/providers/blocknative/gasprice.mjs:72-77` rewrites the readable `chainName`/alias in `preRequest` onto the real key `chainid` (`struct.url.replace('chainName=…','chainid=…')`).
-- Header variant: `schemas/v4.0.0/providers/birdeye/birdeye.mjs:161-167`.
+The same idea applies to opaque keys in a **response**. A fictional `AcmeMarkets` candles endpoint returns `{ o, h, l, c, v, t }`. Rename them to descriptive fields in `postRequest` so downstream tools get a stable, obvious shape:
 
-> **Honest classification:** the *mechanism* (a `preRequest` key rewrite) is proven in the code above. The concrete OHLCV application is a *new* recommendation built on that proven mechanism — not yet a shipped example.
+```js
+postRequest: async ( { response } ) => {
+    const candles = response.data.map( ( { o, h, l, c, v, t } ) => ( {
+        open: o, high: h, low: l, close: c, volume: v, time: t
+    } ) )
+    return { response: { candles } }
+}
+```
 
-## Handler-phase contract (the why + the gotcha)
+A model can chart `candles[].close`; it cannot reliably guess what `c` means.
 
-`preRequest` is exactly the place for these rewrites — which is *why* the contract matters. The phases read the payload differently:
+## The handler-phase contract
 
-| Phase | Reads | Reference |
-|-------|-------|-----------|
-| `executeRequest` | **nested** `payload.userParams.X` | `flowmcp-core/src/v2/task/Fetch.mjs:65-68` |
-| `preRequest` | **flat** `payload.X` | `Fetch.mjs:45-48` |
-| `postRequest` | **flat** `payload.X` | `Fetch.mjs:93-97` |
+The two snippets above read the payload differently on purpose. Handlers run in three phases, and each sees the payload in one shape only:
 
-Mixing them up means the handler **silently does not fire** — no error, just a rewrite that never happens. When a `preRequest` rewrite appears to do nothing, check that it reads `payload.X` (flat), not `payload.userParams.X`.
+| Phase | When | Reads the payload as |
+|-------|------|----------------------|
+| `preRequest` | before the call | **flat** — `payload.interval` |
+| `executeRequest` | the call itself | **nested** — `payload.userParams.interval` |
+| `postRequest` | after the call | **flat** — `payload.interval` |
+
+Reading the wrong shape raises no error — the handler just never fires. So when a `preRequest` rewrite seems to do nothing, first check it reads `payload.interval` (flat), not `payload.userParams.interval`. `preRequest` is the canonical place for enum and key rewrites because it runs before the call with flat access to every parameter.

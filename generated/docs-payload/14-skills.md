@@ -6,9 +6,9 @@ spec_file: "14-skills.md"
 order: 14
 section: "Specification"
 normative: true
-source_commit: "b6d4210"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/14-skills.md"
-generated_at: "2026-06-04T13:48:14.225Z"
+source_commit: "62b50d4"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/spec/v4.3.0/14-skills.md"
+generated_at: "2026-06-04T13:49:20.413Z"
 generated_from: "spec/v4.3.0/14-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/14-skills.md."

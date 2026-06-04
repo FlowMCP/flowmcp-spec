@@ -6,9 +6,9 @@ spec_file: "05-phases-selection.md"
 order: 5
 section: "Grading"
 normative: true
-source_commit: "b6d4210"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/05-phases-selection.md"
-generated_at: "2026-06-04T13:48:14.225Z"
+source_commit: "62b50d4"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/62b50d4/grading/3.0.0/05-phases-selection.md"
+generated_at: "2026-06-04T13:49:20.413Z"
 generated_from: "grading/3.0.0/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/05-phases-selection.md."

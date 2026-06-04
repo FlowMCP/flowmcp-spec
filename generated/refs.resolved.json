@@ -1,8 +1,8 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-06-04T12:51:00.915Z",
-        "fromCommit": "a12ff9b",
+        "at": "2026-06-04T13:26:38.542Z",
+        "fromCommit": "c9061ca",
         "generator": "scripts/generate-refs.mjs"
     },
     "spec": {

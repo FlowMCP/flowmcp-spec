@@ -37,10 +37,10 @@ The grading entry is the **only** durable artefact emitted by a grader; it MUST 
 The canonical `blockedReason` set — shared by the grading module and `index.json` — is:
 
 ```
-"validation-failed" | "fewer-than-three-tests" | "no-about" | "api-down" | "all-schemas-unparseable" | "not-imported"
+"validation-failed" | "fewer-than-three-tests" | "fewer-than-two-tests" | "no-about" | "api-down" | "all-schemas-unparseable" | "not-imported"
 ```
 
-This 6-value set is the **single source of truth** (also encoded in `index.schema.json` `$defs/blockedReason`). Earlier versions of this document listed only `"validation-failed"` as the grading-module subset (`Grading.VALID_BLOCKED_REASONS`) — that narrower list is superseded by this canonical set. A free-text `blockedReason` is rejected (`GRD-038` when `status != 'blocked'`, `GRD-039` when the reason is outside the closed set). The full pinned reason set including prose definitions is in [`23-index-json.md`](./23-index-json.md).
+This 7-value set is the **single source of truth** (also encoded in `index.schema.json` `$defs/blockedReason`). Earlier versions of this document listed only `"validation-failed"` as the grading-module subset (`Grading.VALID_BLOCKED_REASONS`) — that narrower list is superseded by this canonical set. A free-text `blockedReason` is rejected (`GRD-038` when `status != 'blocked'`, `GRD-039` when the reason is outside the closed set). The full pinned reason set including prose definitions is in [`23-index-json.md`](./23-index-json.md).
 
 ---
 
@@ -192,6 +192,12 @@ Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `p
 #### Answers per Area
 
 Each Area defines how many answers its grading entry must carry, split into a deterministic block (computed by code) and a non-deterministic block (produced by the harness sub-agent). A deterministic block alone is not a valid Area grading — the two blocks are merged into one entry. The per-Area answer counts and question sets are normative in the Area output schemas.
+
+#### `single-test` deterministic gate — `testDepth` (Test-Leiter)
+
+The `single-test` Area (Area 1) opens with a **deterministic gate**: the data-pretest counts the working tests per tool and assigns the Test-Leiter rung (see [`06-determinism-and-tier.md` — Deterministic Pretest](./06-determinism-and-tier.md#deterministic-pretest--test-leiter-working-test-bar)). The gate's pass bar is **2 working tests per tool**; a schema is `deterministic-green` only when every downloadable tool clears it.
+
+The rung is surfaced as the deterministic dimension **`testDepth`** (`unavailable` / `reachable` / `schema-validatable` / `data-analyzable`), recorded on the tool node in `index.json`. `testDepth` is **independent** of the non-deterministic `outputSchemaMatch` dimension and MUST NOT be folded into it: `testDepth` measures *how many* working responses exist (deterministic count), while `outputSchemaMatch` judges *whether* the declared output schema matches a response (LLM judgement). A tool at `reachable` (1 working test) is not green but is repairable — never `rejected`.
 
 ### Score Values
 

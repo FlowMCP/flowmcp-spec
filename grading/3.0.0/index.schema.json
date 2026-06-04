@@ -36,7 +36,10 @@
                 },
                 "grade": { "type": "string" },
                 "ref": { "type": "string" },
-                "reason": { "$ref": "#/$defs/blockedReason" },
+                "reason": {
+                    "type": "string",
+                    "description": "On a blocked node the reason MUST be a closed-set blockedReason (enforced by the conditional below). On a pending/graded node it MAY carry an informational free-text reason (e.g. 'no about graded')."
+                },
                 "monitoring": { "$ref": "#/$defs/monitoring" },
                 "boundTo": { "type": "string" },
                 "snapshot": {
@@ -45,7 +48,14 @@
                 }
             },
             "required": [ "status" ],
-            "additionalProperties": true
+            "additionalProperties": true,
+            "if": {
+                "properties": { "status": { "const": "blocked" } },
+                "required": [ "status" ]
+            },
+            "then": {
+                "properties": { "reason": { "$ref": "#/$defs/blockedReason" } }
+            }
         }
     },
     "properties": {
@@ -101,7 +111,10 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "reason": { "$ref": "#/$defs/blockedReason" },
+                    "reason": {
+                        "type": "string",
+                        "description": "Diagnostic blocker reason. Mirrors the derived node-level reason, which includes pending diagnostics (e.g. 'not yet graded') as well as the closed-set blockedReason values. The closed-set guarantee is enforced on a blocked NODE's reason (see $defs/node conditional), not on this diagnostic list."
+                    },
                     "schemaFile": { "type": "string" },
                     "tool": { "type": "string" },
                     "message": { "type": "string" }

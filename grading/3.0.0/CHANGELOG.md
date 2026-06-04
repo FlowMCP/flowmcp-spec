@@ -1,5 +1,20 @@
 # Changelog gradingSpec
 
+## 3.0.2 — 2026-06-04 (corrections + additive)
+
+Internal-consistency corrections to the deterministic grading model, plus two additive
+deterministic dimensions. Non-breaking for any artefact that was already valid (the schema
+`required`/type fixes only *accept* artefacts the engine actually produces and *reject*
+sweep-only blobs that were never conformant).
+
+| File | Change |
+|------|--------|
+| `06-determinism-and-tier.md` | New binding rule 5: **parameterless tools reach the pass bar at 1** (parameterised stay at 2, SHOULD 3). Test-Leiter rung-1 + rule-3 carve-out for parameterless. |
+| `04-phases-single.md` | Description-cascade step 1 no longer sets a divergent "3 MUST"; it references the ch06 pass bar (2 / parameterless 1, SHOULD 3). Resolves the 3-vs-2 contradiction. |
+| `06-determinism-and-tier.md` | New **deterministic response-size dimension**: `responseBytes`/`recordCount`/`durationMs` (metadata) and threshold-booleans `large` (> 1 MB) / `extreme` (> 10 MB, grade-effective on `single-test`). |
+| `19-folder-layout.md` | New normative **addressing grammar** (`<ns>` · `<ns>/<schema>` · `<ns>/tool/<name>` · `<ns>/tool/<name>/tests/<N>`) mapped 1:1 to the layout; new **sweep-only-is-non-conformant** conformance rule (machine-falsifiable). |
+| `index.schema.json` | `proofVersion` type corrected `string` → `integer` (the engine writes `1`). `required` made discriminated: `oneOf` { island `index.json` carries `indexVersion`, no `proofVersion` } / { provider-proof `grade.json` carries `proofVersion`+`generatedAt`, no `indexVersion` }. A blob with neither discriminator now fails validation (falsifiable). |
+
 ## 3.0.1 — 2026-06-04 (additive)
 
 Additive, non-breaking. The pinned `blockedReason` enum gains **`fewer-than-two-tests`** —

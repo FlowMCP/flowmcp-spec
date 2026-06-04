@@ -93,8 +93,8 @@ Beyond the working-test count, the data-pretest records the **size** of each wor
 
 **Binding rules:**
 
-1. `large` / `extreme` are **threshold-booleans** derived deterministically from `responseBytes`; they are grade-effective signals on the `single-test` Area. (MUST)
-2. The raw measurements (`responseBytes`, `recordCount`, `durationMs`) are recorded as metadata and are **not** themselves a pass/fail gate; only the threshold-booleans are grade-effective. (MUST)
+1. `large` / `extreme` are **threshold-booleans** derived deterministically from `responseBytes`. `extreme` is **grade-effective**: an extreme response adds a deterministic fail on the `single-test` Area that downgrades the tool (content-bloat penalty). `large` is a **recorded warning flag** — surfaced, never silently dropped, but not an automatic fail (a within-threshold response adds no size grading, so it never dilutes the working-test bar). (MUST)
+2. The raw measurements (`responseBytes`, `recordCount`, `durationMs`) are recorded as metadata and are **not** themselves a pass/fail gate. (MUST)
 3. Thresholds are fixed at **1 MB** (`large`) and **10 MB** (`extreme`). A change is a `gradingSpec` bump. (MUST)
 
 > **Rationale.** An extreme payload signals a tool that returns un-paginated bulk data — a deterministic, reproducible quality signal independent of any LLM judgement. The byte thresholds are stable across runs because they are computed from the recorded response, not re-fetched.

@@ -1,17 +1,17 @@
 ---
 title: "Overview"
 description: "FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:"
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "00-overview.md"
 order: 0
 section: "Specification"
 normative: false
-source_commit: "6b5dd5b"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/6b5dd5b/spec/v4.2.0/00-overview.md"
-generated_at: "2026-06-01T01:41:42.880Z"
-generated_from: "spec/v4.2.0/00-overview.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/00-overview.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/00-overview.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/00-overview.md."
 ---
 
 FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:
@@ -19,7 +19,7 @@ FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Bas
 1. **CLI** — Direct access to Tools, Resources, Prompts, and Skills
 2. **MCP/A2A Server** — Agents and MCP clients can use FlowMCP as a server (compatible with OpenClaw)
 
-This document provides the conceptual foundation, positioning, terminology, and document index for the v4.2.0 specification.
+This document provides the conceptual foundation, positioning, terminology, and document index for the v4.3.0 specification.
 
 ---
 
@@ -27,7 +27,7 @@ This document provides the conceptual foundation, positioning, terminology, and 
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
 
-Some specification files in `spec/v4.2.0/` are intentionally written in prose without normative keywords because they describe history, lifecycle, or conceptual background (this overview document, the migration guide, the schema lifecycle document). All other specification files use normative language and assume this conformance interpretation.
+Some specification files in `spec/v4.3.0/` are intentionally written in prose without normative keywords because they describe history, lifecycle, or conceptual background (this overview document, the migration guide, the schema lifecycle document). All other specification files use normative language and assume this conformance interpretation.
 
 References:
 - [RFC2119](https://www.rfc-editor.org/rfc/rfc2119) — Key words for use in RFCs to Indicate Requirement Levels
@@ -192,7 +192,7 @@ flowchart TD
 
 ### Provider Level
 
-One API provider per namespace. Each provider directory contains:
+One API provider per namespace. The provider directory name MUST equal `main.namespace` of every schema it contains — the folder↔namespace invariant `VAL019` (see [09-validation-rules](/specification/validation-rules/) and the fallback/rename rules in `16-id-schema.md`). Each provider directory contains:
 
 - **Tools** — Deterministic API endpoint wrappers (`main.tools`)
 - **Resources** — Local SQLite data access (`main.resources`)
@@ -233,6 +233,9 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | **Catalog** | A named directory containing a `registry.json` manifest with shared lists, provider schemas, and agent definitions. The top-level organizational unit. |
 | **Main Export** | `export const main = {...}` — the declarative, JSON-serializable part of a schema. Contains `tools`, `resources`, and `prompts`. Hashable for integrity verification. Schemas use `export const main`; agents use `export const agent` (see Agent). |
 | **Handlers Export** | `export const handlers = ({ sharedLists, libraries }) => ({...})` — factory function receiving injected dependencies. Subject to security scanning. |
+| **Agent-Skill** | A `SKILL.md` file — a Claude Code skill that runs in the IDE harness (e.g. `flowmcp-schema-create`, `flowmcp-schema-diagnose`, indexed by the `flowmcp-schema` entry point). These are **not** part of the FlowMCP schema format. They live in `flowmcp-spec/skills/` or a project `.claude/skills/` directory and are invoked by the developer's AI coding assistant. Do not confuse with Schema-Skills. |
+| **Schema-Skill** | A `.mjs` file with `export const skill` — a FlowMCP first-class primitive (see [14-skills](/specification/skills/)) that maps to the MCP `server.prompt` interface. Schema-Skills live inside the schema catalog (`providers/{ns}/skills/`, etc.) and are invoked via `flowmcp call` or by an MCP client. Do not confuse with Agent-Skills. |
+| **lens** | Overloaded term with two distinct meanings depending on context. (1) **Grading context:** a Persona sub-facet forming the second part of the `<base>--<lens>` Persona slug (e.g. `mira-tanaka--domain`). It is a structural parameter that selects which Grading persona variant to use. (2) **Spec-Documentation context:** one of the per-persona review questions defined in `personas/persona-lens.md` — a review-checklist item, not a structural field. |
 
 ---
 
@@ -249,7 +252,7 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | `06-agents.md` | Agents | Agent manifest format (`agent.mjs` with `export const agent`), tool cherry-picking, model binding, system prompts, integrity verification |
 | `07-tasks.md` | Tasks | Deferred — MCP Tasks integration placeholder |
 | `08-migration.md` | Migration | v1.2.0 to v2.0.0 and v2.0.0 to v3.0.0 migration guides, backward compatibility |
-| `09-validation-rules.md` | Validation Rules | Complete validation checklist for schemas, lists, agents, resources, and prompts |
+| `09-validation-rules.md` | Validation Rules | Complete validation checklist for schemas, lists, agents, resources, and prompts; folder↔namespace invariant `VAL019` |
 | `10-tests.md` | Tests | Test format for tools and resources, design principles, response capture lifecycle, output schema generation |
 | `12-prompt-architecture.md` | Prompt Architecture | Provider-Prompts (model-neutral), Agent-Prompts (model-specific), placeholder syntax, cross-schema composition |
 | `13-resources.md` | Resources | SQLite resource format, queries, parameters, SQL security, handler integration |
@@ -259,8 +262,8 @@ Agent-level prompts are **model-specific** — they are written and tested for a
 | `17-selections.md` | Selections | Curated tool subsets for agent loading — `whenToUse`, reference resolution, SEL validation rules |
 | `18-prefill.md` | Prefill | Pre-execute tools before delivering a Skill — prefill array, execution order, result injection |
 | `19-mcp-integration.md` | MCP Integration | `meta` block for Tools (isReadOnly, isConcurrencySafe, isDestructive, searchHint, aliases, alwaysLoad) |
-| `20-validation-strategy.md` | Validation Strategy | Validation pipeline, grade system, quality thresholds, CI integration |
-| `21-schema-lifecycle.md` | Schema Lifecycle | Six lifecycle stages, API-test special rule for static schemas, partial schema policy |
+| `20-validation-strategy.md` | Validation Strategy | Validation pipeline, grade system, quality thresholds, CI integration; dev-track grade F vs. monitoring-track `blocked` record |
+| `21-schema-lifecycle.md` | Schema Lifecycle | Six lifecycle stages, API-test special rule for static schemas, partial schema policy; two-track split (dev lifecycle here, grading-monitoring in the Grading-Spec) |
 
 ---
 
@@ -303,9 +306,9 @@ Security by default, explicit opt-in for capabilities. Schema files have zero im
 
 ## What Changed
 
-### v4.2.0
+### v4.3.0
 
-The v4.2.0 release adds remote-data resources, a fifth primitive, and richer agent validation:
+The v4.3.0 release adds remote-data resources, a fifth primitive, and richer agent validation:
 
 - **HTTP Resources** — `source: 'http'` references remote files (typically SQLite databases) fetched via HTTPS and cached locally. Validated by RES024 (HTTPS required). See `13-resources.md`.
 - **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.

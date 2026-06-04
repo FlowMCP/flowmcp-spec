@@ -1,20 +1,20 @@
 ---
 title: "Folder Layout"
 description: "The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` (About-Pages),..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/19-folder-layout.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/19-folder-layout.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/19-folder-layout.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/19-folder-layout.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/19-folder-layout.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -62,6 +62,29 @@ Rationale: an in-source hash drifts the moment the file is edited, so the record
 `providers/` is the source of truth for schema content — no duplication. Schema files are NOT copied into `selections/`. A selection references its member schemas by logical id; the member resolution and hash binding are recorded in `index.json`. A content change creates a new file *next to* the old one — never *over* it (see [`15-versioning-axes.md`](/grading/versioning-axes/)).
 
 `index.json` is the **only overwritable file** — it is fully derived and 100% reproducible from the source files and grading artefacts. Source schemas, selection definitions, and grading snapshots are **never** overwritten.
+
+### Folder ↔ Namespace Invariant (NEW in 3.0.0)
+
+The `providers/<dir>/` directory name MUST equal `main.namespace` of **every** schema it contains. This is the binding folder↔namespace invariant — previously only described loosely as "one namespace, several schemas". It is the same invariant the Schemas-Spec writes as a tested validation rule (`VAL012`, see [Schemas-Spec v4.3.0 §09](/specification/validation-rules/) and §16 Namespace Resolution); the grading import asserts it on the island side and the grading track consumes it. The grading module enforces it as `IMP-007` (folder↔namespace invariant violation).
+
+#### Unparseable-folder case (fallback key)
+
+A `providers/<folder>/` with **0 valid schemas** still produces an `index.json` — it carries a `blocked` rollup keyed by the **folder name** as the fallback namespace identifier (`reason: validation-failed` / `all-schemas-unparseable`; see the pinned set in [`23-index-json.md`](/grading/index-json/)). The fallback folder name MUST itself be a valid namespace (`/^[a-z][a-z0-9-]*$/`); a folder name that is not a valid namespace is a hard error (`IMP-006`), never silently normalised.
+
+#### Rename-on-parse lifecycle
+
+Once **≥1** schema in the folder parses and exposes `main.namespace`, that field is **authoritative** and the folder is renamed to match it. A rename is an **identity transition**, not a delete: the never-delete / never-overwrite framing of this chapter is extended to cover folder-identity transitions. The rename runs **exactly once** and never clobbers a differing existing target (the grading module reports `IMP-008` instead of overwriting). This is the IN-side reconciliation of a folder that was first imported under a foldername-fallback placeholder and later acquired a real declared namespace.
+
+#### Provider-proof location (NEW in 3.0.0)
+
+The committed, CI-visible per-namespace grade/status rollup — the **provider-proof** `providers/<ns>/grade.json` — lives **inside the provider folder** in `flowmcp-schemas-private` (Memo 093 Kap. 4, F10). It is distinct from the island-local `index.json`:
+
+| Artefact | Location | Nature | CI-visible |
+|----------|----------|--------|------------|
+| `index.json` | `grading-data/providers/<ns>/` (the island) | born + rebuilt on the workbench, gitignored | no |
+| `grade.json` (provider-proof) | `flowmcp-schemas-private/providers/<ns>/` (the repo) | exported, committed, per-namespace rollup | yes |
+
+The full data flow (where each is born, where it is committed, what the board sync reads) is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
 
 ### Naming Conventions
 
@@ -142,6 +165,8 @@ The following v1 folders and files are **removed** and folded into `index.json`:
 - `index.json.lockSnapshot` + selection definition → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
 - About-Pages (schema-level resource) → [`11-about-convention.md`](/grading/about-convention/)
 - Pre-conditions (`index.json.lockSnapshot` lookup) → [`21-pre-conditions.md`](/grading/pre-conditions/)
+- Emit-on-failure import gate (folder↔namespace fallback) → [`22-workbench-island.md`](/grading/workbench-island/)
+- Pinned `blocked` reason set + provider-proof data flow → [`23-index-json.md`](/grading/index-json/), [`26-monitoring-track.md`](/grading/monitoring-track/)
 
 ## Related
 

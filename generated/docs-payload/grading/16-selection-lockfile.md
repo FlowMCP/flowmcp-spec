@@ -1,20 +1,20 @@
 ---
 title: "Selection Definition + `index.json.lockSnapshot`"
 description: "In 1.1.0 the member pins lived in a standalone `selection.lock.json` and the provider unit was described by an authored `namespace.json`. Both files are removed in 2.0.0. The pins are folded into the..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "16-selection-lockfile.md"
 order: 16
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/16-selection-lockfile.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/16-selection-lockfile.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/16-selection-lockfile.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/16-selection-lockfile.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/16-selection-lockfile.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/16-selection-lockfile.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -57,7 +57,7 @@ A Selection binds N schemas into a domain coverage. The definition lives in `sel
 | `whenToUse` | string | mandatory trigger sentence — graded as its own field, never collapsed into `description` |
 | `personaIds[]` | array (min 1) | mandatory personas — see [`20-entry-point-prompt.md`](/grading/entry-point-prompt/) |
 | `members[]` | array (min 1) | contained schemas (only `schemaId`) |
-| `skills[]` | array (max 4) | bound skills (map / `file` form, see FlowMCP-Spec v4.2.0 SKL018) |
+| `skills[]` | array (max 4) | bound skills (map / `file` form, see FlowMCP-Spec v4.3.0 SKL018) |
 
 **Removed from the source definition:** `selectionHash`, `aboutHash`, `selectionVersion`. The snapshot identity lives in the filename timestamp and (frozen) in `index.json.lockSnapshot`. `version` (the FlowMCP-format field) stays. See [`15-versioning-axes.md`](/grading/versioning-axes/).
 
@@ -94,12 +94,14 @@ The pins that used to live in `selection.lock.json` now live in `index.json.lock
 | Value | Meaning |
 |-------|---------|
 | `pending` | not yet graded |
-| `blocked` | cannot be graded yet (carries a `reason`: fewer than 3 tests, no About, API down — repairable) |
+| `blocked` | cannot be graded yet (carries a `reason`: `validation-failed`, fewer than 3 tests, no About, API down — repairable) |
 | `graded` | a grade is present |
 | `stable` | fully graded and over threshold — ready for use |
 | `rejected` | veto raised (terminal, irreversible) |
 
 `gradingStatus` is the cheap lock lookup consumed by the pre-condition check (see [`21-pre-conditions.md`](/grading/pre-conditions/)). A content change to a member (new file → new `schemaHash`) invalidates `stable`; the next rebuild reflects the new status, but the **frozen** `lockSnapshot` is preserved until a new grading run regenerates it.
+
+A member that fails to validate is `blocked` with `reason: validation-failed` (the same pinned reason set used in [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) and [`23-index-json.md`](/grading/index-json/)); it is **not** `stable` and therefore correctly fails the `stable`-only selection pre-condition. All three status definitions (`06`/`16`/`23`) agree on the `validation-failed`-as-`blocked` reason.
 
 ### Selection-Grading Workflow
 

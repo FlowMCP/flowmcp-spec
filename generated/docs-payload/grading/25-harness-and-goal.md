@@ -1,17 +1,17 @@
 ---
 title: "Harness and `/goal`"
 description: "Non-deterministic grading runs in a **harness**. The harness enum is `claude-code` and is recorded in the grading envelope (`harness`). A non-deterministic evaluation is performed by a sub-agent with..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "25-harness-and-goal.md"
 order: 25
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/25-harness-and-goal.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/25-harness-and-goal.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/25-harness-and-goal.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/25-harness-and-goal.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/25-harness-and-goal.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/25-harness-and-goal.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).

@@ -1,17 +1,17 @@
 ---
 title: "Catalog"
 description: "A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions..."
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "15-catalog.md"
 order: 15
 section: "Specification"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/15-catalog.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "spec/v4.2.0/15-catalog.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/15-catalog.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/15-catalog.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/15-catalog.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/15-catalog.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -66,7 +66,7 @@ schemas/v3.0.0/
     │   │   ├── simple-price.mjs
     │   │   └── prompts/             <- Provider prompts (model-neutral)
     │   └── ...
-    ├── selections/                  <- Curated tool subsets (v4.2.0)
+    ├── selections/                  <- Curated tool subsets (v4.3.0)
     │   ├── evm-research/
     │   │   └── selection.mjs
     │   └── defi-monitor/
@@ -93,7 +93,7 @@ schemas/v3.0.0/
 | `_lists/` | Root | Shared value lists consumed by all providers and agents |
 | `_shared/` | Root | Shared helper modules consumed by provider schemas |
 | `providers/` | Root | Provider schema directories, one per namespace |
-| `selections/` | Root | Curated tool subsets for agent context loading (v4.2.0). See `17-selections.md`. |
+| `selections/` | Root | Curated tool subsets for agent context loading (v4.3.0). See `17-selections.md`. |
 | `providers/{namespace}/` | Provider | Schema files for a single data source |
 | `providers/{namespace}/prompts/` | Provider | Model-neutral prompts for the provider's tools |
 | `agents/` | Root | Agent definition directories |
@@ -107,6 +107,7 @@ schemas/v3.0.0/
 - The catalog directory name MUST match the `name` field in `registry.json`
 - Directory names use kebab-case: `flowmcp-community`, `my-company-tools`
 - Provider namespace directories use kebab-case: `coingecko-com`, `defi-llama`
+- A provider namespace directory name MUST equal `main.namespace` of every schema it contains (folder↔namespace invariant, `VAL019` in `09-validation-rules.md`). For an all-unparseable folder the directory name is the fallback namespace and is renamed to match once a schema parses (rename-on-parse, see [16-id-schema](/specification/id-schema/)).
 - Agent directories use kebab-case: `crypto-research`, `defi-monitor`
 
 ---
@@ -130,7 +131,7 @@ schemas/v3.0.0/
 1. **No cross-catalog shared lists** — a schema in `my-company-tools` cannot reference a shared list defined in `flowmcp-community`. If both catalogs need the same list, each MUST include its own copy.
 2. **No namespace collisions across catalogs** — two catalogs MAY contain providers with the same namespace (e.g. both have `etherscan/`). The runtime qualifies tool names with the catalog name to prevent collisions.
 3. **Independent versioning** — each catalog has its own `version` field. Updating `flowmcp-community` to version `3.1.0` does not affect `my-company-tools` at version `3.0.0`.
-4. **Independent import** — `flowmcp import-registry` targets a single catalog. Importing one catalog does not pull in others.
+4. **Independent configuration** — each catalog is referenced independently in the CLI's `schemaFolders[]`. Adding one catalog does not pull in others.
 
 ---
 
@@ -255,47 +256,46 @@ Each object in the `agents` array describes one agent definition.
 
 ---
 
-## Import Flow
+## Catalog Resolution Flow
 
-The import flow describes how a catalog is downloaded and activated locally. The v3 import flow extends the v2 flow by adding agent manifest resolution.
+This describes how a catalog's contents are resolved once its directory is referenced in the CLI's `schemaFolders[]`. Agent manifests are resolved alongside provider schemas and shared lists.
 
 ```mermaid
 flowchart LR
-    A["flowmcp import-registry URL"] --> B[Download registry.json]
-    B --> C[Download shared lists]
-    B --> D[Download provider schemas]
-    B --> E[Download agent manifests]
+    A["catalog dir in schemaFolders[]"] --> B[Read registry.json]
+    B --> C[Load shared lists]
+    B --> D[Load provider schemas]
+    B --> E[Load agent manifests]
     E --> F[Agents available locally]
-    F --> G["flowmcp import-agent crypto-research"]
-    G --> H[Activate agent tools locally]
+    F --> G[agent tools available]
 ```
 
-The diagram shows the two-phase import process: `import-registry` downloads the catalog contents, and `import-agent` activates a specific agent's tools locally.
+The diagram shows how a catalog referenced in `schemaFolders[]` is resolved: registry.json is read, then shared lists, provider schemas, and agent manifests are loaded, making the catalog's tools and agents available locally.
 
-### Phase 1: Catalog Import (`import-registry`)
+### Phase 1: Catalog Read
 
-1. **Download `registry.json`** from the remote URL.
+1. **Read `registry.json`** from the referenced catalog directory.
 2. **Validate manifest** — check required fields, verify `schemaSpec` compatibility.
-3. **Download shared lists** — resolve each `shared[].file` path and download the `.mjs` files.
-4. **Download provider schemas** — resolve each `schemas[].file` path and download the `.mjs` files.
-5. **Download agent manifests** — resolve each `agents[].manifest` path and download the `agent.mjs` files (and associated prompt, skill, and resource files).
-6. **Store locally** — write all downloaded files into the local catalog directory.
+3. **Load shared lists** — resolve each `shared[].file` path and load the `.mjs` files.
+4. **Load provider schemas** — resolve each `schemas[].file` path and load the `.mjs` files.
+5. **Load agent manifests** — resolve each `agents[].manifest` path and load the `agent.mjs` files (and associated prompt, skill, and resource files).
+6. **Index locally** — register all loaded entries from the catalog directory.
 
-### Phase 2: Agent Activation (`import-agent`)
+### Phase 2: Agent Resolution
 
 1. **Read agent manifest** — parse the locally stored `agent.mjs` for the named agent.
 2. **Resolve tool dependencies** — identify which provider schemas the agent requires.
-3. **Activate tools** — add the agent's required tools to the local project configuration.
+3. **Make tools available** — the agent's required tools become callable from the resolved catalog.
 4. **Register prompts** — make the agent's prompts available as MCP prompts.
 
 ### v2 vs v3 Comparison
 
 | Step | v2 (Current) | v3 (New) |
 |------|-------------|----------|
-| Download | Schemas + shared lists | Schemas + shared lists + agent manifests |
-| Agent setup | User creates groups manually | Pre-built agents available via `import-agent` |
-| Tool composition | Manual cherry-picking into groups | Agent manifest declares required tools |
-| Prompts | Group-level prompts only | Schema-level + agent-level prompts |
+| Load | Schemas + shared lists | Schemas + shared lists + agent manifests |
+| Agent setup | User composes tool sets manually | Pre-built agents available from the catalog |
+| Tool composition | Manual cherry-picking | Agent manifest declares required tools |
+| Prompts | Set-level prompts only | Schema-level + agent-level prompts |
 
 ---
 

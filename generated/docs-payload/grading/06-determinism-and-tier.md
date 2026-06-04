@@ -1,20 +1,20 @@
 ---
 title: "Determinism and Tier"
 description: "The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "06-determinism-and-tier.md"
 order: 6
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/06-determinism-and-tier.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/06-determinism-and-tier.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/06-determinism-and-tier.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/06-determinism-and-tier.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/06-determinism-and-tier.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/06-determinism-and-tier.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -58,6 +58,30 @@ For mixed forms, implementers MAY:
 
 - split the dimension into two sub-dimensions (one `deterministic`, one `non-deterministic`), or
 - collapse it into a single dimension with `determinism = non-deterministic` (the strictly reproducible sub-part still runs, but the aggregate carries the weaker reproducibility claim).
+
+---
+
+## Deterministic Pretest — Test-Leiter (Working-Test Bar)
+
+Before any non-deterministic (LLM) grading runs, a deterministic **data-pretest** executes every tool's declared tests live and counts the **working** ones. A working test is a downloadable primitive (`tool` / `resource`) that returns HTTP 200 **and** a non-empty payload; HTTP 4xx, `status:false`, or an empty payload is a FAIL — never a pass.
+
+The working-test count per tool maps to a **Test-Leiter** rung. This is the deterministic readiness ladder that gates `deterministic-green`:
+
+| Working tests / tool | Rung (`testDepth`) | Meaning |
+|----------------------|--------------------|---------|
+| 0 | `unavailable` | No working test — `blocked` (repairable). In practice does not occur (every tool declares ≥ 1 test). |
+| 1 | `reachable` | Minimum, **INSUFFICIENT** — the deterministic test does NOT pass. The tool is reachable but its output schema cannot be validated against repeated evidence. |
+| 2 | `schema-validatable` | **Pass bar — the deterministic test PASSES.** Two working responses make the output schema validatable; the schema is **deterministic-green**. |
+| ≥ 3 | `data-analyzable` | Ideal gradient (a later wave). Not a second gate. |
+
+**Binding rules:**
+
+1. **The pass bar is `2` working tests per tool, applied per tool (not as a schema-file total).** A schema reaches `deterministic-green` only when **every** downloadable tool independently has ≥ 2 working tests. (MUST)
+2. **The bar is binary at 2.** Reaching 3+ does not change the pass/fail decision; it only raises the `testDepth` rung from `schema-validatable` to `data-analyzable`. (MUST)
+3. **A tool with exactly 1 working test is NOT `deterministic-green`, but is NOT `rejected`.** It is a repairable `blocked`/not-green state, resolved by adding a second working test — never a terminal rejection. (MUST)
+4. **`testDepth` is its own deterministic dimension**, recorded on the tool node in the index rollup, and is **independent** of the LLM `outputSchemaMatch` dimension. The two are never conflated: `testDepth` measures *how many* working responses exist; `outputSchemaMatch` judges *whether* the declared output schema matches a response. (MUST)
+
+> **Rationale.** A single working response cannot distinguish a correct output schema from a coincidentally-shaped one. Two independent working responses are the minimum deterministic evidence that the declared output schema holds. Raising coverage is **work** (add tests), not grounds for lowering the bar.
 
 ---
 
@@ -155,10 +179,12 @@ The node status of a graded primitive is one of **five** values, derived by the 
 | Status | Meaning |
 |--------|---------|
 | `pending` | Not yet graded. |
-| `blocked` | Cannot be graded right now, with a `reason` (fewer than 3 working tests, no About Resource, API unreachable) — repairable. |
+| `blocked` | Cannot be graded right now, with a `reason` (`validation-failed`, fewer than 2 working tests, no About Resource, API unreachable) — repairable. |
 | `graded` | A grade exists. |
 | `stable` | Fully graded via a `mode: "full"` operation and above threshold — ready for use; only this status passes the selection pre-condition. |
 | `rejected` | Veto raised — **terminal and irreversible**. |
+
+The five status **values** are unchanged in `3.0.0`; only the `blocked` **reason** vocabulary is extended. `validation-failed` is a documented, repairable `blocked` reason: emit-on-failure (the `grading import` gate, see [`22-workbench-island.md`](/grading/workbench-island/)) produces a `blocked` node — **not** a `pending` node — when a folder's schemas cannot be parsed or validated. The full pinned reason set lives in [`23-index-json.md`](/grading/index-json/). A `blocked`/`validation-failed` node is a **status record**, not a grading entry (see [`08-grading-model.md`](/grading/grading-model/)).
 
 The `partial`/`full` distinction (see [Partial vs. Full Grading and the `stable` Status](#partial-vs-full-grading-and-the-stable-status)) interacts directly with this status set: `partial` keeps the node at its last full status, only `full` can move a node to `stable`.
 

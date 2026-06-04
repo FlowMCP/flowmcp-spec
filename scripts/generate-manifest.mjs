@@ -19,8 +19,10 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-// Memo 086 PRD-01: version is the single source of truth in package.json (no hardcode)
-const SPEC_VERSION = JSON.parse( readFileSync( join( REPO, 'package.json' ), 'utf8' ) ).version
+// Spec content version is the curated value in data/refs.manual.json
+// (spec.currentVersion); package.json#version tracks the npm package and may
+// diverge from the published spec content directory (#79).
+const SPEC_VERSION = JSON.parse( readFileSync( join( REPO, 'data/refs.manual.json' ), 'utf8' ) ).spec.currentVersion
 const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const GRADING_PAYLOAD_DIR = join( PAYLOAD_DIR, 'grading' )

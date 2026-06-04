@@ -29,15 +29,18 @@ import { execSync } from 'node:child_process'
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
 
-// Memo 059 PRD-008: spec version is read from package.json (single source of
-// truth) — no hardcoded value. Strict mode: fail loudly if missing.
-const PKG_PATH = join( REPO, 'package.json' )
+// Spec content version is the curated value in data/refs.manual.json
+// (spec.currentVersion) — the same single source generate-refs uses. The
+// package.json version tracks the npm package and may diverge from the
+// published spec content directory (e.g. a tooling patch release), so reading
+// it here would point at a non-existent spec/v<pkg> directory (#79).
+const REFS_MANUAL_PATH = join( REPO, 'data/refs.manual.json' )
 const { readFileSync } = await import( 'node:fs' )
-const PKG = JSON.parse( readFileSync( PKG_PATH, 'utf-8' ) )
-if( typeof PKG.version !== 'string' || PKG.version.length === 0 ) {
-    throw new Error( '[generate-docs-payload] package.json#version missing or empty' )
+const REFS_MANUAL = JSON.parse( readFileSync( REFS_MANUAL_PATH, 'utf-8' ) )
+const SPEC_VERSION = REFS_MANUAL?.spec?.currentVersion
+if( typeof SPEC_VERSION !== 'string' || SPEC_VERSION.length === 0 ) {
+    throw new Error( '[generate-docs-payload] data/refs.manual.json spec.currentVersion missing or empty' )
 }
-const SPEC_VERSION = PKG.version
 const SPEC_DIR = join( REPO, `spec/v${ SPEC_VERSION }` )
 const PAYLOAD_DIR = join( REPO, 'generated/docs-payload' )
 const GRADING_ROOT = join( REPO, 'grading' )

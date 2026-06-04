@@ -1,20 +1,20 @@
 ---
 title: "Entry-Point Prompt + Personas Obligation"
 description: "Empty context (see [`02-eligibility.md`](./02-eligibility.md)) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "20-entry-point-prompt.md"
 order: 20
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/20-entry-point-prompt.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/20-entry-point-prompt.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/20-entry-point-prompt.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/20-entry-point-prompt.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/20-entry-point-prompt.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/20-entry-point-prompt.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -41,7 +41,7 @@ You are performing a FlowMCP grading. Instructions:
 1. Persona: crypto-trader-2026
 2. Selection: crypto-domain-full, lockSnapshot hash: <sha>
 3. Mode: Full (initial baseline)
-4. Spec version: gradingSpec/2.0.0
+4. Spec version: gradingSpec/3.0.0
 5. Pre-condition: all member schemas have gradingStatus: stable
 6. Output format: _gradings/<area>--<timestamp>.json
 ```
@@ -52,7 +52,7 @@ Six numbered lines. For Single-Gradings, line 2 is replaced and line 5 is droppe
 1. Persona: crypto-trader-2026
 2. Single-Schema: etherscan.getContractEthereum, area: single-test
 3. Mode: Full (initial baseline)
-4. Spec version: gradingSpec/2.0.0
+4. Spec version: gradingSpec/3.0.0
 6. Output format: _gradings/<area>--<timestamp>.json
 ```
 

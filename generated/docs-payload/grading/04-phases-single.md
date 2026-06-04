@@ -1,20 +1,20 @@
 ---
 title: "Provider-Side Grading Areas"
 description: "This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "04-phases-single.md"
 order: 4
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/04-phases-single.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/04-phases-single.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/04-phases-single.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/04-phases-single.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/04-phases-single.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/04-phases-single.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -55,7 +55,7 @@ The Area model retains four procedures that previously lived inside the phase mo
 
 The description cascade is a **mandatory ordered procedure** for validating tool descriptions. It MUST be executed in the following order; skipping or reordering steps is a finding.
 
-1. **Run tests against the endpoint.** SHOULD: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
+1. **Run tests against the endpoint.** MUST: at least **3 working tests per tool** (status true and non-empty data), covering the breadth of the parameter space. Fewer than 3 working tests blocks the tool from full grading and is recorded with a status reason (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
 2. **Check the responses** and validate the tool description against the actual responses.
 3. **Normalise / update the tool description** to match the validated responses.
 4. **All tools, resources, and prompts MUST have descriptions** — and each description MUST be individually checked.

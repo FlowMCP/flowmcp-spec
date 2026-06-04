@@ -1,20 +1,20 @@
 ---
 title: "Security and Development"
 description: "Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md)..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "09-security-and-development.md"
 order: 9
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/09-security-and-development.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/09-security-and-development.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/09-security-and-development.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/09-security-and-development.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/09-security-and-development.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/09-security-and-development.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -87,7 +87,7 @@ The full error-code catalogue for the grading subsystem itself (codes `GRD-*`, `
 
 ## Best-Practice Reference — Preload Pattern
 
-The Schemas-Spec v4.2.0 defines the **Preload pattern** in [`11-preload.md`](/specification/preload/). For schemas that handle **large, infrequently-updated data sets**, Preload SHOULD be used.
+The Schemas-Spec v4.3.0 defines the **Preload pattern** in [`11-preload.md`](/specification/preload/). For schemas that handle **large, infrequently-updated data sets**, Preload SHOULD be used.
 
 **Example.** A schema fetches a 2-MB reference data file that is updated daily. The schema SHOULD use Preload to cache the file once per day rather than re-fetching it on every tool call.
 
@@ -131,7 +131,7 @@ This sub-dimension is deterministic: the test runs a fixed jq expression against
 
 ## Veto-Trigger Overview
 
-The following table lists all four Categorical-Veto triggers defined by `gradingSpec/2.0.0`. The trigger names are **identical to** the enum values in [`08-grading-model.schema.json`](./08-grading-model.schema.json) `properties.categoricalVeto.oneOf[1].properties.triggeredBy.enum`. The grader MUST NOT introduce new names at runtime.
+The following table lists all four Categorical-Veto triggers defined by `gradingSpec/3.0.0`. The trigger names are **identical to** the enum values in [`08-grading-model.schema.json`](./08-grading-model.schema.json) `properties.categoricalVeto.oneOf[1].properties.triggeredBy.enum`. The grader MUST NOT introduce new names at runtime.
 
 | Trigger | Class | Source |
 |---------|-------|--------|
@@ -169,7 +169,7 @@ Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingS
 - [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — the version namespaces (`scoringSystem` / `gradingSystem`) that bind score changes from this chapter.
 - [`08-grading-model.md`](/grading/grading-model/) — the data model of the Categorical Veto entries defined here.
 - [`10-domain-knowledge.md`](/grading/domain-knowledge/) — Shared Lists and forbidden provider conventions (forward reference).
-- Schemas-Spec v4.2.0 [`11-preload.md`](/specification/preload/) — the Preload pattern (external).
+- Schemas-Spec v4.3.0 [`11-preload.md`](/specification/preload/) — the Preload pattern (external).
 - `node-formatting` skill — formatting rules.
 - `node-error-codes` skill — PREFIX-NUMBER error-code pattern.
 - No-silent-defaults rule — anti-defaults rule.
@@ -178,5 +178,5 @@ Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingS
 ## Related
 
 - **Depends on:** [`00-overview.md`](/grading/overview/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** [`10-domain-knowledge.md`](/grading/domain-knowledge/), Schemas-Spec v4.2.0 [`11-preload.md`](/specification/preload/), `node-formatting` skill, `node-error-codes` skill
+- **Related:** [`10-domain-knowledge.md`](/grading/domain-knowledge/), Schemas-Spec v4.3.0 [`11-preload.md`](/specification/preload/), `node-formatting` skill, `node-error-codes` skill
 

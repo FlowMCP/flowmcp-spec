@@ -1,17 +1,17 @@
 ---
 title: "Workbench Island"
 description: "The grading data directory (`grading-data/`) is a **workbench island**: an internal working area where schemas and selections are hammered on day after day. It is deliberately separate from the..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "22-workbench-island.md"
 order: 22
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/22-workbench-island.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/22-workbench-island.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/22-workbench-island.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/22-workbench-island.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/22-workbench-island.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/22-workbench-island.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
@@ -49,17 +49,28 @@ The island is connected to the real repositories by a two-way round-trip. Both d
 Source (a provider folder or a selection) flows into the workbench:
 
 1. Scan the `.mjs` files.
-2. Run `flowmcp validate` as a gate.
-3. Assert a **single namespace** (one folder = one namespace; several namespaces MUST abort).
+2. Run `flowmcp validate`. **On failure, do NOT abort the run** — emit a `blocked` node with `reason: "validation-failed"` into `index.json`, snapshot the unparseable source if it is readable, and CONTINUE with the remaining files in the folder. This is the **emit-on-failure** contract (the `3.0.0` break, see [Emit-on-failure import contract (NEW in 3.0.0)](#emit-on-failure-import-contract-new-in-300)).
+3. The **single-namespace expectation is retained as a normative invariant** (one folder = one namespace), but its violation is now an **emitted record, not an abort**: a folder whose schemas cannot be parsed to a single namespace emits a `blocked` node rather than aborting. (A genuine *disagreement* between two declared namespaces remains a hard configuration error — see the emit-on-failure section below.)
 4. Existence check: missing → create; changed (new hash) → write a **new snapshot alongside** the old one; identical hash → skip. The import **never overwrites** an existing snapshot.
 5. Convert into the island structure (resources to `resources/about/`, skills to `skills/`, inline skills normalised into files).
 6. Rebuild `index.json`.
+
+#### Emit-on-failure import contract (NEW in 3.0.0)
+
+Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a `flowmcp validate` failure or a folder that resolved to anything other than a single namespace **aborted** the whole import. `3.0.0` flips this to **emit-a-`blocked`-node-and-continue**:
+
+- **Validate failure → `blocked` node.** When a schema fails the validate gate, the import does NOT abort. It emits a `blocked` node with `reason: "validation-failed"` (the pinned reason, matching the closed `blockedReason` set in the grading module — see [`23-index-json.md`](/grading/index-json/)), snapshots the unparseable source if readable, and continues with the remaining files.
+- **All-unparseable folder → namespace-folder fallback.** When **all** schemas in a folder are unparseable (no readable `main.namespace`), the **folder name** is the fallback namespace identifier for the emitted `blocked` rollup. The fallback name MUST itself be a valid namespace (`/^[a-z][a-z0-9-]*$/`); a folder name that is not a valid namespace is a hard error (no silent normalisation). See [`19-folder-layout.md`](/grading/folder-layout/) for the folder↔namespace consistency rule and the rename-on-parse lifecycle.
+- **Single-namespace invariant retained, violation emitted.** The one-folder-one-namespace expectation is still normative. A folder that simply could not be parsed to a namespace emits a `blocked` node (it does not abort). A folder whose parsed schemas **disagree** on a declared namespace (≥2 distinct usable namespaces) is a genuine misconfiguration, not a fallback case, and is reported as a hard error.
+
+> **Non-destructive guarantee restated.** Emit-on-failure changes only the *control flow* (continue instead of abort); it does **not** weaken the non-destructive guarantees. The island still **never overwrites** a source snapshot (Step 4), the export **never overwrites** the destination (OUT), and `index.json` remains the **only** overwritable artifact. No source snapshot is written for an unparseable/blocked schema — only the `index.json` status record is emitted.
 
 ### OUT — `grading export <namespace|selection>`
 
 Workbench flows back toward the source:
 
 - The **primary hand-off is the `index.json`** — the complete graded state (status, grade, member resolution, lock snapshot).
+- The export lands the per-namespace rollup as the committed, CI-visible **provider-proof** `providers/<ns>/grade.json` inside the provider folder of the source repo (`flowmcp-schemas-private`); CI reads that **repo-resident** copy, never the island-local `index.json`. The data flow is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
 - Optionally, the clean schema `.mjs` files (resolved via `resolveLatest`, names stripped) MAY accompany the export.
 - The export **MUST NOT overwrite the source**; it writes into a fresh export folder.
 
@@ -69,12 +80,13 @@ The round-trip is the concrete shape of the flywheel loop described in [`18-flyw
 
 ## Cross-References
 
-- Folder layout and the namespace special case: [`19-folder-layout.md`](/grading/folder-layout/)
+- Folder layout, namespace special case, folder↔namespace + rename-on-parse: [`19-folder-layout.md`](/grading/folder-layout/)
 - Naming grammar (date-before-hash, `resolveLatest`): [`15-versioning-axes.md`](/grading/versioning-axes/)
 - The derived rollup that the round-trip hands off: [`23-index-json.md`](/grading/index-json/)
+- The grading-monitoring track + provider-proof data flow: [`26-monitoring-track.md`](/grading/monitoring-track/)
 
 ## Related
 
 - **Depends on:** [`00-overview.md`](/grading/overview/), [`19-folder-layout.md`](/grading/folder-layout/)
-- **Related:** [`15-versioning-axes.md`](/grading/versioning-axes/), [`23-index-json.md`](/grading/index-json/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+- **Related:** [`15-versioning-axes.md`](/grading/versioning-axes/), [`23-index-json.md`](/grading/index-json/), [`18-flywheel-loop.md`](/grading/flywheel-loop/), [`26-monitoring-track.md`](/grading/monitoring-track/)
 

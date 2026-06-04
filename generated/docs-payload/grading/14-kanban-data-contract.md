@@ -1,17 +1,17 @@
 ---
 title: "Kanban Data Contract (superseded)"
 description: "The earlier `1.1.0` Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. The `2.0.0` break replaces this with a single derived..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "14-kanban-data-contract.md"
 order: 14
 section: "Grading"
 normative: false
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/14-kanban-data-contract.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/14-kanban-data-contract.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/14-kanban-data-contract.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/14-kanban-data-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/14-kanban-data-contract.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/14-kanban-data-contract.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
@@ -23,6 +23,8 @@ edit_warning: "This file is auto-generated. Source: grading/2.0.0/14-kanban-data
 The earlier `1.1.0` Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. The `2.0.0` break replaces this with a single derived rollup file per namespace and per selection: **`index.json`**. The rollup carries the per-node status, the per-member resolution, the frozen lock snapshot, and the aggregate grade in one place. There is no longer a separate phase-status response surface, and the `P*`/`S*` phase identifiers are replaced by the eleven grading areas (see [`23-index-json.md`](/grading/index-json/) and the area chapters).
 
 Consumers MUST read status from `index.json`. The phase-status response described in `1.1.0` and its annex schema are no longer normative.
+
+> **As of `gradingSpec/3.0.0`:** the grading-monitoring board returns **in scope** in [`26-monitoring-track.md`](/grading/monitoring-track/). The two salvaged rules below (audit trail; irreversible veto) remain normative and now apply to that monitoring track.
 
 ---
 

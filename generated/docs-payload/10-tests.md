@@ -1,17 +1,17 @@
 ---
 title: "Tests"
 description: "Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document..."
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/10-tests.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "spec/v4.2.0/10-tests.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/10-tests.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/10-tests.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -604,7 +604,7 @@ A crypto-research agent with three tests demonstrating breadth:
 
 ---
 
-## Skill Tests (v4.2.0)
+## Skill Tests (v4.3.0)
 
 Skills have two test types: structural and one-shot.
 

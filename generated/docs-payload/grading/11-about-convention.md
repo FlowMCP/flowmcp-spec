@@ -1,20 +1,20 @@
 ---
 title: "About Convention as a Schema Resource"
 description: "This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "11-about-convention.md"
 order: 11
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/11-about-convention.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/11-about-convention.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/11-about-convention.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/11-about-convention.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/11-about-convention.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/11-about-convention.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -142,9 +142,9 @@ The deterministic sub-part is binary: the declared `about` Resource and its file
 
 ---
 
-## Relationship to the Schemas-Spec v4.2.0
+## Relationship to the Schemas-Spec v4.3.0
 
-The Schemas-Spec v4.2.0 — particularly [`13-resources.md`](/specification/resources/) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
+The Schemas-Spec v4.3.0 — particularly [`13-resources.md`](/specification/resources/) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
 
 A schema-validator at v4.2 MUST NOT reject a schema for failing the About convention; the convention's enforcement lives entirely in the grader.
 
@@ -152,8 +152,8 @@ A schema-validator at v4.2 MUST NOT reject a schema for failing the About conven
 
 ## Cross-References
 
-- Schemas-Spec v4.2.0 [`13-resources.md`](/specification/resources/) — the external Resource primitive against which the convention is defined.
-- Schemas-Spec v4.2.0 [`17-selections.md`](/specification/selections/) — the selection primitive.
+- Schemas-Spec v4.3.0 [`13-resources.md`](/specification/resources/) — the external Resource primitive against which the convention is defined.
+- Schemas-Spec v4.3.0 [`17-selections.md`](/specification/selections/) — the selection primitive.
 - [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the selection-level About Resource as the Domain-Knowledge content (seven mandatory sections).
 - [`12-personas-contract.md`](/grading/personas-contract/) — the personas reference required by [Content Contract](#content-contract).
 - [`13-skills.md`](/grading/skills/) — the skill obligation to reference the About Resource.
@@ -163,5 +163,5 @@ A schema-validator at v4.2 MUST NOT reject a schema for failing the About conven
 ## Related
 
 - **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** Schemas-Spec v4.2.0 [`13-resources.md`](/specification/resources/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`19-folder-layout.md`](/grading/folder-layout/), [`21-pre-conditions.md`](/grading/pre-conditions/)
+- **Related:** Schemas-Spec v4.3.0 [`13-resources.md`](/specification/resources/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`19-folder-layout.md`](/grading/folder-layout/), [`21-pre-conditions.md`](/grading/pre-conditions/)
 

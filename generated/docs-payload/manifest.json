@@ -1,6 +1,6 @@
 {
-    "spec_version": "4.2.0",
-    "generated_at": "2026-05-31T23:04:00.240Z",
+    "spec_version": "4.3.0",
+    "generated_at": "2026-06-04T13:48:14.670Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -160,7 +160,7 @@
             "collapsed": false,
             "spec_quality": {
                 "grade": 5,
-                "issues": 0
+                "issues": 1
             }
         },
         {
@@ -224,7 +224,7 @@
             "collapsed": false,
             "spec_quality": {
                 "grade": 5,
-                "issues": 0
+                "issues": 1
             }
         },
         {
@@ -272,7 +272,7 @@
             "collapsed": false,
             "spec_quality": {
                 "grade": 5,
-                "issues": 0
+                "issues": 1
             }
         },
         {
@@ -327,7 +327,7 @@
             "filename": "20-validation-strategy.md",
             "slug": "validation-strategy",
             "title": "Validation Strategy",
-            "description": "FlowMCP v4.2.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).",
+            "description": "FlowMCP v4.3.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).",
             "order": 20,
             "section": "Specification",
             "normative": true,
@@ -396,7 +396,7 @@
         },
         {
             "name": "Grading",
-            "file_count": 26,
+            "file_count": 27,
             "order": 2
         }
     ],
@@ -414,19 +414,19 @@
             "count_resources": 0,
             "count_skills": 0,
             "count_subset_required_keys": 91,
-            "timestamp": "2026-05-29T14:10:31.917Z",
+            "timestamp": "2026-06-04T13:28:25.110Z",
             "schema_version": "v4.0.0",
-            "build_hash": "1e76731"
+            "build_hash": "2767b71"
         }
     },
     "grading": {
-        "version": "2.0.0",
+        "version": "3.0.0",
         "files": [
             {
                 "filename": "00-overview.md",
                 "slug": "overview",
                 "title": "Overview",
-                "description": "The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specification v4.2.0 defines what a schema is, what a selection is, and which primitives exist. This Grading-Spec describes...",
+                "description": "The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specification v4.3.0 defines what a schema is, what a selection is, and which primitives exist. This Grading-Spec describes...",
                 "order": 0,
                 "section": "Grading",
                 "normative": false,
@@ -706,6 +706,17 @@
                 "section": "Grading",
                 "normative": true,
                 "sidebar_group": "process-contracts",
+                "collapsed": true
+            },
+            {
+                "filename": "26-monitoring-track.md",
+                "slug": "monitoring-track",
+                "title": "Grading-Monitoring Track",
+                "description": "This chapter brings the **grading-monitoring board back into scope**, reversing the `2.0.x` stance where the GitHub-Kanban wiring was declared out of scope and \"superseded by `index.json`\" (the scope...",
+                "order": 26,
+                "section": "Grading",
+                "normative": true,
+                "sidebar_group": "reference",
                 "collapsed": true
             }
         ]

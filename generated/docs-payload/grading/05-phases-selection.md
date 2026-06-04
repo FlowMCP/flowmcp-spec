@@ -1,20 +1,20 @@
 ---
 title: "Selection-Side Grading Areas"
 description: "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "05-phases-selection.md"
 order: 5
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/05-phases-selection.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/05-phases-selection.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/05-phases-selection.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/05-phases-selection.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/05-phases-selection.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -130,7 +130,7 @@ This tier is the **only** path to grade **A**. The provider-side Areas (`autonom
 - [`13-skills.md`](/grading/skills/) — selection-skill levels and per-skill grading.
 - [`19-folder-layout.md`](/grading/folder-layout/) — `_gradings/` placement, `index.json`, member resolution.
 - [`21-pre-conditions.md`](/grading/pre-conditions/) — the "all members stable" gate.
-- FlowMCP Schemas Specification v4.2.0 — [`17-selections.md`](/specification/selections/).
+- FlowMCP Schemas Specification v4.3.0 — [`17-selections.md`](/specification/selections/).
 
 ## Related
 

@@ -1,20 +1,20 @@
 ---
 title: "Personas Contract"
 description: "The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "12-personas-contract.md"
 order: 12
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/12-personas-contract.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/12-personas-contract.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/12-personas-contract.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/12-personas-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/12-personas-contract.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/12-personas-contract.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -136,7 +136,7 @@ The Lens (`lensId`) when present refines the base persona but does NOT replace i
 
 ## Technical Schema-Persona Tier (added in 2.0.0)
 
-> **Additive section — new in `gradingSpec/2.0.0`.** This tier is added on top of the existing
+> **Additive section — new in `gradingSpec/3.0.0`.** This tier is added on top of the existing
 > base-persona contract ([Source of Truth](#source-of-truth)–[Grading Effect](#grading-effect)). The four generalised base personas and their Lens model remain
 > unchanged and remain the single source of truth for `group-bound` (Selection / Task B) grading.
 > This section introduces a **second, technical** persona tier used for autonomous schema
@@ -189,7 +189,7 @@ content (identity, review focus, sign-off / block criteria) lives in the grading
 
 ---
 
-Technical Schema-Persona tier (see [Technical Schema-Persona Tier](#technical-schema-persona-tier-added-in-200)) added in `gradingSpec/2.0.0`.
+Technical Schema-Persona tier (see [Technical Schema-Persona Tier](#technical-schema-persona-tier-added-in-200)) added in `gradingSpec/3.0.0`.
 
 ## Related
 

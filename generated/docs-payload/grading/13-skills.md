@@ -1,20 +1,20 @@
 ---
 title: "Skills: Namespace Skill vs. Selection Skill"
 description: "A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "13-skills.md"
 order: 13
 section: "Grading"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/grading/2.0.0/13-skills.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "grading/2.0.0/13-skills.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/13-skills.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/13-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/13-skills.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/13-skills.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.2.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
@@ -30,7 +30,7 @@ The two categories cover different scopes (a namespace versus a selection of nam
 
 ### `type` (Schemas-Spec field)
 
-The Schemas-Spec v4.2.0 distinguishes the three skill scopes via the `type` field. The relevant definition is at `repos/flowmcp-spec/spec/v4.2.0/14-skills.md`:
+The Schemas-Spec v4.3.0 distinguishes the three skill scopes via the `type` field. The relevant definition is at `repos/flowmcp-spec/spec/v4.3.0/14-skills.md`:
 
 ```text
 | `type` | `string` | One of: `'namespace'`, `'selection'`, `'agent'` | … |
@@ -176,9 +176,9 @@ The two categories differ on:
 
 ---
 
-## Relationship to the Schemas-Spec v4.2.0
+## Relationship to the Schemas-Spec v4.3.0
 
-The Schemas-Spec v4.2.0 [`14-skills.md`](/specification/skills/) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
+The Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
 
 The `level` field (see [`level` (Grading-Spec extension)](#level-grading-spec-extension)) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
 
@@ -188,7 +188,7 @@ The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration 
 
 ## Cross-References
 
-- Schemas-Spec v4.2.0 [`14-skills.md`](/specification/skills/) — the `type` field and the `SKL018` limit.
+- Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/) — the `type` field and the `SKL018` limit.
 - [`11-about-convention.md`](/grading/about-convention/) — the About-Resource obligation that skills reference.
 - [`12-personas-contract.md`](/grading/personas-contract/) — the persona contract that the persona focus draws from.
 - [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the soft 5 / hard 7 thresholds that determine whether a selection skill is allowed at full scope.
@@ -198,5 +198,5 @@ The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration 
 ## Related
 
 - **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/), [`11-about-convention.md`](/grading/about-convention/), [`12-personas-contract.md`](/grading/personas-contract/)
-- **Related:** Schemas-Spec v4.2.0 [`14-skills.md`](/specification/skills/), [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- **Related:** Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/), [`10-domain-knowledge.md`](/grading/domain-knowledge/)
 

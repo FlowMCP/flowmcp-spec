@@ -1,17 +1,17 @@
 ---
 title: "The `index.json` Rollup"
 description: "Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the..."
-grading_version: "2.0.0"
+grading_version: "3.0.0"
 spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "7d4a5d2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7d4a5d2/grading/2.0.0/23-index-json.md"
-generated_at: "2026-06-01T01:54:15.513Z"
-generated_from: "grading/2.0.0/23-index-json.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/grading/3.0.0/23-index-json.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "grading/3.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: grading/2.0.0/23-index-json.md."
+edit_warning: "This file is auto-generated. Source: grading/3.0.0/23-index-json.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
@@ -53,12 +53,32 @@ Each primitive node (a tool, a schema, an about, a skill, a member) carries one 
 | Status | Meaning |
 |--------|---------|
 | `pending` | Not yet graded. |
-| `blocked` | Cannot be graded right now; carries a `reason` (e.g. fewer than three tests, no about, API down). Repairable. |
+| `blocked` | Cannot be graded right now; carries a `reason` from the pinned reason set below. Repairable. |
 | `graded` | A grade exists. |
 | `stable` | Fully graded **and** above threshold; ready to use. |
 | `rejected` | Veto — **terminal and irreversible** (see [Irreversible veto — terminal status `rejected`](#irreversible-veto--terminal-status-rejected)). |
 
 `graded` and `stable` are **node** values.
+
+#### Pinned `blocked` reason set
+
+A `blocked` node MUST carry a `reason` from the following **closed set**. Free-text reasons are not permitted (the [`index.schema.json`](./index.schema.json) annex enforces the enum):
+
+| `reason` | When |
+|----------|------|
+| `validation-failed` | The schema(s) failed the `grading import` validate gate (emit-on-failure, see [`22-workbench-island.md`](/grading/workbench-island/)). Matches the closed reason set in the grading module (`Grading.VALID_BLOCKED_REASONS`). |
+| `fewer-than-three-tests` | The schema has fewer than three working downloadable tests. |
+| `fewer-than-two-tests` | The schema has fewer than two working downloadable tests (the current Bar=2 minimum; the genuine "below 2" reason that previously collapsed onto `fewer-than-three-tests`). |
+| `no-about` | No About Resource is declared / found namespace-wide. |
+| `api-down` | The API is unreachable at grading time. |
+| `all-schemas-unparseable` | Every `.mjs` in the folder is unparseable (the namespace folder name is the fallback key — see [`19-folder-layout.md`](/grading/folder-layout/)). |
+| `not-imported` | A referenced member exists logically but was never imported. |
+
+Adding a reason value is a `gradingSpec` bump.
+
+#### Status record vs. grading entry
+
+A `blocked` node MAY exist **without a conformant grading entry**. An emit-on-failure `blocked`/`validation-failed` node is a **status record** (it lives in `index.json` with only `status` + `reason`, and optionally `githubIssue` / `boardColumn`), not a graded entry — see the status-record artefact class in [`08-grading-model.md`](/grading/grading-model/). It MUST NOT be treated as a graded entry anywhere a grade is consumed.
 
 ### Rollup status (operational vocabulary)
 
@@ -73,6 +93,27 @@ The top-level namespace/selection rollup summarises its nodes with a **different
 | `rejected` | A veto propagated to the rollup. |
 
 `operational` and `partial` are **rollup** values. A node is never `operational`; a rollup is never `graded`.
+
+### Which vocabulary drives the board
+
+The grading-monitoring board columns (see [`26-monitoring-track.md`](/grading/monitoring-track/)) are driven by the **rollup operational vocabulary** (`operational` / `partial` / `blocked` / `pending` / `rejected`), **not** the node 5-status enum. The status→column mapping is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
+
+---
+
+## Which `index.json` CI reads (exported, repo-resident copy)
+
+`index.json` is **born and rebuilt inside the workbench island** (`grading-data/`), which is gitignored and never CI-visible. The copy that CI and the board sync read is the **exported, repo-resident** per-namespace rollup committed into the provider folder of `flowmcp-schemas-private` (the **provider-proof** `providers/<ns>/grade.json`; see [`19-folder-layout.md`](/grading/folder-layout/) and the full data flow in [`26-monitoring-track.md`](/grading/monitoring-track/)). The island-local `index.json` is **never** CI-visible. The producer/sync detail lives in [`26-monitoring-track.md`](/grading/monitoring-track/); this chapter only pins the location rule.
+
+## Idempotency backref: `githubIssue` / `boardColumn`
+
+A node MAY carry two optional backref fields used by the deterministic board sync:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `githubIssue` | `string` | The number/URL of the one grading-issue already created for this namespace. |
+| `boardColumn` | `string` | The board column the node currently occupies. |
+
+The sync MUST treat a present `githubIssue` backref as idempotency proof: it MUST NOT create a second issue for the namespace — it updates the existing issue / column instead (see [`26-monitoring-track.md`](/grading/monitoring-track/)). Both fields are OPTIONAL in [`index.schema.json`](./index.schema.json).
 
 ---
 
@@ -140,15 +181,33 @@ A categorical veto maps to the node status `rejected`, which is **terminal**. Th
         }
       }
     },
-    "coins": { "status": "pending", "reason": "not yet imported" }
+    "coins": { "status": "blocked", "reason": "not-imported" }
   },
   "blockers": [
-    { "node": "schemas.coins", "reason": "selection member, not imported" }
+    { "node": "schemas.coins", "reason": "not-imported" }
   ]
 }
 ```
 
 A selection `index.json` is analogous, with a `lockSnapshot` block and a `members` resolution manifest in place of `schemas`.
+
+### Example — emit-on-failure status record (namespace-level)
+
+When every schema in a folder fails the import validate gate, the namespace rollup carries a `blocked` status record with `reason: validation-failed` and no grading entry. The optional backref fields appear once the deterministic sync has created the namespace grading-issue:
+
+```json
+{
+  "indexVersion": 2,
+  "namespace": "example-broken",
+  "updatedAt": "2026-06-02T09-00-00Z",
+  "status": "blocked",
+  "reason": "validation-failed",
+  "githubIssue": "FlowMCP/flowmcp-schemas-private#1234",
+  "boardColumn": "Blocked"
+}
+```
+
+This record validates against [`index.schema.json`](./index.schema.json) with only `status` (+ `reason`); see the status-record artefact class in [`08-grading-model.md`](/grading/grading-model/).
 
 ---
 
@@ -172,6 +231,6 @@ A selection `index.json` is analogous, with a `lockSnapshot` block and a `member
 ## Related
 
 - **Depends on:** [`00-overview.md`](/grading/overview/), [`19-folder-layout.md`](/grading/folder-layout/)
-- **Related:** [`14-kanban-data-contract.md`](/grading/kanban-data-contract/) (superseded by this chapter), [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`21-pre-conditions.md`](/grading/pre-conditions/), [`08-grading-model.md`](/grading/grading-model/)
+- **Related:** [`14-kanban-data-contract.md`](/grading/kanban-data-contract/) (superseded by this chapter), [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`21-pre-conditions.md`](/grading/pre-conditions/), [`08-grading-model.md`](/grading/grading-model/), [`26-monitoring-track.md`](/grading/monitoring-track/)
 - **Annex:** [`index.schema.json`](./index.schema.json) — JSON-Schema 2020-12 for `index.json`
 

@@ -1,17 +1,17 @@
 ---
 title: "Schema Format"
 description: "This document defines the structure of a FlowMCP schema file, the two named exports (`main` and `handlers`), tool definitions, resource declarations, skill references, naming conventions, and..."
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "01-schema-format.md"
 order: 1
 section: "Specification"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/01-schema-format.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "spec/v4.2.0/01-schema-format.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/01-schema-format.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/01-schema-format.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/01-schema-format.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/01-schema-format.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -86,9 +86,9 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `description` | `string` | What this schema does, 1-2 sentences. Appears in tool discovery. |
 | `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major MUST be `4`). Version `3.\d+.\d+` is accepted during migration. **FlowMCP-Spec-Version** (frozen by Major). |
 | `schemaVersion` | `string` | **NEW in v4.1.1.** Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
-| `schemaHash` | `string` | **NEW in v4.1.1.** 8-character sha256-prefix (`[0-9a-f]{8}`) of canonical-JSON-serialised schema (excluding the `schemaHash` field itself). Used as stable identifier in `grading-data/schemas/<namespace>/<hash>--v<X.Y.Z>.mjs` snapshots. Automatically generated. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
+| `meta` | `object` | MCP integration metadata block applied to all tools. Required when the schema defines at least one tool. See `19-mcp-integration.md`. |
 
 #### Two Version Axes (v4.1.1+)
 
@@ -106,18 +106,30 @@ export const main = {
     description: 'Fetch verified contract source by address',
     version: '4.0.0',
     schemaVersion: '1.0.0',
-    schemaHash: 'a1b2c3d4',
     root: 'https://api.etherscan.io',
     tools: { /* ... */ }
 }
 ```
 
+> **Note:** `schemaHash` is a **derived-only** field. It is computed by the grading toolchain (`HashGenerator`) from the canonical-JSON-serialised schema **excluding** the `schemaHash` field itself, and stored only in grading entries, `SourceSnapshot`s, and `index.json`. It MUST NOT appear as a source field in `.mjs` schema files. The `FolderScanner` flags an in-source `schemaHash` as defect `SCN-012`.
+
+### Mandatory Informational Fields
+
+These fields are required (`MUST` be present). They carry **no functional effect** on the runtime — the runtime does not validate URLs, interpret ToS, or classify licenses. Their purpose is to document provenance for schema authors and the grading pipeline.
+
+> **Enforcement is phased:** validation currently emits a **Warning** (VAL027, VAL028) for missing/invalid values; this will escalate to **Error** in a future minor release once existing schemas have been migrated. See `09-validation-rules.md`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `docs` | `string[]` | Non-empty array of documentation URLs for the API provider. Every API has documentation — this MUST be filled. |
+| `termsOfService` | `string` | URL to the API provider's Terms of Service — **OR** the sentinel value `"no-tos-found"` when the provider publishes no ToS. The field MUST be present; omitting it is a validation warning (escalates to error). **FlowMCP does not classify or interpret ToS.** See `23-license-and-tos.md`. |
+
+**Sentinel contract for `termsOfService`:** Use `"no-tos-found"` (exact string) when the provider has no published ToS. This signals a conscious author decision rather than an accidentally omitted field.
+
 ### Optional Fields
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `docs` | `string[]` | `[]` | Documentation URLs for the API provider. Informational only. |
-| `termsOfService` | `string \| null` | `null` | URL to the API provider's Terms of Services. **Informational only — FlowMCP does not classify or interpret ToS.** See `23-license-and-tos.md`. |
 | `termsOfServiceCheckedAt` | `string \| null` | `null` | ISO-Date (YYYY-MM-DD) when `termsOfService` URL was last verified by FlowMCP authors. |
 | `termsOfServiceLanguage` | `string \| null` | `null` | Two-letter language code of the ToS document (`'en'`, `'de'`, `'multi'`). |
 | `dataLicense` | `string \| null` | `null` | URL to the data license of API responses (e.g. CC-BY, Public Domain), if separately published by provider. |
@@ -128,7 +140,6 @@ export const main = {
 | `headers` | `object` | `{}` | Default HTTP headers applied to all routes. Route-level headers override these. |
 | `sharedLists` | `object[]` | `[]` | Shared list references. See `03-shared-lists.md` for format. |
 | `resources` | `object` | `{}` | Resource definitions. Keys are resource names in camelCase. Maximum 2 resources. See `13-resources.md`. |
-| `meta` | `object` | — | **Required.** MCP integration metadata block for all tools. See `19-mcp-integration.md`. |
 
 ### Deprecated Fields
 
@@ -141,6 +152,8 @@ export const main = {
 #### `namespace`
 
 The namespace is the primary grouping mechanism. It identifies the API provider and is used in the fully qualified tool name (`namespace/schemaFile::routeName`). Lowercase ASCII letters, digits, and hyphens are allowed — no underscores or uppercase.
+
+The namespace is **also the provider folder name** (`providers/<namespace>/`), and the two MUST stay in sync — the folder↔namespace invariant `VAL019` (see [09-validation-rules](/specification/validation-rules/)); the all-unparseable fallback and rename-on-parse rules are in `16-id-schema.md`.
 
 ```javascript
 // Valid
@@ -252,7 +265,7 @@ tools: {
 | `parameters` | `array` | Yes | Input parameter definitions. Can be empty `[]` for no-input tools. |
 | `output` | `object` | No | Output schema declaring expected response shape. See `04-output-schema.md`. |
 | `preload` | `object` | No | Cache configuration for static/slow-changing datasets. See `11-preload.md`. |
-| `tests` | `array` | Yes | Executable test cases with real parameter values. At least 1 per tool. See `10-tests.md`. |
+| `tests` | `array` | Yes | Executable test cases with real parameter values. Each tool MUST have at least 3 tests. See `10-tests.md`. |
 
 ### Tool Field Details
 

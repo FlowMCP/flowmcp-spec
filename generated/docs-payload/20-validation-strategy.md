@@ -1,17 +1,17 @@
 ---
 title: "Validation Strategy"
-description: "FlowMCP v4.2.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F)."
-spec_version: "4.2.0"
+description: "FlowMCP v4.3.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F)."
+spec_version: "4.3.0"
 spec_file: "20-validation-strategy.md"
 order: 20
 section: "Specification"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/20-validation-strategy.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "spec/v4.2.0/20-validation-strategy.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/20-validation-strategy.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/20-validation-strategy.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/20-validation-strategy.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -20,13 +20,13 @@ edit_warning: "This file is auto-generated. Source: spec/v4.2.0/20-validation-st
 
 ## Overview
 
-FlowMCP v4.2.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
+FlowMCP v4.3.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
 
 ---
 
 ## See also — Grading-Spec in `flowmcp-grading`
 
-A separate **Grading-Spec** (`gradingSpec/1.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.2.0 remains the highest instance.
+A separate **Grading-Spec** (`gradingSpec/3.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.3.0 remains the highest instance.
 
 Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
 
@@ -43,6 +43,15 @@ Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/Flow
 | F | FAIL | Not loadable |
 
 **PASS** means the deterministic validator found no errors (warnings are allowed).
+
+### Two tracks: dev-track grade F vs. monitoring-track `blocked` record
+
+A validation FAIL is recorded differently depending on the track:
+
+- **Development track** (this strategy, the Grade Report). A validation FAIL yields the terminal grade **F = "Not loadable"**. The development gate is unchanged: validate-clean is still required before `stage:production` (see [21-schema-lifecycle](/specification/schema-lifecycle/)). Grade F continues to represent a not-loadable schema in the dev/grade-report sense.
+- **Monitoring / grading track.** The same FAIL produces a **`blocked` record with a repairable reason** (e.g. `validation-failed`), **not** the terminal grade F. This is the emit-on-failure behaviour of the Grading-Spec: the import gate emits a `blocked` node and continues rather than aborting. The pinned `blocked` reason set and the status-record semantics live in the Grading-Spec [`23-index-json.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/23-index-json.md) (status + reason, no grade).
+
+The two tracks are reconciled in `21-schema-lifecycle.md`: the dev gate (validate before production) stays; the monitoring record (emitted regardless) is the grading track's concern.
 
 ## Grade Report Format
 
@@ -121,7 +130,7 @@ Score range: 0.0 (unusable) to 5.0 (excellent).
 
 Before Production deploy, all failing Primitives MUST be removed from the schema file.
 
-A Language Model calling `flowmcp add etherscan-io/contracts` receives the tool list and assumes all tools work. A failing tool in Production causes unpredictable errors.
+A Language Model calling tools from `etherscan-io/contracts` receives the tool list and assumes all tools work. A failing tool in Production causes unpredictable errors.
 
 **Rule:** 1 failing primitive gets removed — regardless of how many others pass.
 

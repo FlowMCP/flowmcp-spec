@@ -1,24 +1,24 @@
 ---
 title: "Validation Rules"
 description: "This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description."
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-source_commit: "7d4a5d2"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7d4a5d2/spec/v4.2.0/09-validation-rules.md"
-generated_at: "2026-06-01T01:54:15.513Z"
-generated_from: "spec/v4.2.0/09-validation-rules.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/09-validation-rules.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/09-validation-rules.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/09-validation-rules.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
 
-This file is the **central code registry** for FlowMCP v4.2.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
+This file is the **central code registry** for FlowMCP v4.3.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
 ---
 
@@ -57,6 +57,7 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | VAL016 | error | `main.tools` (or deprecated `main.routes`) must be an object. May be empty `{}` if `main.resources` is defined. `main.skills` is forbidden in v4.0.0 — skills are namespace-, selection-, or agent-scoped (see [14-skills](/specification/skills/)). |
 | VAL017 | error | Schema MUST NOT define both `main.tools` and `main.routes` simultaneously |
 | VAL018 | warning | `main.routes` is deprecated. Use `main.tools` instead. |
+| VAL019 | error | Folder↔namespace invariant: the `providers/<dir>/` directory name MUST equal `main.namespace` of every schema it contains. This is the idiom of `CAT002` (catalog `name` ↔ catalog dir), `AGT001` (agent name ↔ dir), and `SKL003` (skill name ↔ file basename). When all schemas in a folder are unparseable, the folder name is the fallback namespace; the equality is asserted once a schema parses (rename-on-parse, see [16-id-schema](/specification/id-schema/)). |
 
 ---
 
@@ -71,6 +72,8 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | VAL024 | error | `main.sharedLists` (if present) must be an array of objects |
 | VAL025 | error | `main.requiredLibraries` (if present) must be an array of strings |
 | VAL026 | error | Each entry in `requiredLibraries` must be on the runtime allowlist |
+| VAL027 | **warning** | `main.docs` MUST be a non-empty array of strings. An empty array or absent field is a validation warning. **Will escalate to error in a future release.** Every API has documentation — this field must be filled by the schema author. |
+| VAL028 | **warning** | `main.termsOfService` MUST be present and MUST be either a URL string or the sentinel `"no-tos-found"`. A `null` value or absent field is a validation warning. **Will escalate to error in a future release.** The sentinel signals a conscious author decision that no ToS was found. |
 
 ---
 
@@ -160,8 +163,11 @@ This file is the **central code registry** for FlowMCP v4.2.0. All validation, s
 | RES021 | error | `output.schema.type` must be `'array'` for resource queries. |
 | RES022 | error | Test parameter values MUST pass the corresponding `z` validation. |
 | RES023 | error | Test objects MUST be JSON-serializable. |
-| RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.2.0) |
-| RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.2.0) |
+| RES024 | error | `source: 'http'` requires a `url` field. The URL MUST use HTTPS. (added in v4.3.0) |
+| RES036 | error | `source: 'http'` requires a `path` field (local cache file). Enforced by core (`ResourceDatabaseManager`). (added in v4.3.0) |
+| RES043 | error | `mode: 'url'` is only valid for `source: 'geo-geojson'` or `'geo-csv'`. `sqlite-gtfs` does not support URL mode. (added in v4.3.0) |
+| RES044 | error | `mode: 'url'` requires `url` (HTTPS) and `addon`. `mode` MUST be explicit (no default). (added in v4.3.0) |
+| RES045 | error | `source: 'geo-csv'` with `mode: 'url'` requires a `parseConfig` object. No silent default. (added in v4.3.0) |
 
 `RES001` and `RES036` are enforced by core (`ResourceDatabaseManager`); all other RES codes are pipeline-level validation checks.
 
@@ -278,8 +284,8 @@ Async fields are reserved for future versions. If present, they are ignored by t
 | AGT016 | error | Referenced prompt/skill files MUST exist and be `.mjs` files |
 | AGT017 | error | Prompt files MUST have `export const prompt` (with `content` or `contentFile`) |
 | AGT018 | error | Skill files MUST have `export const skill` (with `name`, `version`, `content`/`contentFile`, `requires`, `input`, `output`) |
-| AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs (added in v4.2.0) |
-| AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) (added in v4.2.0) |
+| AGT030 | error | All IDs in `agent.selections` must be resolvable Selection IDs (added in v4.3.0) |
+| AGT031 | error | `elicitation.maxRounds` must be a positive integer (>= 1) (added in v4.3.0) |
 
 `AGT004`, `AGT030`, and `AGT031` are enforced by core at agent load/startup time; all other AGT codes are pipeline-level validation checks.
 
@@ -287,7 +293,7 @@ See `06-agents.md` for the complete agent specification.
 
 ---
 
-## MCP Integration Meta Rules (v4.2.0)
+## MCP Integration Meta Rules (v4.3.0)
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -305,7 +311,7 @@ See `19-mcp-integration.md` for the complete meta block specification.
 
 ---
 
-## Selection Validation Rules (v4.2.0)
+## Selection Validation Rules (v4.3.0)
 
 | Code | Severity | Rule |
 |------|----------|------|

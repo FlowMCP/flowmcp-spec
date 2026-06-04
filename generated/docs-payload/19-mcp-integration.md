@@ -1,17 +1,17 @@
 ---
 title: "MCP Server Integration"
 description: "When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific metadata. The `meta` block in every Tool definition provides this metadata."
-spec_version: "4.2.0"
+spec_version: "4.3.0"
 spec_file: "19-mcp-integration.md"
 order: 19
 section: "Specification"
 normative: true
-source_commit: "b25ff5d"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b25ff5d/spec/v4.2.0/19-mcp-integration.md"
-generated_at: "2026-06-01T01:39:52.471Z"
-generated_from: "spec/v4.2.0/19-mcp-integration.md"
+source_commit: "b6d4210"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/b6d4210/spec/v4.3.0/19-mcp-integration.md"
+generated_at: "2026-06-04T13:48:14.225Z"
+generated_from: "spec/v4.3.0/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
-edit_warning: "This file is auto-generated. Source: spec/v4.2.0/19-mcp-integration.md."
+edit_warning: "This file is auto-generated. Source: spec/v4.3.0/19-mcp-integration.md."
 ---
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
@@ -26,7 +26,7 @@ When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific
 
 ## Meta Block (Required per Tool)
 
-Every Tool in v4.2.0 MUST have a `meta` block:
+Every Tool in v4.3.0 MUST have a `meta` block:
 
 ```javascript
 export const schema = {

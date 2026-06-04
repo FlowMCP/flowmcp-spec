@@ -3,7 +3,7 @@ name: Generate llms.txt
 on:
   push:
     paths:
-      - 'spec/v4.2.0/*.md'
+      - 'spec/**/*.md'
       - 'package.json'
   workflow_dispatch:
 
@@ -21,6 +21,18 @@ jobs:
         run: |
           SPEC_VERSION=$(node -p "require('./package.json').version")
           SPEC_DIR="spec/v${SPEC_VERSION}"
+          # A patch release reuses the minor spec directory (e.g. package version 4.3.1
+          # has no spec/v4.3.1 — the docs live in spec/v4.3.0). Fall back to the highest
+          # existing spec/vX.Y.Z directory rather than silently emitting an empty file.
+          if [ ! -d "$SPEC_DIR" ]; then
+            FALLBACK_DIR=$(ls -d spec/v*/ 2>/dev/null | sed 's:/*$::' | sort -V | tail -1)
+            echo "WARN: $SPEC_DIR not found; falling back to ${FALLBACK_DIR} for v${SPEC_VERSION}"
+            SPEC_DIR="$FALLBACK_DIR"
+          fi
+          if [ -z "$SPEC_DIR" ] || [ ! -d "$SPEC_DIR" ]; then
+            echo "FAIL: no spec/v* directory found to build llms.txt"
+            exit 1
+          fi
           OUTPUT_DIR="generated"
           OUTPUT="$OUTPUT_DIR/llms.txt"
           OUTPUT_ALIAS="$OUTPUT_DIR/llms-schema-spec.txt"
@@ -101,7 +113,10 @@ jobs:
           echo "" >> "$OUTPUT"
           echo "---" >> "$OUTPUT"
 
-          # Concatenate spec files
+          # Concatenate spec files. A missing file is surfaced (never silently skipped),
+          # and concatenating ZERO files is a hard failure — that is exactly the bug that
+          # produced a header-and-TOC-only llms.txt.
+          CONCATENATED=0
           for i in "${!FILES[@]}"; do
             FILE="$SPEC_DIR/${FILES[$i]}"
             if [ -f "$FILE" ]; then
@@ -109,8 +124,17 @@ jobs:
               cat "$FILE" >> "$OUTPUT"
               echo "" >> "$OUTPUT"
               echo "---" >> "$OUTPUT"
+              CONCATENATED=$((CONCATENATED + 1))
+            else
+              echo "WARN: spec file not found, skipped: $FILE"
             fi
           done
+
+          if [ "$CONCATENATED" -eq 0 ]; then
+            echo "FAIL: 0 spec files concatenated from $SPEC_DIR — refusing to write a header-only llms.txt"
+            exit 1
+          fi
+          echo "Concatenated $CONCATENATED spec files from $SPEC_DIR into $OUTPUT"
 
           # Mirror llms.txt as llms-schema-spec.txt (alias for docs-site convention)
           cp "$OUTPUT" "$OUTPUT_ALIAS"

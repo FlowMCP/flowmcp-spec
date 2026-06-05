@@ -1,5 +1,15 @@
 # Changelog gradingSpec
 
+## 3.0.3 — 2026-06-05 (additive — Area dependency model + Emit-Skill format)
+
+Additive, non-breaking. Promotes the Area dependency model from reference-engine DATA
+into the normative spec and pins the Emit-Skill format.
+
+| File | Change |
+|------|--------|
+| `21-pre-conditions.md` | New normative **Area Dependency Model**: the readiness ladder (`imported → structural-valid → deterministic-green → stable`), the per-Area `dependsOn`/`requiredLevel`/dimension table, and the two binding gates — the **Provider-Namespace-Gate** (`namespace-*` held until every schema is `deterministic-green`, folding onto the weakest schema) and the **About-Namespace-Gate** (`stable`, per the universal pre-condition). `single-test` / `tools-aggregate-schema` are classified **both** (deterministic gate + non-deterministic description scoring). |
+| `21-pre-conditions.md` | New normative **Emit-Skill Format**: `--emit-prompts` returns ONE self-contained skill text carrying the ready-stage Area prompts (real paths + inline output schema, no surviving placeholder), the Task-ID, and the `--consume-scores` return command; gated `namespace-*` Areas follow in a separate emit once the Provider-Namespace-Gate opens. |
+
 ## 3.0.2 — 2026-06-04 (corrections + additive)
 
 Internal-consistency corrections to the deterministic grading model, plus two additive

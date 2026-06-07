@@ -1,6 +1,6 @@
 {
     "spec_version": "4.3.0",
-    "generated_at": "2026-06-04T21:10:58.172Z",
+    "generated_at": "2026-06-07T18:27:40.199Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -151,7 +151,7 @@
             "filename": "09-validation-rules.md",
             "slug": "validation-rules",
             "title": "Validation Rules",
-            "description": "This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.",
+            "description": "This document defines all validation rules enforced by `flowmcp schema-check`. Each rule has a code, severity, and description.",
             "order": 9,
             "section": "Specification",
             "normative": true,

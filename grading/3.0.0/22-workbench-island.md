@@ -42,7 +42,7 @@ The island is connected to the real repositories by a two-way round-trip. Both d
 Source (a provider folder or a selection) flows into the workbench:
 
 1. Scan the `.mjs` files.
-2. Run `flowmcp validate`. **On failure, do NOT abort the run** — emit a `blocked` node with `reason: "validation-failed"` into `index.json`, snapshot the unparseable source if it is readable, and CONTINUE with the remaining files in the folder. This is the **emit-on-failure** contract (the `3.0.0` break, see [Emit-on-failure import contract (NEW in 3.0.0)](#emit-on-failure-import-contract-new-in-300)).
+2. Run `flowmcp schema-check`. **On failure, do NOT abort the run** — emit a `blocked` node with `reason: "validation-failed"` into `index.json`, snapshot the unparseable source if it is readable, and CONTINUE with the remaining files in the folder. This is the **emit-on-failure** contract (the `3.0.0` break, see [Emit-on-failure import contract (NEW in 3.0.0)](#emit-on-failure-import-contract-new-in-300)).
 3. The **single-namespace expectation is retained as a normative invariant** (one folder = one namespace), but its violation is now an **emitted record, not an abort**: a folder whose schemas cannot be parsed to a single namespace emits a `blocked` node rather than aborting. (A genuine *disagreement* between two declared namespaces remains a hard configuration error — see the emit-on-failure section below.)
 4. Existence check: missing → create; changed (new hash) → write a **new snapshot alongside** the old one; identical hash → skip. The import **never overwrites** an existing snapshot.
 5. Convert into the island structure (resources to `resources/about/`, skills to `skills/`, inline skills normalised into files).
@@ -50,7 +50,7 @@ Source (a provider folder or a selection) flows into the workbench:
 
 #### Emit-on-failure import contract (NEW in 3.0.0)
 
-Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a `flowmcp validate` failure or a folder that resolved to anything other than a single namespace **aborted** the whole import. `3.0.0` flips this to **emit-a-`blocked`-node-and-continue**:
+Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a `flowmcp schema-check` failure or a folder that resolved to anything other than a single namespace **aborted** the whole import. `3.0.0` flips this to **emit-a-`blocked`-node-and-continue**:
 
 - **Validate failure → `blocked` node.** When a schema fails the validate gate, the import does NOT abort. It emits a `blocked` node with `reason: "validation-failed"` (the pinned reason, matching the closed `blockedReason` set in the grading module — see [`23-index-json.md`](./23-index-json.md)), snapshots the unparseable source if readable, and continues with the remaining files.
 - **All-unparseable folder → namespace-folder fallback.** When **all** schemas in a folder are unparseable (no readable `main.namespace`), the **folder name** is the fallback namespace identifier for the emitted `blocked` rollup. The fallback name MUST itself be a valid namespace (`/^[a-z][a-z0-9-]*$/`); a folder name that is not a valid namespace is a hard error (no silent normalisation). See [`19-folder-layout.md`](./19-folder-layout.md) for the folder↔namespace consistency rule and the rename-on-parse lifecycle.

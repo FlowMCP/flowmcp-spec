@@ -6,9 +6,9 @@ spec_file: "02-parameters.md"
 order: 2
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/02-parameters.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/02-parameters.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/02-parameters.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/02-parameters.md."
@@ -400,7 +400,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 #### Validation Examples
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH001 error   Empty placeholder {{tool:}} found at line 12
   PH003 error   Input parameter key "123abc" does not match ^[a-zA-Z][a-zA-Z0-9]*$
@@ -409,7 +409,7 @@ flowmcp validate prompt.mjs
 ```
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH002 error   Reference {{tool:nonExistent}} does not resolve to a registered tool
 

@@ -698,14 +698,14 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 ### Validation Output Examples
 
 ```
-flowmcp validate providers/coingecko/prompts/price-comparison.mjs
+flowmcp schema-check providers/coingecko/prompts/price-comparison.mjs
 
   0 errors, 0 warnings
   Prompt is valid
 ```
 
 ```
-flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
+flowmcp schema-check agents/crypto-research/prompts/token-deep-dive.mjs
 
   PRM004 error   Agent-Prompt "token-deep-dive" requires testedWith field
   PRM006 error   dependsOn entry "etherscan/tool/nonExistent" does not resolve
@@ -715,7 +715,7 @@ flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
 ```
 
 ```
-flowmcp validate providers/coingecko/prompts/bad-prompt.mjs
+flowmcp schema-check providers/coingecko/prompts/bad-prompt.mjs
 
   PRM003 error   Prompt "bad-prompt" has both namespace and agent set
   PRM005 error   testedWith "claude-sonnet" must contain /

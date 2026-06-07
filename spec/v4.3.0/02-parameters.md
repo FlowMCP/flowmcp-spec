@@ -391,7 +391,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 #### Validation Examples
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH001 error   Empty placeholder {{tool:}} found at line 12
   PH003 error   Input parameter key "123abc" does not match ^[a-zA-Z][a-zA-Z0-9]*$
@@ -400,7 +400,7 @@ flowmcp validate prompt.mjs
 ```
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH002 error   Reference {{tool:nonExistent}} does not resolve to a registered tool
 

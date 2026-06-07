@@ -1475,7 +1475,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 #### Validation Examples
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH001 error   Empty placeholder {{tool:}} found at line 12
   PH003 error   Input parameter key "123abc" does not match ^[a-zA-Z][a-zA-Z0-9]*$
@@ -1484,7 +1484,7 @@ flowmcp validate prompt.mjs
 ```
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH002 error   Reference {{tool:nonExistent}} does not resolve to a registered tool
 
@@ -4406,7 +4406,7 @@ This step is optional in v2.0.0 but will become recommended in v2.1.0.
 After migration, run the security scan:
 
 ```bash
-flowmcp validate --security <schema-path>
+flowmcp schema-check --security <schema-path>
 ```
 
 This verifies:
@@ -4421,7 +4421,7 @@ This verifies:
 ### Step 6: Run Validation
 
 ```bash
-flowmcp validate <schema-path>
+flowmcp schema-check <schema-path>
 ```
 
 Full validation checks:
@@ -4603,7 +4603,7 @@ export const handlers = ( { sharedLists, libraries } ) => ({
 #### Step 3: Run Validation
 
 ```bash
-flowmcp validate <schema-path>
+flowmcp schema-check <schema-path>
 ```
 
 Validates the migrated schema against v3.0.0 rules.
@@ -4744,7 +4744,7 @@ Per schema:
 
 - [ ] `routes` renamed to `tools`
 - [ ] `version` updated to `'3.0.0'`
-- [ ] Validation passes (`flowmcp validate`)
+- [ ] Validation passes (`flowmcp schema-check`)
 - [ ] Tests pass (`flowmcp grading deterministic`)
 - [ ] (Optional) Resources added if applicable
 - [ ] (Optional) Skills added if applicable
@@ -4770,7 +4770,7 @@ The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every 
 | 2 | Add meta block per Tool | Set all 6 fields explicitly, `alwaysLoad: false` as default |
 | 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
 | 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
-| 5 | Validate | `flowmcp validate` → PASS |
+| 5 | Validate | `flowmcp schema-check` → PASS |
 | 6 | API-Test | `flowmcp grading deterministic` → min. 1 response |
 
 ### Breaking Changes
@@ -4839,7 +4839,7 @@ export const schema = {
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
+This document defines all validation rules enforced by `flowmcp schema-check`. Each rule has a code, severity, and description.
 
 This file is the **central code registry** for FlowMCP v4.3.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
@@ -5237,7 +5237,7 @@ See `10-tests.md` for the complete test specification including format, design p
 The CLI displays results grouped by severity with the rule code, severity, location, and description:
 
 ```
-flowmcp validate etherscan/contracts.mjs
+flowmcp schema-check etherscan/contracts.mjs
 
   VAL014 error   main.version: Must match ^4\.\d+\.\d+$ (found "1.2.0")
   VAL031 error   tools: Maximum 8 tools exceeded (found 10)
@@ -5251,7 +5251,7 @@ flowmcp validate etherscan/contracts.mjs
 When all rules pass:
 
 ```
-flowmcp validate etherscan/contracts.mjs
+flowmcp schema-check etherscan/contracts.mjs
 
   0 errors, 0 warnings
   Schema is valid
@@ -5260,7 +5260,7 @@ flowmcp validate etherscan/contracts.mjs
 With security flag:
 
 ```
-flowmcp validate --security etherscan/contracts.mjs
+flowmcp schema-check --security etherscan/contracts.mjs
 
   SEC001 error   Line 3: Forbidden pattern "import" detected
   SEC017 error   main.handlers.preRequest: Non-serializable value (function)
@@ -5596,7 +5596,7 @@ Tests are executed and the actual response structure is compared against the dec
 
 ### Dry-Run Mode
 
-Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp validate` to check test definitions statically.
+Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp schema-check` to check test definitions statically.
 
 ---
 
@@ -5890,7 +5890,7 @@ The structural test validates that all internal references in the skill are reso
 - All `{{input:key}}` placeholders match the skill's `input` array
 - No unresolvable `{{skill:name}}` references
 
-This test is deterministic and runs during `flowmcp validate`.
+This test is deterministic and runs during `flowmcp schema-check`.
 
 ### One-Shot Test for Skills
 
@@ -5912,7 +5912,7 @@ This demonstrates that One-Shot performance is directly correlated with informat
 ```javascript
 // Structural test: deterministic
 // 1. Validate all references resolve
-// 2. Run: flowmcp validate providers/{namespace}/skills/skill-name.mjs
+// 2. Run: flowmcp schema-check providers/{namespace}/skills/skill-name.mjs
 
 // One-Shot test: probabilistic (LLM-eval)
 // 1. Load skill as MCP prompt
@@ -6864,14 +6864,14 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 ### Validation Output Examples
 
 ```
-flowmcp validate providers/coingecko/prompts/price-comparison.mjs
+flowmcp schema-check providers/coingecko/prompts/price-comparison.mjs
 
   0 errors, 0 warnings
   Prompt is valid
 ```
 
 ```
-flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
+flowmcp schema-check agents/crypto-research/prompts/token-deep-dive.mjs
 
   PRM004 error   Agent-Prompt "token-deep-dive" requires testedWith field
   PRM006 error   dependsOn entry "etherscan/tool/nonExistent" does not resolve
@@ -6881,7 +6881,7 @@ flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
 ```
 
 ```
-flowmcp validate providers/coingecko/prompts/bad-prompt.mjs
+flowmcp schema-check providers/coingecko/prompts/bad-prompt.mjs
 
   PRM003 error   Prompt "bad-prompt" has both namespace and agent set
   PRM005 error   testedWith "claude-sonnet" must contain /
@@ -9037,7 +9037,7 @@ All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 ### Structural Rules (Static Validation)
 
-These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp validate`.
+These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp schema-check`.
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -9167,7 +9167,7 @@ vs_currencies: usd
 
 ### Validation
 
-The one-shot constraint is **not statically verifiable** by `flowmcp validate` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
+The one-shot constraint is **not statically verifiable** by `flowmcp schema-check` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
 
 See `10-tests.md` (One-Shot Test for Skills) for the test protocol.
 
@@ -10228,14 +10228,14 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 ### Validation Output Examples
 
 ```
-flowmcp validate --id "coingecko/tool/simplePrice"
+flowmcp schema-check --id "coingecko/tool/simplePrice"
 
   0 errors, 0 warnings
   ID is valid
 ```
 
 ```
-flowmcp validate --id "COINGECKO/tool/simplePrice"
+flowmcp schema-check --id "COINGECKO/tool/simplePrice"
 
   ID002 error   Namespace "COINGECKO" must match ^[a-z][a-z0-9-]*$
 
@@ -10244,7 +10244,7 @@ flowmcp validate --id "COINGECKO/tool/simplePrice"
 ```
 
 ```
-flowmcp validate --id "simplePrice"
+flowmcp schema-check --id "simplePrice"
 
   ID001 error   ID MUST contain at least one "/" separator
 
@@ -10782,7 +10782,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 | 1 | `stage:research` | API endpoint discovered | API reachable, schema creation is feasible |
 | 2 | `stage:creation` | Research complete | Schema file created in `tests/new-schemas/` |
 | 3 | `stage:api-test` | Schema created | `flowmcp grading deterministic` → min. 1 PASS (see Special Rule) |
-| 4 | `stage:validation` | API test passed | `flowmcp validate` → 0 errors |
+| 4 | `stage:validation` | API test passed | `flowmcp schema-check` → 0 errors |
 | 5 | `stage:grade` | Validation passed | `namespaceAggregate` grade B or better |
 | 6 | `stage:production` | `namespaceAggregate` grade B+ confirmed | Deployed to `providers/` in production catalog |
 
@@ -10796,7 +10796,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:api-test`** — The schema is tested against the live API using `flowmcp grading deterministic <id>`. At least one tool must return a PASS result. See the [API-Test Special Rule](#api-test-special-rule-for-static-schemas) below for schemas with no HTTP tools.
 
-**`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
+**`stage:validation`** — The schema passes structural validation: `flowmcp schema-check <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 
 **`stage:grade`** — The schema receives a quality grade. The gate references the **`namespaceAggregate`** grade — the provider-level rollup — not an implied per-schema grade computed inside this lifecycle. A per-schema grade rolls up into the namespace aggregate; the aggregate is the gate (Memo 093 F3/F4). The `namespaceAggregate` grade B or better is required for production deployment. See the [Grading-Spec v3.0.0](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/00-overview.md) for the grading criteria. **The grade computation — including the aggregate — is owned entirely by the Grading-Spec; §21 only consumes the resulting `namespaceAggregate`.** FlowMCP delegates the grading model, the rollup, and the aggregate to that standard.
 
@@ -10807,7 +10807,7 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 Up to v4.2.0 this lifecycle implied a single strict sequence: validation passes, *then* a grade is produced. v4.3.0 relaxes that sequencing for the **monitoring/grading track**:
 
 - A **monitoring/grading record MAY exist in a `blocked` state for a schema that has NOT cleared `stage:validation`** (emit-on-failure — the Grading-Spec import gate emits a `blocked` node with `reason: validation-failed` instead of aborting).
-- This `blocked` monitoring record does **NOT** advance the schema toward `stage:production`. The **development gate is unchanged**: validate-clean (`flowmcp validate` → 0 errors) is still required before `stage:production`.
+- This `blocked` monitoring record does **NOT** advance the schema toward `stage:production`. The **development gate is unchanged**: validate-clean (`flowmcp schema-check` → 0 errors) is still required before `stage:production`.
 
 In other words: the *development gate* (validate before production) stays; the *monitoring record* (emitted regardless of validation outcome) is the grading track's concern. §21 no longer implies these are the same single sequential gate. See [Grading-Spec v3.0.0 §22 / §23](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/22-workbench-island.md) for the emit-on-failure contract and the pinned `blocked` reason set.
 

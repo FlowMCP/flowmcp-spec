@@ -6,9 +6,9 @@ spec_file: "14-skills.md"
 order: 14
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/14-skills.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/14-skills.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/14-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/14-skills.md."
@@ -496,7 +496,7 @@ All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 ### Structural Rules (Static Validation)
 
-These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp validate`.
+These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp schema-check`.
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -626,7 +626,7 @@ vs_currencies: usd
 
 ### Validation
 
-The one-shot constraint is **not statically verifiable** by `flowmcp validate` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
+The one-shot constraint is **not statically verifiable** by `flowmcp schema-check` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
 
 See `10-tests.md` (One-Shot Test for Skills) for the test protocol.
 

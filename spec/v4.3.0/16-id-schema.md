@@ -348,14 +348,14 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 ### Validation Output Examples
 
 ```
-flowmcp validate --id "coingecko/tool/simplePrice"
+flowmcp schema-check --id "coingecko/tool/simplePrice"
 
   0 errors, 0 warnings
   ID is valid
 ```
 
 ```
-flowmcp validate --id "COINGECKO/tool/simplePrice"
+flowmcp schema-check --id "COINGECKO/tool/simplePrice"
 
   ID002 error   Namespace "COINGECKO" must match ^[a-z][a-z0-9-]*$
 
@@ -364,7 +364,7 @@ flowmcp validate --id "COINGECKO/tool/simplePrice"
 ```
 
 ```
-flowmcp validate --id "simplePrice"
+flowmcp schema-check --id "simplePrice"
 
   ID001 error   ID MUST contain at least one "/" separator
 

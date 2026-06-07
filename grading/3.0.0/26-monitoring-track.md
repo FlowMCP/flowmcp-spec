@@ -25,7 +25,7 @@ The pipeline is split into two tracks that are **not linked**.
 
 ### Track A — Schema-Development
 
-File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** ([Schemas-Spec v4.3.0 §21](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/21-schema-lifecycle.md)). The development gate is unchanged: a schema must pass `flowmcp validate` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
+File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** ([Schemas-Spec v4.3.0 §21](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/21-schema-lifecycle.md)). The development gate is unchanged: a schema must pass `flowmcp schema-check` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
 
 ### Track B — Grading-Monitoring
 

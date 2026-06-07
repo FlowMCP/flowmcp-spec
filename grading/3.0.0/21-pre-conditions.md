@@ -87,7 +87,7 @@ gate**. The ladder is monotonic:
 imported → structural-valid → deterministic-green → stable
 ```
 
-- `structural-valid` — passes `flowmcp validate` (structure).
+- `structural-valid` — passes `flowmcp schema-check` (structure).
 - `deterministic-green` — structural-valid AND the deterministic data-pretest is ok
   (HTTP 200 **and** non-empty data) per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md).
 - `stable` — full grading promoted to stable.

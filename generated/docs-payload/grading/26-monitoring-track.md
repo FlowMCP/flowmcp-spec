@@ -6,9 +6,9 @@ spec_file: "26-monitoring-track.md"
 order: 26
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/26-monitoring-track.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/26-monitoring-track.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "grading/3.0.0/26-monitoring-track.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/26-monitoring-track.md."
@@ -32,7 +32,7 @@ The pipeline is split into two tracks that are **not linked**.
 
 ### Track A — Schema-Development
 
-File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** ([Schemas-Spec v4.3.0 §21](/specification/schema-lifecycle/)). The development gate is unchanged: a schema must pass `flowmcp validate` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
+File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** ([Schemas-Spec v4.3.0 §21](/specification/schema-lifecycle/)). The development gate is unchanged: a schema must pass `flowmcp schema-check` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
 
 ### Track B — Grading-Monitoring
 

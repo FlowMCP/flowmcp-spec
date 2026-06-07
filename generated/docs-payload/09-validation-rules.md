@@ -1,14 +1,14 @@
 ---
 title: "Validation Rules"
-description: "This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description."
+description: "This document defines all validation rules enforced by `flowmcp schema-check`. Each rule has a code, severity, and description."
 spec_version: "4.3.0"
 spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/09-validation-rules.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/09-validation-rules.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/09-validation-rules.md."
@@ -16,7 +16,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/09-validation-ru
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
-This document defines all validation rules enforced by `flowmcp validate`. Each rule has a code, severity, and description.
+This document defines all validation rules enforced by `flowmcp schema-check`. Each rule has a code, severity, and description.
 
 This file is the **central code registry** for FlowMCP v4.3.0. All validation, selection, agent, skill, resource, and placeholder codes (VAL/SEL/AGT/SKL/RES/DEP/SEC/LST/PRM/CAT/ID/PH/TST) are defined here. Other specification documents and downstream tooling reference this registry but do not redefine codes.
 
@@ -414,7 +414,7 @@ See `10-tests.md` for the complete test specification including format, design p
 The CLI displays results grouped by severity with the rule code, severity, location, and description:
 
 ```
-flowmcp validate etherscan/contracts.mjs
+flowmcp schema-check etherscan/contracts.mjs
 
   VAL014 error   main.version: Must match ^4\.\d+\.\d+$ (found "1.2.0")
   VAL031 error   tools: Maximum 8 tools exceeded (found 10)
@@ -428,7 +428,7 @@ flowmcp validate etherscan/contracts.mjs
 When all rules pass:
 
 ```
-flowmcp validate etherscan/contracts.mjs
+flowmcp schema-check etherscan/contracts.mjs
 
   0 errors, 0 warnings
   Schema is valid
@@ -437,7 +437,7 @@ flowmcp validate etherscan/contracts.mjs
 With security flag:
 
 ```
-flowmcp validate --security etherscan/contracts.mjs
+flowmcp schema-check --security etherscan/contracts.mjs
 
   SEC001 error   Line 3: Forbidden pattern "import" detected
   SEC017 error   main.handlers.preRequest: Non-serializable value (function)

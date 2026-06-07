@@ -6,9 +6,9 @@ spec_file: "08-migration.md"
 order: 8
 section: "Specification"
 normative: false
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/08-migration.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/08-migration.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/08-migration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/08-migration.md."
@@ -182,7 +182,7 @@ This step is optional in v2.0.0 but will become recommended in v2.1.0.
 After migration, run the security scan:
 
 ```bash
-flowmcp validate --security <schema-path>
+flowmcp schema-check --security <schema-path>
 ```
 
 This verifies:
@@ -197,7 +197,7 @@ This verifies:
 ### Step 6: Run Validation
 
 ```bash
-flowmcp validate <schema-path>
+flowmcp schema-check <schema-path>
 ```
 
 Full validation checks:
@@ -379,7 +379,7 @@ export const handlers = ( { sharedLists, libraries } ) => ({
 #### Step 3: Run Validation
 
 ```bash
-flowmcp validate <schema-path>
+flowmcp schema-check <schema-path>
 ```
 
 Validates the migrated schema against v3.0.0 rules.
@@ -520,7 +520,7 @@ Per schema:
 
 - [ ] `routes` renamed to `tools`
 - [ ] `version` updated to `'3.0.0'`
-- [ ] Validation passes (`flowmcp validate`)
+- [ ] Validation passes (`flowmcp schema-check`)
 - [ ] Tests pass (`flowmcp grading deterministic`)
 - [ ] (Optional) Resources added if applicable
 - [ ] (Optional) Skills added if applicable
@@ -546,7 +546,7 @@ The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every 
 | 2 | Add meta block per Tool | Set all 6 fields explicitly, `alwaysLoad: false` as default |
 | 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
 | 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
-| 5 | Validate | `flowmcp validate` → PASS |
+| 5 | Validate | `flowmcp schema-check` → PASS |
 | 6 | API-Test | `flowmcp grading deterministic` → min. 1 response |
 
 ### Breaking Changes

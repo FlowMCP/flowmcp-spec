@@ -6,9 +6,9 @@ spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/10-tests.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/10-tests.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
@@ -332,7 +332,7 @@ Tests are executed and the actual response structure is compared against the dec
 
 ### Dry-Run Mode
 
-Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp validate` to check test definitions statically.
+Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp schema-check` to check test definitions statically.
 
 ---
 
@@ -626,7 +626,7 @@ The structural test validates that all internal references in the skill are reso
 - All `{{input:key}}` placeholders match the skill's `input` array
 - No unresolvable `{{skill:name}}` references
 
-This test is deterministic and runs during `flowmcp validate`.
+This test is deterministic and runs during `flowmcp schema-check`.
 
 ### One-Shot Test for Skills
 
@@ -648,7 +648,7 @@ This demonstrates that One-Shot performance is directly correlated with informat
 ```javascript
 // Structural test: deterministic
 // 1. Validate all references resolve
-// 2. Run: flowmcp validate providers/{namespace}/skills/skill-name.mjs
+// 2. Run: flowmcp schema-check providers/{namespace}/skills/skill-name.mjs
 
 // One-Shot test: probabilistic (LLM-eval)
 // 1. Load skill as MCP prompt

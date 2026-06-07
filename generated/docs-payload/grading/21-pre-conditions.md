@@ -6,9 +6,9 @@ spec_file: "21-pre-conditions.md"
 order: 21
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/21-pre-conditions.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/21-pre-conditions.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "grading/3.0.0/21-pre-conditions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/21-pre-conditions.md."
@@ -80,6 +80,68 @@ Non-stable Members:
   - jupiter.swap (schemaHash c3d4e5f6, gradingStatus: pending)
 Follow-up action: complete the Single-Gradings, then rebuild the index and refreeze the lockSnapshot.
 ```
+
+### Area Dependency Model (normative)
+
+The 11 Areas are graded against a **readiness ladder** and a per-Area **dependency
+gate**. The ladder is monotonic:
+
+```
+imported → structural-valid → deterministic-green → stable
+```
+
+- `structural-valid` — passes `flowmcp schema-check` (structure).
+- `deterministic-green` — structural-valid AND the deterministic data-pretest is ok
+  (HTTP 200 **and** non-empty data) per [`06-determinism-and-tier.md`](/grading/determinism-and-tier/).
+- `stable` — full grading promoted to stable.
+
+Each Area declares a `dependsOn` and a `requiredLevel` gate. The reference engine
+keeps this as DATA (`area-dependency-graph.json`); this table is its normative source:
+
+| Area | dependsOn | requiredLevel | dimension |
+|------|-----------|---------------|-----------|
+| `single-test` | none | `structural-valid` | both (det gate + non-det) |
+| `tools-aggregate-schema` | none | `structural-valid` | both |
+| `tools-aggregate-namespace` | all-namespace-schemas | **`deterministic-green`** | both |
+| `namespace-description` | all-namespace-schemas | **`deterministic-green`** | non-det |
+| `namespace-skills` | all-namespace-schemas | **`deterministic-green`** | non-det |
+| `about-namespace` | about-resource-present | **`stable`** | both |
+| `about-selection` | all-member-schemas | `stable` | non-det |
+| `selection-skills-L1/L2/L3` | all-member-schemas | `stable` | non-det |
+| `selection-aggregate` | all-member-schemas | `stable` | non-det |
+
+Two gates are binding:
+
+1. **Provider-Namespace-Gate** — the namespace Areas
+   (`tools-aggregate-namespace`, `namespace-description`, `namespace-skills`) are
+   held until **every** schema of the namespace is `deterministic-green`. The
+   namespace level folds onto the **weakest** schema. This is the cost guard: no
+   namespace-wide LLM round runs while any schema still fails its data-pretest.
+2. **About-Namespace-Gate** — `about-namespace` is an aggregate check and follows
+   the universal pre-condition above (`stable`), not `structural-valid`.
+
+`dimension` is the work split: `deterministic` = the CLI finishes it for free;
+`non-det` = it needs an LLM scoring round; `both` = a free deterministic gate AND
+an LLM round for the descriptive questions (`single-test` / `tools-aggregate-schema`
+carry a deterministic pretest gate plus non-deterministic description scoring).
+
+### Emit-Skill Format (normative)
+
+The non-deterministic emit (`grading non-deterministic <ns> --emit-prompts`)
+returns ONE **self-contained Emit-Skill** — a single instruction text handed to a
+sub-agent, that MUST carry, inline in the text:
+
+1. a self-describing header (this is a grading skill, work the bundled areas in one pass);
+2. the **currently-ready stage's** non-deterministic Area prompts, with the real
+   schema path, tool/namespace names and the output schema **inline** (no unresolved
+   placeholder may survive);
+3. a **Task-ID** (the emit↔consume join key);
+4. the explicit `--consume-scores` return command and the expected answer count.
+
+Hard-gated stage-2 Areas (`namespace-*`) are NOT emitted in the same skill; they are
+emitted in a **follow-up** skill once the Provider-Namespace-Gate opens. The
+transport envelope is owned by [`spec/v4.3.0/22-scoring-protocol.md`]; this section
+owns the Area composition + bundling rules.
 
 ### Cross-Refs
 

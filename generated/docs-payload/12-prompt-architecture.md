@@ -6,9 +6,9 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/12-prompt-architecture.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/12-prompt-architecture.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/12-prompt-architecture.md."
@@ -706,14 +706,14 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 ### Validation Output Examples
 
 ```
-flowmcp validate providers/coingecko/prompts/price-comparison.mjs
+flowmcp schema-check providers/coingecko/prompts/price-comparison.mjs
 
   0 errors, 0 warnings
   Prompt is valid
 ```
 
 ```
-flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
+flowmcp schema-check agents/crypto-research/prompts/token-deep-dive.mjs
 
   PRM004 error   Agent-Prompt "token-deep-dive" requires testedWith field
   PRM006 error   dependsOn entry "etherscan/tool/nonExistent" does not resolve
@@ -723,7 +723,7 @@ flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
 ```
 
 ```
-flowmcp validate providers/coingecko/prompts/bad-prompt.mjs
+flowmcp schema-check providers/coingecko/prompts/bad-prompt.mjs
 
   PRM003 error   Prompt "bad-prompt" has both namespace and agent set
   PRM005 error   testedWith "claude-sonnet" must contain /

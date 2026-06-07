@@ -6,9 +6,9 @@ spec_file: "11-about-convention.md"
 order: 11
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/11-about-convention.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/11-about-convention.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "grading/3.0.0/11-about-convention.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/11-about-convention.md."

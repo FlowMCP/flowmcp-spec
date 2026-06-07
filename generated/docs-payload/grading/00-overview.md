@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Grading"
 normative: false
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/00-overview.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/00-overview.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "grading/3.0.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/00-overview.md."
@@ -163,7 +163,7 @@ The following are the headline additions of the v2 break over the 1.0.0/1.1.0 li
 
 ### 3.0.0
 
-`3.0.0` is the **v3 break**. The import contract changes from "MUST abort on a `flowmcp validate` failure or a multi-namespace folder" to "emit a `blocked` node with `reason: validation-failed` and continue" (emit-on-failure, see [`22-workbench-island.md`](/grading/workbench-island/)). The grading-monitoring track — one grading-issue per namespace, driven deterministically by the per-namespace provider-proof — comes **into scope** in the new [`26-monitoring-track.md`](/grading/monitoring-track/), reversing the old "Kanban out of scope" stance. `index.json` gains a pinned `blocked` reason set and the `githubIssue` / `boardColumn` idempotency backrefs; a `blocked`/`validation-failed` node is recognised as a non-grading **status record** (see [`08-grading-model.md`](/grading/grading-model/)). The folder↔namespace invariant is now binding with an unparseable-folder fallback and a rename-on-parse lifecycle (see [`19-folder-layout.md`](/grading/folder-layout/)). Because the fail-closed import guarantee is removed, this is a MAJOR bump; the legacy `grading/2.0.0/` directory is retained unchanged. See [`CHANGELOG.md`](./CHANGELOG.md).
+`3.0.0` is the **v3 break**. The import contract changes from "MUST abort on a `flowmcp schema-check` failure or a multi-namespace folder" to "emit a `blocked` node with `reason: validation-failed` and continue" (emit-on-failure, see [`22-workbench-island.md`](/grading/workbench-island/)). The grading-monitoring track — one grading-issue per namespace, driven deterministically by the per-namespace provider-proof — comes **into scope** in the new [`26-monitoring-track.md`](/grading/monitoring-track/), reversing the old "Kanban out of scope" stance. `index.json` gains a pinned `blocked` reason set and the `githubIssue` / `boardColumn` idempotency backrefs; a `blocked`/`validation-failed` node is recognised as a non-grading **status record** (see [`08-grading-model.md`](/grading/grading-model/)). The folder↔namespace invariant is now binding with an unparseable-folder fallback and a rename-on-parse lifecycle (see [`19-folder-layout.md`](/grading/folder-layout/)). Because the fail-closed import guarantee is removed, this is a MAJOR bump; the legacy `grading/2.0.0/` directory is retained unchanged. See [`CHANGELOG.md`](./CHANGELOG.md).
 
 ### 2.0.0
 

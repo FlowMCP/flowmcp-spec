@@ -6,9 +6,9 @@ spec_file: "16-id-schema.md"
 order: 16
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/16-id-schema.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "cc34e7e"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/16-id-schema.md"
+generated_at: "2026-06-07T18:27:39.869Z"
 generated_from: "spec/v4.3.0/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/16-id-schema.md."
@@ -357,14 +357,14 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 ### Validation Output Examples
 
 ```
-flowmcp validate --id "coingecko/tool/simplePrice"
+flowmcp schema-check --id "coingecko/tool/simplePrice"
 
   0 errors, 0 warnings
   ID is valid
 ```
 
 ```
-flowmcp validate --id "COINGECKO/tool/simplePrice"
+flowmcp schema-check --id "COINGECKO/tool/simplePrice"
 
   ID002 error   Namespace "COINGECKO" must match ^[a-z][a-z0-9-]*$
 
@@ -373,7 +373,7 @@ flowmcp validate --id "COINGECKO/tool/simplePrice"
 ```
 
 ```
-flowmcp validate --id "simplePrice"
+flowmcp schema-check --id "simplePrice"
 
   ID001 error   ID MUST contain at least one "/" separator
 

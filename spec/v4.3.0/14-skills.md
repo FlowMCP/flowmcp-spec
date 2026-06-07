@@ -487,7 +487,7 @@ All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 ### Structural Rules (Static Validation)
 
-These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp validate`.
+These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp schema-check`.
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -617,7 +617,7 @@ vs_currencies: usd
 
 ### Validation
 
-The one-shot constraint is **not statically verifiable** by `flowmcp validate` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
+The one-shot constraint is **not statically verifiable** by `flowmcp schema-check` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
 
 See `10-tests.md` (One-Shot Test for Skills) for the test protocol.
 

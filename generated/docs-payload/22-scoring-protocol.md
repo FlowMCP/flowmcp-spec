@@ -215,8 +215,8 @@ A Grader MUST NOT:
 
 | Implementation | Type | Location |
 |----------------|------|----------|
-| `grade-score-single` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-single/SKILL.md` |
-| `grade-score-batch` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-batch/SKILL.md` |
+| `grade-score-single` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-single/SKILL.md` |
+| `grade-score-batch` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-batch/SKILL.md` |
 | `flowmcp dev grade` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs:grade()` |
 | `GradeReporter` | Core Module | `flowmcp-core/src/v4/task/GradeReporter.mjs` |
 

@@ -6,9 +6,9 @@ spec_file: "12-load-and-scale.md"
 order: 12
 section: "Best Practice"
 normative: false
-source_commit: "7abcedc"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
-generated_at: "2026-06-21T11:29:22.373Z"
+source_commit: "236dbb3"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
+generated_at: "2026-06-21T11:44:44.465Z"
 generated_from: "best-practice/0.1.0/schema-creation/12-load-and-scale.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/12-load-and-scale.md."

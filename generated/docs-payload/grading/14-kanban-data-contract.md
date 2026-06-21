@@ -6,9 +6,9 @@ spec_file: "14-kanban-data-contract.md"
 order: 14
 section: "Grading"
 normative: false
-source_commit: "7abcedc"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/14-kanban-data-contract.md"
-generated_at: "2026-06-21T11:29:22.373Z"
+source_commit: "236dbb3"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/14-kanban-data-contract.md"
+generated_at: "2026-06-21T11:44:44.465Z"
 generated_from: "grading/3.0.0/14-kanban-data-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/14-kanban-data-contract.md."

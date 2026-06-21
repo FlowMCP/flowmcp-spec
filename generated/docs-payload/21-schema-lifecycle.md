@@ -6,9 +6,9 @@ spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/21-schema-lifecycle.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/21-schema-lifecycle.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/21-schema-lifecycle.md."
@@ -18,7 +18,6 @@ Every FlowMCP schema travels a defined path from an initial idea to a production
 
 A namespace candidate enters the picture even before the first stage. Before `stage:research`, a candidate lives as a **Prospect** on the Kanban board — identified as interesting but not yet confirmed as reachable or feasible. A Prospect sits upstream of the six stages and is not tracked within them; the act of verifying reachability and feasibility is what promotes it into `stage:research`.
 
----
 
 ## Lifecycle Stages
 
@@ -140,10 +139,10 @@ A primitive passes when at least one of its test cases returns a 2xx response wi
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [20-validation-strategy.md](/specification/validation-strategy/)
-- [22-scoring-protocol.md](/specification/scoring-protocol/)
-- [10-tests.md](/specification/tests/)
-- [09-validation-rules.md](/specification/validation-rules/)
-- [15-catalog.md](/specification/catalog/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [20-validation-strategy.md](/specification/validation-strategy/) — the deterministic and probabilistic layers behind the A-F grade.
+- [22-scoring-protocol.md](/specification/scoring-protocol/) — the JSON formats exchanged between the CLI and an external grader.
+- [10-tests.md](/specification/tests/) — executable examples that document tools and capture real responses.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
+- [15-catalog.md](/specification/catalog/) — the registry.json manifest that groups schemas, lists, and agents.
 

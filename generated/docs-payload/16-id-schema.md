@@ -6,9 +6,9 @@ spec_file: "16-id-schema.md"
 order: 16
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/16-id-schema.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/16-id-schema.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/16-id-schema.md."
@@ -27,7 +27,6 @@ flowchart LR
 
 The diagram shows the three components of a full ID separated by `/` delimiters, forming a single unambiguous reference string.
 
----
 
 ## Format
 
@@ -430,11 +429,11 @@ The ID schema provides a single, consistent format that replaces these context-s
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [18-prefill.md](/specification/prefill/)
-- [12-prompt-architecture.md](/specification/prompt-architecture/)
-- [14-skills.md](/specification/skills/)
-- [17-selections.md](/specification/selections/)
-- [15-catalog.md](/specification/catalog/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [18-prefill.md](/specification/prefill/) — placeholder substitution and pre-executed tool calls in skill content.
+- [12-prompt-architecture.md](/specification/prompt-architecture/) — the two-tier prompt system for provider and agent workflows.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [17-selections.md](/specification/selections/) — a named bundle of primitives an agent activates together.
+- [15-catalog.md](/specification/catalog/) — the registry.json manifest that groups schemas, lists, and agents.
 

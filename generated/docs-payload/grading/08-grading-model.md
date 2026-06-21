@@ -6,21 +6,16 @@ spec_file: "08-grading-model.md"
 order: 8
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/08-grading-model.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/08-grading-model.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/08-grading-model.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/08-grading-model.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
----
-
 This page defines the **grading entry** — the single durable artefact a grader emits and the one data model that both skill families (Single-Schema-Validator and Selection-Validator) write into. A grading is an array of per-question evaluations that carries veto power, a tier trim (autonomous max `B` / group max `A`), and can be re-triggered by the user; a present Categorical Veto overrides all aggregation and yields `aggregateGrade = REJECTED`. Every grading entry MUST validate against the JSON-Schema annex [`08-grading-model.schema.json`](./08-grading-model.schema.json).
 
----
 
 ## Status Record vs. Grading Entry (NEW in 3.0.0)
 
@@ -513,17 +508,16 @@ if( rejected.aggregateGrade !== 'REJECTED' ) { throw new Error( 'rejected exampl
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
-- [`09-security-and-development.md`](/grading/security-and-development/)
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`13-skills.md`](/grading/skills/)
-- [`15-versioning-axes.md`](/grading/versioning-axes/)
-- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`22-workbench-island.md`](/grading/workbench-island/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`08-grading-model.schema.json`](./08-grading-model.schema.json)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — why evidencing a single test stays separate from deriving a letter grade.
+- [`09-security-and-development.md`](/grading/security-and-development/) — the security and development checks that carry high categorical-veto affinity.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — how a selection's About Resource carries the group's domain knowledge.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`13-skills.md`](/grading/skills/) — how namespace skills and leveled selection skills are graded differently.
+- [`15-versioning-axes.md`](/grading/versioning-axes/) — how primitives are versioned by filename timestamp and bound by a canonical hash.
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/) — the neutral selection definition and the frozen member-pin lock snapshot.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`22-workbench-island.md`](/grading/workbench-island/) — the walled-off working directory that never overwrites a shipped source.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
 

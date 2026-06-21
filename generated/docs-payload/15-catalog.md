@@ -6,9 +6,9 @@ spec_file: "15-catalog.md"
 order: 15
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/15-catalog.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/15-catalog.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/15-catalog.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/15-catalog.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/15-catalog.md."
 
 A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
----
 
 ## Purpose
 
@@ -403,10 +402,10 @@ The command runs all CAT rules and reports errors and warnings. A catalog with a
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [03-shared-lists.md](/specification/shared-lists/)
-- [06-agents.md](/specification/agents/)
-- [16-id-schema.md](/specification/id-schema/)
-- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [03-shared-lists.md](/specification/shared-lists/) — versioned value sets that schemas reference instead of duplicating.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/) — the six stages a schema travels from idea to production.
 

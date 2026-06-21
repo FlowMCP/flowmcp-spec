@@ -6,16 +6,12 @@ spec_file: "10-domain-knowledge.md"
 order: 10
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/10-domain-knowledge.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/10-domain-knowledge.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/10-domain-knowledge.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/10-domain-knowledge.md."
----
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 ---
 
 A **topic group** — a selection composed of several namespaces — develops conventions, shared vocabularies, and provider-specific quirks that are invisible from any single namespace in isolation. Grading at the `group-bound` tier MUST be validated against the group's **Domain-Knowledge content**, and that content lives in the selection's **About Resource** rather than a separate document — a binding identity rather than a loose association. This chapter sets the two thresholds under which a selection counts as a group, lists the seven mandatory sections the content must carry, and traces how it feeds the `domainConformance` and `personaUseCaseFit` dimensions.
@@ -118,12 +114,12 @@ A grading entry that uses Domain-Knowledge content records the resolved About Re
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`09-security-and-development.md`](/grading/security-and-development/)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`13-skills.md`](/grading/skills/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`09-security-and-development.md`](/grading/security-and-development/) — the security and development checks that carry high categorical-veto affinity.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`13-skills.md`](/grading/skills/) — how namespace skills and leveled selection skills are graded differently.
 

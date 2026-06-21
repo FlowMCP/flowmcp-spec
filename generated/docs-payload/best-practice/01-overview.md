@@ -6,9 +6,9 @@ spec_file: "01-overview.md"
 order: 1
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/01-overview.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/01-overview.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/01-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/01-overview.md."
@@ -18,7 +18,6 @@ The Best-Practice track is the third FlowMCP spec track, sitting alongside the n
 
 > This track is informative and advisory. It introduces no new normative keywords of its own and uses "should", never "MUST" — the normative-language conventions (MUST / SHOULD / MAY) are defined once in the [Specification overview](/specification/overview/) and are not redefined here.
 
----
 
 ## What this track is
 
@@ -84,5 +83,5 @@ Small, sharp learnings that do not warrant a full page:
 
 ## Related
 
-- [`schema-creation/10-readable-interface.md`](/best-practice/readable-interface/)
+- [`schema-creation/10-readable-interface.md`](/best-practice/readable-interface/) — designing the surface for the calling model with readable enums, names, and handler phases.
 

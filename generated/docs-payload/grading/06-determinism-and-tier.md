@@ -6,16 +6,12 @@ spec_file: "06-determinism-and-tier.md"
 order: 6
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/06-determinism-and-tier.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/06-determinism-and-tier.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/06-determinism-and-tier.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/06-determinism-and-tier.md."
----
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 ---
 
 The Grading-Spec rates every dimension along **two orthogonal axes**: *Determinism* (is the score reproducible?) and *Tier* (what is the highest grade it can reach?). Because the axes are independent, a dimension can be deterministic yet group-bound, or non-deterministic yet autonomous. Both values are carried separately in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](/grading/grading-model/)), and this page defines what each value means and how the two combine.
@@ -25,7 +21,6 @@ The Grading-Spec rates every dimension along **two orthogonal axes**: *Determini
 | Determinism | `deterministic` / `non-deterministic` | Reproducibility |
 | Tier | `autonomous` / `group-bound` | Maximum attainable grade (Ch. 7) |
 
----
 
 ## Axis 1 — Determinism
 
@@ -219,12 +214,12 @@ Cross-Refs:
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`04-phases-single.md`](/grading/phases-single/)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`09-security-and-development.md`](/grading/security-and-development/)
-- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`04-phases-single.md`](/grading/phases-single/) — the six provider-side areas that grade one schema without group context.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — why evidencing a single test stays separate from deriving a letter grade.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`09-security-and-development.md`](/grading/security-and-development/) — the security and development checks that carry high categorical-veto affinity.
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/) — the self-reinforcing import, grade, improve, export round-trip.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
 

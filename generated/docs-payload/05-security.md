@@ -6,9 +6,9 @@ spec_file: "05-security.md"
 order: 5
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/05-security.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/05-security.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/05-security.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/05-security.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/05-security.md."
 
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.
 
----
 
 ## Trust Boundary
 
@@ -352,9 +351,9 @@ All violations in a single file are reported together (the scan does not stop at
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [09-validation-rules.md](/specification/validation-rules/)
-- [13-resources.md](/specification/resources/)
-- [23-license-and-tos.md](/specification/license-and-tos/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
+- [23-license-and-tos.md](/specification/license-and-tos/) — the three-layer model linking code, provider ToS, and data licenses.
 

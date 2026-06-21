@@ -6,19 +6,16 @@ spec_file: "25-harness-and-goal.md"
 order: 25
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/25-harness-and-goal.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/25-harness-and-goal.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/25-harness-and-goal.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/25-harness-and-goal.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
-
 Non-deterministic grading runs inside a harness, and the harness is driven by a completion condition rather than a fixed step count. This chapter defines that harness, the completion-condition mechanism, and the surfacing convention that makes the run's progress visible to the transcript-only evaluator. Because each turn restarts from scratch, it also fixes the two-loop structure and the idempotency rule that keep state in files rather than in memory.
 
----
 
 ## The Harness
 
@@ -72,9 +69,9 @@ The prompt builder appends a **Goal-Block** (a fitting completion condition plus
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`24-selection-aggregate.md`](/grading/selection-aggregate/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/) — the first prompt that anchors a grading run to persona, schema, mode, and version.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`24-selection-aggregate.md`](/grading/selection-aggregate/) — the eleventh area that grades a selection as a whole and gates Grade A.
 

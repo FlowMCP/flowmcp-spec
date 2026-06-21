@@ -6,19 +6,16 @@ spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/23-index-json.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/23-index-json.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/23-index-json.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
-
 Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file: there is exactly **one `index.json` per namespace and one per selection**. The file is the rollup — a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status. This chapter pins its structure: the two-part split between a recomputed live rollup and a frozen point-in-time snapshot, the two status vocabularies that must never be mixed, and the audit-trail and veto rules it inherits. It supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)); the two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
 
----
 
 ## Two Natures: Live-Rollup and Frozen `lockSnapshot`
 
@@ -214,13 +211,12 @@ This record validates against [`index.schema.json`](./index.schema.json) with on
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)
-- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`24-selection-aggregate.md`](/grading/selection-aggregate/)
-- [`26-monitoring-track.md`](/grading/monitoring-track/)
-- [`index.schema.json`](./index.schema.json)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`14-kanban-data-contract.md`](/grading/kanban-data-contract/) — the superseded phase-status contract, now replaced by the index.json rollup.
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/) — the neutral selection definition and the frozen member-pin lock snapshot.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`24-selection-aggregate.md`](/grading/selection-aggregate/) — the eleventh area that grades a selection as a whole and gates Grade A.
+- [`26-monitoring-track.md`](/grading/monitoring-track/) — the deterministic GitHub board projecting each namespace's grading state.
 

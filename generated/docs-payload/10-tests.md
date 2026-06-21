@@ -6,9 +6,9 @@ spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/10-tests.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/10-tests.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
 
 Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses become the basis for generating accurate output schemas. The sections below cover the test format for tools, resources, and agents, the design principles that keep tests useful, and the response-capture lifecycle that turns a test into an output schema.
 
----
 
 ## Purpose
 
@@ -686,11 +685,11 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [02-parameters.md](/specification/parameters/)
-- [04-output-schema.md](/specification/output-schema/)
-- [06-agents.md](/specification/agents/)
-- [22-scoring-protocol.md](/specification/scoring-protocol/)
-- [13-resources.md](/specification/resources/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [22-scoring-protocol.md](/specification/scoring-protocol/) — the JSON formats exchanged between the CLI and an external grader.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
 

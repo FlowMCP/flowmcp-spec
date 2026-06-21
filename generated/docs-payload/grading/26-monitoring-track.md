@@ -6,19 +6,16 @@ spec_file: "26-monitoring-track.md"
 order: 26
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/26-monitoring-track.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/26-monitoring-track.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/26-monitoring-track.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/26-monitoring-track.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 This chapter brings the grading-monitoring board back into scope and defines the grading-monitoring track that projects each namespace's grading state onto a deterministic GitHub board. It fixes the decoupling from the schema-development track, the one-grading-issue-per-namespace contract and its provider-proof metadata source, the deterministic board contract, and the island ↔ repo ↔ provider-proof data flow. The executable sync workflow, the proof producer, and the consuming skills are deferred to implementation phases; here only their contracts are written.
 
----
 
 ## Scope — the board is back
 
@@ -157,10 +154,10 @@ The two salvaged rules from [`14-kanban-data-contract.md`](/grading/kanban-data-
 
 ## Related
 
-- [`22-workbench-island.md`](/grading/workbench-island/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)
+- [`22-workbench-island.md`](/grading/workbench-island/) — the walled-off working directory that never overwrites a shipped source.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`14-kanban-data-contract.md`](/grading/kanban-data-contract/) — the superseded phase-status contract, now replaced by the index.json rollup.
 

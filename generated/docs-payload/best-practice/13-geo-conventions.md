@@ -6,9 +6,9 @@ spec_file: "13-geo-conventions.md"
 order: 13
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/schema-creation/13-geo-conventions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/13-geo-conventions.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-c
 
 Geo has a few conventions that everyone trips over once. Adopt the established defaults instead of inventing your own — it keeps schemas interoperable and spares the model a class of silent mistakes.
 
----
 
 ## Longitude-first bounding boxes
 
@@ -58,5 +57,5 @@ show as:    plz = "10115"       (familiar, but many PLZ per municipality)
 
 ## Related
 
-- [`12-load-and-scale.md`](/best-practice/load-and-scale/)
+- [`12-load-and-scale.md`](/best-practice/load-and-scale/) — choosing the load and storage strategy by data size and query ability.
 

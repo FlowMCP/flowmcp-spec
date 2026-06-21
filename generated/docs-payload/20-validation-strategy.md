@@ -6,9 +6,9 @@ spec_file: "20-validation-strategy.md"
 order: 20
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/20-validation-strategy.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/20-validation-strategy.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/20-validation-strategy.md."
@@ -18,7 +18,6 @@ Validation in FlowMCP works in two layers. A **deterministic** layer checks stru
 
 A separate **Grading-Spec** in the `flowmcp-grading` repository covers Single-Schema and Selection grading in more depth. The strategy described here remains the deterministic baseline; the Grading System defined by the Grading-Spec extends, and in places replaces, the simple A–F Grade System below. The Schemas-Spec remains the highest instance.
 
----
 
 ## Grade System
 
@@ -122,9 +121,9 @@ A Language Model calling tools from `etherscan-io/contracts` receives the tool l
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [09-validation-rules.md](/specification/validation-rules/)
-- [22-scoring-protocol.md](/specification/scoring-protocol/)
-- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
-- [10-tests.md](/specification/tests/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
+- [22-scoring-protocol.md](/specification/scoring-protocol/) — the JSON formats exchanged between the CLI and an external grader.
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/) — the six stages a schema travels from idea to production.
+- [10-tests.md](/specification/tests/) — executable examples that document tools and capture real responses.
 

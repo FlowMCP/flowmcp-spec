@@ -6,9 +6,9 @@ spec_file: "12-load-and-scale.md"
 order: 12
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/schema-creation/12-load-and-scale.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/12-load-and-scale.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-c
 
 Choose the load and storage strategy by **data size** and by the **query ability** of the source. A small static file and a large queryable corpus do not deserve the same machinery — match the mechanism to the data.
 
----
 
 ## Preload small static data into memory
 
@@ -70,5 +69,5 @@ Be precise about what the limit governs: the number of clauses is **not** the li
 
 ## Related
 
-- [`13-geo-conventions.md`](/best-practice/geo-conventions/)
+- [`13-geo-conventions.md`](/best-practice/geo-conventions/) — the established geo defaults that keep schemas interoperable and avoid silent mistakes.
 

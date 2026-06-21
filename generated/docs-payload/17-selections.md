@@ -1,28 +1,20 @@
 ---
 title: "Selections"
-description: "**Primitive:** Selection (5th primitive)"
+description: "A **Selection** is a named, thematically-coherent collection of Primitives (Tools, Resources, Prompts, Skills) that an agent can activate together in a single operation."
 spec_version: "4.3.0"
 spec_file: "17-selections.md"
 order: 17
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/17-selections.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/17-selections.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/17-selections.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/17-selections.md."
 ---
 
-**Primitive:** Selection (5th primitive)
-
----
-
-## Overview
-
-A **Selection** is a named collection of Primitives (Tools, Resources, Prompts, Skills) that belong together thematically. Selections enable agents to activate a coherent set of capabilities with a single operation.
-
----
+A **Selection** is a named, thematically-coherent collection of Primitives (Tools, Resources, Prompts, Skills) that an agent can activate together in a single operation.
 
 ## Export Format
 
@@ -138,11 +130,11 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [16-id-schema.md](/specification/id-schema/)
-- [06-agents.md](/specification/agents/)
-- [18-prefill.md](/specification/prefill/)
-- [14-skills.md](/specification/skills/)
-- [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [18-prefill.md](/specification/prefill/) — placeholder substitution and pre-executed tool calls in skill content.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [12-prompt-architecture.md](/specification/prompt-architecture/) — the two-tier prompt system for provider and agent workflows.
 

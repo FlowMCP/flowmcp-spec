@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Grading"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/00-overview.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/00-overview.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/00-overview.md."
@@ -16,15 +16,14 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/00-overview.md
 
 The Grading-Spec describes **how** FlowMCP schemas and selections are evaluated and graded — the phases, the Scoring System, the Grading System, the categorical veto, tiers, skills, and domain knowledge. It is a separate, independently versioned document layered on top of the FlowMCP Schemas Specification, which remains the highest authority for what a schema, a selection, and the primitives actually are. This overview sets the conformance language, the document hierarchy, the guiding interoperability focus, and the chapter map for the rest of the spec.
 
-Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification [/specification/00-overview/](/specification/00-overview/) (Conformance Language). This Grading-Spec does not re-define normative keywords.
+Normative language (MUST/SHOULD/MAY) follows the conventions defined in the FlowMCP Schemas Specification [/specification/00-overview/](/specification/overview/) (Conformance Language). This Grading-Spec does not re-define normative keywords.
 
----
 
 ## Conformance Language
 
 This document uses the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" as defined in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals.
 
-The binding source for this conformance interpretation is the FlowMCP Schemas Specification [/specification/00-overview/](/specification/00-overview/). Some chapters of this Grading-Spec are intentionally written in prose without normative keywords because they describe history, motivation, or conceptual background (this overview document). All other chapters use normative language and assume this conformance interpretation.
+The binding source for this conformance interpretation is the FlowMCP Schemas Specification [/specification/00-overview/](/specification/overview/). Some chapters of this Grading-Spec are intentionally written in prose without normative keywords because they describe history, motivation, or conceptual background (this overview document). All other chapters use normative language and assume this conformance interpretation.
 
 ---
 
@@ -39,7 +38,7 @@ The Grading-Spec is **not** the highest instance. The FlowMCP Schemas Specificat
 | Middle | Grading-Spec (this document) | Independent — describes phases, Scoring System, Grading System, Veto, Tier, Skills, Domain Knowledge |
 | Bottom | Scripts and modules in the grading implementation | Implementation derived from this spec |
 
-Cross-reference: [Schemas-Spec — Overview](/specification/00-overview/).
+Cross-reference: [Schemas-Spec — Overview](/specification/overview/).
 
 ---
 
@@ -85,12 +84,12 @@ The grading rules — how scores are mapped to grades, how the categorical veto 
 
 This Grading-Spec relies on definitions from the Schemas-Spec. The following chapters are particularly relevant:
 
-- [Scoring protocol](/specification/22-scoring-protocol/) — the existing `prompts.json` / `scores.json` contract that this Grading-Spec sub-consumes.
-- [Validation strategy](/specification/20-validation-strategy/) — the deterministic baseline; the Grading System defined here extends (and partly replaces) the Grade System described there.
-- [Resources](/specification/13-resources/) — Resource primitive (basis for the `about` convention to be reserved).
-- [Skills](/specification/14-skills/) — Skill types `'namespace' | 'selection' | 'agent'`.
-- [Selections](/specification/17-selections/) — Selection as the fifth primitive; carries `tools[]` / `skills[]` / `resources[]` / `prompts[]`.
-- [Preload](/specification/11-preload/) — Preload pattern.
+- [Scoring protocol](/specification/scoring-protocol/) — the existing `prompts.json` / `scores.json` contract that this Grading-Spec sub-consumes.
+- [Validation strategy](/specification/validation-strategy/) — the deterministic baseline; the Grading System defined here extends (and partly replaces) the Grade System described there.
+- [Resources](/specification/resources/) — Resource primitive (basis for the `about` convention to be reserved).
+- [Skills](/specification/skills/) — Skill types `'namespace' | 'selection' | 'agent'`.
+- [Selections](/specification/selections/) — Selection as the fifth primitive; carries `tools[]` / `skills[]` / `resources[]` / `prompts[]`.
+- [Preload](/specification/preload/) — Preload pattern.
 
 ---
 

@@ -6,9 +6,9 @@ spec_file: "10-readable-interface.md"
 order: 10
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/10-readable-interface.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/10-readable-interface.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/schema-creation/10-readable-interface.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/10-readable-interface.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-c
 
 Design the schema for the **model that calls it**, not for the API behind it. An upstream API often speaks in terse codes; the language model should not have to decode them. Translate at the edge so the surface the model sees is self-explaining.
 
----
 
 ## Human-readable enums
 
@@ -68,5 +67,5 @@ Reading the wrong shape raises no error — the handler just never fires. So whe
 
 ## Related
 
-- [`14-correctness-license.md`](/best-practice/correctness-license/)
+- [`14-correctness-license.md`](/best-practice/correctness-license/) — assuming nothing, faking nothing, and documenting data provenance and rights.
 

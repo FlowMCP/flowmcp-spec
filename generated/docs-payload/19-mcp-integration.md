@@ -6,9 +6,9 @@ spec_file: "19-mcp-integration.md"
 order: 19
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/19-mcp-integration.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/19-mcp-integration.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/19-mcp-integration.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/19-mcp-integrati
 
 When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared once, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
 
----
 
 ## Meta Block (Required per Tool)
 
@@ -93,10 +92,10 @@ The structural rules for the `meta` block are defined alongside the other schema
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [09-validation-rules.md](/specification/validation-rules/)
-- [13-resources.md](/specification/resources/)
-- [14-skills.md](/specification/skills/)
-- [04-output-schema.md](/specification/output-schema/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
 

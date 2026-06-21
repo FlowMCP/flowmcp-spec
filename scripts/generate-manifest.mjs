@@ -146,15 +146,25 @@ const slugFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 144 K5 (T4): the six FlowMCP primitives get their own sidebar group,
+// pulled out of the flat "Core Specification" bucket. Orders map to:
+//   02 Parameters · 06 Agents · 13 Resources · 14 Skills · 17 Selections · 18 Prompt Placeholders (Prefill)
+const PRIMITIVE_ORDERS = new Set( [ 2, 6, 13, 14, 17, 18 ] )
+
 // Sidebar mapping (PRD-06): groups filenames into UI-Sidebar buckets
-// 00         -> introduction (single overview)
-// 01-19      -> specification (core normative chapters)
+// 00         -> introduction (overview + philosophy)
+// primitives -> the six primitive chapters (Memo 144 T4)
+// 01-19      -> specification (remaining core normative chapters)
 // 20-23      -> guides (validation strategy, lifecycle, scoring, license)
 const sidebarGroupFromFilename = ( { filename } ) => {
+    // Memo 144 K10 (T12): the philosophy chapter is an informative worldview page;
+    // it sits in Introduction right after the overview.
+    if( filename === '24-philosophy.md' ) return 'introduction'
     const match = filename.match( /^(\d{2})-/ )
     if( !match ) return 'specification'
     const order = parseInt( match[ 1 ], 10 )
     if( order === 0 ) return 'introduction'
+    if( PRIMITIVE_ORDERS.has( order ) ) return 'primitives'
     if( order >= 20 ) return 'guides'
     return 'specification'
 }
@@ -163,6 +173,7 @@ const sidebarGroupFromFilename = ( { filename } ) => {
 // Per-group default collapsed-state
 const COLLAPSED_DEFAULT = {
     introduction: false,
+    primitives: false,
     specification: false,
     guides: true
 }
@@ -171,7 +182,9 @@ const COLLAPSED_DEFAULT = {
 // Explicit version_added overrides for files that did not exist in 4.0.0.
 // Default is 4.0.0 (hardcopy from v4.0.0). Add entries here when new files
 // land in 4.1.0 or later.
-const VERSION_ADDED_OVERRIDES = {}
+const VERSION_ADDED_OVERRIDES = {
+    '24-philosophy.md': '4.3.0'
+}
 
 
 const versionAddedFromFilename = ( { filename } ) => {

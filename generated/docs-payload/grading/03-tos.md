@@ -6,19 +6,16 @@ spec_file: "03-tos.md"
 order: 3
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/03-tos.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/03-tos.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/03-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/03-tos.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification.
-
 This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer, not part of the eligibility gate — a missing ToS link does not disqualify a schema, it lowers the score. The chapter anchors the base due-diligence rule (`SHOULD`, not `MUST`), the "ToS attached" definition, the Root-Domain-Match algorithm, the central distinction between "we observe" and "we accept", and the grader role with its mandatory "grader assessment, not legally binding" disclaimer.
 
----
 
 ## Due-Diligence Base
 
@@ -96,8 +93,8 @@ The disclaimer is **non-optional**. A grading entry that contains a `legalAssess
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`02-eligibility.md`](/grading/eligibility/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`08-grading-model.md`](/grading/grading-model/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`02-eligibility.md`](/grading/eligibility/) — what is allowed to be part of a gradable schema before scoring begins.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
 

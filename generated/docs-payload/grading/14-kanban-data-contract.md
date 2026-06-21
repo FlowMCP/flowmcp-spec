@@ -6,16 +6,12 @@ spec_file: "14-kanban-data-contract.md"
 order: 14
 section: "Grading"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/14-kanban-data-contract.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/14-kanban-data-contract.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/14-kanban-data-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/14-kanban-data-contract.md."
----
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
-
 ---
 
 This chapter is **superseded**: the earlier Kanban data contract — a per-phase status response with a `single`/`selection` lane separation — has been replaced by a single derived rollup file per namespace and per selection, the [`index.json`](/grading/index-json/), which carries node status, member resolution, the frozen lock snapshot, and the aggregate grade in one place. Consumers MUST read status from `index.json`; the old phase-status surface and its annex schema are no longer normative. Two principles survive the break and are restated here for traceability — the never-delete audit trail and the irreversible `rejected` veto — and now also govern the grading-monitoring board defined in [`26-monitoring-track.md`](/grading/monitoring-track/).
@@ -44,9 +40,8 @@ A categorical veto produces the terminal node status `rejected`. This status is 
 
 ## Related
 
-- [`14-kanban-data-contract.schema.json`](./14-kanban-data-contract.schema.json)
-- [`23-index-json.md`](/grading/index-json/)
-- [`22-workbench-island.md`](/grading/workbench-island/)
-- [`26-monitoring-track.md`](/grading/monitoring-track/)
-- [`09-security-and-development.md`](/grading/security-and-development/)
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`22-workbench-island.md`](/grading/workbench-island/) — the walled-off working directory that never overwrites a shipped source.
+- [`26-monitoring-track.md`](/grading/monitoring-track/) — the deterministic GitHub board projecting each namespace's grading state.
+- [`09-security-and-development.md`](/grading/security-and-development/) — the security and development checks that carry high categorical-veto affinity.
 

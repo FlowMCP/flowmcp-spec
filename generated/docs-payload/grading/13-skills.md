@@ -1,21 +1,17 @@
 ---
-title: "Skills: Namespace Skill vs. Selection Skill"
+title: "Namespace Skill vs. Selection Skill"
 description: "Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A..."
 grading_version: "3.0.0"
 spec_file: "13-skills.md"
 order: 13
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/13-skills.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/13-skills.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/13-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/13-skills.md."
----
-
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 ---
 
 Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A **selection skill** spans a selection of namespaces, validates at the `group-bound` tier against the group's Domain-Knowledge content, and carries an `L1`/`L2`/`L3` level that reflects its role — Signpost, Topic, or Usecase — not a namespace count. This chapter defines both categories, the `type` and grading-only `level` fields, their mandatory content and validation obligations, and the deterministic cross-reference rules that bind the selection-skill level chain together.
@@ -188,11 +184,11 @@ The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration 
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`14-skills.md`](../../spec/v4.3.0/14-skills.md)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`14-skills.md`](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — how a selection's About Resource carries the group's domain knowledge.
 

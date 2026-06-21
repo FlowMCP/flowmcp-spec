@@ -6,9 +6,9 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/12-prompt-architecture.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/12-prompt-architecture.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/12-prompt-architecture.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/12-prompt-archit
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
----
 
 ## Purpose
 
@@ -917,10 +916,10 @@ agents/
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [14-skills.md](/specification/skills/)
-- [06-agents.md](/specification/agents/)
-- [18-prefill.md](/specification/prefill/)
-- [16-id-schema.md](/specification/id-schema/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [18-prefill.md](/specification/prefill/) — placeholder substitution and pre-executed tool calls in skill content.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
 

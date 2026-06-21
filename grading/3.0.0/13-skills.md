@@ -1,4 +1,4 @@
-# 13 — Skills: Namespace Skill vs. Selection Skill
+# 13 — Namespace Skill vs. Selection Skill
 
 | Field | Value |
 |-------|-------|

@@ -6,19 +6,16 @@ spec_file: "02-eligibility.md"
 order: 2
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/02-eligibility.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/02-eligibility.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/02-eligibility.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/02-eligibility.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification.
-
 This chapter defines **what is allowed to be part of a gradable schema**. Eligibility is the upstream gate: an endpoint that is not eligible MUST NOT appear in a schema, and the chapter sets out the exclusion criteria, the access classes, the schema-splitting rule, and the target-audience priority. The maximalism principle in [`01-default-journey.md`](/grading/default-journey/) operates **inside** this eligibility boundary — "all admitted endpoints" means "all endpoints that pass the rules in this chapter".
 
----
 
 ## Read Focus
 
@@ -128,8 +125,8 @@ The detailed verification method belongs to the grader implementation and is out
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`01-default-journey.md`](/grading/default-journey/)
-- [`04-phases-single.md`](/grading/phases-single/)
-- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`01-default-journey.md`](/grading/default-journey/) — how a schema enters the corpus and why maximal endpoint coverage is the default.
+- [`04-phases-single.md`](/grading/phases-single/) — the six provider-side areas that grade one schema without group context.
+- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/) — the first prompt that anchors a grading run to persona, schema, mode, and version.
 

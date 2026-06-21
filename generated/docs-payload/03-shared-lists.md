@@ -6,9 +6,9 @@ spec_file: "03-shared-lists.md"
 order: 3
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/03-shared-lists.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/03-shared-lists.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/03-shared-lists.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/03-shared-lists.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/03-shared-lists.
 
 Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list that is versioned, validated, and centrally maintained. The sections below cover the list file format, the meta and field definitions, the dependency model between lists, how schemas reference and filter lists, how the runtime injects resolved data into handlers, and the validation rules that keep the registry consistent.
 
----
 
 ## Purpose
 
@@ -555,10 +554,10 @@ Each `.mjs` file contains exactly one shared list. Combining multiple lists in a
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [02-parameters.md](/specification/parameters/)
-- [15-catalog.md](/specification/catalog/)
-- [16-id-schema.md](/specification/id-schema/)
-- [09-validation-rules.md](/specification/validation-rules/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [15-catalog.md](/specification/catalog/) — the registry.json manifest that groups schemas, lists, and agents.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
 

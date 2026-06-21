@@ -6,9 +6,9 @@ spec_file: "14-correctness-license.md"
 order: 14
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/14-correctness-license.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/14-correctness-license.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/schema-creation/14-correctness-license.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/14-correctness-license.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-c
 
 Assume nothing silently, fake nothing, and document where the data comes from and under which rights. Correctness and provenance are what separate a schema that *passes* from one that can be *trusted*.
 
----
 
 ## No silent defaults; a 4xx is not a pass
 
@@ -77,5 +76,5 @@ A small workflow can fetch the URL, run a robots/legal check, and stamp these fi
 
 ## Related
 
-- [`10-readable-interface.md`](/best-practice/readable-interface/)
+- [`10-readable-interface.md`](/best-practice/readable-interface/) — designing the surface for the calling model with readable enums, names, and handler phases.
 

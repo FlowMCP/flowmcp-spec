@@ -6,9 +6,9 @@ spec_file: "02-parameters.md"
 order: 2
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/02-parameters.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/02-parameters.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/02-parameters.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/02-parameters.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/02-parameters.md
 
 A parameter declares where a value is placed in the outgoing API request and how it is validated before the call is made. Each tool parameter pairs a `position` block (placement) with a `z` block (validation); resource parameters reuse the same pairing without a `location` field, and skill input uses a simpler shape.
 
----
 
 ## Parameter Structure
 
@@ -640,9 +639,9 @@ See `14-skills.md` for the complete skill specification.
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [03-shared-lists.md](/specification/shared-lists/)
-- [04-output-schema.md](/specification/output-schema/)
-- [18-prefill.md](/specification/prefill/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [03-shared-lists.md](/specification/shared-lists/) — versioned value sets that schemas reference instead of duplicating.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
+- [18-prefill.md](/specification/prefill/) — placeholder substitution and pre-executed tool calls in skill content.
 

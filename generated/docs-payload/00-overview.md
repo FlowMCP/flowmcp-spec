@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Specification"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/00-overview.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/00-overview.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/00-overview.md."
@@ -21,7 +21,6 @@ FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Bas
 
 This document provides the conceptual foundation, positioning, terminology, and document index for the v4.3.0 specification.
 
----
 
 ## Conformance Language
 
@@ -383,8 +382,8 @@ The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 
 ## Related
 
-- [01-schema-format.md](/specification/schema-format/)
-- [06-agents.md](/specification/agents/)
-- [17-selections.md](/specification/selections/)
-- [15-catalog.md](/specification/catalog/)
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [17-selections.md](/specification/selections/) — a named bundle of primitives an agent activates together.
+- [15-catalog.md](/specification/catalog/) — the registry.json manifest that groups schemas, lists, and agents.
 

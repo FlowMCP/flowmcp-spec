@@ -1,6 +1,6 @@
 {
     "spec_version": "4.3.0",
-    "generated_at": "2026-06-21T11:44:44.581Z",
+    "generated_at": "2026-06-21T18:24:23.315Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -43,7 +43,7 @@
             "order": 2,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -107,7 +107,7 @@
             "order": 6,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -219,7 +219,7 @@
             "order": 13,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -235,7 +235,7 @@
             "order": 14,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -279,11 +279,11 @@
             "filename": "17-selections.md",
             "slug": "selections",
             "title": "Selections",
-            "description": "**Primitive:** Selection (5th primitive)",
+            "description": "A **Selection** is a named, thematically-coherent collection of Primitives (Tools, Resources, Prompts, Skills) that an agent can activate together in a single operation.",
             "order": 17,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -299,7 +299,7 @@
             "order": 18,
             "section": "Specification",
             "normative": true,
-            "sidebar_group": "specification",
+            "sidebar_group": "primitives",
             "version_added": "4.0.0",
             "collapsed": false,
             "spec_quality": {
@@ -386,12 +386,28 @@
                 "grade": 5,
                 "issues": 0
             }
+        },
+        {
+            "filename": "24-philosophy.md",
+            "slug": "philosophy",
+            "title": "Philosophy",
+            "description": "FlowMCP rests on a small set of convictions about how an autonomous agent and an unfamiliar API should meet: that a schema is a contract rather than a cage, that a tool is graded before it is...",
+            "order": 24,
+            "section": "Specification",
+            "normative": false,
+            "sidebar_group": "introduction",
+            "version_added": "4.3.0",
+            "collapsed": false,
+            "spec_quality": {
+                "grade": 4,
+                "issues": 2
+            }
         }
     ],
     "sections": [
         {
             "name": "Specification",
-            "file_count": 24,
+            "file_count": 25,
             "order": 1
         },
         {
@@ -406,10 +422,10 @@
         }
     ],
     "stats": {
-        "total_files": 24,
+        "total_files": 25,
         "normative_files": 21,
-        "prose_files": 3,
-        "average_grade": 5
+        "prose_files": 4,
+        "average_grade": 4.96
     },
     "meta": {
         "stats": {
@@ -573,7 +589,7 @@
             {
                 "filename": "13-skills.md",
                 "slug": "skills",
-                "title": "Skills: Namespace Skill vs. Selection Skill",
+                "title": "Namespace Skill vs. Selection Skill",
                 "description": "Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A...",
                 "order": 13,
                 "section": "Grading",

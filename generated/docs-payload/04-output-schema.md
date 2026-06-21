@@ -6,9 +6,9 @@ spec_file: "04-output-schema.md"
 order: 4
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/04-output-schema.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/04-output-schema.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/04-output-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/04-output-schema.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/04-output-schema
 
 Output schemas make tool responses predictable. By declaring the expected shape of a response at the route level, an AI client knows in advance what fields it will receive and can reason about them without parsing guesswork. The sections below cover the output declaration format, the supported types and MIME-types, the standard response envelope, how output interacts with `postRequest` handlers, and the validation rules applied to every declaration.
 
----
 
 ## Purpose
 
@@ -517,10 +516,10 @@ The diagram shows the non-blocking validation flow: mismatches produce warnings 
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [02-parameters.md](/specification/parameters/)
-- [10-tests.md](/specification/tests/)
-- [22-scoring-protocol.md](/specification/scoring-protocol/)
-- [19-mcp-integration.md](/specification/mcp-integration/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [10-tests.md](/specification/tests/) — executable examples that document tools and capture real responses.
+- [22-scoring-protocol.md](/specification/scoring-protocol/) — the JSON formats exchanged between the CLI and an external grader.
+- [19-mcp-integration.md](/specification/mcp-integration/) — the per-tool meta block and its mapping to MCP annotations.
 

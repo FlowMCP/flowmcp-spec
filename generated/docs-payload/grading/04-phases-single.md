@@ -6,19 +6,16 @@ spec_file: "04-phases-single.md"
 order: 4
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/04-phases-single.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/04-phases-single.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/04-phases-single.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/04-phases-single.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification.
-
 This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. Each Area is a self-contained grading rubric attached to the primitive it evaluates, written to a `_gradings/` folder next to that primitive (see [`19-folder-layout.md`](/grading/folder-layout/)). The provider side produces the **base unit** of the FlowMCP corpus — one namespace with one or more schemas, namespace skills, and an About Resource — while higher-level grouping is defined separately in [`05-phases-selection.md`](/grading/phases-selection/). A schema graded only on the provider side has `gradingTier = autonomous`, whose maximum attainable grade is **B** ([`06-determinism-and-tier.md`](/grading/determinism-and-tier/)); grade A requires a `group-bound` contribution from the selection side.
 
----
 
 ## The Provider-Side Areas
 
@@ -102,14 +99,14 @@ The provider-side Areas produce `gradingTier = autonomous`. Per [`06-determinism
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`01-default-journey.md`](/grading/default-journey/)
-- [`02-eligibility.md`](/grading/eligibility/)
-- [`03-tos.md`](/grading/tos/)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`13-skills.md`](/grading/skills/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`01-default-journey.md`](/grading/default-journey/) — how a schema enters the corpus and why maximal endpoint coverage is the default.
+- [`02-eligibility.md`](/grading/eligibility/) — what is allowed to be part of a gradable schema before scoring begins.
+- [`03-tos.md`](/grading/tos/) — how Terms-of-Service links are checked as a due-diligence score, never a hard gate.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`13-skills.md`](/grading/skills/) — how namespace skills and leveled selection skills are graded differently.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
 

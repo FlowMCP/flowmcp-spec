@@ -6,21 +6,16 @@ spec_file: "09-security-and-development.md"
 order: 9
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/09-security-and-development.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/09-security-and-development.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/09-security-and-development.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/09-security-and-development.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
----
-
 Security and development discipline form an independent grading area with high veto affinity, and this page sets the binding rules for it. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](/grading/grading-model/) originate here (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), while the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. The checks below feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit"; they contribute to the `single-test` and `tools-aggregate-schema` Areas, and no check defined here raises the maximum attainable grade beyond `B` on its own.
 
----
 
 ## API-Key Hygiene (Deterministic)
 
@@ -160,9 +155,9 @@ Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingS
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
-- [`11-preload.md`](/specification/preload/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — why evidencing a single test stays separate from deriving a letter grade.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — how a selection's About Resource carries the group's domain knowledge.
+- [`11-preload.md`](/specification/preload/) — how a tool declares that its response is safe to cache.
 

@@ -6,19 +6,16 @@ spec_file: "22-workbench-island.md"
 order: 22
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/22-workbench-island.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/22-workbench-island.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/22-workbench-island.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/22-workbench-island.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
-
 The grading workbench keeps its working files in a directory that is deliberately walled off from the shipped repositories. This chapter explains why that separation exists, how the internal naming scheme earns its verbosity, and how data crosses the boundary in both directions without ever overwriting a source. The result is a non-destructive round-trip — import, grade, improve, export — whose internal complexity never reaches the public artifacts.
 
----
 
 ## The Island Principle
 
@@ -80,10 +77,10 @@ The round-trip is the concrete shape of the flywheel loop described in [`18-flyw
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`15-versioning-axes.md`](/grading/versioning-axes/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- [`26-monitoring-track.md`](/grading/monitoring-track/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`15-versioning-axes.md`](/grading/versioning-axes/) — how primitives are versioned by filename timestamp and bound by a canonical hash.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/) — the self-reinforcing import, grade, improve, export round-trip.
+- [`26-monitoring-track.md`](/grading/monitoring-track/) — the deterministic GitHub board projecting each namespace's grading state.
 

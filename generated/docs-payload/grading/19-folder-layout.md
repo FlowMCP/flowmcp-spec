@@ -6,19 +6,16 @@ spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/19-folder-layout.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/19-folder-layout.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/19-folder-layout.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 The grading data set is a workbench island organised under three top-level folders — `providers/`, `selections/`, and `shared-lists/` — with one folder per primitive and a timestamp-first naming grammar that makes the newest revision resolvable by a naive sort. Source files stay neutral (no in-source hashes), every hash binding and rollup lives in the derived, overwritable `index.json`, and content is never edited in place or deleted: a change writes a new file next to the old one. This chapter is the single source of truth for those paths; the addressing grammar, the folder↔namespace invariant, the universal `_gradings/` placement rule, and the per-schema lifecycle all build on it.
 
----
 
 ## Folder Layout
 
@@ -166,14 +163,14 @@ Old source files remain referenceable for historical gradings — they are not d
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`15-versioning-axes.md`](/grading/versioning-axes/)
-- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
-- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- [`22-workbench-island.md`](/grading/workbench-island/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`26-monitoring-track.md`](/grading/monitoring-track/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`15-versioning-axes.md`](/grading/versioning-axes/) — how primitives are versioned by filename timestamp and bound by a canonical hash.
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/) — the neutral selection definition and the frozen member-pin lock snapshot.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/) — the self-reinforcing import, grade, improve, export round-trip.
+- [`22-workbench-island.md`](/grading/workbench-island/) — the walled-off working directory that never overwrites a shipped source.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`26-monitoring-track.md`](/grading/monitoring-track/) — the deterministic GitHub board projecting each namespace's grading state.
 

@@ -6,19 +6,16 @@ spec_file: "24-selection-aggregate.md"
 order: 24
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/24-selection-aggregate.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/24-selection-aggregate.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/24-selection-aggregate.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/24-selection-aggregate.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
-
 `selection-aggregate` is the eleventh grading area, and the one that grades a selection as a whole rather than any single primitive within it. It carries the selection-wide dimensions — thresholds, topic coherence, member-against-About conformance, persona fit, and the group-bound tier — that have no per-skill or per-About home. Without it there is no gate for Grade A, which is why this area, its output schema, template, and skill triad MUST exist alongside the ten areas already in place.
 
----
 
 ## Why this area exists
 
@@ -81,13 +78,13 @@ Like every area, `selection-aggregate` is backed by a skill triad — the three-
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`13-skills.md`](/grading/skills/)
-- [`23-index-json.md`](/grading/index-json/)
-- [`25-harness-and-goal.md`](/grading/harness-and-goal/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — how a selection's About Resource carries the group's domain knowledge.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`13-skills.md`](/grading/skills/) — how namespace skills and leveled selection skills are graded differently.
+- [`23-index-json.md`](/grading/index-json/) — the one rollup file per namespace and selection carrying status and grade.
+- [`25-harness-and-goal.md`](/grading/harness-and-goal/) — the completion-condition harness that drives non-deterministic grading turn by turn.
 

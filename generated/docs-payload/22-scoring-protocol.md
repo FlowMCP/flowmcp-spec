@@ -6,9 +6,9 @@ spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/22-scoring-protocol.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/22-scoring-protocol.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/22-scoring-protocol.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/22-scoring-proto
 
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
 
----
 
 ## Purpose
 
@@ -227,10 +226,10 @@ A Grader MUST NOT:
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [20-validation-strategy.md](/specification/validation-strategy/)
-- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
-- [10-tests.md](/specification/tests/)
-- [04-output-schema.md](/specification/output-schema/)
-- [09-validation-rules.md](/specification/validation-rules/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [20-validation-strategy.md](/specification/validation-strategy/) — the deterministic and probabilistic layers behind the A-F grade.
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/) — the six stages a schema travels from idea to production.
+- [10-tests.md](/specification/tests/) — executable examples that document tools and capture real responses.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
+- [09-validation-rules.md](/specification/validation-rules/) — the wayfinder mapping each rule family to its home page.
 

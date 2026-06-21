@@ -6,19 +6,16 @@ spec_file: "16-selection-lockfile.md"
 order: 16
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/16-selection-lockfile.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/16-selection-lockfile.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/16-selection-lockfile.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/16-selection-lockfile.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 A Selection binds several schemas into a domain coverage, and a Selection grading must be reproducible against an exact set of member snapshots. Two artefacts carry that: the neutral `selection.json` holds only the intentional definition (members, skills, personas, trigger sentence) with no pinned hashes, while the frozen `index.json.lockSnapshot` records the member pins — the schema versions and hashes — captured once at grading start and preserved across rebuilds. This chapter defines both artefacts, the per-member `gradingStatus` they carry, and the pre-condition workflow that reads only the frozen snapshot.
 
----
 
 ## Selection Definition and Lock Snapshot
 
@@ -135,13 +132,12 @@ The annex schemas `selection.lock.schema.json` and `namespace.schema.json` are *
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`15-versioning-axes.md`](/grading/versioning-axes/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
-- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/)
-- [`selection.schema.json`](./selection.schema.json)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`15-versioning-axes.md`](/grading/versioning-axes/) — how primitives are versioned by filename timestamp and bound by a canonical hash.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/) — the self-reinforcing import, grade, improve, export round-trip.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`20-entry-point-prompt.md`](/grading/entry-point-prompt/) — the first prompt that anchors a grading run to persona, schema, mode, and version.
 

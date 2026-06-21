@@ -6,9 +6,9 @@ spec_file: "11-reference-data.md"
 order: 11
 section: "Best Practice"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/best-practice/0.1.0/schema-creation/11-reference-data.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/11-reference-data.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "best-practice/0.1.0/schema-creation/11-reference-data.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/11-reference-data.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-c
 
 Maintain recurring lists and value formats **once**, and inherit them everywhere. Duplicated reference data drifts: one copy gets a new entry, the others quietly fall behind. A single canonical source cannot drift against itself.
 
----
 
 ## Shared lists
 
@@ -70,5 +69,5 @@ Never force a key at the very start of a journey when a keyless path exists.
 
 ## Related
 
-- [`10-readable-interface.md`](/best-practice/readable-interface/)
+- [`10-readable-interface.md`](/best-practice/readable-interface/) — designing the surface for the calling model with readable enums, names, and handler phases.
 

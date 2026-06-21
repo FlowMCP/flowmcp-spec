@@ -6,9 +6,9 @@ spec_file: "09-validation-rules.md"
 order: 9
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/09-validation-rules.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/09-validation-rules.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/09-validation-rules.md."
@@ -18,7 +18,6 @@ Every validation rule that `flowmcp schema-check` enforces carries a code, a sev
 
 A rule is defined in exactly one place. The page below it in the table is the authoritative home for that code prefix; nothing on this page duplicates those tables. What remains here is the cross-cutting material that belongs to the validation system as a whole — the meaning of each severity level and the shape of the CLI output.
 
----
 
 ## Rule Families
 
@@ -92,14 +91,14 @@ flowmcp schema-check --security etherscan/contracts.mjs
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [05-security.md](/specification/security/)
-- [02-parameters.md](/specification/parameters/)
-- [06-agents.md](/specification/agents/)
-- [13-resources.md](/specification/resources/)
-- [14-skills.md](/specification/skills/)
-- [16-id-schema.md](/specification/id-schema/)
-- [17-selections.md](/specification/selections/)
-- [20-validation-strategy.md](/specification/validation-strategy/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [05-security.md](/specification/security/) — the trust boundary that keeps schema handlers off the network and filesystem.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [17-selections.md](/specification/selections/) — a named bundle of primitives an agent activates together.
+- [20-validation-strategy.md](/specification/validation-strategy/) — the deterministic and probabilistic layers behind the A-F grade.
 

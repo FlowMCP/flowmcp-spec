@@ -6,9 +6,9 @@ spec_file: "01-schema-format.md"
 order: 1
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/01-schema-format.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/01-schema-format.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/01-schema-format.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/01-schema-format.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/01-schema-format
 
 A FlowMCP schema is a single `.mjs` module that describes how to reach an API and turn its endpoints into tools. It splits into two named exports: a static, JSON-serializable `main` block that holds all declarative configuration, and an optional `handlers` factory that transforms requests and responses. The sections below walk through both exports, the tool and field definitions inside `main`, the naming conventions, and the constraints the runtime enforces at load time.
 
----
 
 ## Schema File Structure
 
@@ -680,11 +679,11 @@ export const handlers = ( { sharedLists } ) => ({
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [02-parameters.md](/specification/parameters/)
-- [04-output-schema.md](/specification/output-schema/)
-- [13-resources.md](/specification/resources/)
-- [14-skills.md](/specification/skills/)
-- [16-id-schema.md](/specification/id-schema/)
-- [19-mcp-integration.md](/specification/mcp-integration/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [19-mcp-integration.md](/specification/mcp-integration/) — the per-tool meta block and its mapping to MCP annotations.
 

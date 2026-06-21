@@ -6,9 +6,9 @@ spec_file: "13-resources.md"
 order: 13
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/13-resources.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/13-resources.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/13-resources.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/13-resources.md.
 
 Resources give a schema local, deterministic data access alongside its network tools. They map to the MCP `server.resource` primitive and live in `main.resources` next to `main.tools`. A resource is backed by a SQLite database (read-only in-memory or writable file-based), a remote SQLite file fetched over HTTPS, or a Markdown document — and the runtime exposes each through a small set of typed queries, with the auto-injected `runSql` and `describeTables` rounding out the query surface. Where a tool reaches out to a third-party API, a resource serves data that should always be available: reference tables, lookups, agent-collected results, and inline documentation.
 
----
 
 ## Why Resources Exist
 
@@ -1475,12 +1474,12 @@ The SQLite database `duneanalytics-templates.db` is not in the schema directory 
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [02-parameters.md](/specification/parameters/)
-- [04-output-schema.md](/specification/output-schema/)
-- [11-preload.md](/specification/preload/)
-- [05-security.md](/specification/security/)
-- [19-mcp-integration.md](/specification/mcp-integration/)
-- [14-skills.md](/specification/skills/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
+- [04-output-schema.md](/specification/output-schema/) — how a route declares its expected response shape.
+- [11-preload.md](/specification/preload/) — how a tool declares that its response is safe to cache.
+- [05-security.md](/specification/security/) — the trust boundary that keeps schema handlers off the network and filesystem.
+- [19-mcp-integration.md](/specification/mcp-integration/) — the per-tool meta block and its mapping to MCP annotations.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
 

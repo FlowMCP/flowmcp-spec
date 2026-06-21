@@ -6,9 +6,9 @@ spec_file: "18-prefill.md"
 order: 18
 section: "Specification"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/18-prefill.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/18-prefill.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/18-prefill.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/18-prefill.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/18-prefill.md."
 
 Skill content carries two complementary template mechanisms that the runtime processes before handing the Skill to an agent. *Placeholders* are tokens embedded directly in the content — `{{type:reference}}` — that are substituted with tool descriptions, resource references, user input, or shared-list values at resolution time. *Prefill* goes one step further: a Skill can declare tool calls in a `prefill` array that the runtime executes up front, then embeds the live results into the content via `{{prefill:...}}` tokens, so the agent receives a Skill already populated with current data.
 
----
 
 ## Placeholder Syntax
 
@@ -86,10 +85,10 @@ This ensures the Skill is always delivered — even if some references are broke
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [16-id-schema.md](/specification/id-schema/)
-- [14-skills.md](/specification/skills/)
-- [12-prompt-architecture.md](/specification/prompt-architecture/)
-- [17-selections.md](/specification/selections/)
-- [02-parameters.md](/specification/parameters/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [16-id-schema.md](/specification/id-schema/) — the canonical namespace/type/name identifier for every primitive.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [12-prompt-architecture.md](/specification/prompt-architecture/) — the two-tier prompt system for provider and agent workflows.
+- [17-selections.md](/specification/selections/) — a named bundle of primitives an agent activates together.
+- [02-parameters.md](/specification/parameters/) — how a parameter places a value and validates it before the call.
 

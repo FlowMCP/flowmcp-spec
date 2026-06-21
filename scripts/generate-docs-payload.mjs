@@ -37,6 +37,11 @@ const REPO = resolve( __dirname, '..' )
 const REFS_MANUAL_PATH = join( REPO, 'data/refs.manual.json' )
 const { readFileSync } = await import( 'node:fs' )
 const REFS_MANUAL = JSON.parse( readFileSync( REFS_MANUAL_PATH, 'utf-8' ) )
+// Memo 144 K4 (T3): per-route short descriptions for the "## Related" footer
+// (memo-init style: "- [file.md](/route/) — description."). Keyed by canonical
+// in-site route; also serves as the liveness whitelist (a Related link whose
+// canonical route is absent is a dead/removed page and gets pruned).
+const RELATED_DESCRIPTIONS = JSON.parse( readFileSync( join( REPO, 'data/related-descriptions.json' ), 'utf-8' ) )
 const SPEC_VERSION = REFS_MANUAL?.spec?.currentVersion
 if( typeof SPEC_VERSION !== 'string' || SPEC_VERSION.length === 0 ) {
     throw new Error( '[generate-docs-payload] data/refs.manual.json spec.currentVersion missing or empty' )
@@ -55,7 +60,8 @@ const GENERATOR = 'scripts/generate-docs-payload.mjs'
 const PROSAIC_FILES = new Set( [
     '00-overview.md',
     '08-migration.md',
-    '21-schema-lifecycle.md'
+    '21-schema-lifecycle.md',
+    '24-philosophy.md'
 ] )
 
 
@@ -170,6 +176,15 @@ const slugFromFilename = ( { filename } ) => {
 }
 
 
+// Memo 144 K8 (T11): stale NN-prefixed absolute in-site routes — e.g.
+// "/specification/22-scoring-protocol/" — 404, because the live route drops the
+// order prefix ("/specification/scoring-protocol/"). Strip the "NN-" from any
+// absolute /track/NN-slug/ link. Generic across tracks and regression-proof for
+// future sources; applied at the tail of every link rewriter.
+const STALE_ROUTE_RE = /\]\(\/(specification|grading|best-practice)\/\d{2}-([a-z0-9-]+)\/(#[^)]*)?\)/g
+const stripStaleRoutePrefix = ( { content } ) => content.replace( STALE_ROUTE_RE, ( match, track, slug, anchor ) => `](/${ track }/${ slug }/${ anchor ?? '' })` )
+
+
 // Memo 087 PRD-P2-A: grading link rewrite. The grading source uses relative
 // sibling links "[text](./NN-name.md)" which 404 on the site (rendered at
 // /grading/<slug>/). GitHub-blob cross-refs into the sister spec resolve to the
@@ -185,7 +200,7 @@ const gradingLinkRewrite = ( { content } ) => {
         /\]\(https:\/\/github\.com\/FlowMCP\/flowmcp-spec\/blob\/[^)]*?\/spec\/v[\d.]+\/(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
         ( match, fname, anchor ) => `](/specification/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
     )
-    return result
+    return stripStaleRoutePrefix( { content: result } )
 }
 
 
@@ -212,6 +227,36 @@ const NORMATIVE_NOTE_RE = /^>\s*Normative language \(MUST\/SHOULD\/MAY\)[^\n]*\n
 const stripNormativeNote = ( { content, filename, overviewFile } ) => {
     if( filename === overviewFile ) return content
     return content.replace( NORMATIVE_NOTE_RE, '' )
+}
+
+
+// Memo 144 K3 (T2): the grading track repeats a "> Conformance language (MUST/SHOULD/MAY) ..."
+// blockquote in every chapter source. The conformance interpretation is anchored ONCE in the
+// grading overview (which keeps its full "## Conformance Language" section); every other chapter
+// merely repeats the pointer as boilerplate. Strip it from all non-overview grading pages —
+// the same single-lever, regression-proof approach as stripNormativeNote. Soll: only the
+// spec overview + grading overview surface the conformance note.
+const CONFORMANCE_NOTE_RE = /^>\s*Conformance language \(MUST\/SHOULD\/MAY\)[^\n]*\n/gm
+
+const stripConformanceNote = ( { content, filename, overviewFile } ) => {
+    if( filename === overviewFile ) return content
+    return content.replace( CONFORMANCE_NOTE_RE, '' )
+}
+
+
+// Memo 144 K2 (T1): remove the post-intro horizontal rule (rendered <hr>, CSS opacity .5)
+// that sits between the page intro block and the first "## " section. The grading and spec
+// source chapters are inconsistent — some carry a "---" after the intro, some do not. Strip
+// any standalone "---" line that occurs BEFORE the first "## " heading (the intro region);
+// inline section dividers between "## " sections are left untouched. Runs after the metadata
+// table is dropped, so the leading "| Field | Value |" separator is already gone.
+const stripIntroRule = ( { content } ) => {
+    const firstSection = content.search( /^##\s/m )
+    if( firstSection === -1 ) return content
+    const head = content.slice( 0, firstSection )
+    const body = content.slice( firstSection )
+    const cleanedHead = head.replace( /^---[ \t]*\r?\n/gm, '' )
+    return cleanedHead + body
 }
 
 const gradingMetadataFooter = ( { content } ) => {
@@ -257,7 +302,54 @@ const gradingMetadataFooter = ( { content } ) => {
 }
 
 
-const gradingBodyTransform = ( { content, filename } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ) } ) } )
+// Memo 144 K4 (T3): canonicalise a "## Related" link href to its in-site route so
+// it can be looked up in RELATED_DESCRIPTIONS. Handles three shapes seen in the
+// generated footers: (a) already-canonical "/track/slug/", (b) a stale NN-prefixed
+// route "/track/NN-slug/" (→ strip the prefix), (c) an un-rewritten cross-track
+// source path like "../../spec/v4.3.0/14-skills.md" (→ "/specification/skills/").
+// A null route means the link could not be resolved to a known track → dead.
+const canonicalRelatedRoute = ( { href } ) => {
+    const hashIdx = href.indexOf( '#' )
+    const clean = ( hashIdx >= 0 ? href.slice( 0, hashIdx ) : href ).trim()
+    const inSite = clean.match( /^\/(specification|grading|best-practice)\/(?:\d{2}-)?([a-z0-9-]+)\/?$/ )
+    if( inSite ) return `/${ inSite[ 1 ] }/${ inSite[ 2 ] }/`
+    const specPath = clean.match( /(?:^|\/)spec\/v[\d.]+\/(?:\d{2}-)?([a-z0-9-]+)\.md$/ )
+    if( specPath ) return `/specification/${ specPath[ 1 ] }/`
+    const gradingPath = clean.match( /(?:^|\/)grading\/[\d.]+\/(?:\d{2}-)?([a-z0-9-]+)\.md$/ )
+    if( gradingPath ) return `/grading/${ gradingPath[ 1 ] }/`
+    const bpPath = clean.match( /(?:^|\/)best-practice\/[\d.]+\/(?:\d{2}-)?([a-z0-9-]+)\.md$/ )
+    if( bpPath ) return `/best-practice/${ bpPath[ 1 ] }/`
+    return null
+}
+
+
+// Memo 144 K4 (T3): rewrite the generated "## Related" footer to the memo-init
+// style — each bullet gets " — <description>" from RELATED_DESCRIPTIONS, and any
+// bullet whose canonical route is unknown (dead/removed page, or an un-rewritten
+// stale link) is pruned. Runs LAST, after the per-track link rewrites, so it sees
+// the final routes. Non-bullet lines (the "## Related" heading, blank lines) pass through.
+const enrichRelatedFooter = ( { content } ) => {
+    const idx = content.search( /^## Related\s*$/m )
+    if( idx === -1 ) return content
+    const before = content.slice( 0, idx )
+    const rebuilt = content.slice( idx )
+        .split( '\n' )
+        .map( ( line ) => {
+            const bullet = line.match( /^- \[([^\]]+)\]\(([^)]+)\)/ )
+            if( !bullet ) return line
+            const route = canonicalRelatedRoute( { href: bullet[ 2 ] } )
+            if( route !== null && RELATED_DESCRIPTIONS[ route ] ) {
+                return `- [${ bullet[ 1 ] }](${ route }) — ${ RELATED_DESCRIPTIONS[ route ] }`
+            }
+            return null
+        } )
+        .filter( ( line ) => line !== null )
+        .join( '\n' )
+    return before + rebuilt
+}
+
+
+const gradingBodyTransform = ( { content, filename } ) => enrichRelatedFooter( { content: gradingLinkRewrite( { content: stripIntroRule( { content: gradingMetadataFooter( { content: stripConformanceNote( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ), filename, overviewFile: '00-overview.md' } ) } ) } ) } ) } )
 
 
 // Memo 108: best-practice link rewrite. The BP source uses relative sibling and
@@ -268,13 +360,14 @@ const gradingBodyTransform = ( { content, filename } ) => gradingLinkRewrite( { 
 // untouched (the ":" / "//" break the relative-prefix match). slug = basename
 // without the leading "NN-". Mirrors gradingLinkRewrite.
 const bestPracticeLinkRewrite = ( { content } ) => {
-    return content.replace(
+    const result = content.replace(
         /\]\((?:\.\.?\/)?(?:[a-z0-9-]+\/)*(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
         ( match, fname, anchor ) => `](/best-practice/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
     )
+    return stripStaleRoutePrefix( { content: result } )
 }
 
-const bestPracticeBodyTransform = ( { content, filename } ) => bestPracticeLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '01-overview.md' } ) } ) } )
+const bestPracticeBodyTransform = ( { content, filename } ) => enrichRelatedFooter( { content: bestPracticeLinkRewrite( { content: stripIntroRule( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '01-overview.md' } ) } ) } ) } ) } )
 
 
 // Memo 088 PRD-SpecLinks: spec link rewrite. The spec source uses relative
@@ -287,7 +380,7 @@ const specLinkRewrite = ( { content } ) => {
         /\]\(\.\/(\d{2}-[a-z0-9-]+)\.md(#[^)]*)?\)/g,
         ( match, fname, anchor ) => `](/specification/${ fname.replace( /^\d+-/, '' ) }/${ anchor ?? '' })`
     )
-    return result
+    return stripStaleRoutePrefix( { content: result } )
 }
 
 
@@ -297,7 +390,7 @@ const specLinkRewrite = ( { content } ) => {
 // specLinkRewrite rewrites the relative ./NN-name.md links — including those in
 // the new footer — to /specification/<slug>/ routes. Order matters: footer first
 // so its links are caught by the rewrite (mirrors gradingBodyTransform).
-const specBodyTransform = ( { content, filename } ) => specLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ) } ) } )
+const specBodyTransform = ( { content, filename } ) => enrichRelatedFooter( { content: specLinkRewrite( { content: stripIntroRule( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ) } ) } ) } ) } )
 
 
 const identityBodyTransform = ( { content } ) => content

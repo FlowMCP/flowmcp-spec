@@ -6,19 +6,16 @@ spec_file: "18-flywheel-loop.md"
 order: 18
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/18-flywheel-loop.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/18-flywheel-loop.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/18-flywheel-loop.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/18-flywheel-loop.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
 The grading process is a self-reinforcing flywheel: provider folders and selection definitions are imported into the workbench, graded by the provider-side and selection-side areas, and the graded state is exported back as `index.json`. Each turn improves the inputs to the next — a stronger schema lifts every selection that contains it, and every selection run surfaces the weakest schemas in a namespace. This chapter traces that round-trip end to end, names the three loops that keep it spinning, and lists the anti-patterns that break it.
 
----
 
 ## The Flywheel as an IN/OUT Round-Trip
 
@@ -100,12 +97,12 @@ The following patterns break the flywheel and are excluded by the spec:
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`08-grading-model.md`](/grading/grading-model/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
-- [`04-phases-single.md`](/grading/phases-single/)
-- [`05-phases-selection.md`](/grading/phases-selection/)
-- [`11-about-convention.md`](/grading/about-convention/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`08-grading-model.md`](/grading/grading-model/) — the grading entry data model, its veto power, and tier trim.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
+- [`04-phases-single.md`](/grading/phases-single/) — the six provider-side areas that grade one schema without group context.
+- [`05-phases-selection.md`](/grading/phases-selection/) — the five selection-side areas that grade a curated group of namespaces.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
 

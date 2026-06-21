@@ -6,9 +6,9 @@ spec_file: "08-migration.md"
 order: 8
 section: "Specification"
 normative: false
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/spec/v4.3.0/08-migration.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/08-migration.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "spec/v4.3.0/08-migration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/08-migration.md."
@@ -16,7 +16,6 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/08-migration.md.
 
 This guide covers migrating schemas between FlowMCP versions in chronological order. Section 1 covers v1.2.0 to v2.0.0 migration, Section 2 covers v2.0.0 to v3.0.0, and Section 3 covers v3.0.0 to v4.0.0.
 
----
 
 ## Section 1: v1.2.0 to v2.0.0
 
@@ -606,10 +605,10 @@ export const schema = {
 
 ## Related
 
-- [00-overview.md](/specification/overview/)
-- [01-schema-format.md](/specification/schema-format/)
-- [06-agents.md](/specification/agents/)
-- [13-resources.md](/specification/resources/)
-- [14-skills.md](/specification/skills/)
-- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [00-overview.md](/specification/overview/) — mission, the two-channel catalog, and the knowledge framing.
+- [01-schema-format.md](/specification/schema-format/) — how a schema declares its tools through main and handlers.
+- [06-agents.md](/specification/agents/) — how an agent bundles tools, a model, and a prompt into one composition.
+- [13-resources.md](/specification/resources/) — local SQLite and Markdown data access alongside network tools.
+- [14-skills.md](/specification/skills/) — reusable instruction sets an agent can load and follow.
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/) — the six stages a schema travels from idea to production.
 

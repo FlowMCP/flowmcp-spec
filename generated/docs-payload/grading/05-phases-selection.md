@@ -6,21 +6,16 @@ spec_file: "05-phases-selection.md"
 order: 5
 section: "Grading"
 normative: true
-source_commit: "236dbb3"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/236dbb3/grading/3.0.0/05-phases-selection.md"
-generated_at: "2026-06-21T11:44:44.465Z"
+source_commit: "55474a9"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/05-phases-selection.md"
+generated_at: "2026-06-21T18:24:22.826Z"
 generated_from: "grading/3.0.0/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/05-phases-selection.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
-
----
-
 A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces — the fifth schema primitive defined in the FlowMCP Schemas Specification (see its [`17-selections.md`](/specification/selections/)). This page is the normative source for the **selection-side grading Areas**, which run on top of the provider-side Areas of [`04-phases-single.md`](/grading/phases-single/): they presuppose that every member schema has already been graded on the provider side and reached the status `stable` (see the pre-condition below). The selection-side Areas produce `gradingTier = group-bound`, and only under this tier is grade **A** reachable (per [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
 
----
 
 ## Prerequisite: Soft and Hard Thresholds
 
@@ -114,13 +109,13 @@ This tier is the **only** path to grade **A**. The provider-side Areas (`autonom
 
 ## Related
 
-- [`00-overview.md`](/grading/overview/)
-- [`04-phases-single.md`](/grading/phases-single/)
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
-- [`11-about-convention.md`](/grading/about-convention/)
-- [`12-personas-contract.md`](/grading/personas-contract/)
-- [`13-skills.md`](/grading/skills/)
-- [`19-folder-layout.md`](/grading/folder-layout/)
-- [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`00-overview.md`](/grading/overview/) — how FlowMCP schemas and selections are evaluated and graded.
+- [`04-phases-single.md`](/grading/phases-single/) — the six provider-side areas that grade one schema without group context.
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that decide reproducibility and the highest grade a dimension can reach.
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — how a selection's About Resource carries the group's domain knowledge.
+- [`11-about-convention.md`](/grading/about-convention/) — the reserved About markdown Resource that describes what a namespace does.
+- [`12-personas-contract.md`](/grading/personas-contract/) — how a grading entry references one of the four base personas and a lens.
+- [`13-skills.md`](/grading/skills/) — how namespace skills and leveled selection skills are graded differently.
+- [`19-folder-layout.md`](/grading/folder-layout/) — the three top-level folders and timestamp-first naming grammar of the grading island.
+- [`21-pre-conditions.md`](/grading/pre-conditions/) — the universal rule blocking aggregate checks until every member schema is stable.
 

@@ -6,9 +6,9 @@ spec_file: "13-geo-conventions.md"
 order: 13
 section: "Best Practice"
 normative: false
-source_commit: "55474a9"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
-generated_at: "2026-06-21T18:24:22.826Z"
+source_commit: "659863f"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
+generated_at: "2026-06-21T18:39:36.331Z"
 generated_from: "best-practice/0.1.0/schema-creation/13-geo-conventions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/13-geo-conventions.md."

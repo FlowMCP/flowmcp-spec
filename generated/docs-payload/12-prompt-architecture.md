@@ -6,9 +6,9 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "Specification"
 normative: true
-source_commit: "55474a9"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/spec/v4.3.0/12-prompt-architecture.md"
-generated_at: "2026-06-21T18:24:22.826Z"
+source_commit: "659863f"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/spec/v4.3.0/12-prompt-architecture.md"
+generated_at: "2026-06-21T18:39:36.331Z"
 generated_from: "spec/v4.3.0/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/12-prompt-architecture.md."

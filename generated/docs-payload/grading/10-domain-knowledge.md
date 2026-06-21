@@ -6,9 +6,9 @@ spec_file: "10-domain-knowledge.md"
 order: 10
 section: "Grading"
 normative: true
-source_commit: "55474a9"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/55474a9/grading/3.0.0/10-domain-knowledge.md"
-generated_at: "2026-06-21T18:24:22.826Z"
+source_commit: "659863f"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/grading/3.0.0/10-domain-knowledge.md"
+generated_at: "2026-06-21T18:39:36.331Z"
 generated_from: "grading/3.0.0/10-domain-knowledge.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/10-domain-knowledge.md."

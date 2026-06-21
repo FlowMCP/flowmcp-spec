@@ -6,15 +6,13 @@ spec_file: "05-security.md"
 order: 5
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/05-security.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/05-security.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/05-security.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/05-security.md."
 ---
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.
 
@@ -354,6 +352,9 @@ All violations in a single file are reported together (the scan does not stop at
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [09-validation-rules.md](/specification/validation-rules/), [13-resources.md](/specification/resources/), [23-license-and-tos.md](/specification/license-and-tos/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [09-validation-rules.md](/specification/validation-rules/)
+- [13-resources.md](/specification/resources/)
+- [23-license-and-tos.md](/specification/license-and-tos/)
 

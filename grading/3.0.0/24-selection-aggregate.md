@@ -1,4 +1,4 @@
-# 24 — The `selection-aggregate` Area (11th area)
+# 24 — The `selection-aggregate` Area
 
 | Field | Value |
 |-------|-------|
@@ -9,6 +9,8 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
 
+`selection-aggregate` is the eleventh grading area, and the one that grades a selection as a whole rather than any single primitive within it. It carries the selection-wide dimensions — thresholds, topic coherence, member-against-About conformance, persona fit, and the group-bound tier — that have no per-skill or per-About home. Without it there is no gate for Grade A, which is why this area, its output schema, template, and skill triad MUST exist alongside the ten areas already in place.
+
 ---
 
 ## Why this area exists
@@ -18,8 +20,6 @@ Grading is organised into **areas** — one rubric per primitive type. Ten areas
 The selection-wide dimensions — thresholds, topic coherence, member-against-about conformance, persona use-case fit, the group-bound tier path — have no per-skill or per-about home. Without `selection-aggregate` there is no gate for Grade A. This area MUST exist; its output schema, template, and skill triad MUST be built (the other ten already exist).
 
 The area's gradings are stored at `selections/<selection>/_gradings/` (the selection-level `_gradings/` folder).
-
----
 
 ## Carried Dimensions
 
@@ -34,13 +34,11 @@ The area's gradings are stored at `selections/<selection>/_gradings/` (the selec
 | **Group-bound tier** | This is the area that opens the path to **Grade A** (`gradingTier = group-bound`). Provider-level grading alone caps at Grade B. |
 | **Cascade-stop** | The aggregate stops the cascade when a hard precondition fails (e.g. members below threshold), rather than producing a misleading partial grade. |
 
----
-
 ## Output Schema
 
 The output of every area shares a common **envelope** (from `_master.schema.json` plus the area-specific part) and a list of `answers[]`. The `selection-aggregate` output conforms to that envelope.
 
-### Envelope (shared)
+### Shared envelope
 
 | Field | Value |
 |-------|-------|
@@ -62,29 +60,14 @@ Each `answer` has: `questionId` (`^Q-…`), `score` (1–5 **or** `pass`/`fail`/
 
 Validation uses draft 2020-12 (`Ajv2020` + `ajv-formats`); `_master` is added once via `addSchema`.
 
----
-
 ## Template
 
 The prompt template for `selection-aggregate` follows the same contract as the other ten areas' templates: it states the area, injects the resolved member-resolution manifest (from [`index.json`](./23-index-json.md)), the About / Domain-Knowledge, the declared personas, and the threshold counts, then asks one question per carried dimension. The template MUST include the Goal-Block and the surfacing convention (see [`25-harness-and-goal.md`](./25-harness-and-goal.md)).
-
----
 
 ## Skill Triad
 
 Like every area, `selection-aggregate` is backed by a skill triad — the three-skill contract (`start-grade` → `evaluate` → `apply-improvement`) that the harness runs as the inner micro-loop. The triad reads the frozen `lockSnapshot` and the member-resolution manifest, evaluates the carried dimensions, and emits `improvementHints[]` when the selection falls short. The triad MUST be built for this area (the other ten already have theirs).
 
----
-
 ## Relationship to the index rollup
 
 `selection-aggregate` is the node `selectionAggregate` in the selection's [`index.json`](./23-index-json.md). Its status follows the 5-status node enum; reaching `stable` here (with the hard threshold met and a group-bound evaluation present) is what allows the selection rollup to reach Grade A.
-
----
-
-## Cross-References
-
-- Selection phases and thresholds: [`05-phases-selection.md`](./05-phases-selection.md)
-- Domain knowledge / About distinction: [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`11-about-convention.md`](./11-about-convention.md)
-- Member resolution manifest: [`23-index-json.md`](./23-index-json.md)
-- Harness, Goal-Block, surfacing convention: [`25-harness-and-goal.md`](./25-harness-and-goal.md)

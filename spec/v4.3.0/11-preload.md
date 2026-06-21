@@ -7,13 +7,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime MAY cache the response locally.
-
----
-
-## Motivation
-
-Some API endpoints return complete, rarely changing datasets (e.g. all hospitals in Germany, all memorial stones in Berlin). Fetching these on every call wastes bandwidth and time. The `preload` field lets schema authors declare caching intent so the CLI and other runtimes can cache responses transparently.
+Some tools return data that barely moves — a full list of hospitals in a country, every memorial stone in a city, a reference table that is refreshed once a week. Re-fetching such a dataset on every call costs bandwidth and time for no benefit. The optional `preload` field lets a schema author declare that a tool's response is safe to cache and for how long, so a runtime can serve a stored copy instead of hitting the network each time. Caching always stays optional on the runtime's side: `preload` expresses intent, and the runtime decides whether to honour it. The sections below specify the field, its validation rules, the cache key derivation, the runtime cache flow, and the author guidelines for choosing a sensible time-to-live.
 
 ---
 
@@ -64,7 +58,7 @@ routes: {
 
 ## Validation Rules
 
-These rules extend the existing validation rule set from `09-validation-rules.md`:
+These rules extend the validation rule set indexed in [09-validation-rules.md](./09-validation-rules.md):
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -202,8 +196,8 @@ Runtimes SHOULD document which approach they use.
 
 ### Tests
 
-Route tests (`10-route-tests.md`) always bypass the cache to ensure they test the live API. The `--no-cache` flag is implied during test execution.
+Tool tests (see [10-tests.md](./10-tests.md)) always bypass the cache to ensure they exercise the live API. The `--no-cache` flag is implied during test execution.
 
 ### Output Schema
 
-The output schema (`04-output-schema.md`) describes the response shape regardless of whether the response comes from cache or a live fetch. Caching does not affect the output contract.
+The output schema (see [04-output-schema.md](./04-output-schema.md)) describes the response shape regardless of whether the response comes from cache or a live fetch. Caching does not affect the output contract.

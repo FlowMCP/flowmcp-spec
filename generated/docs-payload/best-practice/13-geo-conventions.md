@@ -6,9 +6,9 @@ spec_file: "13-geo-conventions.md"
 order: 13
 section: "Best Practice"
 normative: false
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/best-practice/0.1.0/schema-creation/13-geo-conventions.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "best-practice/0.1.0/schema-creation/13-geo-conventions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/13-geo-conventions.md."
@@ -58,5 +58,5 @@ show as:    plz = "10115"       (familiar, but many PLZ per municipality)
 
 ## Related
 
-- **Related:** [`12-load-and-scale.md`](/best-practice/load-and-scale/)
+- [`12-load-and-scale.md`](/best-practice/load-and-scale/)
 

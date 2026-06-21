@@ -7,7 +7,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-This document defines the structure of a FlowMCP schema file, the two named exports (`main` and `handlers`), tool definitions, resource declarations, skill references, naming conventions, and constraints.
+A FlowMCP schema is a single `.mjs` module that describes how to reach an API and turn its endpoints into tools. It splits into two named exports: a static, JSON-serializable `main` block that holds all declarative configuration, and an optional `handlers` factory that transforms requests and responses. The sections below walk through both exports, the tool and field definitions inside `main`, the naming conventions, and the constraints the runtime enforces at load time.
 
 ---
 
@@ -76,19 +76,19 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `name` | `string` | Human-readable schema name in PascalCase (e.g. `SmartContractExplorer`). |
 | `description` | `string` | What this schema does, 1-2 sentences. Appears in tool discovery. |
 | `version` | `string` | Must match pattern `4.\d+.\d+` (semver, major MUST be `4`). Version `3.\d+.\d+` is accepted during migration. **FlowMCP-Spec-Version** (frozen by Major). |
-| `schemaVersion` | `string` | **NEW in v4.1.1.** Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
+| `schemaVersion` | `string` | Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
 | `meta` | `object` | MCP integration metadata block applied to all tools. Required when the schema defines at least one tool. See `19-mcp-integration.md`. |
 
-#### Two Version Axes (v4.1.1+)
+#### Two Version Axes
 
 | Axis | Field | Range | Meaning |
 |------|-------|-------|---------|
 | Spec-Version | `version` | `4.\d+.\d+` (Major frozen) | FlowMCP-Spec-Version |
 | Schema-Version | `schemaVersion` | `\d+.\d+.\d+` (semver, free) | Schema-Content-Version |
 
-Example header (v4.1.1):
+Example header:
 
 ```javascript
 export const main = {
@@ -390,6 +390,7 @@ export const handlers = ( { sharedLists, libraries } ) => ({
         }
     }
 })
+```
 
 ### Handler Per-Call Parameters
 

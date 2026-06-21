@@ -5,13 +5,15 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`09-security-and-development.md`](./09-security-and-development.md) |
-| Related | [`05-phases-selection.md`](./05-phases-selection.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md) |
+| Related | [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`09-security-and-development.md`](./09-security-and-development.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
-## Purpose
+A **topic group** — a selection composed of several namespaces — develops conventions, shared vocabularies, and provider-specific quirks that are invisible from any single namespace in isolation. Grading at the `group-bound` tier MUST be validated against the group's **Domain-Knowledge content**, and that content lives in the selection's **About Resource** rather than a separate document — a binding identity rather than a loose association. This chapter sets the two thresholds under which a selection counts as a group, lists the seven mandatory sections the content must carry, and traces how it feeds the `domainConformance` and `personaUseCaseFit` dimensions.
+
+## Domain-Knowledge as the Selection's About Resource
 
 A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation. Grading at the `group-bound` tier (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)) MUST be validated against the group's **Domain-Knowledge content** — and that content lives in the selection's **About Resource**, not in a separate document.
 
@@ -106,14 +108,3 @@ A grading entry that uses Domain-Knowledge content records the resolved About Re
 | `personaUseCaseFit` | `group-bound` | Reads the Personas Reference and Use Cases sections of the Domain-Knowledge content as ground truth. Carried by `selection-aggregate`. |
 
 **Binding rule.** Without Domain-Knowledge content for a group, no `group-bound` grading entry can be produced, and `aggregateGrade = A` is consequently NOT attainable for the schemas in that selection. This rule is the **structural enforcement** of the diversity maxim: groups have to invest in their About Resource to unlock the top grade.
-
----
-
-## Cross-References
-
-- [`05-phases-selection.md`](./05-phases-selection.md) — the `about-selection` and `selection-aggregate` Areas that consume the Domain-Knowledge content.
-- [`08-grading-model.md`](./08-grading-model.md) — the `domainConformance` dimension and the `selectionContext` field.
-- [`09-security-and-development.md`](./09-security-and-development.md) — Shared-List enforcement is referenced from the security chapter.
-- [`11-about-convention.md`](./11-about-convention.md) — About as a markdown schema Resource; the carrier of the Domain-Knowledge content.
-- [`12-personas-contract.md`](./12-personas-contract.md) — the Personas Reference section consumes the persona slugs and Lens definitions.
-- [`13-skills.md`](./13-skills.md) — selection-skill validation reads the group's Domain-Knowledge content as context.

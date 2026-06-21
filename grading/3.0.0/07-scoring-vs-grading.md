@@ -11,11 +11,7 @@
 
 ---
 
-## Core Statement
-
-The terms **"Scoring"** and **"Grading"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update does **not** automatically imply a grading update — and vice versa.
-
-A grader, scorer, or aggregator that conforms to `gradingSpec/3.0.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
+"Scoring" and "Grading" name two distinct sub-systems that this spec keeps strictly apart: the Scoring System evidences how a single test or dimension performs, while the Grading System derives a letter mark from a collection of those scores. Each carries its own independent version namespace, so a scoring update does not automatically imply a grading update — and vice versa. A grader, scorer, or aggregator that conforms to `gradingSpec/3.0.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
 
 ---
 
@@ -81,12 +77,3 @@ Changing any threshold, the tier-trim rule, or the numeric mapping bumps the `gr
 The Schemas-Spec v4.3.0 provides the **upstream contract** for scoring: the `prompts.json` / `scores.json` artefact pair is defined in [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/22-scoring-protocol.md) of the Schemas-Spec (sister repository `flowmcp-spec`). The Scoring System named here **sub-consumes** that protocol: scores produced by the Schemas-Spec scoring protocol enter this spec's Scoring System as inputs, and the dimensions enumerated in [`08-grading-model.md`](./08-grading-model.md), "Dimension Enum", extend that protocol with the additional grading dimensions defined here.
 
 This Grading-Spec does NOT re-define the `prompts.json` / `scores.json` contract. Implementers MUST treat the Schemas-Spec v4.3.0 `22-scoring-protocol.md` as the **highest instance** for the artefact pair; conflicting prose in this spec is to be read as a refinement, not as a replacement.
-
----
-
-## Cross-References
-
-- [`08-grading-model.md`](./08-grading-model.md) — how scores become a grade (the data model and the JSON-Schema annex).
-- [`04-phases-single.md`](./04-phases-single.md) / [`05-phases-selection.md`](./05-phases-selection.md) — where scores are produced.
-- Schemas-Spec v4.3.0 [`22-scoring-protocol.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/22-scoring-protocol.md) — sub-consumed scoring artefact contract (external).
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — interaction of version bumps with reproducibility.

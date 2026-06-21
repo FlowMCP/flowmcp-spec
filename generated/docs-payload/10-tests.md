@@ -1,22 +1,20 @@
 ---
 title: "Tests"
-description: "Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document..."
+description: "Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they..."
 spec_version: "4.3.0"
 spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/10-tests.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/10-tests.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
+Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses become the basis for generating accurate output schemas. The sections below cover the test format for tools, resources, and agents, the design principles that keep tests useful, and the response-capture lifecycle that turns a test into an output schema.
 
 ---
 
@@ -688,6 +686,11 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
-- **Related:** [04-output-schema.md](/specification/output-schema/), [06-agents.md](/specification/agents/), [22-scoring-protocol.md](/specification/scoring-protocol/), [13-resources.md](/specification/resources/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [02-parameters.md](/specification/parameters/)
+- [04-output-schema.md](/specification/output-schema/)
+- [06-agents.md](/specification/agents/)
+- [22-scoring-protocol.md](/specification/scoring-protocol/)
+- [13-resources.md](/specification/resources/)
 

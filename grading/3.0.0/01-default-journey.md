@@ -7,15 +7,9 @@
 | Depends on | [`00-overview.md`](./00-overview.md) |
 | Related | [`02-eligibility.md`](./02-eligibility.md), [`04-phases-single.md`](./04-phases-single.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification.
 
----
-
-## Purpose
-
-This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** as a contribution to the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)).
-
-The default position is unambiguous: **more tools = better interoperability**. Reduction below the documented endpoint set MUST be justified, or it MUST cost points.
+This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** that feeds the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](./04-phases-single.md)). The default position is unambiguous: more tools mean better interoperability. Reduction below the documented endpoint set MUST be justified, or it MUST cost points.
 
 ---
 
@@ -30,7 +24,7 @@ A documentation URL is **NOT** a mandatory entry point. Other entry paths — in
 
 ---
 
-## Maximalism Principle (MUST)
+## Maximalism Principle
 
 When the entry path is a documentation URL, the resulting schema (or schema set) **MUST be maximalist**: it MUST cover **all endpoints admitted by [`02-eligibility.md`](./02-eligibility.md)** (Chapter 3, eligibility rules).
 
@@ -43,7 +37,7 @@ No silent reduction. An omission without a justification recorded in the grading
 
 ---
 
-## Default-Reversal (MUST be stated in the spec)
+## Default-Reversal
 
 The **default is reversed**: when in doubt, take **more tools**.
 
@@ -72,11 +66,3 @@ The **completeness validation** is a deterministic contribution graded in the `s
 - The **point deduction MUST be proportional to the gap**, except where a per-endpoint justification under [`02-eligibility.md`](./02-eligibility.md) is recorded in the grading JSON.
 
 Gap reporting is mandatory; gap penalisation is conditional on the absence of an eligibility-based justification recorded in the grading JSON.
-
----
-
-## Cross-References
-
-- [`00-overview.md`](./00-overview.md) — Conformance language, interoperability as the main focus.
-- [`02-eligibility.md`](./02-eligibility.md) — Which endpoints are admitted (the maximalism boundary).
-- [`04-phases-single.md`](./04-phases-single.md) — the `single-test` / `tools-aggregate-schema` Areas carry the completeness-validation grading.

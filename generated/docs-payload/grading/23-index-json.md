@@ -1,14 +1,14 @@
 ---
-title: "The `index.json` Rollup"
-description: "Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the..."
+title: "Namespace and Selection Rollup"
+description: "Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file: there is exactly **one `index.json` per namespace and one per selection**. The file..."
 grading_version: "3.0.0"
 spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/23-index-json.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/23-index-json.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/23-index-json.md."
@@ -16,13 +16,7 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/23-index-json.
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
 
----
-
-## Purpose
-
-Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the rollup: a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status.
-
-This chapter supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)). The two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
+Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file: there is exactly **one `index.json` per namespace and one per selection**. The file is the rollup — a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status. This chapter pins its structure: the two-part split between a recomputed live rollup and a frozen point-in-time snapshot, the two status vocabularies that must never be mixed, and the audit-trail and veto rules it inherits. It supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)); the two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
 
 ---
 
@@ -117,9 +111,9 @@ The sync MUST treat a present `githubIssue` backref as idempotency proof: it MUS
 
 ---
 
-## Member-Resolution-Manifest (SEL003)
+## Member-Resolution Manifest
 
-For a selection, the rollup carries a **member-resolution manifest** — the heart of selection grading. For each member it records `schemaId → resolved provider artifact + grade + status`. Without this manifest the selection aggregate cannot reproduce its "M of N members PASS" verdict, because the member IDs in `selection.json` are logical and must be resolved (via `resolveLatest`) to a concrete graded provider artifact. The manifest makes that resolution explicit and auditable.
+For a selection, the rollup carries a **member-resolution manifest** — the heart of selection grading. For each member it records `schemaId → resolved provider artifact + grade + status`. Without this manifest the selection aggregate cannot reproduce its "M of N members PASS" verdict, because the member IDs in `selection.json` are logical and must be resolved (via `resolveLatest`) to a concrete graded provider artifact. The manifest makes that resolution explicit and auditable. The selection aggregate that consumes it is defined in [`24-selection-aggregate.md`](/grading/selection-aggregate/).
 
 ---
 
@@ -218,19 +212,15 @@ This record validates against [`index.schema.json`](./index.schema.json) with on
 - The rebuild runs after every grading write.
 - The former per-namespace `summary.json` as an entry point is superseded by `index.json`; only the per-schema `summary.json` (phase-0 pretest data) remains.
 
----
-
-## Cross-References
-
-- Superseded contract: [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)
-- Pre-condition gate reading `lockSnapshot`: [`21-pre-conditions.md`](/grading/pre-conditions/)
-- Lock snapshot fields (ex-lockfile): [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- Grading model (`schemaId`, `aggregateGrade`, veto): [`08-grading-model.md`](/grading/grading-model/)
-- Selection aggregate that consumes the manifest: [`24-selection-aggregate.md`](/grading/selection-aggregate/)
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`19-folder-layout.md`](/grading/folder-layout/)
-- **Related:** [`14-kanban-data-contract.md`](/grading/kanban-data-contract/) (superseded by this chapter), [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`21-pre-conditions.md`](/grading/pre-conditions/), [`08-grading-model.md`](/grading/grading-model/), [`26-monitoring-track.md`](/grading/monitoring-track/)
-- **Annex:** [`index.schema.json`](./index.schema.json) — JSON-Schema 2020-12 for `index.json`
+- [`00-overview.md`](/grading/overview/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`14-kanban-data-contract.md`](/grading/kanban-data-contract/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`24-selection-aggregate.md`](/grading/selection-aggregate/)
+- [`26-monitoring-track.md`](/grading/monitoring-track/)
+- [`index.schema.json`](./index.schema.json)
 

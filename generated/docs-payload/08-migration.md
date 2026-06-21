@@ -6,9 +6,9 @@ spec_file: "08-migration.md"
 order: 8
 section: "Specification"
 normative: false
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/08-migration.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/08-migration.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/08-migration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/08-migration.md."
@@ -606,6 +606,10 @@ export const schema = {
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [06-agents.md](/specification/agents/), [13-resources.md](/specification/resources/), [14-skills.md](/specification/skills/), [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [06-agents.md](/specification/agents/)
+- [13-resources.md](/specification/resources/)
+- [14-skills.md](/specification/skills/)
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
 

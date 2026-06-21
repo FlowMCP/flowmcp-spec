@@ -7,7 +7,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output declaration format, supported types, the response envelope, handler interaction, and validation rules.
+Output schemas make tool responses predictable. By declaring the expected shape of a response at the route level, an AI client knows in advance what fields it will receive and can reason about them without parsing guesswork. The sections below cover the output declaration format, the supported types and MIME-types, the standard response envelope, how output interacts with `postRequest` handlers, and the validation rules applied to every declaration.
 
 ---
 
@@ -383,7 +383,7 @@ If a route does not define an `output` field:
 
 Omitting the output schema is acceptable for:
 
-- Legacy schemas migrating from v1.x
+- Legacy schemas being migrated from an earlier major version
 - Routes with highly variable response shapes (rare)
 - Exploratory schemas during development
 

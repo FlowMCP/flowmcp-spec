@@ -6,9 +6,9 @@ spec_file: "00-overview.md"
 order: 0
 section: "Specification"
 normative: false
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/00-overview.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/00-overview.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/00-overview.md."
@@ -383,5 +383,8 @@ The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 
 ## Related
 
-- **Related:** [01-schema-format.md](/specification/schema-format/), [06-agents.md](/specification/agents/), [17-selections.md](/specification/selections/), [15-catalog.md](/specification/catalog/)
+- [01-schema-format.md](/specification/schema-format/)
+- [06-agents.md](/specification/agents/)
+- [17-selections.md](/specification/selections/)
+- [15-catalog.md](/specification/catalog/)
 

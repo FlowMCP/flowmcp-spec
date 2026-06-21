@@ -1,14 +1,14 @@
 ---
 title: "Security and Development"
-description: "Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md)..."
+description: "Security and development discipline form an independent grading area with high veto affinity, and this page sets the binding rules for it. Three of the four Categorical-Veto triggers defined in..."
 grading_version: "3.0.0"
 spec_file: "09-security-and-development.md"
 order: 9
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/09-security-and-development.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/09-security-and-development.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/09-security-and-development.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/09-security-and-development.md."
@@ -18,11 +18,7 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/09-security-an
 
 ---
 
-## Introduction
-
-Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](/grading/grading-model/) live in this chapter (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), and the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. This chapter defines the binding rules for each.
-
-The checks covered here feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit". No check defined in this chapter raises the maximum attainable grade beyond `B` on its own. These checks contribute to the `single-test` and `tools-aggregate-schema` areas (see the 11 Areas in [`08-grading-model.md`](/grading/grading-model/)).
+Security and development discipline form an independent grading area with high veto affinity, and this page sets the binding rules for it. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](/grading/grading-model/) originate here (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), while the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. The checks below feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit"; they contribute to the `single-test` and `tools-aggregate-schema` Areas, and no check defined here raises the maximum attainable grade beyond `B` on its own.
 
 ---
 
@@ -162,21 +158,11 @@ The no-silent-defaults rule is binding for this spec chapter. Every score-boost 
 
 Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingSystem/1.0.0` implementation; this chapter does NOT enumerate them. The binding contract is the **explicitness** rule, not specific numerical values.
 
----
-
-## Cross-References
-
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — the version namespaces (`scoringSystem` / `gradingSystem`) that bind score changes from this chapter.
-- [`08-grading-model.md`](/grading/grading-model/) — the data model of the Categorical Veto entries defined here.
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — Shared Lists and forbidden provider conventions (forward reference).
-- Schemas-Spec v4.3.0 [`11-preload.md`](/specification/preload/) — the Preload pattern (external).
-- `node-formatting` skill — formatting rules.
-- `node-error-codes` skill — PREFIX-NUMBER error-code pattern.
-- No-silent-defaults rule — anti-defaults rule.
-- Never-read-env-files-with-values rule — env handling.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** [`10-domain-knowledge.md`](/grading/domain-knowledge/), Schemas-Spec v4.3.0 [`11-preload.md`](/specification/preload/), `node-formatting` skill, `node-error-codes` skill
+- [`00-overview.md`](/grading/overview/)
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`11-preload.md`](/specification/preload/)
 

@@ -1,32 +1,20 @@
 ---
 title: "ID Schema"
-description: "A unified ID system for referencing all FlowMCP primitives. IDs MUST be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter..."
+description: "A FlowMCP catalog exposes three MCP primitives — Tools, Resources, and Skills (prompts) — across potentially hundreds of schemas from dozens of providers, and references to those primitives turn up..."
 spec_version: "4.3.0"
 spec_file: "16-id-schema.md"
 order: 16
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/16-id-schema.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/16-id-schema.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/16-id-schema.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-A unified ID system for referencing all FlowMCP primitives. IDs MUST be unambiguous, human-readable, and resolvable. This document defines the ID format, component rules, Schema-File-ID, CLI-Adapter mapping, the No Short Form rule, resolution algorithm, placeholder integration, namespace governance, and validation rules.
-
----
-
-## Purpose
-
-FlowMCP exposes three MCP primitives — Tools, Resources, and Skills (prompts) — across potentially hundreds of schemas from dozens of providers. As the ecosystem grows, references to these primitives appear in multiple contexts: group definitions, skill placeholders, registry entries, CLI commands, and cross-schema dependencies.
-
-Without a unified ID system, references are ambiguous. Does `simplePrice` refer to a tool, a resource, or a prompt? Which provider owns it? Is `evmChains` a tool name or a shared list?
-
-The ID schema solves this by defining a **structured, human-readable identifier format** that uniquely identifies any primitive in the ecosystem. Every tool, resource, prompt, and shared list has exactly one canonical ID.
+A FlowMCP catalog exposes three MCP primitives — Tools, Resources, and Skills (prompts) — across potentially hundreds of schemas from dozens of providers, and references to those primitives turn up everywhere: group definitions, skill placeholders, registry entries, CLI commands, and cross-schema dependencies. Without a unified scheme, a bare name like `lookupItem` is ambiguous — is it a tool, a resource, or a prompt, and which provider owns it? The ID schema removes that ambiguity by giving every tool, resource, prompt, and shared list exactly one canonical, human-readable, resolvable identifier built from a namespace, a type discriminator, and a name.
 
 ```mermaid
 flowchart LR
@@ -34,7 +22,7 @@ flowchart LR
     B --> C[Resource Type]
     C --> D["/"]
     D --> E[Name]
-    E --> F["coingecko/tool/simplePrice"]
+    E --> F["acme/tool/lookupItem"]
 ```
 
 The diagram shows the three components of a full ID separated by `/` delimiters, forming a single unambiguous reference string.
@@ -53,13 +41,13 @@ namespace/resourceType/name
 
 | Type | Format | Slashes | Example |
 |------|--------|---------|---------|
-| **Schema-File** | `namespace/schema-name` | **1** | `etherscan-io/contracts` |
-| Tool | `namespace/tool/name` | 2 | `etherscan-io/tool/getAbi` |
-| Resource | `namespace/resource/name` | 2 | `etherscan-io/resource/chainDb` |
-| Prompt | `namespace/prompt/name` | 2 | `etherscan-io/prompt/intro` |
-| Skill | `namespace/skill/name` | 2 | `etherscan-io/skill/audit` |
-| Selection | `namespace/selection/name` | 2 | `evm-research/selection/contract` |
-| Agent | `namespace/agent/name` | 2 | `crypto/agent/researcher` |
+| **Schema-File** | `namespace/schema-name` | **1** | `directory-io/records` |
+| Tool | `namespace/tool/name` | 2 | `directory-io/tool/getEntry` |
+| Resource | `namespace/resource/name` | 2 | `directory-io/resource/entryDb` |
+| Prompt | `namespace/prompt/name` | 2 | `directory-io/prompt/intro` |
+| Skill | `namespace/skill/name` | 2 | `directory-io/skill/audit` |
+| Selection | `namespace/selection/name` | 2 | `record-research/selection/lookup` |
+| Agent | `namespace/agent/name` | 2 | `research/agent/researcher` |
 
 **Distinguishing rule:** 1 Slash = Schema-File-ID (Container). 2 Slashes = Primitive-ID (Content).
 
@@ -67,11 +55,11 @@ namespace/resourceType/name
 
 | ID | Description |
 |----|-------------|
-| `coingecko/tool/simplePrice` | Tool from CoinGecko provider |
-| `coingecko/resource/supported-coins` | Resource from CoinGecko |
-| `coingecko/prompt/price-comparison` | Prompt from CoinGecko |
-| `crypto-research/prompt/token-deep-dive` | Agent prompt |
-| `shared/list/evmChains` | Shared list reference |
+| `weather/tool/getForecast` | Tool from the weather provider |
+| `weather/resource/supported-cities` | Resource from the weather provider |
+| `weather/prompt/forecast-summary` | Prompt from the weather provider |
+| `data-research/prompt/record-deep-dive` | Agent prompt |
+| `shared/list/regionCodes` | Shared list reference |
 
 Each segment serves a distinct purpose: the namespace identifies the owner, the resource type discriminates the primitive kind, and the name identifies the specific item within that namespace and type.
 
@@ -92,10 +80,10 @@ Each segment serves a distinct purpose: the namespace identifies the owner, the 
 The namespace identifies the owner of the primitive. It is derived from the provider's domain name or agent name and MUST be unique within its own `schemaFolder` — each folder is its own registry (see [Namespace Rules](#namespace-rules)). The CLI aggregates multiple folders into one catalog, so the same namespace MAY appear in more than one aggregated folder; cross-folder collisions are disambiguated by the optional source coordinate `<source>:<namespace>` (see [Source Coordinate](#source-coordinate)).
 
 ```
-coingecko          ← provider namespace
-etherscan          ← provider namespace
-defilama           ← provider namespace
-crypto-research    ← agent namespace
+weather            ← provider namespace
+directory          ← provider namespace
+catalog            ← provider namespace
+data-research      ← agent namespace
 shared             ← reserved namespace for shared lists
 ```
 
@@ -125,10 +113,10 @@ The name identifies the specific primitive within its namespace and type. Naming
 
 | Primitive | Convention | Example |
 |-----------|-----------|---------|
-| Tool | camelCase | `simplePrice`, `getContractAbi` |
-| Resource | camelCase | `tokenLookup`, `chainConfig` |
-| Prompt | kebab-case | `price-comparison`, `token-deep-dive` |
-| Shared List | camelCase | `evmChains`, `countryCodes` |
+| Tool | camelCase | `getForecast`, `getEntry` |
+| Resource | camelCase | `recordLookup`, `regionConfig` |
+| Prompt | kebab-case | `forecast-summary`, `record-deep-dive` |
+| Shared List | camelCase | `regionCodes`, `countryCodes` |
 
 ---
 
@@ -139,29 +127,29 @@ A schema is a `.mjs` file containing 1–8 Primitives. The Schema-File-ID identi
 **Format:** `namespace/schema-name` (1 slash)
 
 ```
-Schema-File-ID:  etherscan-io/contracts
-                 └── namespace: etherscan-io
-                 └── schema-name: contracts (equals filename without .mjs)
+Schema-File-ID:  directory-io/records
+                 └── namespace: directory-io
+                 └── schema-name: records (equals filename without .mjs)
 
 Contains Primitive-IDs:
-  etherscan-io/tool/getAbi
-  etherscan-io/tool/getContractCreation
-  etherscan-io/resource/abiCache
+  directory-io/tool/getEntry
+  directory-io/tool/getEntryHistory
+  directory-io/resource/entryCache
 ```
 
 ### Naming Rules for schema-name
 
 - Kebab-case, only lowercase letters and hyphens
-- Thematic, not technical (e.g., `contracts`, `nft`, `defi` — not `schema1`, `tools-v2`)
-- For providers with multiple schemas: topic prefix optional (`moralis-nft`, `moralis-defi`)
+- Thematic, not technical (e.g., `records`, `events`, `reports` — not `schema1`, `tools-v2`)
+- For providers with multiple schemas: topic prefix optional (`registry-records`, `registry-events`)
 - Matches exactly the filename without `.mjs`
 
 ### Directory Mapping
 
 ```
-schemas/v4.1.0/providers/etherscan-io/contracts.mjs
+schemas/v4.1.0/providers/directory-io/records.mjs
                           └── namespace    └── schema-name.mjs
-→ Schema-File-ID: etherscan-io/contracts
+→ Schema-File-ID: directory-io/records
 ```
 
 The path segment labelled "namespace" above **MUST equal** `main.namespace` of every schema in the directory — it is a binding equality, not merely a label or a derivation. This is the folder↔namespace invariant `VAL019` (see [09-validation-rules](/specification/validation-rules/)). The grading-monitoring track and the namespace-resolution fallback below consume this invariant.
@@ -184,8 +172,8 @@ The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to 
 
 | External Spec-ID | Internal MCP Tool Name |
 |------------------|------------------------|
-| `etherscan-io/tool/getAbi` | `getAbi_etherscan-io` |
-| `moralis/tool/getTokenBalance` | `getTokenBalance_moralis` |
+| `directory-io/tool/getEntry` | `getEntry_directory-io` |
+| `registry/tool/getRecord` | `getRecord_registry` |
 
 **Mapping Rule:** `routeName_namespace` (underscore separator, namespace at end). Implemented in `#buildToolName()` in the CLI.
 
@@ -197,8 +185,8 @@ When the CLI aggregates several `schemaFolders[]` and two folders expose the sam
 
 | External Spec-ID | Internal MCP Tool Name |
 |------------------|------------------------|
-| `folder-a:coingecko/tool/simplePrice` | `simplePrice_coingecko` (uncontested source kept bare) |
-| `folder-b:coingecko/tool/simplePrice` | `simplePrice_coingecko_folder-b` (source appended to break the collision) |
+| `folder-a:weather/tool/getForecast` | `getForecast_weather` (uncontested source kept bare) |
+| `folder-b:weather/tool/getForecast` | `getForecast_weather_folder-b` (source appended to break the collision) |
 
 Without this propagation, two equally-named folders cannot both be served — the MCP layer aborts on the duplicate tool name (the `serve` dedup/rename/error path). The CLI applies a deterministic dedup-or-rename so the source disambiguation reaches all the way into the served tool name; a genuine duplicate that cannot be disambiguated is reported, never silently dropped.
 
@@ -206,9 +194,9 @@ Without this propagation, two equally-named folders cannot both be served — th
 
 ## No Short Form
 
-Short Form is not supported in FlowMCP v4. `flowmcp call getTokenBalance` (without namespace/type) is not allowed.
+Short Form is not supported in FlowMCP v4. `flowmcp call getRecord` (without namespace/type) is not allowed.
 
-**Reason:** Ambiguity and hidden data provenance. `moralis/tool/getTokenBalance` is explicit — the namespace immediately shows the data source. For LLMs especially, full Spec-IDs are semantically unambiguous.
+**Reason:** Ambiguity and hidden data provenance. `registry/tool/getRecord` is explicit — the namespace immediately shows the data source. For LLMs especially, full Spec-IDs are semantically unambiguous.
 
 All CLI commands use full Spec-IDs.
 
@@ -242,7 +230,7 @@ The diagram shows the resolution flow from receiving an ID string through parsin
 1. **Parse** — split the ID string on `/` to extract segments. Three segments required: namespace, type, name. Any other count: validation error ID001 (Short Form is not supported).
 2. **Find** — look up the namespace in the loaded catalog. The catalog is the aggregation of the per-folder registries from `schemaFolders[]`; each folder maps its namespaces to schema file locations. When more than one aggregated folder owns the namespace, a qualified reference (`<source>:<namespace>/...`, see [Source Coordinate](#source-coordinate)) selects the exact folder, while an unqualified reference resolves first-wins (first folder in `schemaFolders[]` order) plus a visible collision warning.
 3. **Match** — within the namespace, find the schema, tool, resource, or prompt with the matching name and type.
-4. **Return** — produce the resolved reference: file path to the schema file and the internal key path (e.g., `main.tools.simplePrice`).
+4. **Return** — produce the resolved reference: file path to the schema file and the internal key path (e.g., `main.tools.getForecast`).
 
 ---
 
@@ -252,10 +240,10 @@ The ID schema connects to the `{{type:name}}` placeholder syntax used in skill c
 
 | Placeholder | Interpretation |
 |-------------|---------------|
-| `{{tool:getContractAbi}}` | Tool reference — resolved to a tool in the same schema's `main.tools` |
-| `{{resource:verifiedContracts}}` | Resource reference — resolved to a resource in the same schema's `main.resources` |
+| `{{tool:getEntry}}` | Tool reference — resolved to a tool in the same schema's `main.tools` |
+| `{{resource:verifiedEntries}}` | Resource reference — resolved to a resource in the same schema's `main.resources` |
 | `{{skill:quick-summary}}` | Skill reference — resolved to a skill registered in the current scope (`selection.skills`, `agent.skills`, or the active namespace's `providers/{ns}/skills/`). `main.skills` is forbidden in v4.0.0. |
-| `{{input:address}}` | Input parameter — value provided by the user at runtime |
+| `{{input:recordId}}` | Input parameter — value provided by the user at runtime |
 
 ### Resolution in Skills
 
@@ -291,8 +279,8 @@ When the CLI aggregates several `schemaFolders[]`, two folders may expose the sa
 ```
 
 ```
-folder-a:coingecko/tool/simplePrice
-folder-b:coingecko/tool/simplePrice
+folder-a:weather/tool/getForecast
+folder-b:weather/tool/getForecast
 ```
 
 - `<source>` identifies the originating `schemaFolder` (the source key the CLI assigns to that folder).
@@ -304,9 +292,9 @@ folder-b:coingecko/tool/simplePrice
 
 | Source | Namespace Derivation | Example |
 |--------|---------------------|---------|
-| API Provider | Domain-derived name | `coingecko`, `etherscan`, `defilama` |
-| Agent | Agent name | `crypto-research`, `defi-monitor` |
-| Shared resources | Reserved `shared` | `shared/list/evmChains` |
+| API Provider | Domain-derived name | `weather`, `directory`, `catalog` |
+| Agent | Agent name | `data-research`, `status-monitor` |
+| Shared resources | Reserved `shared` | `shared/list/regionCodes` |
 
 ### Provider Namespaces
 
@@ -318,10 +306,10 @@ Providers use their domain-derived name as the namespace. The derivation follows
 - Remove `www.` prefix if present
 
 ```
-api.coingecko.com   → coingecko
-etherscan.io        → etherscan
-defillama.com       → defilama
-pro-api.coinmarketcap.com → coinmarketcap
+api.weather.com     → weather
+directory.io        → directory
+catalog.com         → catalog
+pro-api.marketplace.com → marketplace
 ```
 
 ### Agent Namespaces
@@ -329,8 +317,8 @@ pro-api.coinmarketcap.com → coinmarketcap
 Agents use their agent name as the namespace. Agent namespaces follow the same pattern constraints as provider namespaces (`^[a-z][a-z0-9-]*$`).
 
 ```
-crypto-research     ← agent that performs token research
-defi-monitor        ← agent that monitors DeFi protocols
+data-research       ← agent that performs record research
+status-monitor      ← agent that monitors service status
 ```
 
 ### Reserved Namespaces
@@ -357,23 +345,23 @@ The `shared` namespace is reserved by the FlowMCP specification. Schema authors 
 ### Validation Output Examples
 
 ```
-flowmcp schema-check --id "coingecko/tool/simplePrice"
+flowmcp schema-check --id "weather/tool/getForecast"
 
   0 errors, 0 warnings
   ID is valid
 ```
 
 ```
-flowmcp schema-check --id "COINGECKO/tool/simplePrice"
+flowmcp schema-check --id "WEATHER/tool/getForecast"
 
-  ID002 error   Namespace "COINGECKO" must match ^[a-z][a-z0-9-]*$
+  ID002 error   Namespace "WEATHER" must match ^[a-z][a-z0-9-]*$
 
   1 error, 0 warnings
   ID is invalid
 ```
 
 ```
-flowmcp schema-check --id "simplePrice"
+flowmcp schema-check --id "getForecast"
 
   ID001 error   ID MUST contain at least one "/" separator
 
@@ -388,42 +376,42 @@ flowmcp schema-check --id "simplePrice"
 ### Tool Reference
 
 ```
-coingecko/tool/simplePrice
+weather/tool/getForecast
 ```
 
-- **Namespace**: `coingecko` — the CoinGecko provider
+- **Namespace**: `weather` — the weather provider
 - **Type**: `tool` — an MCP tool (API endpoint)
-- **Name**: `simplePrice` — the specific tool name (camelCase)
+- **Name**: `getForecast` — the specific tool name (camelCase)
 
 ### Resource Reference
 
 ```
-coingecko/resource/supported-coins
+weather/resource/supported-cities
 ```
 
-- **Namespace**: `coingecko` — the CoinGecko provider
+- **Namespace**: `weather` — the weather provider
 - **Type**: `resource` — an MCP resource (SQLite data)
-- **Name**: `supported-coins` — the specific resource
+- **Name**: `supported-cities` — the specific resource
 
 ### Prompt Reference
 
 ```
-crypto-research/prompt/token-deep-dive
+data-research/prompt/record-deep-dive
 ```
 
-- **Namespace**: `crypto-research` — an agent namespace
+- **Namespace**: `data-research` — an agent namespace
 - **Type**: `prompt` — an MCP prompt (skill)
-- **Name**: `token-deep-dive` — the specific prompt (kebab-case)
+- **Name**: `record-deep-dive` — the specific prompt (kebab-case)
 
 ### Shared List Reference
 
 ```
-shared/list/evmChains
+shared/list/regionCodes
 ```
 
 - **Namespace**: `shared` — reserved namespace
 - **Type**: `list` — a shared list
-- **Name**: `evmChains` — the specific list (camelCase)
+- **Name**: `regionCodes` — the specific list (camelCase)
 
 ---
 
@@ -442,6 +430,11 @@ The ID schema provides a single, consistent format that replaces these context-s
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [18-prefill.md](/specification/prefill/), [12-prompt-architecture.md](/specification/prompt-architecture/), [14-skills.md](/specification/skills/), [17-selections.md](/specification/selections/), [15-catalog.md](/specification/catalog/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [18-prefill.md](/specification/prefill/)
+- [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [14-skills.md](/specification/skills/)
+- [17-selections.md](/specification/selections/)
+- [15-catalog.md](/specification/catalog/)
 

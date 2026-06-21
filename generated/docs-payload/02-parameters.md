@@ -1,22 +1,20 @@
 ---
 title: "Parameters"
-description: "This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is..."
+description: "A parameter declares where a value is placed in the outgoing API request and how it is validated before the call is made. Each tool parameter pairs a `position` block (placement) with a `z` block..."
 spec_version: "4.3.0"
 spec_file: "02-parameters.md"
 order: 2
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/02-parameters.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/02-parameters.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/02-parameters.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/02-parameters.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is validated (`z`). Resource parameters use the same `position` + `z` system but without a `location` field. Skill input uses a simpler format.
+A parameter declares where a value is placed in the outgoing API request and how it is validated before the call is made. Each tool parameter pairs a `position` block (placement) with a `z` block (validation); resource parameters reuse the same pairing without a `location` field, and skill input uses a simpler shape.
 
 ---
 
@@ -642,6 +640,9 @@ See `14-skills.md` for the complete skill specification.
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [03-shared-lists.md](/specification/shared-lists/), [04-output-schema.md](/specification/output-schema/), [18-prefill.md](/specification/prefill/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [03-shared-lists.md](/specification/shared-lists/)
+- [04-output-schema.md](/specification/output-schema/)
+- [18-prefill.md](/specification/prefill/)
 

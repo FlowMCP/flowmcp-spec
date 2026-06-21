@@ -1,14 +1,14 @@
 ---
 title: "Universal Pre-Condition Obligation"
-description: "This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks..."
+description: "An aggregate grade is only trustworthy if its members are themselves settled. This chapter states the one rule that guarantees that: any check spanning multiple schemas — a Selection-Grading or an..."
 grading_version: "3.0.0"
 spec_file: "21-pre-conditions.md"
 order: 21
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/21-pre-conditions.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/21-pre-conditions.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/21-pre-conditions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/21-pre-conditions.md."
@@ -16,11 +16,13 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/21-pre-conditi
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+An aggregate grade is only trustworthy if its members are themselves settled. This chapter states the one rule that guarantees that: any check spanning multiple schemas — a Selection-Grading or an About verification — is blocked until every member schema reads `gradingStatus: stable` in the frozen `lockSnapshot`. It is the single place where that universal pre-condition is defined; the Selection and About chapters point back here rather than restating it, and the chapter also pins the readiness ladder and per-Area dependency gates that decide when each Area becomes eligible to run.
+
 ---
 
 ## Pre-Conditions
 
-This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`.
+The pre-condition obligation was generalised from the original Selection-only rule to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`. This is its central anchoring point.
 
 ### Universal Rule
 
@@ -143,17 +145,16 @@ emitted in a **follow-up** skill once the Provider-Namespace-Gate opens. The
 transport envelope is owned by [`spec/v4.3.0/22-scoring-protocol.md`]; this section
 owns the Area composition + bundling rules.
 
-### Cross-Refs
-
-- Tier trim — full vs. partial → [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- Selection workflow step 0 → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- About verification step 0 → [`11-about-convention.md`](/grading/about-convention/)
-- Version bump invalidates `stable` → [`15-versioning-axes.md`](/grading/versioning-axes/)
-- Flywheel loop (pre-condition as a gate) → [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- Pre-condition validator implementation (shared between the About and Selection paths) — a later-stage concern
+The pre-condition validator itself is shared between the About and Selection paths;
+its concrete implementation is a later-stage concern and is not pinned by this spec.
 
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`08-grading-model.md`](/grading/grading-model/), [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- **Related:** [`11-about-convention.md`](/grading/about-convention/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+- [`00-overview.md`](/grading/overview/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`15-versioning-axes.md`](/grading/versioning-axes/)
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
 

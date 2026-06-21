@@ -6,15 +6,13 @@ spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/22-scoring-protocol.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/22-scoring-protocol.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/22-scoring-protocol.md."
 ---
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
 
@@ -229,6 +227,10 @@ A Grader MUST NOT:
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [20-validation-strategy.md](/specification/validation-strategy/)
-- **Related:** [21-schema-lifecycle.md](/specification/schema-lifecycle/), [10-tests.md](/specification/tests/), [04-output-schema.md](/specification/output-schema/), [09-validation-rules.md](/specification/validation-rules/)
+- [00-overview.md](/specification/overview/)
+- [20-validation-strategy.md](/specification/validation-strategy/)
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [10-tests.md](/specification/tests/)
+- [04-output-schema.md](/specification/output-schema/)
+- [09-validation-rules.md](/specification/validation-rules/)
 

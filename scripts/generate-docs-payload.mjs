@@ -200,6 +200,20 @@ const gradingLinkRewrite = ( { content } ) => {
 // now carry a Depends-on/Related table after the H1).
 const FOOTER_LABELS = new Set( [ 'depends on', 'related', 'annex', 'replaced by' ] )
 
+
+// Memo 142 (NORMATIVE): the "> Normative language (MUST/SHOULD/MAY) ..." conformance
+// blockquote is hand-written in every chapter source. The conformance interpretation
+// is defined ONCE in the overview (the anchor); every other chapter merely repeats the
+// pointer as boilerplate. Strip it from all non-overview pages during generation — a
+// single lever instead of editing every source file, and regression-proof for any new
+// chapter added later. The overview keeps the note (it IS the anchor).
+const NORMATIVE_NOTE_RE = /^>\s*Normative language \(MUST\/SHOULD\/MAY\)[^\n]*\n/gm
+
+const stripNormativeNote = ( { content, filename, overviewFile } ) => {
+    if( filename === overviewFile ) return content
+    return content.replace( NORMATIVE_NOTE_RE, '' )
+}
+
 const gradingMetadataFooter = ( { content } ) => {
     const tableMatch = content.match( /(^#\s+.+\n\n)((?:\|.*\n)+)/m )
     if( !tableMatch ) return content
@@ -213,9 +227,22 @@ const gradingMetadataFooter = ( { content } ) => {
         .map( ( cells ) => ( { label: cells[ 1 ], value: cells[ 2 ] } ) )
         .filter( ( row ) => row.label !== '' && !/^-+$/.test( row.label ) && row.label.toLowerCase() !== 'field' )
 
+    // Memo 142 (RELATED): merge Depends-on / Related / Annex / Replaced-by into ONE
+    // flat "## Related" bullet list (memo-init style) — one bullet per link, deduped
+    // by href, no "**Depends on:** / **Related:**" label split. Plain-text cells
+    // without links contribute nothing (e.g. an em-dash placeholder).
     const footerRows = rows.filter( ( row ) => FOOTER_LABELS.has( row.label.toLowerCase() ) )
-    const footer = footerRows.length > 0
-        ? '\n\n## Related\n\n' + footerRows.map( ( row ) => `- **${ row.label }:** ${ row.value }` ).join( '\n' ) + '\n'
+    const seenHrefs = new Set()
+    const footerLinks = footerRows
+        .flatMap( ( row ) => row.value.match( /\[[^\]]+\]\([^)]+\)/g ) ?? [] )
+        .filter( ( link ) => {
+            const href = link.slice( link.indexOf( '(' ) )
+            if( seenHrefs.has( href ) ) return false
+            seenHrefs.add( href )
+            return true
+        } )
+    const footer = footerLinks.length > 0
+        ? '\n\n## Related\n\n' + footerLinks.map( ( link ) => `- ${ link }` ).join( '\n' ) + '\n'
         : ''
 
     // Drop the metadata table, keeping the H1 + blank line.
@@ -230,7 +257,7 @@ const gradingMetadataFooter = ( { content } ) => {
 }
 
 
-const gradingBodyTransform = ( { content } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+const gradingBodyTransform = ( { content, filename } ) => gradingLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ) } ) } )
 
 
 // Memo 108: best-practice link rewrite. The BP source uses relative sibling and
@@ -247,7 +274,7 @@ const bestPracticeLinkRewrite = ( { content } ) => {
     )
 }
 
-const bestPracticeBodyTransform = ( { content } ) => bestPracticeLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+const bestPracticeBodyTransform = ( { content, filename } ) => bestPracticeLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '01-overview.md' } ) } ) } )
 
 
 // Memo 088 PRD-SpecLinks: spec link rewrite. The spec source uses relative
@@ -270,7 +297,7 @@ const specLinkRewrite = ( { content } ) => {
 // specLinkRewrite rewrites the relative ./NN-name.md links — including those in
 // the new footer — to /specification/<slug>/ routes. Order matters: footer first
 // so its links are caught by the rewrite (mirrors gradingBodyTransform).
-const specBodyTransform = ( { content } ) => specLinkRewrite( { content: gradingMetadataFooter( { content } ) } )
+const specBodyTransform = ( { content, filename } ) => specLinkRewrite( { content: gradingMetadataFooter( { content: stripNormativeNote( { content, filename, overviewFile: '00-overview.md' } ) } ) } )
 
 
 const identityBodyTransform = ( { content } ) => content

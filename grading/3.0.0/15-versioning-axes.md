@@ -5,7 +5,7 @@
 | Status | Normative — restructured in 2.0.0 |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`19-folder-layout.md`](./19-folder-layout.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
+| Related | [`08-grading-model.md`](./08-grading-model.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`19-folder-layout.md`](./19-folder-layout.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
 
 > **Spec:** `gradingSpec/3.0.0`
 > **Status:** stable (structural break vs. 1.1.0)
@@ -13,11 +13,11 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+Every gradable primitive is versioned by a timestamp carried in its filename rather than by an in-source version key, so the newest revision is found by a naive sort and historical revisions stay referenceable. The same files are kept neutral: they carry only logical names, while the canonical sha256-8 hash that binds a grading to an exact content snapshot lives in the filename and the derived `index.json` — never inside the source. This chapter defines the timestamp naming axis, the out-of-source hash placement, and the canonical representation used to compute the hash.
+
 ---
 
-## Versioning + Canonical Hash
-
-### Timestamp Versioning
+## Timestamp Versioning
 
 Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in [`19-folder-layout.md`](./19-folder-layout.md):
 
@@ -35,7 +35,7 @@ The only version key that stays inside the source is `version` (FlowMCP spec for
 | `schemaVersion` | REMOVED from source | filename timestamp + `index.json` | snapshot identity of a schema |
 | `selectionVersion` | REMOVED from source | filename timestamp + `index.json.lockSnapshot` | snapshot identity of a selection |
 
-### Hash Out of Source (Neutrality)
+## Hash Out of Source (Neutrality)
 
 The schema `.mjs` and the `selection.json` are **neutral**: they carry only logical names. The in-source keys `schemaHash`, `selectionHash`, and `aboutHash` are **removed** — they drifted on every edit, so the recorded value no longer matched the actual content.
 
@@ -49,7 +49,7 @@ Reference resolution by logical name (examples):
 
 There is no flat `defillama-about.md` — only the versioned file. `resolveLatest` knows which one is newest.
 
-### Canonical Representation for the Hash
+## Canonical Representation for the Hash
 
 The hash is computed by JSON stable-stringify (sorted keys, deterministic whitespace handling) over the object and hashed with sha256 (8 hex chars). The same procedure applies to `schemaHash` (schema object), `selectionHash` (selection object), `aboutHash` (About file bytes), and `namespaceHash` (namespace rollup payload). These values are recorded in the grading entry (see [`08-grading-model.md`](./08-grading-model.md)) and in `index.json` — not in the source.
 
@@ -64,11 +64,4 @@ function computeSchemaHash( { schema } ) {
 }
 ```
 
-Reference implementation: [`src/HashGenerator.mjs`](../../src/HashGenerator.mjs) (`computeSchemaHash` / `computeSelectionHash` / `computeNamespaceHash`). The algorithm is unchanged from 1.1.0; only the placement of the result changed (filename + `index.json`, never source).
-
-### Cross-Refs
-
-- Hashes in the grading entry → [`08-grading-model.md`](./08-grading-model.md)
-- Per-member hash binding (frozen) → [`16-selection-lockfile.md`](./16-selection-lockfile.md) (`index.json.lockSnapshot`)
-- Filename naming grammar → [`19-folder-layout.md`](./19-folder-layout.md)
-- Flywheel — new file in the iteration loop → [`18-flywheel-loop.md`](./18-flywheel-loop.md)
+Reference implementation: [`src/HashGenerator.mjs`](../../src/HashGenerator.mjs) (`computeSchemaHash` / `computeSelectionHash` / `computeNamespaceHash`). The hash result is placed in the filename and `index.json`, never in the source.

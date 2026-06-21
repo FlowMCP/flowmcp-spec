@@ -1,14 +1,14 @@
 ---
 title: "Grading Model"
-description: "A grading is an **array of evaluations** that carries **veto power**, a **tier trim** (autonomous max `B` / group max `A`), and can be **re-triggered by the user**. It is described as **one data..."
+description: "This page defines the **grading entry** — the single durable artefact a grader emits and the one data model that both skill families (Single-Schema-Validator and Selection-Validator) write into. A..."
 grading_version: "3.0.0"
 spec_file: "08-grading-model.md"
 order: 8
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/08-grading-model.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/08-grading-model.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/08-grading-model.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/08-grading-model.md."
@@ -18,11 +18,7 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/08-grading-mod
 
 ---
 
-## Core Statement
-
-A grading is an **array of evaluations** that carries **veto power**, a **tier trim** (autonomous max `B` / group max `A`), and can be **re-triggered by the user**. It is described as **one data model** with **two skill families** writing into it. The Categorical Veto, when present, overrides every aggregation logic and yields `aggregateGrade = REJECTED`.
-
-The grading entry is the **only** durable artefact emitted by a grader; it MUST be valid against [`08-grading-model.schema.json`](./08-grading-model.schema.json).
+This page defines the **grading entry** — the single durable artefact a grader emits and the one data model that both skill families (Single-Schema-Validator and Selection-Validator) write into. A grading is an array of per-question evaluations that carries veto power, a tier trim (autonomous max `B` / group max `A`), and can be re-triggered by the user; a present Categorical Veto overrides all aggregation and yields `aggregateGrade = REJECTED`. Every grading entry MUST validate against the JSON-Schema annex [`08-grading-model.schema.json`](./08-grading-model.schema.json).
 
 ---
 
@@ -187,7 +183,7 @@ A grading entry that uses an `area` value not listed here is INVALID. Adding a n
 
 Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `providers/<ns>/index.json`). Areas 7–11 are **selection** areas (tier `group-bound`, Grade A attainable, rollup in `selections/<sel>/index.json`). The two blocks are disjoint — a provider schema is not evaluated over the selection areas, and a selection is not evaluated over the provider areas. See [`19-folder-layout.md`](/grading/folder-layout/) for the `_gradings/` location per Area.
 
-#### `selection-aggregate` (Area 11)
+#### The selection-aggregate Area (Area 11)
 
 `selection-aggregate` carries the selection-wide checks: thresholds (soft ≥ 5 / hard ≥ 7 members), topic coherence, `domainConformance` (members checked against the About / domain knowledge), `personaUseCaseFit`, the group-bound tier path to Grade A, and the cascade stop. Per-skill areas (8/9/10) grade one skill at a time and carry `skillId` in the envelope; there is no level-cohort grade.
 
@@ -195,7 +191,7 @@ Areas 1–6 are **provider** areas (tier `autonomous`, max Grade B, rollup in `p
 
 Each Area defines how many answers its grading entry must carry, split into a deterministic block (computed by code) and a non-deterministic block (produced by the harness sub-agent). A deterministic block alone is not a valid Area grading — the two blocks are merged into one entry. The per-Area answer counts and question sets are normative in the Area output schemas.
 
-#### `single-test` deterministic gate — `testDepth` (Test-Leiter)
+#### The single-test deterministic gate — testDepth (Test-Leiter)
 
 The `single-test` Area (Area 1) opens with a **deterministic gate**: the data-pretest counts the working tests per tool and assigns the Test-Leiter rung (see [`06-determinism-and-tier.md` — Deterministic Pretest](/grading/determinism-and-tier/#deterministic-pretest--test-leiter-working-test-bar)). The gate's pass bar is **2 working tests per tool**; a schema is `deterministic-green` only when every downloadable tool clears it.
 
@@ -515,20 +511,19 @@ if( !okRejected ) { throw new Error( 'rejected example invalid: ' + JSON.stringi
 if( rejected.aggregateGrade !== 'REJECTED' ) { throw new Error( 'rejected example must aggregate to REJECTED' ) }
 ```
 
----
-
-## Cross-References
-
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — separation of the two systems and their version namespaces.
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — the two axes that underlie the `determinism` and `gradingTier` fields.
-- [`09-security-and-development.md`](/grading/security-and-development/) — the Categorical-Veto trigger definitions and the API-key-hygiene rules.
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the source of `selectionContext.domainDocId`.
-- [`12-personas-contract.md`](/grading/personas-contract/) — the source of `selectionContext.personaIds[]`.
-- [`13-skills.md`](/grading/skills/) — the source of the skill Areas `namespace-skills`, `selection-skills-L1`, `selection-skills-L2`, `selection-skills-L3` (per skill, with `skillId` in the envelope).
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
-- **Related:** [`09-security-and-development.md`](/grading/security-and-development/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`19-folder-layout.md`](/grading/folder-layout/), [`22-workbench-island.md`](/grading/workbench-island/), [`23-index-json.md`](/grading/index-json/)
-- **Annex:** [`08-grading-model.schema.json`](./08-grading-model.schema.json) — JSON-Schema 2020-12 of the grading entry
+- [`00-overview.md`](/grading/overview/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
+- [`09-security-and-development.md`](/grading/security-and-development/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`13-skills.md`](/grading/skills/)
+- [`15-versioning-axes.md`](/grading/versioning-axes/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`22-workbench-island.md`](/grading/workbench-island/)
+- [`23-index-json.md`](/grading/index-json/)
+- [`08-grading-model.schema.json`](./08-grading-model.schema.json)
 

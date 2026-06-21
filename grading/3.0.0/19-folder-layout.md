@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Normative — restructured in 2.0.0 |
+| Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md) |
-| Related | [`11-about-convention.md`](./11-about-convention.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md) |
+| Related | [`11-about-convention.md`](./11-about-convention.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md), [`08-grading-model.md`](./08-grading-model.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`22-workbench-island.md`](./22-workbench-island.md), [`23-index-json.md`](./23-index-json.md), [`26-monitoring-track.md`](./26-monitoring-track.md) |
 
 > **Spec:** `gradingSpec/3.0.0`
 > **Status:** stable (structural break vs. 1.1.0)
@@ -13,13 +13,15 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+The grading data set is a workbench island organised under three top-level folders — `providers/`, `selections/`, and `shared-lists/` — with one folder per primitive and a timestamp-first naming grammar that makes the newest revision resolvable by a naive sort. Source files stay neutral (no in-source hashes), every hash binding and rollup lives in the derived, overwritable `index.json`, and content is never edited in place or deleted: a change writes a new file next to the old one. This chapter is the single source of truth for those paths; the addressing grammar, the folder↔namespace invariant, the universal `_gradings/` placement rule, and the per-schema lifecycle all build on it.
+
 ---
 
 ## Folder Layout
 
-The binding folder layout for grading data is the single source of truth for all other spec sections. The paths in `08-grading-model.md` (grading-entry files), `11-about-convention.md` (About-Pages), and `16-selection-lockfile.md` (selection files + `index.json.lockSnapshot`) all refer to this layout.
+The binding folder layout is the single source of truth for all other spec sections: the paths in [`08-grading-model.md`](./08-grading-model.md) (grading-entry files), [`11-about-convention.md`](./11-about-convention.md) (About-Pages), and [`16-selection-lockfile.md`](./16-selection-lockfile.md) (selection files + `index.json.lockSnapshot`) all refer to it.
 
-The grading data set is a **workbench island**: an internal working area on which schemas and selections are iterated daily. Internally the naming is deliberately verbose (timestamp plus hash in the filename, one folder per primitive) because that is exactly what guarantees predictability, linkability, and version tracking. When the data is mirrored out to the real repositories, names are stripped down to clean spec names.
+The island is an internal working area on which schemas and selections are iterated daily. Internally the naming is deliberately verbose (timestamp plus hash in the filename, one folder per primitive) because that is exactly what guarantees predictability, linkability, and version tracking. When the data is mirrored out to the real repositories, names are stripped down to clean spec names.
 
 ### Binding Layout
 
@@ -50,7 +52,7 @@ grading-data/
 
 Three top-level folders: `providers/`, `selections/`, `shared-lists/`.
 
-### Source-of-Truth Rule (inverted in 2.0.0)
+### Source-of-Truth Rule
 
 The two important source files — the schema `.mjs` and the `selection.json` — are **neutral**: they carry only logical names and no in-source hashes or snapshot version keys. Versioning lives in the filename; **the hash bindings live in the derived `index.json`** (see [`16-selection-lockfile.md`](./16-selection-lockfile.md)).
 
@@ -60,9 +62,9 @@ Rationale: an in-source hash drifts the moment the file is edited, so the record
 
 `index.json` is the **only overwritable file** — it is fully derived and 100% reproducible from the source files and grading artefacts. Source schemas, selection definitions, and grading snapshots are **never** overwritten.
 
-### Folder ↔ Namespace Invariant (NEW in 3.0.0)
+### Folder ↔ Namespace Invariant
 
-The `providers/<dir>/` directory name MUST equal `main.namespace` of **every** schema it contains. This is the binding folder↔namespace invariant — previously only described loosely as "one namespace, several schemas". It is the same invariant the Schemas-Spec writes as a tested validation rule (`VAL012`, see [Schemas-Spec v4.3.0 §09](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/09-validation-rules.md) and §16 Namespace Resolution); the grading import asserts it on the island side and the grading track consumes it. The grading module enforces it as `IMP-007` (folder↔namespace invariant violation).
+The `providers/<dir>/` directory name MUST equal `main.namespace` of **every** schema it contains. This is the binding folder↔namespace invariant — previously only described loosely as "one namespace, several schemas". It is the same invariant the Schemas-Spec writes as a tested validation rule (`VAL012`, see the Schemas-Spec validation rules and Namespace Resolution sections); the grading import asserts it on the island side and the grading track consumes it. The grading module enforces it as `IMP-007` (folder↔namespace invariant violation).
 
 #### Unparseable-folder case (fallback key)
 
@@ -72,7 +74,7 @@ A `providers/<folder>/` with **0 valid schemas** still produces an `index.json` 
 
 Once **≥1** schema in the folder parses and exposes `main.namespace`, that field is **authoritative** and the folder is renamed to match it. A rename is an **identity transition**, not a delete: the never-delete / never-overwrite framing of this chapter is extended to cover folder-identity transitions. The rename runs **exactly once** and never clobbers a differing existing target (the grading module reports `IMP-008` instead of overwriting). This is the IN-side reconciliation of a folder that was first imported under a foldername-fallback placeholder and later acquired a real declared namespace.
 
-#### Provider-proof location (NEW in 3.0.0)
+#### Provider-proof location
 
 The committed, CI-visible per-namespace grade/status rollup — the **provider-proof** `providers/<ns>/grade.json` — lives **inside the provider folder** in `flowmcp-schemas-private` (Memo 093 Kap. 4, F10). It is distinct from the island-local `index.json`:
 
@@ -96,7 +98,7 @@ The full data flow (where each is born, where it is committed, what the board sy
 
 `resolveLatest(dir, logicalName)` is the single resolver for both primitives and gradings: it filters on the prefix, sorts, and takes the last entry as the newest version. Date-before-hash is what makes this naive sort correct — with `<name>--<hash>--<ts>` the random hash would dominate the sort and an older file could be picked as the "newest".
 
-### Addressing Grammar (NEW in 3.0.0)
+### Addressing Grammar
 
 A grading target is addressed by a slash-delimited **id grammar** that maps one-to-one onto the folder layout above. Tooling (the CLI grading commands) parses these ids; the grammar is normative so that addressing is portable across implementations.
 
@@ -109,7 +111,7 @@ A grading target is addressed by a slash-delimited **id grammar** that maps one-
 
 `<N>` is the test index matching the `test-<N>.json` filename. An id MUST resolve to exactly one layout node; an unresolvable id is a hard error (never silently widened to a parent node). The per-test form `<ns>/tool/<name>/tests/<N>` is the finest addressing granularity and exists so that a single recorded test can be re-graded in isolation without touching its siblings, the schema, or the namespace rollup.
 
-### Conformance: sweep-only is non-conformant (NEW in 3.0.0)
+### Conformance: sweep-only is non-conformant
 
 A schema folder that carries a `summary.json` (pretest data) but **no** `_gradings/` for its graded primitives is **non-conformant** — it has been *swept* (the data-pretest ran) but not *graded* (no deterministic Area entry was written). The universal `_gradings/` rule below is therefore machine-falsifiable: a conformance check MUST flag a `providers/<ns>/<schema>/` that has `summary.json` and `tools/<tool>/tests/` but lacks the corresponding `tools/<tool>/_gradings/` and `<schema>/_gradings/`. A conforming deterministic grading produces the full structure (`_gradings/` + the namespace `index.json` + the exported `grade.json`), never summary-only. The enforcing gate is specified on the consumer side (the grading `doctor` / layout conformance check).
 
@@ -158,26 +160,3 @@ A resource is **never** placed at the namespace level technically — there is n
 ```
 
 Old source files remain referenceable for historical gradings — they are not deleted (legacy files are never deleted). The newest file is always the current one (`resolveLatest`).
-
-### Removed in 2.0.0
-
-The following v1 folders and files are **removed** and folded into `index.json`:
-
-| Removed | Replacement |
-|---------|-------------|
-| `schemas/` (root) | `providers/` (plural, with per-schema sub-folders) |
-| `single/` | per-tool `_gradings/` under `providers/<ns>/<schema>/tools/<tool>/` |
-| `phase-status/` | `index.json` (5-status rollup per namespace/selection) |
-| `projects/` | `providers/<ns>/` + `selections/<sel>/` |
-| authored `namespace.json` | folded into `index.json` (see [`16-selection-lockfile.md`](./16-selection-lockfile.md)) |
-| `selection.lock.json` | folded into `index.json.lockSnapshot` (see [`16-selection-lockfile.md`](./16-selection-lockfile.md)) |
-
-### Cross-Refs
-
-- Grading-entry top-level fields → [`08-grading-model.md`](./08-grading-model.md) (hashes live in the grading entry and `index.json`, not in the source schema)
-- Version axes + canonical hash → [`15-versioning-axes.md`](./15-versioning-axes.md)
-- `index.json.lockSnapshot` + selection definition → [`16-selection-lockfile.md`](./16-selection-lockfile.md)
-- About-Pages (schema-level resource) → [`11-about-convention.md`](./11-about-convention.md)
-- Pre-conditions (`index.json.lockSnapshot` lookup) → [`21-pre-conditions.md`](./21-pre-conditions.md)
-- Emit-on-failure import gate (folder↔namespace fallback) → [`22-workbench-island.md`](./22-workbench-island.md)
-- Pinned `blocked` reason set + provider-proof data flow → [`23-index-json.md`](./23-index-json.md), [`26-monitoring-track.md`](./26-monitoring-track.md)

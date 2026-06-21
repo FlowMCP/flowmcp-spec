@@ -1,14 +1,14 @@
 ---
 title: "Scoring System vs. Grading System"
-description: "The terms **\"Scoring\"** and **\"Grading\"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update..."
+description: "\"Scoring\" and \"Grading\" name two distinct sub-systems that this spec keeps strictly apart: the Scoring System evidences how a single test or dimension performs, while the Grading System derives a..."
 grading_version: "3.0.0"
 spec_file: "07-scoring-vs-grading.md"
 order: 7
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/07-scoring-vs-grading.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/07-scoring-vs-grading.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/07-scoring-vs-grading.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/07-scoring-vs-grading.md."
@@ -18,11 +18,7 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/07-scoring-vs-
 
 ---
 
-## Core Statement
-
-The terms **"Scoring"** and **"Grading"** are used **strictly separately** throughout this specification. They name two different sub-systems with two independent version namespaces. A scoring update does **not** automatically imply a grading update — and vice versa.
-
-A grader, scorer, or aggregator that conforms to `gradingSpec/3.0.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
+"Scoring" and "Grading" name two distinct sub-systems that this spec keeps strictly apart: the Scoring System evidences how a single test or dimension performs, while the Grading System derives a letter mark from a collection of those scores. Each carries its own independent version namespace, so a scoring update does not automatically imply a grading update — and vice versa. A grader, scorer, or aggregator that conforms to `gradingSpec/3.0.0` MUST keep both names — and both version strings — apart in every emitted artefact (grading entries, logs, error codes).
 
 ---
 
@@ -89,17 +85,12 @@ The Schemas-Spec v4.3.0 provides the **upstream contract** for scoring: the `pro
 
 This Grading-Spec does NOT re-define the `prompts.json` / `scores.json` contract. Implementers MUST treat the Schemas-Spec v4.3.0 `22-scoring-protocol.md` as the **highest instance** for the artefact pair; conflicting prose in this spec is to be read as a refinement, not as a replacement.
 
----
-
-## Cross-References
-
-- [`08-grading-model.md`](/grading/grading-model/) — how scores become a grade (the data model and the JSON-Schema annex).
-- [`04-phases-single.md`](/grading/phases-single/) / [`05-phases-selection.md`](/grading/phases-selection/) — where scores are produced.
-- Schemas-Spec v4.3.0 [`22-scoring-protocol.md`](/specification/scoring-protocol/) — sub-consumed scoring artefact contract (external).
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — interaction of version bumps with reproducibility.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- **Related:** [`08-grading-model.md`](/grading/grading-model/), [`04-phases-single.md`](/grading/phases-single/), [`05-phases-selection.md`](/grading/phases-selection/), Schemas-Spec v4.3.0 [`22-scoring-protocol.md`](/specification/scoring-protocol/)
+- [`00-overview.md`](/grading/overview/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`04-phases-single.md`](/grading/phases-single/)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`22-scoring-protocol.md`](/specification/scoring-protocol/)
 

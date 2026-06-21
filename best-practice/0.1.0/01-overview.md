@@ -6,17 +6,19 @@
 | Version | `bestPracticeSpec/0.1.0` |
 | Related | [`schema-creation/10-readable-interface.md`](./schema-creation/10-readable-interface.md) |
 
-> Conformance language is intentionally absent here. Unlike the Schemas Specification and the Grading-Spec, the Best-Practice track is **advisory**: it collects recommendations and learnings. It uses "should", not "MUST".
+The Best-Practice track is the third FlowMCP spec track, sitting alongside the normative **Specification** and the **Grading** spec. Where those two define what a schema *is* and how it is *evaluated*, this track is **advisory and non-normative**: it gathers the recommendations and hard-won learnings for writing good schemas, not compliance rules. Nothing on these pages can disqualify a schema — they raise quality systematically, beyond the mere absence of errors.
+
+> This track is informative and advisory. It introduces no new normative keywords of its own and uses "should", never "MUST" — the normative-language conventions (MUST / SHOULD / MAY) are defined once in the [Specification overview](/specification/overview/) and are not redefined here.
 
 ---
 
 ## What this track is
 
-The Best-Practice track is the **third** FlowMCP spec track, alongside the **Specification** (`spec/v4.3.0/`) and **Grading** (`grading/3.0.0/`). Both of those are normative — they define what a schema *is* and how it is *evaluated*. This track is different in character:
+The character of the track in one line:
 
 > **You don't have to, but you should.**
 
-It holds **recommendations and learnings**, not validation rules. Nothing here disqualifies a schema. The normative rules stay in the Specification and the Grading-Spec; this track raises quality *systematically*, beyond mere absence of errors.
+It holds recommendations and learnings, not validation rules. The normative rules stay in the Specification and the Grading-Spec; this track is where quality grows *systematically*, beyond the mere absence of errors.
 
 ## The problem it solves — alignment
 

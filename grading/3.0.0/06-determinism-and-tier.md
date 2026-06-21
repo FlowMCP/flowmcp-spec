@@ -11,9 +11,7 @@
 
 ---
 
-## Introduction — Two Orthogonal Axes
-
-The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but autonomous. Both axes are carried independently in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](./08-grading-model.md)).
+The Grading-Spec rates every dimension along **two orthogonal axes**: *Determinism* (is the score reproducible?) and *Tier* (what is the highest grade it can reach?). Because the axes are independent, a dimension can be deterministic yet group-bound, or non-deterministic yet autonomous. Both values are carried separately in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](./08-grading-model.md)), and this page defines what each value means and how the two combine.
 
 | Axis | Values | Effect |
 |------|--------|--------|
@@ -160,7 +158,7 @@ A Veto is an outcome of its own; it does not reduce a numerical score, it replac
 
 ---
 
-## Interaction with Scoring- / Grading-System Version
+## Interaction with the Scoring- / Grading-System Version
 
 Determinism applies **at a fixed Scoring-System version**. A bump of the `scoringSystem/X.Y.Z` namespace can change how a deterministic test is scored — the test remains deterministic at the new version, but old scores cannot be compared one-to-one to new scores.
 
@@ -211,13 +209,3 @@ Cross-Refs:
 - Node status in the index rollup and the frozen member snapshot → see [`19-folder-layout.md`](./19-folder-layout.md).
 - Iteration pattern → see [`18-flywheel-loop.md`](./18-flywheel-loop.md).
 - Pre-condition effect (only `stable` members pass) → see [`21-pre-conditions.md`](./21-pre-conditions.md).
-
----
-
-## Cross-References
-
-- [`04-phases-single.md`](./04-phases-single.md) — provider-side Areas (the cascade-stop and HTTP-4xx rule live here as well).
-- [`05-phases-selection.md`](./05-phases-selection.md) — selection-side Areas (the `group-bound` contributions enter here).
-- [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — versioning contract for `scoringSystem` and `gradingSystem`.
-- [`08-grading-model.md`](./08-grading-model.md) — defines `determinism`, `gradingTier`, and `maxAttainableGrade` as grading-entry fields.
-- [`09-security-and-development.md`](./09-security-and-development.md) — security dimensions (external-module audit, API-key-domain match) listed in [Dimension–Area Matrix](#dimensionarea-matrix).

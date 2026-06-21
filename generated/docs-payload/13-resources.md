@@ -1,26 +1,24 @@
 ---
 title: "Resources"
-description: "Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This..."
+description: "Resources give a schema local, deterministic data access alongside its network tools. They map to the MCP `server.resource` primitive and live in `main.resources` next to `main.tools`. A resource is..."
 spec_version: "4.3.0"
 spec_file: "13-resources.md"
 order: 13
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/13-resources.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/13-resources.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/13-resources.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Resources provide local data access via SQLite databases and Markdown documents. They map to the MCP `server.resource` primitive and are defined in `main.resources` alongside `main.tools`. This document defines the resource format, two SQLite modes (in-memory and file-based), the origin-based storage system, Markdown resources, query definitions, parameter binding, handler integration, and validation rules.
+Resources give a schema local, deterministic data access alongside its network tools. They map to the MCP `server.resource` primitive and live in `main.resources` next to `main.tools`. A resource is backed by a SQLite database (read-only in-memory or writable file-based), a remote SQLite file fetched over HTTPS, or a Markdown document — and the runtime exposes each through a small set of typed queries, with the auto-injected `runSql` and `describeTables` rounding out the query surface. Where a tool reaches out to a third-party API, a resource serves data that should always be available: reference tables, lookups, agent-collected results, and inline documentation.
 
 ---
 
-## Purpose
+## Why Resources Exist
 
 Tools fetch data from external APIs over the network — they depend on third-party availability, rate limits, and response format stability. Some use cases require data that is **local, deterministic, and always available**: token metadata lookups, chain ID mappings, contract registries, country code tables. Other use cases require **persistent local storage** for agent-generated data: analysis results, collected metrics, scraping output.
 
@@ -1477,6 +1475,12 @@ The SQLite database `duneanalytics-templates.db` is not in the schema directory 
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
-- **Related:** [04-output-schema.md](/specification/output-schema/), [11-preload.md](/specification/preload/), [05-security.md](/specification/security/), [19-mcp-integration.md](/specification/mcp-integration/), [14-skills.md](/specification/skills/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [02-parameters.md](/specification/parameters/)
+- [04-output-schema.md](/specification/output-schema/)
+- [11-preload.md](/specification/preload/)
+- [05-security.md](/specification/security/)
+- [19-mcp-integration.md](/specification/mcp-integration/)
+- [14-skills.md](/specification/skills/)
 

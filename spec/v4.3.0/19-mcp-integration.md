@@ -7,17 +7,13 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
----
-
-## Overview
-
-When FlowMCP is used as an MCP Server, each Tool is registered with MCP-specific metadata. The `meta` block in every Tool definition provides this metadata.
+When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared once, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
 
 ---
 
 ## Meta Block (Required per Tool)
 
-Every Tool in v4.3.0 MUST have a `meta` block:
+Every Tool MUST have a `meta` block:
 
 ```javascript
 export const schema = {
@@ -52,33 +48,31 @@ export const schema = {
 
 ## MCP Translation
 
-When a Tool is registered with an MCP Server, `meta` fields are translated to MCP annotations:
+When a Tool is registered with an MCP Server, the loading- and search-related `meta` fields are translated to MCP annotations:
 
 | FlowMCP Field | MCP Annotation |
 |---------------|----------------|
 | `meta.alwaysLoad` | `_meta['anthropic/alwaysLoad']` |
 | `meta.searchHint` | `_meta['anthropic/searchHint']` |
 
-This translation happens at registration time in the FlowMCP CLI/Core.
+This translation happens at registration time in the FlowMCP CLI/Core. Schema authors set the FlowMCP-side fields; the annotation shape is produced by the registration step.
 
 ## alwaysLoad Policy
 
-`alwaysLoad: true` should be used sparingly. Guidelines:
+`alwaysLoad: true` should be used sparingly:
 
-- **true**: Tool is almost always needed in any session (e.g., a core utility tool)
-- **false** (default): Tool is loaded on demand via ToolSearch
+- **true**: Tool is almost always needed in any session (e.g., a core utility tool).
+- **false** (default): Tool is loaded on demand via ToolSearch.
 
-Excessive `alwaysLoad: true` pollutes the agent's active tool list and degrades performance.
+Excessive `alwaysLoad: true` pollutes the agent's active tool list and degrades performance, so the default of lazy loading is the right choice for most Tools.
 
 ## aliases Field
 
-`aliases` enables ToolSearch to find a Tool by alternative names:
-
-If an agent searches for `getAbi`, ToolSearch finds `getSmartContractAbi` because `getAbi` is in its `aliases` array.
-
-Empty array `[]` is valid — means no aliases.
+`aliases` lets ToolSearch find a Tool by alternative names. If an agent searches for `getAbi`, ToolSearch finds `getSmartContractAbi` because `getAbi` is in its `aliases` array. An empty array `[]` is valid and simply means the Tool declares no aliases.
 
 ## Validation Rules
+
+The structural rules for the `meta` block are defined alongside the other schema rules in [09-validation-rules.md](./09-validation-rules.md); they are listed here for reference at the point of use:
 
 | Code | Severity | Rule |
 |------|----------|------|

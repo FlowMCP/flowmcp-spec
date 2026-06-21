@@ -6,9 +6,9 @@ spec_file: "11-reference-data.md"
 order: 11
 section: "Best Practice"
 normative: false
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/best-practice/0.1.0/schema-creation/11-reference-data.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/best-practice/0.1.0/schema-creation/11-reference-data.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "best-practice/0.1.0/schema-creation/11-reference-data.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/11-reference-data.md."
@@ -70,5 +70,5 @@ Never force a key at the very start of a journey when a keyless path exists.
 
 ## Related
 
-- **Related:** [`10-readable-interface.md`](/best-practice/readable-interface/)
+- [`10-readable-interface.md`](/best-practice/readable-interface/)
 

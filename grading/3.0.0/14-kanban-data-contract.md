@@ -4,20 +4,22 @@
 |-------|-------|
 | Status | **Superseded** by [`23-index-json.md`](./23-index-json.md) |
 | Version | `gradingSpec/3.0.0` |
-| Replaced by | [`23-index-json.md`](./23-index-json.md) — the namespace/selection rollup `index.json` |
 | Annex | [`14-kanban-data-contract.schema.json`](./14-kanban-data-contract.schema.json) — **deprecated** (kept as valid JSON for reference only) |
+| Related | [`23-index-json.md`](./23-index-json.md), [`22-workbench-island.md`](./22-workbench-island.md), [`26-monitoring-track.md`](./26-monitoring-track.md), [`09-security-and-development.md`](./09-security-and-development.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
 
 ---
 
+This chapter is **superseded**: the earlier Kanban data contract — a per-phase status response with a `single`/`selection` lane separation — has been replaced by a single derived rollup file per namespace and per selection, the [`index.json`](./23-index-json.md), which carries node status, member resolution, the frozen lock snapshot, and the aggregate grade in one place. Consumers MUST read status from `index.json`; the old phase-status surface and its annex schema are no longer normative. Two principles survive the break and are restated here for traceability — the never-delete audit trail and the irreversible `rejected` veto — and now also govern the grading-monitoring board defined in [`26-monitoring-track.md`](./26-monitoring-track.md).
+
 ## Why this chapter is superseded
 
-The earlier `1.1.0` Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. The `2.0.0` break replaces this with a single derived rollup file per namespace and per selection: **`index.json`**. The rollup carries the per-node status, the per-member resolution, the frozen lock snapshot, and the aggregate grade in one place. There is no longer a separate phase-status response surface, and the `P*`/`S*` phase identifiers are replaced by the eleven grading areas (see [`23-index-json.md`](./23-index-json.md) and the area chapters).
+The earlier Kanban data contract exposed a per-phase status response (`P1`–`P7`, `S1`–`S4`) with a `single`/`selection` lane separation. That surface is replaced by a single derived rollup file per namespace and per selection: **`index.json`**. The rollup carries the per-node status, the per-member resolution, the frozen lock snapshot, and the aggregate grade in one place. There is no longer a separate phase-status response surface, and the `P*`/`S*` phase identifiers are replaced by the eleven grading areas (see [`23-index-json.md`](./23-index-json.md) and the area chapters).
 
-Consumers MUST read status from `index.json`. The phase-status response described in `1.1.0` and its annex schema are no longer normative.
+Consumers MUST read status from `index.json`. The earlier phase-status response and its annex schema are no longer normative.
 
-> **As of `gradingSpec/3.0.0`:** the grading-monitoring board returns **in scope** in [`26-monitoring-track.md`](./26-monitoring-track.md). The two salvaged rules below (audit trail; irreversible veto) remain normative and now apply to that monitoring track.
+> The grading-monitoring board returns **in scope** in [`26-monitoring-track.md`](./26-monitoring-track.md). The two salvaged rules below (audit trail; irreversible veto) remain normative and now apply to that monitoring track.
 
 ---
 
@@ -32,11 +34,3 @@ Grading entries MUST NOT be deleted or overwritten. A re-grading produces a **ne
 ### Irreversible veto — terminal status `rejected`
 
 A categorical veto produces the terminal node status `rejected`. This status is **irreversible**: a primitive in `rejected` MUST NOT be moved back to any other status by editing or deleting its grading entry. A veto can only be lifted by a fully new evaluation that produces a new grading entry; the original veto entry remains in the audit trail. The four closed veto triggers (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`, `ai-security-veto`) are defined in [`09-security-and-development.md`](./09-security-and-development.md).
-
----
-
-## Cross-References
-
-- Rollup model that replaces this chapter: [`23-index-json.md`](./23-index-json.md)
-- Workbench island that produces the data: [`22-workbench-island.md`](./22-workbench-island.md)
-- Veto triggers: [`09-security-and-development.md`](./09-security-and-development.md)

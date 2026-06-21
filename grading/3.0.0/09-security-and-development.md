@@ -5,17 +5,13 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0`, `gradingSystem/1.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md) |
-| Related | [`10-domain-knowledge.md`](./10-domain-knowledge.md), Schemas-Spec v4.3.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/11-preload.md), `node-formatting` skill, `node-error-codes` skill |
+| Related | [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md), [`08-grading-model.md`](./08-grading-model.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), Schemas-Spec v4.3.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/11-preload.md), `node-formatting` skill, `node-error-codes` skill |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
-## Introduction
-
-Security and development discipline form an **independent grading area with high veto affinity**. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md) live in this chapter (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), and the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. This chapter defines the binding rules for each.
-
-The checks covered here feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit". No check defined in this chapter raises the maximum attainable grade beyond `B` on its own. These checks contribute to the `single-test` and `tools-aggregate-schema` areas (see the 11 Areas in [`08-grading-model.md`](./08-grading-model.md)).
+Security and development discipline form an independent grading area with high veto affinity, and this page sets the binding rules for it. Three of the four Categorical-Veto triggers defined in [`08-grading-model.md`](./08-grading-model.md) originate here (`malicious-module`, `api-key-domain-mismatch`, `illegal-content`), while the fourth (`ai-security-veto`) is the non-deterministic counterpart that catches what the deterministic triggers miss. The checks below feed primarily `securityScore` (autonomous tier), plus `formattingCompliance` and the `outputSchemaConformance` sub-dimension "pipebarkeit"; they contribute to the `single-test` and `tools-aggregate-schema` Areas, and no check defined here raises the maximum attainable grade beyond `B` on its own.
 
 ---
 
@@ -154,16 +150,3 @@ The no-silent-defaults rule is binding for this spec chapter. Every score-boost 
 - Aging defaults (14 / 30 / 180 days, the `#AGING_DEFAULTS` constant) MUST be exposed as named constants in the implementation, not as inline literals.
 
 Concrete weights, thresholds, and score-boost magnitudes belong in the `gradingSystem/1.0.0` implementation; this chapter does NOT enumerate them. The binding contract is the **explicitness** rule, not specific numerical values.
-
----
-
-## Cross-References
-
-- [`07-scoring-vs-grading.md`](./07-scoring-vs-grading.md) — the version namespaces (`scoringSystem` / `gradingSystem`) that bind score changes from this chapter.
-- [`08-grading-model.md`](./08-grading-model.md) — the data model of the Categorical Veto entries defined here.
-- [`10-domain-knowledge.md`](./10-domain-knowledge.md) — Shared Lists and forbidden provider conventions (forward reference).
-- Schemas-Spec v4.3.0 [`11-preload.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/11-preload.md) — the Preload pattern (external).
-- `node-formatting` skill — formatting rules.
-- `node-error-codes` skill — PREFIX-NUMBER error-code pattern.
-- No-silent-defaults rule — anti-defaults rule.
-- Never-read-env-files-with-values rule — env handling.

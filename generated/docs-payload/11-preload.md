@@ -1,28 +1,20 @@
 ---
 title: "Preload & Caching"
-description: "This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime MAY cache the response locally."
+description: "Some tools return data that barely moves — a full list of hospitals in a country, every memorial stone in a city, a reference table that is refreshed once a week. Re-fetching such a dataset on every..."
 spec_version: "4.3.0"
 spec_file: "11-preload.md"
 order: 11
 section: "Specification"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/spec/v4.3.0/11-preload.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/11-preload.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "spec/v4.3.0/11-preload.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/11-preload.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-This document defines the optional `preload` field on route level. It signals that a route returns a static or slow-changing dataset and that the runtime MAY cache the response locally.
-
----
-
-## Motivation
-
-Some API endpoints return complete, rarely changing datasets (e.g. all hospitals in Germany, all memorial stones in Berlin). Fetching these on every call wastes bandwidth and time. The `preload` field lets schema authors declare caching intent so the CLI and other runtimes can cache responses transparently.
+Some tools return data that barely moves — a full list of hospitals in a country, every memorial stone in a city, a reference table that is refreshed once a week. Re-fetching such a dataset on every call costs bandwidth and time for no benefit. The optional `preload` field lets a schema author declare that a tool's response is safe to cache and for how long, so a runtime can serve a stored copy instead of hitting the network each time. Caching always stays optional on the runtime's side: `preload` expresses intent, and the runtime decides whether to honour it. The sections below specify the field, its validation rules, the cache key derivation, the runtime cache flow, and the author guidelines for choosing a sensible time-to-live.
 
 ---
 
@@ -73,7 +65,7 @@ routes: {
 
 ## Validation Rules
 
-These rules extend the existing validation rule set from `09-validation-rules.md`:
+These rules extend the validation rule set indexed in [09-validation-rules.md](/specification/validation-rules/):
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -211,14 +203,16 @@ Runtimes SHOULD document which approach they use.
 
 ### Tests
 
-Route tests (`10-route-tests.md`) always bypass the cache to ensure they test the live API. The `--no-cache` flag is implied during test execution.
+Tool tests (see [10-tests.md](/specification/tests/)) always bypass the cache to ensure they exercise the live API. The `--no-cache` flag is implied during test execution.
 
 ### Output Schema
 
-The output schema (`04-output-schema.md`) describes the response shape regardless of whether the response comes from cache or a live fetch. Caching does not affect the output contract.
+The output schema (see [04-output-schema.md](/specification/output-schema/)) describes the response shape regardless of whether the response comes from cache or a live fetch. Caching does not affect the output contract.
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [13-resources.md](/specification/resources/), [10-tests.md](/specification/tests/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [13-resources.md](/specification/resources/)
+- [10-tests.md](/specification/tests/)
 

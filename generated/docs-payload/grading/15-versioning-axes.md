@@ -1,14 +1,14 @@
 ---
 title: "Versioning + Canonical Hash"
-description: "Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in..."
+description: "Every gradable primitive is versioned by a timestamp carried in its filename rather than by an in-source version key, so the newest revision is found by a naive sort and historical revisions stay..."
 grading_version: "3.0.0"
 spec_file: "15-versioning-axes.md"
 order: 15
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/15-versioning-axes.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/15-versioning-axes.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/15-versioning-axes.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/15-versioning-axes.md."
@@ -16,11 +16,11 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/15-versioning-
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+Every gradable primitive is versioned by a timestamp carried in its filename rather than by an in-source version key, so the newest revision is found by a naive sort and historical revisions stay referenceable. The same files are kept neutral: they carry only logical names, while the canonical sha256-8 hash that binds a grading to an exact content snapshot lives in the filename and the derived `index.json` — never inside the source. This chapter defines the timestamp naming axis, the out-of-source hash placement, and the canonical representation used to compute the hash.
+
 ---
 
-## Versioning + Canonical Hash
-
-### Timestamp Versioning
+## Timestamp Versioning
 
 Versioning is carried by the **filename**, not by an in-source version key. Each primitive (schema, resource, skill, selection definition) is stored under the naming grammar defined in [`19-folder-layout.md`](/grading/folder-layout/):
 
@@ -38,7 +38,7 @@ The only version key that stays inside the source is `version` (FlowMCP spec for
 | `schemaVersion` | REMOVED from source | filename timestamp + `index.json` | snapshot identity of a schema |
 | `selectionVersion` | REMOVED from source | filename timestamp + `index.json.lockSnapshot` | snapshot identity of a selection |
 
-### Hash Out of Source (Neutrality)
+## Hash Out of Source (Neutrality)
 
 The schema `.mjs` and the `selection.json` are **neutral**: they carry only logical names. The in-source keys `schemaHash`, `selectionHash`, and `aboutHash` are **removed** — they drifted on every edit, so the recorded value no longer matched the actual content.
 
@@ -52,7 +52,7 @@ Reference resolution by logical name (examples):
 
 There is no flat `defillama-about.md` — only the versioned file. `resolveLatest` knows which one is newest.
 
-### Canonical Representation for the Hash
+## Canonical Representation for the Hash
 
 The hash is computed by JSON stable-stringify (sorted keys, deterministic whitespace handling) over the object and hashed with sha256 (8 hex chars). The same procedure applies to `schemaHash` (schema object), `selectionHash` (selection object), `aboutHash` (About file bytes), and `namespaceHash` (namespace rollup payload). These values are recorded in the grading entry (see [`08-grading-model.md`](/grading/grading-model/)) and in `index.json` — not in the source.
 
@@ -67,17 +67,13 @@ function computeSchemaHash( { schema } ) {
 }
 ```
 
-Reference implementation: [`src/HashGenerator.mjs`](../../src/HashGenerator.mjs) (`computeSchemaHash` / `computeSelectionHash` / `computeNamespaceHash`). The algorithm is unchanged from 1.1.0; only the placement of the result changed (filename + `index.json`, never source).
-
-### Cross-Refs
-
-- Hashes in the grading entry → [`08-grading-model.md`](/grading/grading-model/)
-- Per-member hash binding (frozen) → [`16-selection-lockfile.md`](/grading/selection-lockfile/) (`index.json.lockSnapshot`)
-- Filename naming grammar → [`19-folder-layout.md`](/grading/folder-layout/)
-- Flywheel — new file in the iteration loop → [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+Reference implementation: [`src/HashGenerator.mjs`](../../src/HashGenerator.mjs) (`computeSchemaHash` / `computeSelectionHash` / `computeNamespaceHash`). The hash result is placed in the filename and `index.json`, never in the source.
 
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** [`16-selection-lockfile.md`](/grading/selection-lockfile/), [`19-folder-layout.md`](/grading/folder-layout/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+- [`00-overview.md`](/grading/overview/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
 

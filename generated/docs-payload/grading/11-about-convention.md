@@ -1,14 +1,14 @@
 ---
 title: "About Convention as a Schema Resource"
-description: "This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows."
+description: "The **About Resource** is a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows. It is a schema Resource — declared under..."
 grading_version: "3.0.0"
 spec_file: "11-about-convention.md"
 order: 11
 section: "Grading"
 normative: true
-source_commit: "cc34e7e"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/cc34e7e/grading/3.0.0/11-about-convention.md"
-generated_at: "2026-06-07T18:27:39.869Z"
+source_commit: "42b4603"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/11-about-convention.md"
+generated_at: "2026-06-21T01:06:21.418Z"
 generated_from: "grading/3.0.0/11-about-convention.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/11-about-convention.md."
@@ -18,9 +18,9 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/11-about-conve
 
 ---
 
-## Scope Statement
+The **About Resource** is a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows. It is a schema Resource — declared under `main.resources` with the reserved name `about`, authored as markdown rather than a `.mjs` module — not a namespace route. It exists because consumers (LLM graders, skill authors, third-party tools, dashboards) repeatedly need one uniform way to ask *"what does this namespace do, what doesn't it do, which conventions does it follow?"* without reading the schema source first; this **guessability argument** is the deep reason the name `about` is reserved. The chapter has three parts: the declaration contract, the content contract, and the detection and grading of About on the namespace and selection levels.
 
-This chapter defines the **About Resource**: a markdown Resource that describes what a namespace (or a selection) does, what it does not do, and which conventions it follows.
+## The About Resource as a Schema Resource
 
 The About Resource is **a schema Resource**, not a namespace route. It is:
 
@@ -34,13 +34,7 @@ The chapter has three parts:
 2. The **content contract** — what an About Resource MUST, SHOULD, and MAY carry (see [Content Contract](#content-contract)).
 3. The **detection and grading** of About on the namespace and selection levels (see [Detection](#detection-deterministic)–[Selection-Level About](#selection-level-about--domain-knowledge)).
 
----
-
-## Purpose
-
-The About Resource exists because consumers — LLM graders, skill authors, third-party tools, dashboards — repeatedly need a uniform way to ask: *"What does this namespace do, what doesn't it do, which conventions does it follow?"* A single, conventionally named, declared Resource answers that question without the consumer having to read the schema source first.
-
-This is the **guessability argument**. It is the deep cause for reserving the name `about`; the content contract (see [Content Contract](#content-contract)) is what makes the reserved name worth asking against.
+The About Resource exists because consumers — LLM graders, skill authors, third-party tools, dashboards — repeatedly need a uniform way to ask: *"What does this namespace do, what doesn't it do, which conventions does it follow?"* A single, conventionally named, declared Resource answers that question without the consumer having to read the schema source first. This is the **guessability argument**: it is the deep cause for reserving the name `about`; the content contract (see [Content Contract](#content-contract)) is what makes the reserved name worth asking against.
 
 ---
 
@@ -142,26 +136,19 @@ The deterministic sub-part is binary: the declared `about` Resource and its file
 
 ---
 
-## Relationship to the Schemas-Spec v4.3.0
+## Relationship to the Schemas-Spec
 
-The Schemas-Spec v4.3.0 — particularly [`13-resources.md`](/specification/resources/) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is **forward-looking convention**, applied by graders that conform to this Grading-Spec.
-
-A schema-validator at v4.2 MUST NOT reject a schema for failing the About convention; the convention's enforcement lives entirely in the grader.
-
----
-
-## Cross-References
-
-- Schemas-Spec v4.3.0 [`13-resources.md`](/specification/resources/) — the external Resource primitive against which the convention is defined.
-- Schemas-Spec v4.3.0 [`17-selections.md`](/specification/selections/) — the selection primitive.
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the selection-level About Resource as the Domain-Knowledge content (seven mandatory sections).
-- [`12-personas-contract.md`](/grading/personas-contract/) — the personas reference required by [Content Contract](#content-contract).
-- [`13-skills.md`](/grading/skills/) — the skill obligation to reference the About Resource.
-- [`19-folder-layout.md`](/grading/folder-layout/) — the `resources/about/` placement and the versioned-file naming.
-- [`21-pre-conditions.md`](/grading/pre-conditions/) — About detection as part of the pre-condition gate.
+The Schemas-Spec — particularly [`13-resources.md`](../../spec/v4.3.0/13-resources.md) — defines the Resource primitive. This Grading-Spec adds the **convention** that one Resource named `about` carries the content contract above. The reservation is a **forward-looking convention**, applied by graders that conform to this Grading-Spec. A schema-validator MUST NOT reject a schema for failing the About convention — the convention's enforcement lives entirely in the grader, not in the schema validator.
 
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** Schemas-Spec v4.3.0 [`13-resources.md`](/specification/resources/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`19-folder-layout.md`](/grading/folder-layout/), [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`00-overview.md`](/grading/overview/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`13-resources.md`](../../spec/v4.3.0/13-resources.md)
+- [`17-selections.md`](../../spec/v4.3.0/17-selections.md)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`13-skills.md`](/grading/skills/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`21-pre-conditions.md`](/grading/pre-conditions/)
 

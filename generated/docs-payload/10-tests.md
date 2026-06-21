@@ -1,22 +1,20 @@
 ---
 title: "Tests"
-description: "Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document..."
+description: "Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they..."
 spec_version: "4.3.0"
 spec_file: "10-tests.md"
 order: 10
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/10-tests.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/10-tests.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/10-tests.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/10-tests.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses are the basis for generating accurate output schemas. This document defines the test format for both tools and resources, design principles, the response capture lifecycle, and validation rules.
+Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses become the basis for generating accurate output schemas. The sections below cover the test format for tools, resources, and agents, the design principles that keep tests useful, and the response-capture lifecycle that turns a test into an output schema.
 
 ---
 
@@ -332,7 +330,7 @@ Tests are executed and the actual response structure is compared against the dec
 
 ### Dry-Run Mode
 
-Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp validate` to check test definitions statically.
+Tests are validated for correctness (parameter types, required fields, _description presence) without making API calls. Used during `flowmcp schema-check` to check test definitions statically.
 
 ---
 
@@ -626,7 +624,7 @@ The structural test validates that all internal references in the skill are reso
 - All `{{input:key}}` placeholders match the skill's `input` array
 - No unresolvable `{{skill:name}}` references
 
-This test is deterministic and runs during `flowmcp validate`.
+This test is deterministic and runs during `flowmcp schema-check`.
 
 ### One-Shot Test for Skills
 
@@ -648,7 +646,7 @@ This demonstrates that One-Shot performance is directly correlated with informat
 ```javascript
 // Structural test: deterministic
 // 1. Validate all references resolve
-// 2. Run: flowmcp validate providers/{namespace}/skills/skill-name.mjs
+// 2. Run: flowmcp schema-check providers/{namespace}/skills/skill-name.mjs
 
 // One-Shot test: probabilistic (LLM-eval)
 // 1. Load skill as MCP prompt
@@ -688,6 +686,11 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
-- **Related:** [04-output-schema.md](/specification/output-schema/), [06-agents.md](/specification/agents/), [22-scoring-protocol.md](/specification/scoring-protocol/), [13-resources.md](/specification/resources/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [02-parameters.md](/specification/parameters/)
+- [04-output-schema.md](/specification/output-schema/)
+- [06-agents.md](/specification/agents/)
+- [22-scoring-protocol.md](/specification/scoring-protocol/)
+- [13-resources.md](/specification/resources/)
 

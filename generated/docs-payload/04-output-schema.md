@@ -1,22 +1,20 @@
 ---
 title: "Output Schema"
-description: "Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output..."
+description: "Output schemas make tool responses predictable. By declaring the expected shape of a response at the route level, an AI client knows in advance what fields it will receive and can reason about them..."
 spec_version: "4.3.0"
 spec_file: "04-output-schema.md"
 order: 4
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/04-output-schema.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/04-output-schema.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/04-output-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/04-output-schema.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Output schemas make tool responses predictable. AI clients can know in advance what shape the data will have, enabling structured reasoning without parsing guesswork. This document defines the output declaration format, supported types, the response envelope, handler interaction, and validation rules.
+Output schemas make tool responses predictable. By declaring the expected shape of a response at the route level, an AI client knows in advance what fields it will receive and can reason about them without parsing guesswork. The sections below cover the output declaration format, the supported types and MIME-types, the standard response envelope, how output interacts with `postRequest` handlers, and the validation rules applied to every declaration.
 
 ---
 
@@ -392,7 +390,7 @@ If a route does not define an `output` field:
 
 Omitting the output schema is acceptable for:
 
-- Legacy schemas migrating from v1.x
+- Legacy schemas being migrated from an earlier major version
 - Routes with highly variable response shapes (rare)
 - Exploratory schemas during development
 
@@ -519,6 +517,10 @@ The diagram shows the non-blocking validation flow: mismatches produce warnings 
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
-- **Related:** [10-tests.md](/specification/tests/), [22-scoring-protocol.md](/specification/scoring-protocol/), [19-mcp-integration.md](/specification/mcp-integration/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [02-parameters.md](/specification/parameters/)
+- [10-tests.md](/specification/tests/)
+- [22-scoring-protocol.md](/specification/scoring-protocol/)
+- [19-mcp-integration.md](/specification/mcp-integration/)
 

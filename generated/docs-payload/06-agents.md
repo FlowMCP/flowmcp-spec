@@ -1,22 +1,20 @@
 ---
 title: "Agents"
-description: "An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full..."
+description: "An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Unlike a plain tool list, an Agent is a full composition: it cherry-picks tools..."
 spec_version: "4.3.0"
 spec_file: "06-agents.md"
 order: 6
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/06-agents.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/06-agents.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/06-agents.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/06-agents.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Agents replace Groups from v2. Where Groups were simple tool lists, Agents are full compositions with a model binding, system prompt, tests, prompts, skills, and optional resources. This document defines the agent manifest format, tool cherry-picking, model binding, system prompts, integrity verification, and validation rules.
+An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Unlike a plain tool list, an Agent is a full composition: it cherry-picks tools across providers, binds them to a specific LLM, defines a system prompt and behavioral guidelines, and ships with its own tests, explanatory prompts, instructional skills, and optional resources. The sections below cover the agent manifest format, how tool references are resolved, model binding, the system prompt, integrity verification through hashes, and the validation rules applied at activation.
 
 ---
 
@@ -134,7 +132,7 @@ export const agent = {
 
 ### Field Details
 
-#### `name`
+#### The `name` field
 
 The agent name serves as both the identifier and the directory name. It must be unique within a catalog.
 
@@ -146,18 +144,18 @@ CryptoResearch           <- INVALID (uppercase)
 crypto research          <- INVALID (space)
 ```
 
-#### `version`
+#### The `version` field
 
 The version field uses the format `flowmcp/X.Y.Z` (not semver of the agent itself). It declares which FlowMCP specification the manifest conforms to. This allows the runtime to apply the correct validation rules.
 
 ```
 flowmcp/4.0.0            <- valid (current spec)
-flowmcp/3.0.0            <- DEPRECATED (v3 agent, accepted with warning during migration)
+flowmcp/3.0.0            <- DEPRECATED (accepted with warning during migration)
 4.0.0                    <- INVALID (missing flowmcp/ prefix)
-flowmcp/2.0.0            <- INVALID (agents are a v3+ concept)
+flowmcp/2.0.0            <- INVALID (agents did not exist in that earlier spec line)
 ```
 
-#### `model`
+#### The `model` field
 
 The model field uses OpenRouter syntax: `provider/model-name`. The `/` separator is required and distinguishes the model provider from the model identifier. The model determines which LLM the agent is tested with and optimized for. Agent prompts and skills are model-specific — a prompt tuned for Claude MAY not work well with GPT-4o and vice versa.
 
@@ -168,7 +166,7 @@ google/gemini-2.0-flash                  <- valid
 claude-sonnet                            <- INVALID (no provider prefix)
 ```
 
-#### `systemPrompt`
+#### The `systemPrompt` field
 
 The system prompt contains the agent's persona and behavioral instructions. It is sent as the system message at the start of every conversation. The system prompt should:
 
@@ -183,7 +181,7 @@ export const agent = {
 }
 ```
 
-#### `tools`
+#### The `tools` field
 
 Tools are declared as an object. External tools from provider schemas use keys with `/` (value `null`). Inline tools defined by the agent use keys without `/` (value is the tool definition). See the [Slash Rule](#slash-rule) for details.
 
@@ -208,15 +206,15 @@ export const agent = {
 
 See [Tool Cherry-Picking](#tool-cherry-picking) for external tool resolution details.
 
-#### `maxRounds`
+#### The `maxRounds` field
 
 The maximum number of tool-call rounds the agent MAY execute in a single conversation turn. A "round" is one cycle of: LLM generates a tool call, runtime executes it, result is returned to the LLM. Default is `10`. Set lower for agents that SHOULD answer quickly, higher for agents that perform complex multi-step analysis.
 
-#### `maxTokens`
+#### The `maxTokens` field
 
 The maximum number of tokens the LLM MAY generate per response. Default is `4096`. This controls response length, not total context.
 
-#### `prompts`
+#### The `prompts` field
 
 Explanatory prompts declared as an object. Each key is the prompt name, each value MUST have a `file` key pointing to an `.mjs` file. Prompt files export `export const content` — a string containing the explanatory text.
 
@@ -236,7 +234,7 @@ export const agent = {
 
 External prompt references (slash keys with `null` value) import prompts from provider schemas without copying them. Inline prompts use the format defined in `12-prompt-architecture.md` and use the `{{...}}` placeholder syntax for dynamic content.
 
-#### `skills`
+#### The `skills` field
 
 Instructional skills declared as an object. Each key is the skill name, each value MUST have a `file` key pointing to an `.mjs` file. Skill files export `export const skill` — an object containing the skill definition with content, input parameters, output description, and optionally external requirements.
 
@@ -254,7 +252,7 @@ export const agent = {
 
 Skills cannot be externally referenced because they are model-specific (`testedWith` required). A skill written for Claude MAY not work with GPT-4o. Skill files follow the format defined in `14-skills.md`.
 
-#### systemPrompt vs prompts vs skills
+#### The three content layers: systemPrompt vs prompts vs skills
 
 The three content layers serve different purposes:
 
@@ -266,7 +264,7 @@ The three content layers serve different purposes:
 
 At runtime, `systemPrompt` is always included as the system message. Prompts and skills are loaded and made available via MCP `server.prompt` — the LLM accesses them on demand.
 
-#### `resources`
+#### The `resources` field
 
 Own resources the agent brings — typically SQLite databases with curated context data. External resources from provider schemas can be referenced via slash keys (value `null`). Inline resources follow the same format as provider schema resources.
 
@@ -297,11 +295,11 @@ export const agent = {
 }
 ```
 
-#### `sharedLists`
+#### The `sharedLists` field
 
 Names of shared lists the agent needs. These are resolved from the catalog's `_lists/` directory at load time. Shared lists provide reusable value sets (EVM chain IDs, country codes, trading pairs) that the agent's prompts and system prompt MAY reference.
 
-#### `inputSchema`
+#### The `inputSchema` field
 
 An optional JSON Schema that defines the expected input format when invoking the agent. This allows callers to validate their input before sending it to the agent.
 
@@ -708,11 +706,11 @@ See `15-catalog.md` for the full catalog specification.
 
 ## Agent vs Group Migration
 
-Agents replace Groups from FlowMCP v2. The migration is conceptual — agents are not backward-compatible with groups because they serve a fundamentally different purpose.
+Agents replace the older Group concept. The migration is conceptual — agents are not backward-compatible with groups because they serve a fundamentally different purpose.
 
 ### What Changed
 
-| Aspect | Group (v2) | Agent (v3) |
+| Aspect | Group (legacy) | Agent (current) |
 |--------|-----------|------------|
 | Definition file | `.flowmcp/groups.json` | `agents/{name}/agent.mjs` |
 | Format | JSON | `.mjs` with `export const agent` |
@@ -742,7 +740,7 @@ Groups cannot be automatically converted to agents because agents require fields
 9. **Add resources** — optionally add own SQLite databases
 10. **Register in catalog** — add the agent to `registry.json`
 
-See `08-migration.md` for the complete v2-to-v3 migration guide.
+See `08-migration.md` for the complete Group-to-Agent migration guide.
 
 ---
 
@@ -787,7 +785,7 @@ The diagram shows the full activation lifecycle from reading the manifest to the
 9. **Verify hashes** — compare stored hash against calculated hash (warn on mismatch)
 10. **Load resources** — initialize agent-owned resources (SQLite databases) from `agent.resources`
 11. **Load prompts** — import prompt files from `main.prompts`, each MUST export `export const content`
-12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each MUST export `export const skill`. `main.skills` is forbidden in v4.0.0.
+12. **Load skills** — import skill files from `agent.skills` (and any referenced Selections' `selection.skills` and the active namespaces' `providers/{ns}/skills/`). Each MUST export `export const skill`. `main.skills` is forbidden.
 13. **Register tools** — expose the agent's tools via MCP `server.tool`
 14. **Register prompts** — expose the agent's prompts via MCP `server.prompt`
 15. **Register skills** — expose the agent's skills via MCP `server.prompt`
@@ -1071,6 +1069,11 @@ export const agent = {
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [12-prompt-architecture.md](/specification/prompt-architecture/), [14-skills.md](/specification/skills/), [17-selections.md](/specification/selections/), [16-id-schema.md](/specification/id-schema/), [10-tests.md](/specification/tests/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [14-skills.md](/specification/skills/)
+- [17-selections.md](/specification/selections/)
+- [16-id-schema.md](/specification/id-schema/)
+- [10-tests.md](/specification/tests/)
 

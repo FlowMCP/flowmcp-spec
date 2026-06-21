@@ -7,7 +7,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-> Defines how FlowMCP handles third-party API Terms of Services (ToS) and data licensing.
+FlowMCP sits between its own code, the third-party APIs a schema calls, and the data those APIs return — and each of those carries its own legal terms. The purpose of this page is to draw a clear line around what FlowMCP takes responsibility for and what it deliberately leaves to the user: FlowMCP records and links the relevant Terms of Services and data licenses, but it never interprets or certifies them. The page describes that three-layer model, the optional schema fields that carry the links, and where responsibility for compliance ultimately rests.
 
 ## Three-Layer License Model
 
@@ -98,10 +98,5 @@ FlowMCP makes **no warranty** about ToS compliance, data licensing, or fitness f
 ToS change. FlowMCP recommends:
 
 - **6-month re-check cadence** for all schemas with `termsOfService`
-- Reactive update when known provider ToS changes occur (e.g. Twitter 2023)
+- Reactive update when a known provider changes its ToS
 - Audit script `audit-tos-freshness.mjs` flags schemas with stale `termsOfServiceCheckedAt`
-
-## See Also
-
-- [`01-schema-format.md`](./01-schema-format.md) — Schema field reference
-- [`19-mcp-integration.md`](./19-mcp-integration.md) — Meta block (per-tool metadata)

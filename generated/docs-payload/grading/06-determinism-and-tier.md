@@ -1,14 +1,14 @@
 ---
 title: "Determinism and Tier"
-description: "The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but..."
+description: "The Grading-Spec rates every dimension along **two orthogonal axes**: *Determinism* (is the score reproducible?) and *Tier* (what is the highest grade it can reach?). Because the axes are..."
 grading_version: "3.0.0"
 spec_file: "06-determinism-and-tier.md"
 order: 6
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/06-determinism-and-tier.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/06-determinism-and-tier.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/06-determinism-and-tier.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/06-determinism-and-tier.md."
@@ -18,9 +18,7 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/06-determinism
 
 ---
 
-## Introduction — Two Orthogonal Axes
-
-The Grading-Spec separates **reproducibility** (Determinism) from **attainability** (Tier). The two axes are **orthogonal**: a dimension can be deterministic but group-bound, or non-deterministic but autonomous. Both axes are carried independently in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](/grading/grading-model/)).
+The Grading-Spec rates every dimension along **two orthogonal axes**: *Determinism* (is the score reproducible?) and *Tier* (what is the highest grade it can reach?). Because the axes are independent, a dimension can be deterministic yet group-bound, or non-deterministic yet autonomous. Both values are carried separately in the grading entry as the fields `determinism` and `gradingTier` (see [`08-grading-model.md`](/grading/grading-model/)), and this page defines what each value means and how the two combine.
 
 | Axis | Values | Effect |
 |------|--------|--------|
@@ -167,7 +165,7 @@ A Veto is an outcome of its own; it does not reduce a numerical score, it replac
 
 ---
 
-## Interaction with Scoring- / Grading-System Version
+## Interaction with the Scoring- / Grading-System Version
 
 Determinism applies **at a fixed Scoring-System version**. A bump of the `scoringSystem/X.Y.Z` namespace can change how a deterministic test is scored — the test remains deterministic at the new version, but old scores cannot be compared one-to-one to new scores.
 
@@ -219,18 +217,14 @@ Cross-Refs:
 - Iteration pattern → see [`18-flywheel-loop.md`](/grading/flywheel-loop/).
 - Pre-condition effect (only `stable` members pass) → see [`21-pre-conditions.md`](/grading/pre-conditions/).
 
----
-
-## Cross-References
-
-- [`04-phases-single.md`](/grading/phases-single/) — provider-side Areas (the cascade-stop and HTTP-4xx rule live here as well).
-- [`05-phases-selection.md`](/grading/phases-selection/) — selection-side Areas (the `group-bound` contributions enter here).
-- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/) — versioning contract for `scoringSystem` and `gradingSystem`.
-- [`08-grading-model.md`](/grading/grading-model/) — defines `determinism`, `gradingTier`, and `maxAttainableGrade` as grading-entry fields.
-- [`09-security-and-development.md`](/grading/security-and-development/) — security dimensions (external-module audit, API-key-domain match) listed in [Dimension–Area Matrix](#dimensionarea-matrix).
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/)
-- **Related:** [`04-phases-single.md`](/grading/phases-single/), [`05-phases-selection.md`](/grading/phases-selection/), [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/), [`08-grading-model.md`](/grading/grading-model/), [`09-security-and-development.md`](/grading/security-and-development/), [`18-flywheel-loop.md`](/grading/flywheel-loop/), [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`00-overview.md`](/grading/overview/)
+- [`04-phases-single.md`](/grading/phases-single/)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`07-scoring-vs-grading.md`](/grading/scoring-vs-grading/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`09-security-and-development.md`](/grading/security-and-development/)
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+- [`21-pre-conditions.md`](/grading/pre-conditions/)
 

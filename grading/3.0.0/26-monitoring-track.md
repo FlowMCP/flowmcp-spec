@@ -9,6 +9,8 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+This chapter brings the grading-monitoring board back into scope and defines the grading-monitoring track that projects each namespace's grading state onto a deterministic GitHub board. It fixes the decoupling from the schema-development track, the one-grading-issue-per-namespace contract and its provider-proof metadata source, the deterministic board contract, and the island ↔ repo ↔ provider-proof data flow. The executable sync workflow, the proof producer, and the consuming skills are deferred to implementation phases; here only their contracts are written.
+
 ---
 
 ## Scope — the board is back
@@ -17,15 +19,13 @@ This chapter brings the **grading-monitoring board back into scope**, reversing 
 
 What is in scope here: the **two-track decoupling**, the **one-grading-issue-per-namespace** contract and its metadata source, the **board contract** (which status vocabulary drives which column, idempotency), and the explicit **island ↔ repo ↔ provider-proof data flow**. What is not: the executable sync workflow, the producer that writes the provider-proof, and the consuming skills — those are implementation phases (see [Out of scope](#out-of-scope)).
 
----
-
-## Two Tracks (decoupling)
+## Two decoupled tracks
 
 The pipeline is split into two tracks that are **not linked**.
 
 ### Track A — Schema-Development
 
-File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** ([Schemas-Spec v4.3.0 §21](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/21-schema-lifecycle.md)). The development gate is unchanged: a schema must pass `flowmcp validate` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
+File versioning via Git plus the existing schema issues. Owned by the **Schemas-Spec lifecycle** (the schema-lifecycle chapter of the latest Schemas Specification). The development gate is unchanged: a schema must pass `flowmcp schema-check` (clean) before it reaches `stage:production`. The Grading-Spec does **not** own Track A issues.
 
 ### Track B — Grading-Monitoring
 
@@ -40,11 +40,9 @@ The two tracks are **NOT linked**:
 
 **Selection** (which providers to bundle into a domain selection) remains **OUT OF SCOPE** (a separate memo). The selection gate is unchanged: selection runs only once all member providers are `stable` (the `stable`-only pre-condition, [`21-pre-conditions.md`](./21-pre-conditions.md)).
 
----
+## One grading-issue per namespace
 
-## One Grading-Issue per Namespace
-
-Exactly **one** grading-issue exists per namespace. This supersedes the per-primitive sub-issue model that the Schemas-Spec used to describe (the sub-issue wording is removed from [Schemas-Spec v4.3.0 §21](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/21-schema-lifecycle.md)); a removed primitive is now a `blockers[]` entry under the namespace grading-issue, not its own issue.
+Exactly **one** grading-issue exists per namespace. This supersedes the per-primitive sub-issue model that the Schemas-Spec used to describe (the sub-issue wording is removed from the latest Schemas Specification's schema-lifecycle chapter); a removed primitive is now a `blockers[]` entry under the namespace grading-issue, not its own issue.
 
 ### Metadata source — the provider-proof
 
@@ -60,15 +58,13 @@ The grading-issue metadata is sourced **only** from the provider-proof `provider
 
 ### Provider grade = `namespaceAggregate`
 
-The **provider grade is the `namespaceAggregate`** — the namespace-level rollup grade (Memo 093 F3/F4). A per-schema grade **rolls up** into the namespace aggregate; the per-schema grade is **not** the gate. This resolves the schema-spec conflict where §21 implied a per-schema grade gate: §21 now consumes the `namespaceAggregate` (see [Schemas-Spec v4.3.0 §21](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/21-schema-lifecycle.md)).
+The **provider grade is the `namespaceAggregate`** — the namespace-level rollup grade (Memo 093 F3/F4). A per-schema grade **rolls up** into the namespace aggregate; the per-schema grade is **not** the gate. This resolves the schema-spec conflict where the schema-lifecycle chapter implied a per-schema grade gate: that chapter now consumes the `namespaceAggregate`.
 
-### Namespace anlage (where the namespace name comes from)
+### Where the namespace name comes from
 
-The namespace is normally derived from the schema `namespace` field. When **all** schemas in a folder are unparseable, the **folder name** is the fallback namespace identifier (cross-ref [`19-folder-layout.md`](./19-folder-layout.md)); the folder↔namespace consistency rule is the tested invariant ([Schemas-Spec v4.3.0 §09](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/09-validation-rules.md), `VAL012`). Once a schema parses and exposes a real namespace, that field is authoritative and the folder is renamed to match (rename-later). The fallback namespace MUST be a valid namespace (`/^[a-z][a-z0-9-]*$/`).
+The namespace is normally derived from the schema `namespace` field. When **all** schemas in a folder are unparseable, the **folder name** is the fallback namespace identifier (cross-ref [`19-folder-layout.md`](./19-folder-layout.md)); the folder↔namespace consistency rule is the tested invariant (the validation-rules chapter of the latest Schemas Specification, `VAL012`). Once a schema parses and exposes a real namespace, that field is authoritative and the folder is renamed to match (rename-later). The fallback namespace MUST be a valid namespace (`/^[a-z][a-z0-9-]*$/`).
 
----
-
-## Board Contract
+## Board contract
 
 The board is a **deterministic** projection of the provider-proof. The contract has five parts.
 
@@ -76,7 +72,7 @@ The board is a **deterministic** projection of the provider-proof. The contract 
 
 The **sync workflow (a script) is the only writer** of issue / board state. The chain `provider-proof → issue/board` is pure code (`jq` / node plus `gh` GraphQL) — **no LLM**. Before any board update, the proof is validated against [`index.schema.json`](./index.schema.json). A proof that does not validate is not synced.
 
-### 2. Column mapping (rollup operational vocabulary)
+### 2. Column mapping from the rollup operational vocabulary
 
 The board columns are driven by the **rollup operational vocabulary** (`operational` / `partial` / `blocked` / `pending` / `rejected`, defined in [`23-index-json.md`](./23-index-json.md)), **NOT** the node 5-status enum. The mapping is:
 
@@ -90,7 +86,7 @@ The board columns are driven by the **rollup operational vocabulary** (`operatio
 
 Every status value in this table exists in the operational rollup enum of [`23-index-json.md`](./23-index-json.md); the `validation-failed` reason matches the pinned reason set there.
 
-### 3. Idempotency (backref)
+### 3. Idempotency via the backref
 
 The sync reads the `githubIssue` / `boardColumn` backref (defined on the node and the namespace rollup in [`23-index-json.md`](./23-index-json.md), enforced in [`index.schema.json`](./index.schema.json)). When the `githubIssue` backref is **present**, the sync MUST NOT create a second issue for the namespace — it **updates** the existing issue / moves the existing card instead.
 
@@ -102,8 +98,6 @@ The **only** non-deterministic part of the whole pipeline is the LLM evaluation 
 
 A `kanban-readonly` consumer reads the proof / board and answers "which provider next". The binding invariant is that the **reader never writes**: a read-only consumer MUST NOT create or mutate issues, cards, or proofs. (The implementing skill ships in a later phase; this chapter only states the contract it must honour.)
 
----
-
 ## Island ↔ Repo ↔ Provider-Proof Data Flow
 
 This is the explicit data-flow contract: where `index.json` is born, where it is committed, and what CI reads.
@@ -113,7 +107,7 @@ This is the explicit data-flow contract: where `index.json` is born, where it is
 3. The **export step** (`grading export`, the OUT side of [`22-workbench-island.md`](./22-workbench-island.md)) lands the proof into the provider folder of the repo. CI reads the **repo-resident** proof, **never** the island-local `index.json`.
 4. A **push on the provider-proof** triggers the deterministic sync workflow (Memo 093 F10, decision A). The push is the event; the sync is the deterministic reaction.
 
-### Island vs. Repo (comparison)
+### Island compared to Repo
 
 | Aspect | Island (`grading-data/`) | Repo (`flowmcp-schemas-private`) |
 |--------|--------------------------|----------------------------------|
@@ -140,24 +134,12 @@ flowchart TD
 
 The diagram mirrors the Soll-Ablauf of Memo 093 Kap. 10: `Backlog → import → {parse?} → blocked-node | grade+aggregate → provider-proof → git push → deterministic sync → 1 issue/namespace + board → kanban-readonly`. The only non-deterministic node is `grade 6 areas`.
 
----
-
-## Relationship to the superseded Chapter 14
+## Relationship to the superseded Kanban Data Contract
 
 The two salvaged rules from [`14-kanban-data-contract.md`](./14-kanban-data-contract.md) remain normative and now apply to this monitoring track:
 
 - **Audit trail — never delete, newest is current.** Grading entries and provider-proofs are never deleted or overwritten in place; the current state is the newest entry. The board projection follows the newest proof.
 - **Irreversible veto — `rejected` is terminal.** A `rejected` namespace stays `rejected`; the board MUST NOT move a `rejected` card back to another column by editing or deleting an entry. A veto is lifted only by a fully new evaluation.
-
----
-
-## Cross-References
-
-- The emit-on-failure import gate that produces `blocked` records: [`22-workbench-island.md`](./22-workbench-island.md)
-- The `index.json` rollup, pinned reason set, board vocabulary, and backref fields: [`23-index-json.md`](./23-index-json.md)
-- Folder↔namespace invariant, fallback, rename-on-parse, provider-proof location: [`19-folder-layout.md`](./19-folder-layout.md)
-- The status-record artefact class (non-grading `blocked` node): [`08-grading-model.md`](./08-grading-model.md)
-- The salvaged audit-trail / irreversible-veto rules: [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)
 
 ## Out of scope
 

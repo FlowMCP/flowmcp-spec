@@ -1,14 +1,14 @@
 ---
 title: "Skills: Namespace Skill vs. Selection Skill"
-description: "A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection..."
+description: "Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A..."
 grading_version: "3.0.0"
 spec_file: "13-skills.md"
 order: 13
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/13-skills.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/13-skills.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/13-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/13-skills.md."
@@ -18,7 +18,9 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/13-skills.md."
 
 ---
 
-## Opening Clarification
+Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A **selection skill** spans a selection of namespaces, validates at the `group-bound` tier against the group's Domain-Knowledge content, and carries an `L1`/`L2`/`L3` level that reflects its role — Signpost, Topic, or Usecase — not a namespace count. This chapter defines both categories, the `type` and grading-only `level` fields, their mandatory content and validation obligations, and the deterministic cross-reference rules that bind the selection-skill level chain together.
+
+## Namespace Skill vs Selection Skill
 
 A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a separate, simpler category and do NOT carry a level.
 
@@ -176,27 +178,21 @@ The two categories differ on:
 
 ---
 
-## Relationship to the Schemas-Spec v4.3.0
+## Relationship to the Schemas-Spec
 
-The Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
+The Schemas-Spec [`14-skills.md`](../../spec/v4.3.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
 
 The `level` field (see [`level` (Grading-Spec extension)](#level-grading-spec-extension)) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
 
 The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration scope) is preserved without modification.
 
----
-
-## Cross-References
-
-- Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/) — the `type` field and the `SKL018` limit.
-- [`11-about-convention.md`](/grading/about-convention/) — the About-Resource obligation that skills reference.
-- [`12-personas-contract.md`](/grading/personas-contract/) — the persona contract that the persona focus draws from.
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the soft 5 / hard 7 thresholds that determine whether a selection skill is allowed at full scope.
-- [`05-phases-selection.md`](/grading/phases-selection/) — the `selection-skills-L1` / `-L2` / `-L3` Areas (per-skill grading).
-- [`08-grading-model.md`](/grading/grading-model/) — the dimensions `namespaceSkillValidity`, `selectionSkillL1`, `selectionSkillL2`, `selectionSkillL3`.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/), [`11-about-convention.md`](/grading/about-convention/), [`12-personas-contract.md`](/grading/personas-contract/)
-- **Related:** Schemas-Spec v4.3.0 [`14-skills.md`](/specification/skills/), [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`00-overview.md`](/grading/overview/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`14-skills.md`](../../spec/v4.3.0/14-skills.md)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
 

@@ -1,14 +1,14 @@
 ---
 title: "Universal Pre-Condition Obligation"
-description: "This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks..."
+description: "An aggregate grade is only trustworthy if its members are themselves settled. This chapter states the one rule that guarantees that: any check spanning multiple schemas — a Selection-Grading or an..."
 grading_version: "3.0.0"
 spec_file: "21-pre-conditions.md"
 order: 21
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/21-pre-conditions.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/21-pre-conditions.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/21-pre-conditions.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/21-pre-conditions.md."
@@ -16,11 +16,13 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/21-pre-conditi
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+An aggregate grade is only trustworthy if its members are themselves settled. This chapter states the one rule that guarantees that: any check spanning multiple schemas — a Selection-Grading or an About verification — is blocked until every member schema reads `gradingStatus: stable` in the frozen `lockSnapshot`. It is the single place where that universal pre-condition is defined; the Selection and About chapters point back here rather than restating it, and the chapter also pins the readiness ladder and per-Area dependency gates that decide when each Area becomes eligible to run.
+
 ---
 
 ## Pre-Conditions
 
-This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`.
+The pre-condition obligation was generalised from the original Selection-only rule to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`. This is its central anchoring point.
 
 ### Universal Rule
 
@@ -81,17 +83,78 @@ Non-stable Members:
 Follow-up action: complete the Single-Gradings, then rebuild the index and refreeze the lockSnapshot.
 ```
 
-### Cross-Refs
+### Area Dependency Model (normative)
 
-- Tier trim — full vs. partial → [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
-- Selection workflow step 0 → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- About verification step 0 → [`11-about-convention.md`](/grading/about-convention/)
-- Version bump invalidates `stable` → [`15-versioning-axes.md`](/grading/versioning-axes/)
-- Flywheel loop (pre-condition as a gate) → [`18-flywheel-loop.md`](/grading/flywheel-loop/)
-- Pre-condition validator implementation (shared between the About and Selection paths) — a later-stage concern
+The 11 Areas are graded against a **readiness ladder** and a per-Area **dependency
+gate**. The ladder is monotonic:
+
+```
+imported → structural-valid → deterministic-green → stable
+```
+
+- `structural-valid` — passes `flowmcp schema-check` (structure).
+- `deterministic-green` — structural-valid AND the deterministic data-pretest is ok
+  (HTTP 200 **and** non-empty data) per [`06-determinism-and-tier.md`](/grading/determinism-and-tier/).
+- `stable` — full grading promoted to stable.
+
+Each Area declares a `dependsOn` and a `requiredLevel` gate. The reference engine
+keeps this as DATA (`area-dependency-graph.json`); this table is its normative source:
+
+| Area | dependsOn | requiredLevel | dimension |
+|------|-----------|---------------|-----------|
+| `single-test` | none | `structural-valid` | both (det gate + non-det) |
+| `tools-aggregate-schema` | none | `structural-valid` | both |
+| `tools-aggregate-namespace` | all-namespace-schemas | **`deterministic-green`** | both |
+| `namespace-description` | all-namespace-schemas | **`deterministic-green`** | non-det |
+| `namespace-skills` | all-namespace-schemas | **`deterministic-green`** | non-det |
+| `about-namespace` | about-resource-present | **`stable`** | both |
+| `about-selection` | all-member-schemas | `stable` | non-det |
+| `selection-skills-L1/L2/L3` | all-member-schemas | `stable` | non-det |
+| `selection-aggregate` | all-member-schemas | `stable` | non-det |
+
+Two gates are binding:
+
+1. **Provider-Namespace-Gate** — the namespace Areas
+   (`tools-aggregate-namespace`, `namespace-description`, `namespace-skills`) are
+   held until **every** schema of the namespace is `deterministic-green`. The
+   namespace level folds onto the **weakest** schema. This is the cost guard: no
+   namespace-wide LLM round runs while any schema still fails its data-pretest.
+2. **About-Namespace-Gate** — `about-namespace` is an aggregate check and follows
+   the universal pre-condition above (`stable`), not `structural-valid`.
+
+`dimension` is the work split: `deterministic` = the CLI finishes it for free;
+`non-det` = it needs an LLM scoring round; `both` = a free deterministic gate AND
+an LLM round for the descriptive questions (`single-test` / `tools-aggregate-schema`
+carry a deterministic pretest gate plus non-deterministic description scoring).
+
+### Emit-Skill Format (normative)
+
+The non-deterministic emit (`grading non-deterministic <ns> --emit-prompts`)
+returns ONE **self-contained Emit-Skill** — a single instruction text handed to a
+sub-agent, that MUST carry, inline in the text:
+
+1. a self-describing header (this is a grading skill, work the bundled areas in one pass);
+2. the **currently-ready stage's** non-deterministic Area prompts, with the real
+   schema path, tool/namespace names and the output schema **inline** (no unresolved
+   placeholder may survive);
+3. a **Task-ID** (the emit↔consume join key);
+4. the explicit `--consume-scores` return command and the expected answer count.
+
+Hard-gated stage-2 Areas (`namespace-*`) are NOT emitted in the same skill; they are
+emitted in a **follow-up** skill once the Provider-Namespace-Gate opens. The
+transport envelope is owned by [`spec/v4.3.0/22-scoring-protocol.md`]; this section
+owns the Area composition + bundling rules.
+
+The pre-condition validator itself is shared between the About and Selection paths;
+its concrete implementation is a later-stage concern and is not pinned by this spec.
 
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`08-grading-model.md`](/grading/grading-model/), [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- **Related:** [`11-about-convention.md`](/grading/about-convention/), [`15-versioning-axes.md`](/grading/versioning-axes/), [`18-flywheel-loop.md`](/grading/flywheel-loop/)
+- [`00-overview.md`](/grading/overview/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`15-versioning-axes.md`](/grading/versioning-axes/)
+- [`18-flywheel-loop.md`](/grading/flywheel-loop/)
 

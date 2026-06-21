@@ -7,7 +7,7 @@
 
 > Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
-This document defines the parameter format for FlowMCP schema tools, resources, and skills. Each tool parameter describes where a value is placed in the API request (`position`) and how it is validated (`z`). Resource parameters use the same `position` + `z` system but without a `location` field. Skill input uses a simpler format.
+A parameter declares where a value is placed in the outgoing API request and how it is validated before the call is made. Each tool parameter pairs a `position` block (placement) with a `z` block (validation); resource parameters reuse the same pairing without a `location` field, and skill input uses a simpler shape.
 
 ---
 
@@ -391,7 +391,7 @@ A schema author uses `{{USER_PARAM}}` and `{{SERVER_PARAM:KEY}}` when defining h
 #### Validation Examples
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH001 error   Empty placeholder {{tool:}} found at line 12
   PH003 error   Input parameter key "123abc" does not match ^[a-zA-Z][a-zA-Z0-9]*$
@@ -400,7 +400,7 @@ flowmcp validate prompt.mjs
 ```
 
 ```
-flowmcp validate prompt.mjs
+flowmcp schema-check prompt.mjs
 
   PH002 error   Reference {{tool:nonExistent}} does not resolve to a registered tool
 

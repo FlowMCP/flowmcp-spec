@@ -13,11 +13,13 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+An aggregate grade is only trustworthy if its members are themselves settled. This chapter states the one rule that guarantees that: any check spanning multiple schemas — a Selection-Grading or an About verification — is blocked until every member schema reads `gradingStatus: stable` in the frozen `lockSnapshot`. It is the single place where that universal pre-condition is defined; the Selection and About chapters point back here rather than restating it, and the chapter also pins the readiness ladder and per-Area dependency gates that decide when each Area becomes eligible to run.
+
 ---
 
 ## Pre-Conditions
 
-This section is the **central anchoring point** for the pre-condition obligation. It was generalised from the Selection pre-condition to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`.
+The pre-condition obligation was generalised from the original Selection-only rule to a **universal rule**: all aggregated checks (Selection-Gradings, About verifications) are blocked until all member schemas carry `gradingStatus: stable`. This is its central anchoring point.
 
 ### Universal Rule
 
@@ -87,7 +89,7 @@ gate**. The ladder is monotonic:
 imported → structural-valid → deterministic-green → stable
 ```
 
-- `structural-valid` — passes `flowmcp validate` (structure).
+- `structural-valid` — passes `flowmcp schema-check` (structure).
 - `deterministic-green` — structural-valid AND the deterministic data-pretest is ok
   (HTTP 200 **and** non-empty data) per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md).
 - `stable` — full grading promoted to stable.
@@ -140,11 +142,5 @@ emitted in a **follow-up** skill once the Provider-Namespace-Gate opens. The
 transport envelope is owned by [`spec/v4.3.0/22-scoring-protocol.md`]; this section
 owns the Area composition + bundling rules.
 
-### Cross-Refs
-
-- Tier trim — full vs. partial → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)
-- Selection workflow step 0 → [`16-selection-lockfile.md`](./16-selection-lockfile.md)
-- About verification step 0 → [`11-about-convention.md`](./11-about-convention.md)
-- Version bump invalidates `stable` → [`15-versioning-axes.md`](./15-versioning-axes.md)
-- Flywheel loop (pre-condition as a gate) → [`18-flywheel-loop.md`](./18-flywheel-loop.md)
-- Pre-condition validator implementation (shared between the About and Selection paths) — a later-stage concern
+The pre-condition validator itself is shared between the About and Selection paths;
+its concrete implementation is a later-stage concern and is not pinned by this spec.

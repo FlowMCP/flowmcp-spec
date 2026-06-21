@@ -6,15 +6,13 @@ spec_file: "17-selections.md"
 order: 17
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/17-selections.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/17-selections.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/17-selections.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/17-selections.md."
 ---
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 **Primitive:** Selection (5th primitive)
 
@@ -140,6 +138,11 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [16-id-schema.md](/specification/id-schema/)
-- **Related:** [06-agents.md](/specification/agents/), [18-prefill.md](/specification/prefill/), [14-skills.md](/specification/skills/), [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [16-id-schema.md](/specification/id-schema/)
+- [06-agents.md](/specification/agents/)
+- [18-prefill.md](/specification/prefill/)
+- [14-skills.md](/specification/skills/)
+- [12-prompt-architecture.md](/specification/prompt-architecture/)
 

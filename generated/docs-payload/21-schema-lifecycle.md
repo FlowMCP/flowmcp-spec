@@ -1,30 +1,22 @@
 ---
 title: "Schema Lifecycle"
-description: "Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas,..."
+description: "Every FlowMCP schema travels a defined path from an initial idea to a production deployment, and this page is the canonical description of that path: the six lifecycle stages, the special rules for..."
 spec_version: "4.3.0"
 spec_file: "21-schema-lifecycle.md"
 order: 21
 section: "Specification"
 normative: false
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/21-schema-lifecycle.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/21-schema-lifecycle.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/21-schema-lifecycle.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/21-schema-lifecycle.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
+Every FlowMCP schema travels a defined path from an initial idea to a production deployment, and this page is the canonical description of that path: the six lifecycle stages, the special rules for static and migrated schemas, and the policy for handling schemas where only some primitives pass. It is the recommended way to develop a schema, and where other lifecycle descriptions in the project (README files, runbooks, skill documentation) disagree, this page is authoritative.
 
----
-
-## Overview
-
-> **Canonical Reference.** This document (§21) is the **Recommended Way** for FlowMCP schema development. The six stages below plus the Prospect-prelude (tracked on the Kanban board, before `stage:research`) define the complete path from idea to production. All other lifecycle descriptions in the project (README files, CLAUDE.md runbooks, skill documentation) are subordinate to this document. When in doubt, §21 takes precedence.
-
-Every FlowMCP schema passes through a defined lifecycle from initial research to production deployment. This document defines the six stages, special rules for static schemas and migrated schemas, and the policy for handling partially passing schemas.
-
-**Prospect-prelude (pre-stage:research):** Before `stage:research`, a namespace candidate lives as a **Prospect** on the Kanban board (see Grading-Spec §26 Monitoring Track). A Prospect has been identified as interesting but not yet confirmed as reachable or feasible. It is not tracked within the six stages of this document — it is upstream of the lifecycle. The transition from Prospect to `stage:research` is the act of verifying reachability and feasibility.
+A namespace candidate enters the picture even before the first stage. Before `stage:research`, a candidate lives as a **Prospect** on the Kanban board — identified as interesting but not yet confirmed as reachable or feasible. A Prospect sits upstream of the six stages and is not tracked within them; the act of verifying reachability and feasibility is what promotes it into `stage:research`.
 
 ---
 
@@ -35,11 +27,11 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 | 1 | `stage:research` | API endpoint discovered | API reachable, schema creation is feasible |
 | 2 | `stage:creation` | Research complete | Schema file created in `tests/new-schemas/` |
 | 3 | `stage:api-test` | Schema created | `flowmcp grading deterministic` → min. 1 PASS (see Special Rule) |
-| 4 | `stage:validation` | API test passed | `flowmcp validate` → 0 errors |
+| 4 | `stage:validation` | API test passed | `flowmcp schema-check` → 0 errors |
 | 5 | `stage:grade` | Validation passed | `namespaceAggregate` grade B or better |
 | 6 | `stage:production` | `namespaceAggregate` grade B+ confirmed | Deployed to `providers/` in production catalog |
 
-> **Two tracks.** The six stages above are the **development lifecycle** and live here. *Monitoring, issue tracking, and the grade rollup* live in the **Grading-Spec**, not here (see [Grading-Spec v3.0.0 §26 Monitoring Track](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/26-monitoring-track.md)). These two are no longer the same single sequential gate — see [Validate-before-grade ordering](#validate-before-grade-ordering-two-tracks).
+> **Two tracks.** The six stages above are the **development lifecycle** and live here. Monitoring, issue tracking, and the grade rollup live in the **Grading-Spec**, not on this page. These two are no longer the same single sequential gate — see [Validate-before-grade ordering](#validate-before-grade-ordering-two-tracks) below.
 
 ### Stage Details
 
@@ -49,20 +41,20 @@ Every FlowMCP schema passes through a defined lifecycle from initial research to
 
 **`stage:api-test`** — The schema is tested against the live API using `flowmcp grading deterministic <id>`. At least one tool must return a PASS result. See the [API-Test Special Rule](#api-test-special-rule-for-static-schemas) below for schemas with no HTTP tools.
 
-**`stage:validation`** — The schema passes structural validation: `flowmcp validate <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
+**`stage:validation`** — The schema passes structural validation: `flowmcp schema-check <path>` returns 0 errors. All validation rules from `09-validation-rules.md` must be satisfied.
 
-**`stage:grade`** — The schema receives a quality grade. The gate references the **`namespaceAggregate`** grade — the provider-level rollup — not an implied per-schema grade computed inside this lifecycle. A per-schema grade rolls up into the namespace aggregate; the aggregate is the gate (Memo 093 F3/F4). The `namespaceAggregate` grade B or better is required for production deployment. See the [Grading-Spec v3.0.0](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/00-overview.md) for the grading criteria. **The grade computation — including the aggregate — is owned entirely by the Grading-Spec; §21 only consumes the resulting `namespaceAggregate`.** FlowMCP delegates the grading model, the rollup, and the aggregate to that standard.
+**`stage:grade`** — The schema receives a quality grade. The gate references the **`namespaceAggregate`** grade — the provider-level rollup — not an implied per-schema grade computed inside this lifecycle. A per-schema grade rolls up into the namespace aggregate, and the aggregate is what the gate checks: `namespaceAggregate` grade B or better is required for production deployment. The grade computation — including the rollup and the aggregate — is owned entirely by the Grading-Spec; the lifecycle only consumes the resulting `namespaceAggregate` and delegates the grading model to that standard.
 
 **`stage:production`** — The schema is moved from `tests/new-schemas/` to `providers/{namespace}/` in the production catalog and registered in `registry.json`.
 
 ### Validate-before-grade ordering (two tracks)
 
-Up to v4.2.0 this lifecycle implied a single strict sequence: validation passes, *then* a grade is produced. v4.3.0 relaxes that sequencing for the **monitoring/grading track**:
+Up to 4.2 this lifecycle implied a single strict sequence: validation passes, *then* a grade is produced. From 4.3 that sequencing is relaxed for the **monitoring/grading track**:
 
 - A **monitoring/grading record MAY exist in a `blocked` state for a schema that has NOT cleared `stage:validation`** (emit-on-failure — the Grading-Spec import gate emits a `blocked` node with `reason: validation-failed` instead of aborting).
-- This `blocked` monitoring record does **NOT** advance the schema toward `stage:production`. The **development gate is unchanged**: validate-clean (`flowmcp validate` → 0 errors) is still required before `stage:production`.
+- This `blocked` monitoring record does **NOT** advance the schema toward `stage:production`. The **development gate is unchanged**: validate-clean (`flowmcp schema-check` → 0 errors) is still required before `stage:production`.
 
-In other words: the *development gate* (validate before production) stays; the *monitoring record* (emitted regardless of validation outcome) is the grading track's concern. §21 no longer implies these are the same single sequential gate. See [Grading-Spec v3.0.0 §22 / §23](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/22-workbench-island.md) for the emit-on-failure contract and the pinned `blocked` reason set.
+In other words: the *development gate* (validate before production) stays; the *monitoring record* (emitted regardless of validation outcome) is the grading track's concern. The two are no longer the same single sequential gate. The emit-on-failure contract and the pinned `blocked` reason set are defined by the Grading-Spec.
 
 ---
 
@@ -85,19 +77,13 @@ Not all schemas make HTTP calls. A schema is considered **static** when all of i
 
 ## Migration Special Rule
 
-Schemas migrated from v3.0.0 to v4.0.0 do not need to repeat the full lifecycle from scratch:
-
-- Migrated schemas start at **`stage:api-test`** (not `stage:research`)
-- The research and creation stages are considered complete by virtue of the existing v3 schema
-- All subsequent stages (`stage:api-test` through `stage:production`) apply normally
-
-This shortens the migration path: a previously passing v3 schema that has been updated to v4 syntax needs only an API test, validation pass, and grade check before it can re-enter production.
+A schema brought forward from an older FlowMCP version does not need to repeat the lifecycle from scratch. It enters at **`stage:api-test`** rather than `stage:research`, because the research and creation stages are already complete by virtue of the existing schema; every subsequent stage (`stage:api-test` through `stage:production`) then applies normally. The full migration procedure — what changes between versions and how to update each part of a schema — lives in the [Migration Guide](/specification/migration/).
 
 ---
 
 ## Partial Schema Policy
 
-> **Two tracks.** This policy is part of the *development lifecycle* (the six stages above). *Monitoring, issue tracking, and the grade rollup* live in the Grading-Spec — see [Grading-Spec v3.0.0 §26 Monitoring Track](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/26-monitoring-track.md). A removed primitive becomes a **blocker on the one grading-issue per namespace**, not a standalone GitHub issue.
+> **Two tracks.** This policy is part of the development lifecycle (the six stages above). Monitoring, issue tracking, and the grade rollup live in the Grading-Spec. A removed primitive becomes a **blocker on the one grading-issue per namespace**, not a standalone issue.
 
 ### Core Rule
 
@@ -137,7 +123,7 @@ The threshold-free policy prevents edge cases where a "60% pass rate" is conside
 
 Removed primitives are not abandoned — they are tracked for future resolution:
 
-1. **Blocker on the namespace grading-issue** — A removed primitive becomes a `blocked` node / `blockers[]` entry under the **one grading-issue per namespace** (defined in the Grading-Spec [`26-monitoring-track.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/26-monitoring-track.md)). No separate per-primitive GitHub issue is opened, and there is no parent-schema-issue link — the two tracks are not coupled.
+1. **Blocker on the namespace grading-issue** — A removed primitive becomes a `blocked` node / `blockers[]` entry under the **one grading-issue per namespace** (defined by the Grading-Spec monitoring track). No separate per-primitive issue is opened, and there is no parent-schema-issue link — the two tracks are not coupled.
 2. **Backlog stage** — The removed primitive starts at `stage:research` (with the API reachability already known).
 3. **Resolution path** — When the underlying issue is fixed (changed API, missing auth, updated handler), the primitive is re-added to the schema and goes through `stage:api-test` → `stage:validation` → `stage:grade`.
 4. **Re-integration** — The fixed primitive is merged back into the production schema. A new grade check may be required if the primitive significantly changes the schema's scope.
@@ -154,6 +140,10 @@ A primitive passes when at least one of its test cases returns a 2xx response wi
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/)
-- **Related:** [20-validation-strategy.md](/specification/validation-strategy/), [22-scoring-protocol.md](/specification/scoring-protocol/), [10-tests.md](/specification/tests/), [09-validation-rules.md](/specification/validation-rules/), [15-catalog.md](/specification/catalog/)
+- [00-overview.md](/specification/overview/)
+- [20-validation-strategy.md](/specification/validation-strategy/)
+- [22-scoring-protocol.md](/specification/scoring-protocol/)
+- [10-tests.md](/specification/tests/)
+- [09-validation-rules.md](/specification/validation-rules/)
+- [15-catalog.md](/specification/catalog/)
 

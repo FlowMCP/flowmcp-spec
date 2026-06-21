@@ -6,15 +6,13 @@ spec_file: "22-scoring-protocol.md"
 order: 22
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/22-scoring-protocol.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/22-scoring-protocol.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/22-scoring-protocol.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/22-scoring-protocol.md."
 ---
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
 
@@ -34,11 +32,11 @@ CLI is responsible for 1 and 3. Grader is responsible for 2. Communication via J
 
 ## Delegation — the grading model lives in the Grading-Spec
 
-FlowMCP is the highest instance and **delegates the grading model** to a separate, independently versioned standard: the **Grading-Spec** (`gradingSpec/2.0.0`), published as a dedicated docs area. The Grading-Spec owns the grading model — score-to-grade thresholds, the extended dimension set, Scoring System, Grading System, Categorical-Veto, Tier-trim, and skill families.
+FlowMCP is the highest instance and **delegates the grading model** to a separate, independently versioned standard: the **Grading-Spec** (`gradingSpec/3.0.0`), published as a dedicated docs area. The Grading-Spec owns the grading model — score-to-grade thresholds, the extended dimension set, Scoring System, Grading System, Categorical-Veto, Tier-trim, and skill families.
 
 This file owns the **upstream scoring transport** only: the deterministic `prompts.json` / `scores.json` artefact pair exchanged between the CLI and an external Grader. The Grading-Spec **sub-consumes** this transport and treats it as the highest instance for the artefact pair — it does not redefine it.
 
-Entry point: [Grading-Spec 2.0.0 — Overview](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/00-overview.md).
+Entry point: [Grading-Spec 3.0.0 — Overview](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/00-overview.md).
 
 ---
 
@@ -59,13 +57,13 @@ Each schema is evaluated on 2 dimensions:
 | `whenToUse` | Clarity and specificity of the schema description (does an LLM know when to use this schema?) |
 | `parameters` | How well the parameter descriptions enable correct tool invocation |
 
-Each dimension yields a score on a 1.0-5.0 scale (floating point). These two are the **base transport dimensions**; the Grading-Spec ([`08-grading-model.md` §Dimension Enum](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/08-grading-model.md)) extends this set with the additional grading dimensions it owns.
+Each dimension yields a score on a 1.0-5.0 scale (floating point). These two are the **base transport dimensions**; the Grading-Spec ([`08-grading-model.md` §Dimension Enum](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/08-grading-model.md)) extends this set with the additional grading dimensions it owns.
 
 ---
 
 ## Grade Thresholds — delegated to the Grading-Spec
 
-The score-to-grade banding, the production gate, the tier-trim rule and the Categorical-Veto list are **owned by the Grading-Spec** (`gradingSystem/1.0.0`), not by this transport protocol. See [Grading-Spec 2.0.0 — §4.1 Score-to-Grade Thresholds](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/2.0.0/07-scoring-vs-grading.md). Changing any threshold or the numeric mapping bumps the `gradingSystem` version independently of `scoringProtocol`.
+The score-to-grade banding, the production gate, the tier-trim rule and the Categorical-Veto list are **owned by the Grading-Spec** (`gradingSystem/1.0.0`), not by this transport protocol. See [Grading-Spec 3.0.0 — §4.1 Score-to-Grade Thresholds](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/07-scoring-vs-grading.md). Changing any threshold or the numeric mapping bumps the `gradingSystem` version independently of `scoringProtocol`.
 
 ---
 
@@ -215,8 +213,8 @@ A Grader MUST NOT:
 
 | Implementation | Type | Location |
 |----------------|------|----------|
-| `grade-score-single` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-single/SKILL.md` |
-| `grade-score-batch` | Workbench Skill | `cli/memo-toolkit/skills/grade/grade-score-batch/SKILL.md` |
+| `grade-score-single` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-single/SKILL.md` |
+| `grade-score-batch` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-batch/SKILL.md` |
 | `flowmcp dev grade` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs:grade()` |
 | `GradeReporter` | Core Module | `flowmcp-core/src/v4/task/GradeReporter.mjs` |
 
@@ -229,6 +227,10 @@ A Grader MUST NOT:
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [20-validation-strategy.md](/specification/validation-strategy/)
-- **Related:** [21-schema-lifecycle.md](/specification/schema-lifecycle/), [10-tests.md](/specification/tests/), [04-output-schema.md](/specification/output-schema/), [09-validation-rules.md](/specification/validation-rules/)
+- [00-overview.md](/specification/overview/)
+- [20-validation-strategy.md](/specification/validation-strategy/)
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [10-tests.md](/specification/tests/)
+- [04-output-schema.md](/specification/output-schema/)
+- [09-validation-rules.md](/specification/validation-rules/)
 

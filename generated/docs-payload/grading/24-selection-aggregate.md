@@ -1,20 +1,22 @@
 ---
-title: "The `selection-aggregate` Area (11th area)"
-description: "Grading is organised into **areas** — one rubric per primitive type. Ten areas already exist with output schemas under `prompts/output-schemas/`: `single-test`, `tools-aggregate-schema`,..."
+title: "The `selection-aggregate` Area"
+description: "`selection-aggregate` is the eleventh grading area, and the one that grades a selection as a whole rather than any single primitive within it. It carries the selection-wide dimensions — thresholds,..."
 grading_version: "3.0.0"
 spec_file: "24-selection-aggregate.md"
 order: 24
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/24-selection-aggregate.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/24-selection-aggregate.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/24-selection-aggregate.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/24-selection-aggregate.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/).
+
+`selection-aggregate` is the eleventh grading area, and the one that grades a selection as a whole rather than any single primitive within it. It carries the selection-wide dimensions — thresholds, topic coherence, member-against-About conformance, persona fit, and the group-bound tier — that have no per-skill or per-About home. Without it there is no gate for Grade A, which is why this area, its output schema, template, and skill triad MUST exist alongside the ten areas already in place.
 
 ---
 
@@ -25,8 +27,6 @@ Grading is organised into **areas** — one rubric per primitive type. Ten areas
 The selection-wide dimensions — thresholds, topic coherence, member-against-about conformance, persona use-case fit, the group-bound tier path — have no per-skill or per-about home. Without `selection-aggregate` there is no gate for Grade A. This area MUST exist; its output schema, template, and skill triad MUST be built (the other ten already exist).
 
 The area's gradings are stored at `selections/<selection>/_gradings/` (the selection-level `_gradings/` folder).
-
----
 
 ## Carried Dimensions
 
@@ -41,13 +41,11 @@ The area's gradings are stored at `selections/<selection>/_gradings/` (the selec
 | **Group-bound tier** | This is the area that opens the path to **Grade A** (`gradingTier = group-bound`). Provider-level grading alone caps at Grade B. |
 | **Cascade-stop** | The aggregate stops the cascade when a hard precondition fails (e.g. members below threshold), rather than producing a misleading partial grade. |
 
----
-
 ## Output Schema
 
 The output of every area shares a common **envelope** (from `_master.schema.json` plus the area-specific part) and a list of `answers[]`. The `selection-aggregate` output conforms to that envelope.
 
-### Envelope (shared)
+### Shared envelope
 
 | Field | Value |
 |-------|-------|
@@ -69,35 +67,27 @@ Each `answer` has: `questionId` (`^Q-…`), `score` (1–5 **or** `pass`/`fail`/
 
 Validation uses draft 2020-12 (`Ajv2020` + `ajv-formats`); `_master` is added once via `addSchema`.
 
----
-
 ## Template
 
 The prompt template for `selection-aggregate` follows the same contract as the other ten areas' templates: it states the area, injects the resolved member-resolution manifest (from [`index.json`](/grading/index-json/)), the About / Domain-Knowledge, the declared personas, and the threshold counts, then asks one question per carried dimension. The template MUST include the Goal-Block and the surfacing convention (see [`25-harness-and-goal.md`](/grading/harness-and-goal/)).
-
----
 
 ## Skill Triad
 
 Like every area, `selection-aggregate` is backed by a skill triad — the three-skill contract (`start-grade` → `evaluate` → `apply-improvement`) that the harness runs as the inner micro-loop. The triad reads the frozen `lockSnapshot` and the member-resolution manifest, evaluates the carried dimensions, and emits `improvementHints[]` when the selection falls short. The triad MUST be built for this area (the other ten already have theirs).
 
----
-
 ## Relationship to the index rollup
 
 `selection-aggregate` is the node `selectionAggregate` in the selection's [`index.json`](/grading/index-json/). Its status follows the 5-status node enum; reaching `stable` here (with the hard threshold met and a group-bound evaluation present) is what allows the selection rollup to reach Grade A.
 
----
-
-## Cross-References
-
-- Selection phases and thresholds: [`05-phases-selection.md`](/grading/phases-selection/)
-- Domain knowledge / About distinction: [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`11-about-convention.md`](/grading/about-convention/)
-- Member resolution manifest: [`23-index-json.md`](/grading/index-json/)
-- Harness, Goal-Block, surfacing convention: [`25-harness-and-goal.md`](/grading/harness-and-goal/)
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`05-phases-selection.md`](/grading/phases-selection/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`11-about-convention.md`](/grading/about-convention/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/), [`23-index-json.md`](/grading/index-json/), [`25-harness-and-goal.md`](/grading/harness-and-goal/)
+- [`00-overview.md`](/grading/overview/)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`13-skills.md`](/grading/skills/)
+- [`23-index-json.md`](/grading/index-json/)
+- [`25-harness-and-goal.md`](/grading/harness-and-goal/)
 

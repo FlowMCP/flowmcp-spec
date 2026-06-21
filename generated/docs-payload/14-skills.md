@@ -1,26 +1,24 @@
 ---
 title: "Skills"
-description: "Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown..."
+description: "Skills are reusable, self-contained instruction sets that an AI agent can load and follow. They map to the MCP `server.prompt` primitive and live in `.mjs` files, each with a structured `export const..."
 spec_version: "4.3.0"
 spec_file: "14-skills.md"
 order: 14
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/14-skills.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/14-skills.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/14-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/14-skills.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Skills are reusable instructions for AI agents. They map to the MCP `server.prompt` primitive. Each skill is a `.mjs` file with a structured `export const skill` object that combines Markdown instructions with typed metadata. This document defines the skill file format, field specifications, placeholder syntax, schema integration, scope rules, security constraints, and validation rules.
+Skills are reusable, self-contained instruction sets that an AI agent can load and follow. They map to the MCP `server.prompt` primitive and live in `.mjs` files, each with a structured `export const skill` object that pairs Markdown instructions with typed metadata. A skill declares the tools and resources it needs, the input it expects, and the output it produces, and its instructions reference those primitives through `{{tool:...}}`, `{{resource:...}}`, and `{{input:...}}` placeholders resolved at load time.
 
 ---
 
-## Purpose
+## Where Skills Fit
 
 Tools define individual MCP tools. Group prompts define multi-step workflows that compose tools. Skills occupy a different layer — they are **self-contained instruction sets** that an AI agent can load and follow. A skill declares what tools and resources it needs, what input it expects, and what output it produces. The instructions themselves are Markdown content with placeholder references to tools, resources, and input parameters.
 
@@ -172,7 +170,7 @@ Skills are registered into their parent scope via the parent's manifest (`select
 
 ### Field Details
 
-#### `name`
+#### The `name` Field
 
 The skill name is the primary identifier. It is used in the MCP prompt registration, in `{{skill:name}}` placeholder references, and as the key under which the skill is registered in `selection.skills` or `agent.skills` (or as the file basename in `providers/{ns}/skills/`). Only lowercase letters, numbers, and hyphens are allowed. The name MUST start with a letter.
 
@@ -189,7 +187,7 @@ name: 'my_skill'               // underscore not allowed
 name: ''                       // empty not allowed
 ```
 
-#### `version`
+#### The `version` Field
 
 The version string identifies the skill format specification. In v4, the valid value is `'flowmcp/4.0.0'`. The prefix `flowmcp/` aligns with the agent manifest versioning.
 
@@ -207,7 +205,7 @@ version: '4.0.0'               // must include flowmcp/ prefix
 
 Unified versioning in v4.3.0: all FlowMCP primitives (Schema, Selection, Agent, Skill, Prompt) carry the same `flowmcp/X.Y.Z` version string. When the FlowMCP specification changes in a breaking way, the version increments across all primitives in lockstep (e.g. `flowmcp/5.0.0`).
 
-#### `description`
+#### The `description` Field
 
 A human-readable summary of what the skill does. This text appears in MCP prompt listings and search results. Maximum 1024 characters.
 
@@ -221,7 +219,7 @@ description: 'A skill.'
 description: 'This skill does many things including...' // (1024+ chars)
 ```
 
-#### `requires`
+#### The `requires` Object
 
 The `requires` object declares what the skill depends on. All three sub-fields are optional. If `requires` is omitted entirely, the skill has no declared dependencies.
 
@@ -250,7 +248,7 @@ requires: {}
 
 **`requires.external`** — Free-form strings declaring external capabilities. These are informational only — the runtime does not validate them against available capabilities. They help consumers understand what environment the skill expects.
 
-#### `input`
+#### The `input` Array
 
 An array of parameter definitions. Each parameter describes one piece of information the user must (or may) provide when invoking the skill. Input parameters are referenced in the `content` via `{{input:key}}` placeholders.
 
@@ -306,7 +304,7 @@ Each object in the `input` array has the following fields:
 
 The `values` field is required when `type` is `'enum'` and forbidden when `type` is anything else. If a non-enum parameter includes `values`, the validator raises SKL009.
 
-#### `output`
+#### The `output` Field
 
 A string describing the expected output of the skill. This helps the AI agent understand what deliverable it should produce.
 
@@ -320,7 +318,7 @@ output: 'A report.'
 output: 'Some data.'
 ```
 
-#### `content`
+#### The `content` Field
 
 The Markdown instructions that the AI agent follows. This is the core of the skill — it tells the agent what to do, step by step. Content MUST NOT be empty. It may contain placeholders that reference tools, resources, other skills, and input parameters. See [Placeholders](#placeholders).
 
@@ -496,7 +494,7 @@ All FlowMCP primitives carry the same `flowmcp/X.Y.Z` version string:
 
 ### Structural Rules (Static Validation)
 
-These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp validate`.
+These rules can be checked at load time by examining the skill file and the schema's `main` block. They run during `flowmcp schema-check`.
 
 | Code | Severity | Rule |
 |------|----------|------|
@@ -626,7 +624,7 @@ vs_currencies: usd
 
 ### Validation
 
-The one-shot constraint is **not statically verifiable** by `flowmcp validate` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
+The one-shot constraint is **not statically verifiable** by `flowmcp schema-check` — it depends on LLM behavior. However, skill authors MUST follow the content embedding requirements above. Reviewers MAY flag skills that lack embedded parameter tables as failing the one-shot design principle.
 
 See `10-tests.md` (One-Shot Test for Skills) for the test protocol.
 
@@ -939,6 +937,11 @@ etherscan/
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [12-prompt-architecture.md](/specification/prompt-architecture/), [18-prefill.md](/specification/prefill/), [16-id-schema.md](/specification/id-schema/), [06-agents.md](/specification/agents/), [17-selections.md](/specification/selections/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [18-prefill.md](/specification/prefill/)
+- [16-id-schema.md](/specification/id-schema/)
+- [06-agents.md](/specification/agents/)
+- [17-selections.md](/specification/selections/)
 

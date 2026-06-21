@@ -1,14 +1,14 @@
 ---
-title: "Scope Whitelist + Public-only Principle"
-description: "This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by..."
+title: "Scope Allowlist + Public-only Principle"
+description: "The grading system covers only an explicit allowlist of FlowMCP constructs: Tools, Shared Lists, the `about` markdown resource, and Skills are gradable, while all other Resources, Prompts, and..."
 grading_version: "3.0.0"
 spec_file: "17-scope-whitelist.md"
 order: 17
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/17-scope-whitelist.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/17-scope-whitelist.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/17-scope-whitelist.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/17-scope-whitelist.md."
@@ -16,13 +16,15 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/17-scope-white
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+The grading system covers only an explicit allowlist of FlowMCP constructs: Tools, Shared Lists, the `about` markdown resource, and Skills are gradable, while all other Resources, Prompts, and Procedures stay on-hold because they lack a clear grading methodology. A second, orthogonal boundary applies on top of that allowlist — the public-only principle restricts grading to publicly accessible data sources, leaving private or non-public interfaces to the schema author. This chapter defines both boundaries and the consequences they have for which areas run and how out-of-scope fields are answered.
+
 ---
 
 ## Scope
 
-### Scope Whitelist
+### Scope Allowlist
 
-This spec defines explicitly which FlowMCP constructs are covered by the grading system. The `about` markdown resource and Skills now have a clear grading methodology and are in-scope (graded by their dedicated areas). All other Resources, Prompts, and Procedures remain FlowMCP constructs without a clear grading methodology — they lie outside the current scope.
+The grading system covers an explicit allowlist of FlowMCP constructs. The `about` markdown resource and Skills have a clear grading methodology and are in-scope (graded by their dedicated areas). All other Resources, Prompts, and Procedures remain FlowMCP constructs without a clear grading methodology — they lie outside the current scope.
 
 | Element | Status | Rationale |
 |---------|--------|-----------|
@@ -36,7 +38,7 @@ This spec defines explicitly which FlowMCP constructs are covered by the grading
 | Prompts | Out-of-Scope (on-hold) | Unclear how to test |
 | Procedures | Out-of-Scope (on-hold) | Unclear how to test |
 
-Nine entries in total. The `about` markdown resource and Skills are in-scope; all other Resources, Prompts, and Procedures remain on-hold. Adding a new element to the whitelist is a `gradingSpec` bump.
+Nine entries in total. The `about` markdown resource and Skills are in-scope; all other Resources, Prompts, and Procedures remain on-hold. Adding a new element to the allowlist is a `gradingSpec` bump.
 
 ### Public-only Principle
 
@@ -46,8 +48,7 @@ This principle is the consequence of [`02-eligibility.md`](/grading/eligibility/
 
 ### Consequences
 
-- **Provider areas are tool-centric** (matches the whitelist) — the `single-test`, `tools-aggregate-schema`, and `tools-aggregate-namespace` areas evaluate tool aspects (see [`08-grading-model.md`](/grading/grading-model/))
-- **Tool-aspect checks match the whitelist** — the provider-side tool areas are tool-centric and fit the whitelist
+- **Provider areas are tool-centric** (matches the allowlist) — the `single-test`, `tools-aggregate-schema`, and `tools-aggregate-namespace` areas evaluate tool aspects (see [`08-grading-model.md`](/grading/grading-model/))
 - **Existing non-tool code that is not `about` or a Skill is marked on-hold** — code audit
 - **The `n/a` convention** (see [`08-grading-model.md`](/grading/grading-model/)) is the standard answer for out-of-scope fields of an otherwise valid schema (e.g. a schema has tools + resources — tools are graded, resources `n/a`)
 
@@ -60,16 +61,11 @@ The exclusion criteria and access classes in [`02-eligibility.md`](/grading/elig
 
 The two complement each other. A schema can satisfy the exclusion criteria and access classes perfectly and still contain out-of-scope constructs (e.g. Procedures) — the Procedures then receive `n/a`, the tools are graded in full.
 
-### Cross-Refs
-
-- Tool-centric grading areas (`single-test`, `tools-aggregate-schema`, `tools-aggregate-namespace`) → [`08-grading-model.md`](/grading/grading-model/)
-- `n/a` pragma → [`08-grading-model.md`](/grading/grading-model/)
-- Eligibility (read focus, OAuth prohibition) → [`02-eligibility.md`](/grading/eligibility/)
-- Target audience (public interfaces) → [`02-eligibility.md`](/grading/eligibility/)
-- Folder layout (tools vs. Shared Lists paths) → [`19-folder-layout.md`](/grading/folder-layout/)
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`02-eligibility.md`](/grading/eligibility/), [`08-grading-model.md`](/grading/grading-model/)
-- **Related:** [`05-phases-selection.md`](/grading/phases-selection/), [`19-folder-layout.md`](/grading/folder-layout/)
+- [`00-overview.md`](/grading/overview/)
+- [`02-eligibility.md`](/grading/eligibility/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
 

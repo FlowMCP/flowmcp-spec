@@ -1,20 +1,22 @@
 ---
 title: "Entry-Point Prompt + Personas Obligation"
-description: "Empty context (see [`02-eligibility.md`](./02-eligibility.md)) is a convention — it needs an **operational anchor**. The entry-point prompt is that anchor: the first prompt after `/clear` starts..."
+description: "Every grading run begins from an empty context, and an empty context needs a concrete starting signal. This chapter defines that signal: the entry-point prompt, the first prompt a grader pastes after..."
 grading_version: "3.0.0"
 spec_file: "20-entry-point-prompt.md"
 order: 20
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/20-entry-point-prompt.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/20-entry-point-prompt.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/20-entry-point-prompt.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/20-entry-point-prompt.md."
 ---
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
+
+Every grading run begins from an empty context, and an empty context needs a concrete starting signal. This chapter defines that signal: the entry-point prompt, the first prompt a grader pastes after `/clear`, which binds the persona, the selection or single schema, the mode, and the spec version into one block. It also fixes the personas obligation — when a persona is spec-mandatory versus merely conventional — so that Single- and Selection-Gradings stay anchored to the same evaluation lens.
 
 ---
 
@@ -74,20 +76,16 @@ Rationale: Single-Gradings without a persona anchor produce evaluation drift. Th
 - Selection-Gradings: persona **MUST** be in `selection.json` AND in the prompt
 - Single-Gradings: persona **SHOULD** be in the prompt (organisational, not a spec-mandatory field)
 
-### Cross-Reference to the README
+### Where the Template Lives
 
-The README in the grading repository contains the ready-to-use prompt with example values. The README section anchors the entry-point prompt and the personas obligation in a single block.
-
-### Cross-Refs
-
-- Empty-context convention → [`02-eligibility.md`](/grading/eligibility/)
-- Personas contract (Lens, four personas) → [`12-personas-contract.md`](/grading/personas-contract/)
-- Selection `personaIds[]` obligation → [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- Pre-condition (line 5 of the prompt) → [`21-pre-conditions.md`](/grading/pre-conditions/)
-- Output format `_gradings/` (line 6 of the prompt) → [`19-folder-layout.md`](/grading/folder-layout/)
+The README in the grading repository carries the ready-to-use prompt with example values, anchoring the entry-point prompt and the personas obligation in a single block. The grader copies that block, runs `/clear`, and fills in the run-specific values (persona, selection or single schema, mode, and the `lockSnapshot` hash).
 
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`02-eligibility.md`](/grading/eligibility/), [`12-personas-contract.md`](/grading/personas-contract/), [`16-selection-lockfile.md`](/grading/selection-lockfile/)
-- **Related:** [`21-pre-conditions.md`](/grading/pre-conditions/), [`19-folder-layout.md`](/grading/folder-layout/)
+- [`00-overview.md`](/grading/overview/)
+- [`02-eligibility.md`](/grading/eligibility/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`16-selection-lockfile.md`](/grading/selection-lockfile/)
+- [`21-pre-conditions.md`](/grading/pre-conditions/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
 

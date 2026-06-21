@@ -1,34 +1,22 @@
 ---
 title: "Validation Strategy"
-description: "FlowMCP v4.3.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F)."
+description: "Validation in FlowMCP works in two layers. A **deterministic** layer checks structural correctness — that the schema is well-formed and every primitive declares the fields it must. A..."
 spec_version: "4.3.0"
 spec_file: "20-validation-strategy.md"
 order: 20
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/20-validation-strategy.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/20-validation-strategy.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/20-validation-strategy.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
+Validation in FlowMCP works in two layers. A **deterministic** layer checks structural correctness — that the schema is well-formed and every primitive declares the fields it must. A **probabilistic** layer adds an LLM-based quality judgement on top of a structurally clean schema. Together the two layers produce a **Grade Report** that assigns a single letter grade (A–F), which is the record this page defines.
 
----
-
-## Overview
-
-FlowMCP v4.3.0 introduces a two-layer validation strategy: **deterministic** (structural) and **probabilistic** (LLM-based). Together they produce a **Grade Report** with a letter grade (A–F).
-
----
-
-## See also — Grading-Spec in `flowmcp-grading`
-
-A separate **Grading-Spec** (`gradingSpec/3.0.0`) covers Single-Schema and Selection grading in the [flowmcp-grading](https://github.com/FlowMCP/flowmcp-grading) repo. The Validation Strategy in this file remains the deterministic baseline; the Grading System defined in the Grading-Spec extends (and partly replaces) the simple A–F Grade System described below. The Schemas-Spec v4.3.0 remains the highest instance.
-
-Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/00-overview.md).
+A separate **Grading-Spec** in the `flowmcp-grading` repository covers Single-Schema and Selection grading in more depth. The strategy described here remains the deterministic baseline; the Grading System defined by the Grading-Spec extends, and in places replaces, the simple A–F Grade System below. The Schemas-Spec remains the highest instance.
 
 ---
 
@@ -48,10 +36,8 @@ Entry point: [flowmcp-grading/spec/1.0.0/00-overview.md](https://github.com/Flow
 
 A validation FAIL is recorded differently depending on the track:
 
-- **Development track** (this strategy, the Grade Report). A validation FAIL yields the terminal grade **F = "Not loadable"**. The development gate is unchanged: validate-clean is still required before `stage:production` (see [21-schema-lifecycle](/specification/schema-lifecycle/)). Grade F continues to represent a not-loadable schema in the dev/grade-report sense.
-- **Monitoring / grading track.** The same FAIL produces a **`blocked` record with a repairable reason** (e.g. `validation-failed`), **not** the terminal grade F. This is the emit-on-failure behaviour of the Grading-Spec: the import gate emits a `blocked` node and continues rather than aborting. The pinned `blocked` reason set and the status-record semantics live in the Grading-Spec [`23-index-json.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/grading/3.0.0/23-index-json.md) (status + reason, no grade).
-
-The two tracks are reconciled in `21-schema-lifecycle.md`: the dev gate (validate before production) stays; the monitoring record (emitted regardless) is the grading track's concern.
+- **Development track** (this strategy, the Grade Report). A validation FAIL yields the terminal grade **F = "Not loadable"**. The development gate is unchanged: validate-clean is still required before `stage:production` (see [21-schema-lifecycle.md](/specification/schema-lifecycle/)). Grade F continues to represent a not-loadable schema in the dev/grade-report sense.
+- **Monitoring / grading track.** The same FAIL produces a **`blocked` record with a repairable reason** (e.g. `validation-failed`), **not** the terminal grade F. This is the emit-on-failure behaviour of the Grading-Spec: the import gate emits a `blocked` node and continues rather than aborting. The pinned `blocked` reason set and the status-record semantics live in the Grading-Spec (status + reason, no grade).
 
 ## Grade Report Format
 
@@ -106,7 +92,7 @@ Validator versions are internal and are NOT stored in schema files. They appear 
 - `validation/4.0` — initial v4 validator
 - `validation/4.1` — incremental update (backward compatible)
 
-This avoids `validationVersion` fields in schema files (anti-pattern — the Grade Report is the record).
+This avoids `validationVersion` fields in schema files (an anti-pattern — the Grade Report is the record).
 
 ## Deterministic Validation
 
@@ -136,6 +122,9 @@ A Language Model calling tools from `etherscan-io/contracts` receives the tool l
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [09-validation-rules.md](/specification/validation-rules/)
-- **Related:** [22-scoring-protocol.md](/specification/scoring-protocol/), [21-schema-lifecycle.md](/specification/schema-lifecycle/), [10-tests.md](/specification/tests/)
+- [00-overview.md](/specification/overview/)
+- [09-validation-rules.md](/specification/validation-rules/)
+- [22-scoring-protocol.md](/specification/scoring-protocol/)
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [10-tests.md](/specification/tests/)
 

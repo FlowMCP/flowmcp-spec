@@ -5,13 +5,15 @@
 | Status | Normative — NEW in 1.1.0 |
 | Version | `gradingSpec/1.1.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`02-eligibility.md`](./02-eligibility.md), [`12-personas-contract.md`](./12-personas-contract.md), [`16-selection-lockfile.md`](./16-selection-lockfile.md) |
-| Related | [`21-pre-conditions.md`](./21-pre-conditions.md), [`19-folder-layout.md`](./19-folder-layout.md) |
+| Related | [`21-pre-conditions.md`](./21-pre-conditions.md), [`19-folder-layout.md`](./19-folder-layout.md), [`12-personas-contract.md`](./12-personas-contract.md) |
 
 > **Spec:** `gradingSpec/1.1.0`
 > **Status:** stable (additive extension of 1.0.0)
 > **Changes vs. 1.0.0:** entirely new [Entry-Point Prompt](#entry-point-prompt) chapter (entry-point prompt template + personas obligation for Single AND Selection).
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
+
+Every grading run begins from an empty context, and an empty context needs a concrete starting signal. This chapter defines that signal: the entry-point prompt, the first prompt a grader pastes after `/clear`, which binds the persona, the selection or single schema, the mode, and the spec version into one block. It also fixes the personas obligation — when a persona is spec-mandatory versus merely conventional — so that Single- and Selection-Gradings stay anchored to the same evaluation lens.
 
 ---
 
@@ -71,14 +73,6 @@ Rationale: Single-Gradings without a persona anchor produce evaluation drift. Th
 - Selection-Gradings: persona **MUST** be in `selection.json` AND in the prompt
 - Single-Gradings: persona **SHOULD** be in the prompt (organisational, not a spec-mandatory field)
 
-### Cross-Reference to the README
+### Where the Template Lives
 
-The README in the grading repository contains the ready-to-use prompt with example values. The README section anchors the entry-point prompt and the personas obligation in a single block.
-
-### Cross-Refs
-
-- Empty-context convention → [`02-eligibility.md`](./02-eligibility.md)
-- Personas contract (Lens, four personas) → [`12-personas-contract.md`](./12-personas-contract.md)
-- Selection `personaIds[]` obligation → [`16-selection-lockfile.md`](./16-selection-lockfile.md)
-- Pre-condition (line 5 of the prompt) → [`21-pre-conditions.md`](./21-pre-conditions.md)
-- Output format `_gradings/` (line 6 of the prompt) → [`19-folder-layout.md`](./19-folder-layout.md)
+The README in the grading repository carries the ready-to-use prompt with example values, anchoring the entry-point prompt and the personas obligation in a single block. The grader copies that block, runs `/clear`, and fills in the run-specific values (persona, selection or single schema, mode, and the `lockSnapshot` hash).

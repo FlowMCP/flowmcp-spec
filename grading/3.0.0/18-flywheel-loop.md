@@ -5,9 +5,11 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md), [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md) |
-| Related | [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`11-about-convention.md`](./11-about-convention.md) |
+| Related | [`19-folder-layout.md`](./19-folder-layout.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`04-phases-single.md`](./04-phases-single.md), [`05-phases-selection.md`](./05-phases-selection.md), [`11-about-convention.md`](./11-about-convention.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
+
+The grading process is a self-reinforcing flywheel: provider folders and selection definitions are imported into the workbench, graded by the provider-side and selection-side areas, and the graded state is exported back as `index.json`. Each turn improves the inputs to the next — a stronger schema lifts every selection that contains it, and every selection run surfaces the weakest schemas in a namespace. This chapter traces that round-trip end to end, names the three loops that keep it spinning, and lists the anti-patterns that break it.
 
 ---
 
@@ -80,8 +82,6 @@ The flywheel is self-reinforcing along three loops:
 2. **Aggregation loop per selection**: SGRADE → (on member change) GATE → SGRADE. Every re-grading of a member updates the namespace `index.json`; the selection's frozen `lockSnapshot` is refreshed at the next selection-grading start.
 3. **About-verification loop**: ABOUT (route-exists + content check) → on change a new About snapshot → re-check; the namespace `index.json` records the new About grade.
 
----
-
 ## Anti-Patterns
 
 The following patterns break the flywheel and are excluded by the spec:
@@ -89,13 +89,4 @@ The following patterns break the flywheel and are excluded by the spec:
 - **Partial gradings without a concluding full grading**: the node status never reaches `stable`, the selection stays blocked (see [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)).
 - **Schema edit without a new snapshot**: a source edit MUST produce a new versioned snapshot file; editing in place breaks the latest-resolution and the hash binding (see [`19-folder-layout.md`](./19-folder-layout.md)).
 - **Selection grading with non-`stable` members**: the pre-condition (see [`21-pre-conditions.md`](./21-pre-conditions.md)) blocks the selection run before any Area runs.
-
----
-
-## Cross-References
-
-- Round-trip and folder layout → [`19-folder-layout.md`](./19-folder-layout.md)
-- Partial vs. full and the five node statuses → [`06-determinism-and-tier.md`](./06-determinism-and-tier.md)
-- Pre-condition → [`21-pre-conditions.md`](./21-pre-conditions.md)
-- Provider-side Areas → [`04-phases-single.md`](./04-phases-single.md)
-- Selection-side Areas → [`05-phases-selection.md`](./05-phases-selection.md)
+- **Reading the live directory instead of the frozen snapshot**: the pre-condition gate MUST read the frozen `index.json.lockSnapshot`, not the live rollup. Reading the live directory aggregates over members that are still moving between rounds, so the gate would judge an unstable point in time and the result would not be reproducible (see [`16-selection-lockfile.md`](./16-selection-lockfile.md)).

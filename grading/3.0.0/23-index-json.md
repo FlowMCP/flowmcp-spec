@@ -1,22 +1,16 @@
-# 23 — The `index.json` Rollup
+# 23 — Namespace and Selection Rollup
 
 | Field | Value |
 |-------|-------|
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`19-folder-layout.md`](./19-folder-layout.md) |
-| Related | [`14-kanban-data-contract.md`](./14-kanban-data-contract.md) (superseded by this chapter), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`08-grading-model.md`](./08-grading-model.md), [`26-monitoring-track.md`](./26-monitoring-track.md) |
+| Related | [`14-kanban-data-contract.md`](./14-kanban-data-contract.md) (superseded by this chapter), [`16-selection-lockfile.md`](./16-selection-lockfile.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`08-grading-model.md`](./08-grading-model.md), [`24-selection-aggregate.md`](./24-selection-aggregate.md), [`26-monitoring-track.md`](./26-monitoring-track.md) |
 | Annex | [`index.schema.json`](./index.schema.json) — JSON-Schema 2020-12 for `index.json` |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
 
----
-
-## Purpose
-
-Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file. There is exactly **one `index.json` per namespace and one per selection**. It is the rollup: a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status.
-
-This chapter supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)). The two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
+Status and grade live on the **namespace** level (and the **selection** level), not on a per-schema sidecar file: there is exactly **one `index.json` per namespace and one per selection**. The file is the rollup — a tree of `tool → schema → namespace` (provider flow) or `member → selection` (selection flow), where each node carries its newest grade (resolved via `resolveLatest`) and a rolled-up status. This chapter pins its structure: the two-part split between a recomputed live rollup and a frozen point-in-time snapshot, the two status vocabularies that must never be mixed, and the audit-trail and veto rules it inherits. It supersedes the former Kanban phase-status contract (see [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)); the two salvaged rules from that contract — the audit trail and the irreversible veto — are restated normatively in [Salvaged Rules: Audit Trail + Irreversible Veto](#salvaged-rules-audit-trail--irreversible-veto).
 
 ---
 
@@ -111,9 +105,9 @@ The sync MUST treat a present `githubIssue` backref as idempotency proof: it MUS
 
 ---
 
-## Member-Resolution-Manifest (SEL003)
+## Member-Resolution Manifest
 
-For a selection, the rollup carries a **member-resolution manifest** — the heart of selection grading. For each member it records `schemaId → resolved provider artifact + grade + status`. Without this manifest the selection aggregate cannot reproduce its "M of N members PASS" verdict, because the member IDs in `selection.json` are logical and must be resolved (via `resolveLatest`) to a concrete graded provider artifact. The manifest makes that resolution explicit and auditable.
+For a selection, the rollup carries a **member-resolution manifest** — the heart of selection grading. For each member it records `schemaId → resolved provider artifact + grade + status`. Without this manifest the selection aggregate cannot reproduce its "M of N members PASS" verdict, because the member IDs in `selection.json` are logical and must be resolved (via `resolveLatest`) to a concrete graded provider artifact. The manifest makes that resolution explicit and auditable. The selection aggregate that consumes it is defined in [`24-selection-aggregate.md`](./24-selection-aggregate.md).
 
 ---
 
@@ -211,13 +205,3 @@ This record validates against [`index.schema.json`](./index.schema.json) with on
 - The rebuild preserves the frozen `lockSnapshot` byte-for-byte.
 - The rebuild runs after every grading write.
 - The former per-namespace `summary.json` as an entry point is superseded by `index.json`; only the per-schema `summary.json` (phase-0 pretest data) remains.
-
----
-
-## Cross-References
-
-- Superseded contract: [`14-kanban-data-contract.md`](./14-kanban-data-contract.md)
-- Pre-condition gate reading `lockSnapshot`: [`21-pre-conditions.md`](./21-pre-conditions.md)
-- Lock snapshot fields (ex-lockfile): [`16-selection-lockfile.md`](./16-selection-lockfile.md)
-- Grading model (`schemaId`, `aggregateGrade`, veto): [`08-grading-model.md`](./08-grading-model.md)
-- Selection aggregate that consumes the manifest: [`24-selection-aggregate.md`](./24-selection-aggregate.md)

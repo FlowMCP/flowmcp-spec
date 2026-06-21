@@ -1,22 +1,20 @@
 ---
 title: "Shared Lists"
-description: "Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list. This..."
+description: "Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list that is..."
 spec_version: "4.3.0"
 spec_file: "03-shared-lists.md"
 order: 3
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/03-shared-lists.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/03-shared-lists.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/03-shared-lists.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/03-shared-lists.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list. This document defines the list format, field definitions, dependency model, schema referencing, runtime injection, and validation rules.
+Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list that is versioned, validated, and centrally maintained. The sections below cover the list file format, the meta and field definitions, the dependency model between lists, how schemas reference and filter lists, how the runtime injects resolved data into handlers, and the validation rules that keep the registry consistent.
 
 ---
 
@@ -557,6 +555,10 @@ Each `.mjs` file contains exactly one shared list. Combining multiple lists in a
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/), [02-parameters.md](/specification/parameters/)
-- **Related:** [15-catalog.md](/specification/catalog/), [16-id-schema.md](/specification/id-schema/), [09-validation-rules.md](/specification/validation-rules/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [02-parameters.md](/specification/parameters/)
+- [15-catalog.md](/specification/catalog/)
+- [16-id-schema.md](/specification/id-schema/)
+- [09-validation-rules.md](/specification/validation-rules/)
 

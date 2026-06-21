@@ -6,15 +6,13 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/12-prompt-architecture.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/12-prompt-architecture.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/12-prompt-architecture.md."
 ---
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
@@ -706,14 +704,14 @@ Skills are schema-scoped instruction sets with explicit input typing and structu
 ### Validation Output Examples
 
 ```
-flowmcp validate providers/coingecko/prompts/price-comparison.mjs
+flowmcp schema-check providers/coingecko/prompts/price-comparison.mjs
 
   0 errors, 0 warnings
   Prompt is valid
 ```
 
 ```
-flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
+flowmcp schema-check agents/crypto-research/prompts/token-deep-dive.mjs
 
   PRM004 error   Agent-Prompt "token-deep-dive" requires testedWith field
   PRM006 error   dependsOn entry "etherscan/tool/nonExistent" does not resolve
@@ -723,7 +721,7 @@ flowmcp validate agents/crypto-research/prompts/token-deep-dive.mjs
 ```
 
 ```
-flowmcp validate providers/coingecko/prompts/bad-prompt.mjs
+flowmcp schema-check providers/coingecko/prompts/bad-prompt.mjs
 
   PRM003 error   Prompt "bad-prompt" has both namespace and agent set
   PRM005 error   testedWith "claude-sonnet" must contain /
@@ -919,6 +917,10 @@ agents/
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [14-skills.md](/specification/skills/), [06-agents.md](/specification/agents/), [18-prefill.md](/specification/prefill/), [16-id-schema.md](/specification/id-schema/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [14-skills.md](/specification/skills/)
+- [06-agents.md](/specification/agents/)
+- [18-prefill.md](/specification/prefill/)
+- [16-id-schema.md](/specification/id-schema/)
 

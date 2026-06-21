@@ -1,14 +1,14 @@
 ---
 title: "Domain Knowledge and Group Definition"
-description: "A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation...."
+description: "A **topic group** — a selection composed of several namespaces — develops conventions, shared vocabularies, and provider-specific quirks that are invisible from any single namespace in isolation...."
 grading_version: "3.0.0"
 spec_file: "10-domain-knowledge.md"
 order: 10
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/10-domain-knowledge.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/10-domain-knowledge.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/10-domain-knowledge.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/10-domain-knowledge.md."
@@ -18,7 +18,9 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/10-domain-know
 
 ---
 
-## Purpose
+A **topic group** — a selection composed of several namespaces — develops conventions, shared vocabularies, and provider-specific quirks that are invisible from any single namespace in isolation. Grading at the `group-bound` tier MUST be validated against the group's **Domain-Knowledge content**, and that content lives in the selection's **About Resource** rather than a separate document — a binding identity rather than a loose association. This chapter sets the two thresholds under which a selection counts as a group, lists the seven mandatory sections the content must carry, and traces how it feeds the `domainConformance` and `personaUseCaseFit` dimensions.
+
+## Domain-Knowledge as the Selection's About Resource
 
 A **topic group** (selection composed of several namespaces) develops conventions, shared vocabularies, and provider-specific quirks that are not visible from any single namespace in isolation. Grading at the `group-bound` tier (see [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)) MUST be validated against the group's **Domain-Knowledge content** — and that content lives in the selection's **About Resource**, not in a separate document.
 
@@ -114,19 +116,14 @@ A grading entry that uses Domain-Knowledge content records the resolved About Re
 
 **Binding rule.** Without Domain-Knowledge content for a group, no `group-bound` grading entry can be produced, and `aggregateGrade = A` is consequently NOT attainable for the schemas in that selection. This rule is the **structural enforcement** of the diversity maxim: groups have to invest in their About Resource to unlock the top grade.
 
----
-
-## Cross-References
-
-- [`05-phases-selection.md`](/grading/phases-selection/) — the `about-selection` and `selection-aggregate` Areas that consume the Domain-Knowledge content.
-- [`08-grading-model.md`](/grading/grading-model/) — the `domainConformance` dimension and the `selectionContext` field.
-- [`09-security-and-development.md`](/grading/security-and-development/) — Shared-List enforcement is referenced from the security chapter.
-- [`11-about-convention.md`](/grading/about-convention/) — About as a markdown schema Resource; the carrier of the Domain-Knowledge content.
-- [`12-personas-contract.md`](/grading/personas-contract/) — the Personas Reference section consumes the persona slugs and Lens definitions.
-- [`13-skills.md`](/grading/skills/) — selection-skill validation reads the group's Domain-Knowledge content as context.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/), [`09-security-and-development.md`](/grading/security-and-development/)
-- **Related:** [`05-phases-selection.md`](/grading/phases-selection/), [`11-about-convention.md`](/grading/about-convention/), [`12-personas-contract.md`](/grading/personas-contract/), [`13-skills.md`](/grading/skills/)
+- [`00-overview.md`](/grading/overview/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`09-security-and-development.md`](/grading/security-and-development/)
+- [`05-phases-selection.md`](/grading/phases-selection/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`13-skills.md`](/grading/skills/)
 

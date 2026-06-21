@@ -1,53 +1,48 @@
 ---
 title: "MCP Tasks"
-description: "**Deferred to v2.1.0.** This section is a placeholder."
+description: "MCP Tasks describe long-running asynchronous operations — a query that takes thirty seconds to finish, a job that is submitted now and collected later. The underlying MCP protocol gives such..."
 spec_version: "4.3.0"
 spec_file: "07-tasks.md"
 order: 7
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/07-tasks.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/07-tasks.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/07-tasks.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/07-tasks.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-## Status
-
-**Deferred to v2.1.0.** This section is a placeholder.
-
-MCP Tasks enable long-running asynchronous operations (e.g. executing a Dune Analytics query that takes 30+ seconds). The MCP protocol defines a task lifecycle with creation, polling, completion, and cancellation.
+MCP Tasks describe long-running asynchronous operations — a query that takes thirty seconds to finish, a job that is submitted now and collected later. The underlying MCP protocol gives such operations a lifecycle of creation, polling, completion, and cancellation. FlowMCP does not yet model this lifecycle: task support is a reserved, forward-looking area of the specification, and this page documents what is held back and why.
 
 ---
 
-## Why Deferred
+## Why It Is Held Back
 
-FlowMCP schemas describe how to interact with **external API async patterns** (job submission, status polling, result retrieval). The MCP Tasks protocol defines how the **MCP server itself** exposes async operations to AI clients. These are two complementary layers that need careful alignment.
+A schema describes how to talk to an **external API's** asynchronous pattern — submitting a job, polling its status, retrieving the result once it is ready. The MCP Tasks protocol describes something different: how the **MCP server itself** surfaces its own asynchronous operations to AI clients. These are two distinct layers, and binding them together cleanly is what task support depends on. A future revision will define:
 
-v2.1.0 will define:
-- Schema-level fields for declaring async routes
-- Mapping between external API status values and MCP Task states
-- Integration with the MCP Tasks protocol (`tasks/get`, `tasks/result`, `tasks/cancel`)
-
----
-
-## Reference
-
-- [MCP Tasks Specification (2025-11-25)](https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/tasks)
-- [SEP-1686: Tasks — GitHub Discussion](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1686)
+- Schema-level fields for declaring asynchronous tools
+- A mapping between an external API's own status values and MCP Task states
+- Integration with the MCP Tasks protocol operations (`tasks/get`, `tasks/result`, `tasks/cancel`)
 
 ---
 
 ## Reserved Fields
 
-Schema authors MAY include an `async` field in route definitions for forward compatibility. In v2.0.0, this field is **ignored** by the runtime but preserved for future use.
+Schema authors MAY include an `async` field in tool definitions for forward compatibility. The runtime currently **ignores** this field but preserves it untouched, so schemas written today remain valid once task support lands.
+
+---
+
+## Reference
+
+- [MCP Tasks Specification](https://modelcontextprotocol.io/specification/basic/utilities/tasks)
+- [SEP-1686: Tasks — protocol discussion](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1686)
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [04-output-schema.md](/specification/output-schema/), [10-tests.md](/specification/tests/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [04-output-schema.md](/specification/output-schema/)
+- [10-tests.md](/specification/tests/)
 

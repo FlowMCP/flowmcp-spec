@@ -9,6 +9,8 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md).
 
+The grading workbench keeps its working files in a directory that is deliberately walled off from the shipped repositories. This chapter explains why that separation exists, how the internal naming scheme earns its verbosity, and how data crosses the boundary in both directions without ever overwriting a source. The result is a non-destructive round-trip — import, grade, improve, export — whose internal complexity never reaches the public artifacts.
+
 ---
 
 ## The Island Principle
@@ -42,15 +44,15 @@ The island is connected to the real repositories by a two-way round-trip. Both d
 Source (a provider folder or a selection) flows into the workbench:
 
 1. Scan the `.mjs` files.
-2. Run `flowmcp validate`. **On failure, do NOT abort the run** — emit a `blocked` node with `reason: "validation-failed"` into `index.json`, snapshot the unparseable source if it is readable, and CONTINUE with the remaining files in the folder. This is the **emit-on-failure** contract (the `3.0.0` break, see [Emit-on-failure import contract (NEW in 3.0.0)](#emit-on-failure-import-contract-new-in-300)).
+2. Run `flowmcp schema-check`. **On failure, do NOT abort the run** — emit a `blocked` node with `reason: "validation-failed"` into `index.json`, snapshot the unparseable source if it is readable, and CONTINUE with the remaining files in the folder. This is the **emit-on-failure** contract (the `3.0.0` break, see [Emit-on-Failure Import Contract](#emit-on-failure-import-contract)).
 3. The **single-namespace expectation is retained as a normative invariant** (one folder = one namespace), but its violation is now an **emitted record, not an abort**: a folder whose schemas cannot be parsed to a single namespace emits a `blocked` node rather than aborting. (A genuine *disagreement* between two declared namespaces remains a hard configuration error — see the emit-on-failure section below.)
 4. Existence check: missing → create; changed (new hash) → write a **new snapshot alongside** the old one; identical hash → skip. The import **never overwrites** an existing snapshot.
 5. Convert into the island structure (resources to `resources/about/`, skills to `skills/`, inline skills normalised into files).
 6. Rebuild `index.json`.
 
-#### Emit-on-failure import contract (NEW in 3.0.0)
+#### Emit-on-Failure Import Contract
 
-Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a `flowmcp validate` failure or a folder that resolved to anything other than a single namespace **aborted** the whole import. `3.0.0` flips this to **emit-a-`blocked`-node-and-continue**:
+Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a `flowmcp schema-check` failure or a folder that resolved to anything other than a single namespace **aborted** the whole import. `3.0.0` flips this to **emit-a-`blocked`-node-and-continue**:
 
 - **Validate failure → `blocked` node.** When a schema fails the validate gate, the import does NOT abort. It emits a `blocked` node with `reason: "validation-failed"` (the pinned reason, matching the closed `blockedReason` set in the grading module — see [`23-index-json.md`](./23-index-json.md)), snapshots the unparseable source if readable, and continues with the remaining files.
 - **All-unparseable folder → namespace-folder fallback.** When **all** schemas in a folder are unparseable (no readable `main.namespace`), the **folder name** is the fallback namespace identifier for the emitted `blocked` rollup. The fallback name MUST itself be a valid namespace (`/^[a-z][a-z0-9-]*$/`); a folder name that is not a valid namespace is a hard error (no silent normalisation). See [`19-folder-layout.md`](./19-folder-layout.md) for the folder↔namespace consistency rule and the rename-on-parse lifecycle.
@@ -68,12 +70,3 @@ Workbench flows back toward the source:
 - The export **MUST NOT overwrite the source**; it writes into a fresh export folder.
 
 The round-trip is the concrete shape of the flywheel loop described in [`18-flywheel-loop.md`](./18-flywheel-loop.md): import → grade → improve → export, then around again.
-
----
-
-## Cross-References
-
-- Folder layout, namespace special case, folder↔namespace + rename-on-parse: [`19-folder-layout.md`](./19-folder-layout.md)
-- Naming grammar (date-before-hash, `resolveLatest`): [`15-versioning-axes.md`](./15-versioning-axes.md)
-- The derived rollup that the round-trip hands off: [`23-index-json.md`](./23-index-json.md)
-- The grading-monitoring track + provider-proof data flow: [`26-monitoring-track.md`](./26-monitoring-track.md)

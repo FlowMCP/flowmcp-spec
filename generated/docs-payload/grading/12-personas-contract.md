@@ -1,14 +1,14 @@
 ---
 title: "Personas Contract"
-description: "The Grading-Spec does NOT define personas of its own. It **references** the personas maintained in the sister repository `flowmcp-spec` at the path `repos/flowmcp-spec/personas/`. That folder is the..."
+description: "The Grading-Spec does not invent personas; it references the four generalised base personas maintained in the `flowmcp-spec` personas folder and pins down how a grading entry points at one. This..."
 grading_version: "3.0.0"
 spec_file: "12-personas-contract.md"
 order: 12
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/12-personas-contract.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/12-personas-contract.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/12-personas-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/12-personas-contract.md."
@@ -17,6 +17,8 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/12-personas-co
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
+
+The Grading-Spec does not invent personas; it references the four generalised base personas maintained in the `flowmcp-spec` personas folder and pins down how a grading entry points at one. This chapter fixes the persona reference contract (`basePersonaId` plus an optional `lensId`), explains the **Lens** model that narrows a generalised persona to a domain without spawning a fifth one, and records which Areas must carry a persona. It also recognises a second, technical persona tier — three review lenses owned by the grading repository — used only for autonomous Task-A schema preparation.
 
 ## Source of Truth
 
@@ -134,10 +136,9 @@ The Lens (`lensId`) when present refines the base persona but does NOT replace i
 
 ---
 
-## Technical Schema-Persona Tier (added in 2.0.0)
+## Technical Schema-Persona Tier
 
-> **Additive section — new in `gradingSpec/3.0.0`.** This tier is added on top of the existing
-> base-persona contract ([Source of Truth](#source-of-truth)–[Grading Effect](#grading-effect)). The four generalised base personas and their Lens model remain
+> This tier sits on top of the base-persona contract ([Source of Truth](#source-of-truth)–[Grading Effect](#grading-effect)). The four generalised base personas and their Lens model remain
 > unchanged and remain the single source of truth for `group-bound` (Selection / Task B) grading.
 > This section introduces a **second, technical** persona tier used for autonomous schema
 > preparation (Task A) grading.
@@ -176,23 +177,10 @@ The definitions of the technical Schema-Personas are owned by `repos/flowmcp-gra
 (see that folder's `README.md`). This spec recognises the tier and its three slugs; the persona
 content (identity, review focus, sign-off / block criteria) lives in the grading repository.
 
----
-
-## Cross-References
-
-- `repos/flowmcp-spec/personas/` — the single source of truth for the four generalised personas and the Lens concept.
-- `repos/flowmcp-spec/personas/persona-lens.md` — detailed description of the Lens concept.
-- `repos/flowmcp-grading/personas/` — the technical Schema-Persona tier (see [Technical Schema-Persona Tier](#technical-schema-persona-tier-added-in-200)), owned by the grading repository.
-- [`08-grading-model.md`](/grading/grading-model/) — the `persona` field and the persona obligation per Area.
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/), section 6 — Lens definition lives in the Domain-Knowledge content.
-- [`13-skills.md`](/grading/skills/) — selection skills MUST carry persona focus on all three levels.
-
----
-
-Technical Schema-Persona tier (see [Technical Schema-Persona Tier](#technical-schema-persona-tier-added-in-200)) added in `gradingSpec/3.0.0`.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`08-grading-model.md`](/grading/grading-model/), [`10-domain-knowledge.md`](/grading/domain-knowledge/)
-- **Related:** Schemas-Spec sister-repo personas folder `repos/flowmcp-spec/personas/`, [`13-skills.md`](/grading/skills/)
+- [`00-overview.md`](/grading/overview/)
+- [`08-grading-model.md`](/grading/grading-model/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`13-skills.md`](/grading/skills/)
 

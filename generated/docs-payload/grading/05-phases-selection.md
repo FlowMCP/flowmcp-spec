@@ -1,14 +1,14 @@
 ---
 title: "Selection-Side Grading Areas"
-description: "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification..."
+description: "A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces — the fifth schema primitive defined in the FlowMCP Schemas Specification (see its..."
 grading_version: "3.0.0"
 spec_file: "05-phases-selection.md"
 order: 5
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/05-phases-selection.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/05-phases-selection.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/05-phases-selection.md."
@@ -18,17 +18,11 @@ edit_warning: "This file is auto-generated. Source: grading/3.0.0/05-phases-sele
 
 ---
 
-## Introduction
-
-A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces. It is the **fifth primitive** introduced in the FlowMCP Schemas Specification v4.2 (see [`17-selections.md`](/specification/selections/)).
-
-This chapter is the **normative source for the selection-side grading Areas**. These Areas run **on top of** the provider-side Areas of [`04-phases-single.md`](/grading/phases-single/): they presuppose that every member schema has already been graded on the provider side and reached the status `stable` (see the pre-condition in [Pre-Condition and the `selection.json` Reference Layer](#pre-condition-and-the-selectionjson-reference-layer)).
-
-The selection-side Areas produce `gradingTier = group-bound` — and under this tier, grade **A** is reachable (per [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
+A **selection** is a topic-oriented, curated collection of tools and skills assembled over several member namespaces — the fifth schema primitive defined in the FlowMCP Schemas Specification (see its [`17-selections.md`](/specification/selections/)). This page is the normative source for the **selection-side grading Areas**, which run on top of the provider-side Areas of [`04-phases-single.md`](/grading/phases-single/): they presuppose that every member schema has already been graded on the provider side and reached the status `stable` (see the pre-condition below). The selection-side Areas produce `gradingTier = group-bound`, and only under this tier is grade **A** reachable (per [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)).
 
 ---
 
-## Prerequisite: Soft and Hard Thresholds (MUST)
+## Prerequisite: Soft and Hard Thresholds
 
 The selection-side Areas have a **minimum-size precondition**, expressed as two thresholds. The thresholds are normative; the rationale is corpus diversity (see [`10-domain-knowledge.md`](/grading/domain-knowledge/)).
 
@@ -41,7 +35,7 @@ The selection-side Areas have a **minimum-size precondition**, expressed as two 
 - A selection with **5–6 namespaces** MAY run the structural and skill Areas with reduced scope but MUST NOT claim grade A.
 - A selection with **≥ 7 namespaces** MAY claim grade A via the full set of selection Areas including `selection-aggregate`.
 
-The **group-bound contribution that unlocks grade A** is carried by the `selection-aggregate` Area (see [`selection-aggregate` (the group-bound Area)](#selection-aggregate-the-group-bound-area)). A selection cannot reach grade A without at least one `group-bound` Area contributing to its aggregate.
+The **group-bound contribution that unlocks grade A** is carried by the `selection-aggregate` Area (see [The Group-Bound Aggregate Area](#the-group-bound-aggregate-area)). A selection cannot reach grade A without at least one `group-bound` Area contributing to its aggregate.
 
 ---
 
@@ -51,27 +45,27 @@ The grading system defines **eleven Areas** in total (see [`04-phases-single.md`
 
 | # | Area | Evaluates | `_gradings/` location | Persona | Det/Non-Det |
 |---|------|-----------|------------------------|---------|-------------|
-| 7 | `about-selection` | the About Resource of the selection (= the Domain-Knowledge document) | `selections/<sel>/resources/about/_gradings/` | yes | deterministic + non-deterministic |
+| 7 | `about-selection` | the About Resource of the selection (the Domain-Knowledge document) | `selections/<sel>/resources/about/_gradings/` | yes | deterministic + non-deterministic |
 | 8 | `selection-skills-L1` | one L1 skill (per skill) | `selections/<sel>/skills/<skill>/_gradings/` | yes | non-deterministic |
 | 9 | `selection-skills-L2` | one L2 skill (per skill) | `selections/<sel>/skills/<skill>/_gradings/` | yes | non-deterministic |
 | 10 | `selection-skills-L3` | one L3 skill (per skill) | `selections/<sel>/skills/<skill>/_gradings/` | yes | non-deterministic |
 | 11 | `selection-aggregate` | **the selection as a whole** | `selections/<sel>/_gradings/` | yes | deterministic + non-deterministic |
 
-### `about-selection`
+### Area `about-selection` — the group's About Resource
 
-The selection-level About Resource is graded here. The About Resource doubles as the **Domain-Knowledge document** of the group (see [`10-domain-knowledge.md`](/grading/domain-knowledge/) and [`11-about-convention.md`](/grading/about-convention/)): it carries the seven mandatory domain-knowledge sections. This Area scores the **document quality** (are the sections present and coherent?). Member conformance against the document is a separate check carried by `selection-aggregate` (see [`selection-aggregate` (the group-bound Area)](#selection-aggregate-the-group-bound-area)) — two distinct evaluations, no circularity.
+The selection-level About Resource is graded here. The About Resource doubles as the **Domain-Knowledge document** of the group (see [`10-domain-knowledge.md`](/grading/domain-knowledge/) and [`11-about-convention.md`](/grading/about-convention/)): it carries the seven mandatory domain-knowledge sections. This Area scores the **document quality** (are the sections present and coherent?). Member conformance against the document is a separate check carried by `selection-aggregate` (see [The Group-Bound Aggregate Area](#the-group-bound-aggregate-area)) — two distinct evaluations, no circularity.
 
-### `selection-skills-L1` / `-L2` / `-L3`
+### Areas `selection-skills-L1` / `-L2` / `-L3` — per-skill grading
 
 Selection skills are graded **per skill**, not per cohort. Each skill has its own `_gradings/` folder. The L-semantics (Signpost / Topic / Usecase) and the per-skill predecessor chain are defined in [`13-skills.md`](/grading/skills/). The Area name records which level the graded skill declares via its `level` extension field; the grading **reads** that field, it does not assign the level.
 
 ---
 
-## `selection-aggregate` (the group-bound Area)
+## The Group-Bound Aggregate Area
 
-`selection-aggregate` grades the selection **as a whole**. It carries the selection-wide dimensions that have no per-skill or About home:
+The `selection-aggregate` Area grades the selection **as a whole**. It carries the selection-wide dimensions that have no per-skill or About home:
 
-- **Thresholds** — soft ≥ 5 / hard ≥ 7 members (see [Prerequisite: Soft and Hard Thresholds](#prerequisite-soft-and-hard-thresholds-must)).
+- **Thresholds** — soft ≥ 5 / hard ≥ 7 members (see [Prerequisite: Soft and Hard Thresholds](#prerequisite-soft-and-hard-thresholds)).
 - **Topic coherence** — does the member set form one coherent topic?
 - **`domainConformance`** — are the members consistent with the About / Domain-Knowledge document?
 - **`personaUseCaseFit`** — does the selection serve its declared persona use cases?
@@ -118,22 +112,15 @@ gradingTier = group-bound
 
 This tier is the **only** path to grade **A**. The provider-side Areas (`autonomous`) cannot, by construction, deliver grade A.
 
----
-
-## Cross-References
-
-- [`04-phases-single.md`](/grading/phases-single/) — provider-side Areas; the selection side consumes their stable base units.
-- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/) — tier rules (max grade B autonomous vs. grade A possible group-bound).
-- [`10-domain-knowledge.md`](/grading/domain-knowledge/) — the seven mandatory domain-knowledge sections carried by the About Resource.
-- [`11-about-convention.md`](/grading/about-convention/) — About as a schema Resource.
-- [`12-personas-contract.md`](/grading/personas-contract/) — persona references for the persona-bearing Areas.
-- [`13-skills.md`](/grading/skills/) — selection-skill levels and per-skill grading.
-- [`19-folder-layout.md`](/grading/folder-layout/) — `_gradings/` placement, `index.json`, member resolution.
-- [`21-pre-conditions.md`](/grading/pre-conditions/) — the "all members stable" gate.
-- FlowMCP Schemas Specification v4.3.0 — [`17-selections.md`](/specification/selections/).
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/), [`04-phases-single.md`](/grading/phases-single/)
-- **Related:** [`06-determinism-and-tier.md`](/grading/determinism-and-tier/), [`10-domain-knowledge.md`](/grading/domain-knowledge/), [`13-skills.md`](/grading/skills/)
+- [`00-overview.md`](/grading/overview/)
+- [`04-phases-single.md`](/grading/phases-single/)
+- [`06-determinism-and-tier.md`](/grading/determinism-and-tier/)
+- [`10-domain-knowledge.md`](/grading/domain-knowledge/)
+- [`11-about-convention.md`](/grading/about-convention/)
+- [`12-personas-contract.md`](/grading/personas-contract/)
+- [`13-skills.md`](/grading/skills/)
+- [`19-folder-layout.md`](/grading/folder-layout/)
+- [`21-pre-conditions.md`](/grading/pre-conditions/)
 

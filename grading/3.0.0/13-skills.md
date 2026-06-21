@@ -5,13 +5,15 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md) |
-| Related | Schemas-Spec v4.3.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/14-skills.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md) |
+| Related | Schemas-Spec [`14-skills.md`](../../spec/v4.3.0/14-skills.md), [`05-phases-selection.md`](./05-phases-selection.md), [`08-grading-model.md`](./08-grading-model.md), [`10-domain-knowledge.md`](./10-domain-knowledge.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md) |
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
 ---
 
-## Opening Clarification
+Skills come in two categories that grade very differently. A **namespace skill** covers exactly one namespace, validates at the `autonomous` tier without group context, and carries no level. A **selection skill** spans a selection of namespaces, validates at the `group-bound` tier against the group's Domain-Knowledge content, and carries an `L1`/`L2`/`L3` level that reflects its role — Signpost, Topic, or Usecase — not a namespace count. This chapter defines both categories, the `type` and grading-only `level` fields, their mandatory content and validation obligations, and the deterministic cross-reference rules that bind the selection-skill level chain together.
+
+## Namespace Skill vs Selection Skill
 
 A skill carries a `type` (see [Skill Type and the `level` Extension](#skill-type-and-the-level-extension)). The L1/L2/L3 **level** semantics described in this chapter apply **only to selection skills** (`type: 'selection'`). Namespace skills (`type: 'namespace'`) are a separate, simpler category and do NOT carry a level.
 
@@ -169,21 +171,10 @@ The two categories differ on:
 
 ---
 
-## Relationship to the Schemas-Spec v4.3.0
+## Relationship to the Schemas-Spec
 
-The Schemas-Spec v4.3.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
+The Schemas-Spec [`14-skills.md`](../../spec/v4.3.0/14-skills.md) declares the `type` field with values `'namespace'`, `'selection'`, `'agent'`. The tier consequences of these values are the binding interpretation of the `type` values for grading purposes (see [`type` (Schemas-Spec field)](#type-schemas-spec-field)).
 
 The `level` field (see [`level` (Grading-Spec extension)](#level-grading-spec-extension)) is a **Grading-Spec extension** — it is not part of the Schemas-Spec skill object. A v4.2 schema-validator MUST NOT reject a skill for carrying or omitting `level`; the field is read only by the grader.
 
 The Schemas-Spec rule `SKL018` (max 4 skills per selection / agent registration scope) is preserved without modification.
-
----
-
-## Cross-References
-
-- Schemas-Spec v4.3.0 [`14-skills.md`](https://github.com/FlowMCP/flowmcp-spec/blob/main/spec/v4.3.0/14-skills.md) — the `type` field and the `SKL018` limit.
-- [`11-about-convention.md`](./11-about-convention.md) — the About-Resource obligation that skills reference.
-- [`12-personas-contract.md`](./12-personas-contract.md) — the persona contract that the persona focus draws from.
-- [`10-domain-knowledge.md`](./10-domain-knowledge.md) — the soft 5 / hard 7 thresholds that determine whether a selection skill is allowed at full scope.
-- [`05-phases-selection.md`](./05-phases-selection.md) — the `selection-skills-L1` / `-L2` / `-L3` Areas (per-skill grading).
-- [`08-grading-model.md`](./08-grading-model.md) — the dimensions `namespaceSkillValidity`, `selectionSkillL1`, `selectionSkillL2`, `selectionSkillL3`.

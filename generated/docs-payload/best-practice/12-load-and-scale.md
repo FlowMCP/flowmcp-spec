@@ -6,9 +6,9 @@ spec_file: "12-load-and-scale.md"
 order: 12
 section: "Best Practice"
 normative: false
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/best-practice/0.1.0/schema-creation/12-load-and-scale.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "best-practice/0.1.0/schema-creation/12-load-and-scale.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/12-load-and-scale.md."
@@ -70,5 +70,5 @@ Be precise about what the limit governs: the number of clauses is **not** the li
 
 ## Related
 
-- **Related:** [`13-geo-conventions.md`](/best-practice/geo-conventions/)
+- [`13-geo-conventions.md`](/best-practice/geo-conventions/)
 

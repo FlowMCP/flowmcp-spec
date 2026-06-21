@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Normative — restructured in 2.0.0 (lockfile removed) |
+| Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md), [`08-grading-model.md`](./08-grading-model.md), [`15-versioning-axes.md`](./15-versioning-axes.md) |
-| Related | [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md), [`11-about-convention.md`](./11-about-convention.md) |
+| Related | [`19-folder-layout.md`](./19-folder-layout.md), [`21-pre-conditions.md`](./21-pre-conditions.md), [`18-flywheel-loop.md`](./18-flywheel-loop.md), [`11-about-convention.md`](./11-about-convention.md), [`15-versioning-axes.md`](./15-versioning-axes.md), [`20-entry-point-prompt.md`](./20-entry-point-prompt.md) |
 | Annex | [`selection.schema.json`](./selection.schema.json) — neutral selection definition |
 
 > **Spec:** `gradingSpec/3.0.0`
@@ -14,11 +14,13 @@
 
 > Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
 
+A Selection binds several schemas into a domain coverage, and a Selection grading must be reproducible against an exact set of member snapshots. Two artefacts carry that: the neutral `selection.json` holds only the intentional definition (members, skills, personas, trigger sentence) with no pinned hashes, while the frozen `index.json.lockSnapshot` records the member pins — the schema versions and hashes — captured once at grading start and preserved across rebuilds. This chapter defines both artefacts, the per-member `gradingStatus` they carry, and the pre-condition workflow that reads only the frozen snapshot.
+
 ---
 
-## Selection Definition + Lock Snapshot
+## Selection Definition and Lock Snapshot
 
-In 1.1.0 the member pins lived in a standalone `selection.lock.json` and the provider unit was described by an authored `namespace.json`. Both files are removed in 2.0.0. The pins are folded into the derived `index.json.lockSnapshot`, and the namespace rollup is part of `index.json` (see [`19-folder-layout.md`](./19-folder-layout.md)). This section now describes the neutral `selection.json` definition and the frozen `lockSnapshot`.
+The member pins and the namespace rollup live in the derived `index.json` rather than in standalone authored files: the pins sit in `index.json.lockSnapshot` and the namespace rollup is part of `index.json` (see [`19-folder-layout.md`](./19-folder-layout.md)). The two artefacts described below are the neutral `selection.json` definition and the frozen `lockSnapshot`.
 
 ### `selection.json` (Neutral Definition)
 
@@ -57,11 +59,11 @@ A Selection binds N schemas into a domain coverage. The definition lives in `sel
 | `members[]` | array (min 1) | contained schemas (only `schemaId`) |
 | `skills[]` | array (max 4) | bound skills (map / `file` form, see FlowMCP-Spec v4.3.0 SKL018) |
 
-**Removed from the source definition:** `selectionHash`, `aboutHash`, `selectionVersion`. The snapshot identity lives in the filename timestamp and (frozen) in `index.json.lockSnapshot`. `version` (the FlowMCP-format field) stays. See [`15-versioning-axes.md`](./15-versioning-axes.md).
+**Not carried in the source definition:** `selectionHash`, `aboutHash`, and a snapshot version key. The snapshot identity lives in the filename timestamp and (frozen) in `index.json.lockSnapshot`. `version` (the FlowMCP-format field) stays. See [`15-versioning-axes.md`](./15-versioning-axes.md).
 
-### `index.json.lockSnapshot` (Frozen Pins, replaces `selection.lock.json`)
+### `index.json.lockSnapshot` (Frozen Pins)
 
-The pins that used to live in `selection.lock.json` now live in `index.json.lockSnapshot`. The `index.json` has two natures (see [`19-folder-layout.md`](./19-folder-layout.md)): a **live rollup** that is recomputed on every rebuild, and a **frozen `lockSnapshot`** that is written **once at grading start** and then **preserved** by the rebuild (not recomputed live). The pre-condition gate reads **only** the frozen part — a point in time — otherwise it would aggregate over unstable members.
+The member pins live in `index.json.lockSnapshot`. The `index.json` has two natures (see [`19-folder-layout.md`](./19-folder-layout.md)): a **live rollup** that is recomputed on every rebuild, and a **frozen `lockSnapshot`** that is written **once at grading start** and then **preserved** by the rebuild (not recomputed live). The pre-condition gate reads **only** the frozen part — a point in time — otherwise it would aggregate over unstable members.
 
 ```json
 {
@@ -83,7 +85,7 @@ The pins that used to live in `selection.lock.json` now live in `index.json.lock
 }
 ```
 
-**`lockSnapshot` fields:** `selectionId`, `selectionVersion`, `selectionHash`, `generatedAt`; per member `{ schemaId, schemaVersion, schemaHash, gradingStatus, override }`. The `selectionVersion` / `schemaVersion` snapshot values are the filename timestamps frozen at grading start — they do **not** live in the source. `override` salvages the old override mechanism (whitelist `['name', 'description']`).
+**`lockSnapshot` fields:** `selectionId`, `selectionVersion`, `selectionHash`, `generatedAt`; per member `{ schemaId, schemaVersion, schemaHash, gradingStatus, override }`. The `selectionVersion` / `schemaVersion` snapshot values are the filename timestamps frozen at grading start — they do **not** live in the source. `override` carries the override mechanism (allowlist `['name', 'description']`).
 
 #### `gradingStatus` field
 
@@ -125,20 +127,6 @@ Cross-reference: [`21-pre-conditions.md`](./21-pre-conditions.md) (universal pre
 
 The member resolution manifest (recorded in `index.json`) maps each member `schemaId` to the resolved provider artefact plus its grade and status. Without this manifest the selection aggregate cannot reproduce "M of N members PASS". This is the heart of selection grading. See the `index.json` rollup in [`19-folder-layout.md`](./19-folder-layout.md).
 
-### Removed in 2.0.0
+### Deprecated Annex Schemas
 
-| Removed | Replacement |
-|---------|-------------|
-| `selection.lock.json` (standalone file) | `index.json.lockSnapshot` ([`index.json.lockSnapshot` (Frozen Pins, replaces `selection.lock.json`)](#indexjsonlocksnapshot-frozen-pins-replaces-selectionlockjson)) |
-| `namespace.json` (authored payload) | `index.json` rollup (see [`19-folder-layout.md`](./19-folder-layout.md)) |
-| in-source `selectionHash`, `aboutHash`, `selectionVersion` | filename timestamp + `index.json` (see [`15-versioning-axes.md`](./15-versioning-axes.md)) |
-
-The annex schemas `selection.lock.schema.json` and `namespace.schema.json` are **deprecated** — they describe removed files and are retained only for historical reference. New tooling MUST NOT validate against them.
-
-### Cross-Refs
-
-- Folder paths (`selections/<id>/selection/…`, `index.json`) → [`19-folder-layout.md`](./19-folder-layout.md)
-- Pre-condition as a universal rule → [`21-pre-conditions.md`](./21-pre-conditions.md)
-- About-Pages file layout (schema-level resource) → [`11-about-convention.md`](./11-about-convention.md)
-- Versioning + canonical hash → [`15-versioning-axes.md`](./15-versioning-axes.md)
-- Entry-point prompt (Selection mandatory persona) → [`20-entry-point-prompt.md`](./20-entry-point-prompt.md)
+The annex schemas `selection.lock.schema.json` and `namespace.schema.json` are **deprecated** — they describe artefacts that are no longer authored and are retained only for historical reference. New tooling MUST NOT validate against them.

@@ -1,22 +1,20 @@
 ---
 title: "License & Terms of Services"
-description: "FlowMCP operates in a three-layer license model. **Schema authors and users MUST understand all three layers.**"
+description: "FlowMCP sits between its own code, the third-party APIs a schema calls, and the data those APIs return — and each of those carries its own legal terms. The purpose of this page is to draw a clear..."
 spec_version: "4.3.0"
 spec_file: "23-license-and-tos.md"
 order: 23
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/23-license-and-tos.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/23-license-and-tos.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/23-license-and-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/23-license-and-tos.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
-> Defines how FlowMCP handles third-party API Terms of Services (ToS) and data licensing.
+FlowMCP sits between its own code, the third-party APIs a schema calls, and the data those APIs return — and each of those carries its own legal terms. The purpose of this page is to draw a clear line around what FlowMCP takes responsibility for and what it deliberately leaves to the user: FlowMCP records and links the relevant Terms of Services and data licenses, but it never interprets or certifies them. The page describes that three-layer model, the optional schema fields that carry the links, and where responsibility for compliance ultimately rests.
 
 ## Three-Layer License Model
 
@@ -107,16 +105,14 @@ FlowMCP makes **no warranty** about ToS compliance, data licensing, or fitness f
 ToS change. FlowMCP recommends:
 
 - **6-month re-check cadence** for all schemas with `termsOfService`
-- Reactive update when known provider ToS changes occur (e.g. Twitter 2023)
+- Reactive update when a known provider changes its ToS
 - Audit script `audit-tos-freshness.mjs` flags schemas with stale `termsOfServiceCheckedAt`
-
-## See Also
-
-- [`01-schema-format.md`](/specification/schema-format/) — Schema field reference
-- [`19-mcp-integration.md`](/specification/mcp-integration/) — Meta block (per-tool metadata)
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [01-schema-format.md](/specification/schema-format/)
-- **Related:** [19-mcp-integration.md](/specification/mcp-integration/), [05-security.md](/specification/security/), [21-schema-lifecycle.md](/specification/schema-lifecycle/)
+- [00-overview.md](/specification/overview/)
+- [01-schema-format.md](/specification/schema-format/)
+- [19-mcp-integration.md](/specification/mcp-integration/)
+- [05-security.md](/specification/security/)
+- [21-schema-lifecycle.md](/specification/schema-lifecycle/)
 

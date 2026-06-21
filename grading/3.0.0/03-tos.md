@@ -5,27 +5,15 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
-| Related | [`02-eligibility.md`](./02-eligibility.md), `08-grading-model.md` (forthcoming) |
+| Related | [`02-eligibility.md`](./02-eligibility.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`08-grading-model.md`](./08-grading-model.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification.
 
----
-
-## Purpose
-
-This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer (`Sorgfaltspflicht`), not part of the eligibility gate. A missing ToS link does **not** disqualify a schema; it lowers the score.
-
-The chapter anchors:
-
-- the **base due-diligence rule** (`SHOULD`, not `MUST`),
-- the **"ToS attached" definition**,
-- the **Root-Domain-Match** algorithm,
-- the central distinction **"we observe" vs. "we accept"**, and
-- the **grader role and mandatory disclaimer** ("grader assessment, not legally binding").
+This chapter defines the **Terms-of-Service (ToS) handling** of the Grading-Spec. ToS handling is part of the **due-diligence** layer, not part of the eligibility gate — a missing ToS link does not disqualify a schema, it lowers the score. The chapter anchors the base due-diligence rule (`SHOULD`, not `MUST`), the "ToS attached" definition, the Root-Domain-Match algorithm, the central distinction between "we observe" and "we accept", and the grader role with its mandatory "grader assessment, not legally binding" disclaimer.
 
 ---
 
-## Due-Diligence Base (SHOULD)
+## Due-Diligence Base
 
 The base position is: **public documentation + no unlawful content = due-diligence met.**
 
@@ -54,7 +42,7 @@ Per the determinism rules in [`06-determinism-and-tier.md`](./06-determinism-and
 
 ---
 
-## Root-Domain-Match (MUST)
+## Root-Domain-Match
 
 The ToS link **MUST share the same root domain** as the API endpoints it covers.
 
@@ -80,7 +68,7 @@ A ToS link that does not satisfy the Root-Domain-Match MUST be treated as **not 
 
 This is the central separation of concerns. It is binding for all FlowMCP graders, scoring code, and documentation:
 
-- **FlowMCP observes** that a ToS link is attached to the API, in the technical sense defined in ["ToS Attached" — Definition](#tos-attached--definition) and [Root-Domain-Match](#root-domain-match-must) above.
+- **FlowMCP observes** that a ToS link is attached to the API, in the technical sense defined in ["ToS Attached" — Definition](#tos-attached--definition) and [Root-Domain-Match](#root-domain-match) above.
 - **FlowMCP does NOT accept** the ToS in any legal sense. No FlowMCP component — grader, CLI, or spec — constitutes acceptance of the linked terms on behalf of any user.
 - A **legal assessment of the ToS is NOT the task of FlowMCP**. FlowMCP does not classify licences, does not interpret restrictions, and does not declare a schema "legally usable".
 
@@ -98,12 +86,3 @@ If the grader records such an opinion, it MUST:
 2. mark the opinion verbatim as **"grader assessment, not legally binding"**.
 
 The disclaimer is **non-optional**. A grading entry that contains a `legalAssessment` without the disclaimer MUST be treated as malformed.
-
----
-
-## Cross-References
-
-- [`00-overview.md`](./00-overview.md) — Conformance language.
-- [`02-eligibility.md`](./02-eligibility.md) — Due-diligence base sits on top of the eligibility rules.
-- `08-grading-model.md` (Chapter 7) — Defines the `legalAssessment` field and its disclaimer requirement.
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — HTTP-status interpretation rule (4xx is not pass).

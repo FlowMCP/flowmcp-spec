@@ -1,26 +1,20 @@
 ---
 title: "Prefill and Placeholders"
-description: "**Placeholders** are template tokens embedded in Skill content that are resolved at runtime. **Prefill** is a mechanism to pre-execute a tool and embed its result into the Skill before delivery."
+description: "Skill content carries two complementary template mechanisms that the runtime processes before handing the Skill to an agent. *Placeholders* are tokens embedded directly in the content —..."
 spec_version: "4.3.0"
 spec_file: "18-prefill.md"
 order: 18
 section: "Specification"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/spec/v4.3.0/18-prefill.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/18-prefill.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/18-prefill.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/18-prefill.md."
 ---
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [Conformance Language](/specification/overview/#conformance-language).
-
----
-
-## Overview
-
-**Placeholders** are template tokens embedded in Skill content that are resolved at runtime. **Prefill** is a mechanism to pre-execute a tool and embed its result into the Skill before delivery.
+Skill content carries two complementary template mechanisms that the runtime processes before handing the Skill to an agent. *Placeholders* are tokens embedded directly in the content — `{{type:reference}}` — that are substituted with tool descriptions, resource references, user input, or shared-list values at resolution time. *Prefill* goes one step further: a Skill can declare tool calls in a `prefill` array that the runtime executes up front, then embeds the live results into the content via `{{prefill:...}}` tokens, so the agent receives a Skill already populated with current data.
 
 ---
 
@@ -92,6 +86,10 @@ This ensures the Skill is always delivered — even if some references are broke
 
 ## Related
 
-- **Depends on:** [00-overview.md](/specification/overview/), [16-id-schema.md](/specification/id-schema/), [14-skills.md](/specification/skills/)
-- **Related:** [12-prompt-architecture.md](/specification/prompt-architecture/), [17-selections.md](/specification/selections/), [02-parameters.md](/specification/parameters/)
+- [00-overview.md](/specification/overview/)
+- [16-id-schema.md](/specification/id-schema/)
+- [14-skills.md](/specification/skills/)
+- [12-prompt-architecture.md](/specification/prompt-architecture/)
+- [17-selections.md](/specification/selections/)
+- [02-parameters.md](/specification/parameters/)
 

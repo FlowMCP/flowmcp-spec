@@ -5,19 +5,11 @@
 | Status | Normative |
 | Version | `gradingSpec/3.0.0` |
 | Depends on | [`00-overview.md`](./00-overview.md) |
-| Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`11-about-convention.md`](./11-about-convention.md) |
+| Related | [`01-default-journey.md`](./01-default-journey.md), [`02-eligibility.md`](./02-eligibility.md), [`03-tos.md`](./03-tos.md), [`05-phases-selection.md`](./05-phases-selection.md), [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), [`11-about-convention.md`](./11-about-convention.md), [`12-personas-contract.md`](./12-personas-contract.md), [`13-skills.md`](./13-skills.md), [`19-folder-layout.md`](./19-folder-layout.md) |
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification v4.3.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](./00-overview.md). The binding source is the FlowMCP Schemas Specification.
 
----
-
-## Introduction
-
-This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. It replaces the linear phase model of earlier spec versions with an **Area model**: each Area is a self-contained grading rubric attached to the primitive it evaluates, written to a `_gradings/` folder next to that primitive (see [`19-folder-layout.md`](./19-folder-layout.md)).
-
-The provider side produces the **base unit** of the FlowMCP corpus: **one namespace** with one or more schemas, namespace skills, and an About Resource. Higher-level grouping (selection side) is defined separately in [`05-phases-selection.md`](./05-phases-selection.md).
-
-A schema graded only on the provider side has `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the **maximum attainable grade** on this tier is **B**. Grade A requires a `group-bound` contribution from the selection side.
+This chapter is the **normative source for the provider-side grading Areas** — the Areas that grade one **schema** inside one **namespace** without group context. Each Area is a self-contained grading rubric attached to the primitive it evaluates, written to a `_gradings/` folder next to that primitive (see [`19-folder-layout.md`](./19-folder-layout.md)). The provider side produces the **base unit** of the FlowMCP corpus — one namespace with one or more schemas, namespace skills, and an About Resource — while higher-level grouping is defined separately in [`05-phases-selection.md`](./05-phases-selection.md). A schema graded only on the provider side has `gradingTier = autonomous`, whose maximum attainable grade is **B** ([`06-determinism-and-tier.md`](./06-determinism-and-tier.md)); grade A requires a `group-bound` contribution from the selection side.
 
 ---
 
@@ -100,17 +92,3 @@ A Resource technically never lives at namespace level — there is no namespace 
 ## Tier
 
 The provider-side Areas produce `gradingTier = autonomous`. Per [`06-determinism-and-tier.md`](./06-determinism-and-tier.md), the maximum attainable grade on `autonomous` is **B**. A schema that should be eligible for grade **A** must additionally be graded on the selection side (`group-bound`, see [`05-phases-selection.md`](./05-phases-selection.md)).
-
----
-
-## Cross-References
-
-- [`01-default-journey.md`](./01-default-journey.md) — maximalism and the completeness contribution to `single-test` / `tools-aggregate-schema`.
-- [`02-eligibility.md`](./02-eligibility.md) — endpoint eligibility (input to schema authoring).
-- [`03-tos.md`](./03-tos.md) — ToS check.
-- [`05-phases-selection.md`](./05-phases-selection.md) — selection-side Areas (consume provider-side base units).
-- [`06-determinism-and-tier.md`](./06-determinism-and-tier.md) — tier and determinism rules (max-grade-B on `autonomous`).
-- [`11-about-convention.md`](./11-about-convention.md) — About Resource content contract.
-- [`12-personas-contract.md`](./12-personas-contract.md) — personas referenced by persona-bearing Areas.
-- [`13-skills.md`](./13-skills.md) — namespace skills and selection skills.
-- [`19-folder-layout.md`](./19-folder-layout.md) — `_gradings/` placement and the `index.json` rollup.

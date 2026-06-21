@@ -6,23 +6,17 @@ spec_file: "01-default-journey.md"
 order: 1
 section: "Grading"
 normative: true
-source_commit: "2e9a898"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2e9a898/grading/3.0.0/01-default-journey.md"
-generated_at: "2026-06-04T21:10:58.055Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/01-default-journey.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/01-default-journey.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/01-default-journey.md."
 ---
 
-> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification v4.3.0.
+> Conformance language (MUST/SHOULD/MAY) follows BCP 14 [RFC2119]/[RFC8174] as defined in [`00-overview.md`](/grading/overview/). The binding source is the FlowMCP Schemas Specification.
 
----
-
-## Purpose
-
-This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** as a contribution to the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](/grading/phases-single/)).
-
-The default position is unambiguous: **more tools = better interoperability**. Reduction below the documented endpoint set MUST be justified, or it MUST cost points.
+This chapter anchors the **default journey** by which a schema enters the FlowMCP corpus, the **maximalism principle** that governs its endpoint coverage, the link to the **interoperability** main focus, and the **completeness validation** that feeds the `single-test` and `tools-aggregate-schema` Areas (see [`04-phases-single.md`](/grading/phases-single/)). The default position is unambiguous: more tools mean better interoperability. Reduction below the documented endpoint set MUST be justified, or it MUST cost points.
 
 ---
 
@@ -37,7 +31,7 @@ A documentation URL is **NOT** a mandatory entry point. Other entry paths — in
 
 ---
 
-## Maximalism Principle (MUST)
+## Maximalism Principle
 
 When the entry path is a documentation URL, the resulting schema (or schema set) **MUST be maximalist**: it MUST cover **all endpoints admitted by [`02-eligibility.md`](/grading/eligibility/)** (Chapter 3, eligibility rules).
 
@@ -50,7 +44,7 @@ No silent reduction. An omission without a justification recorded in the grading
 
 ---
 
-## Default-Reversal (MUST be stated in the spec)
+## Default-Reversal
 
 The **default is reversed**: when in doubt, take **more tools**.
 
@@ -80,16 +74,9 @@ The **completeness validation** is a deterministic contribution graded in the `s
 
 Gap reporting is mandatory; gap penalisation is conditional on the absence of an eligibility-based justification recorded in the grading JSON.
 
----
-
-## Cross-References
-
-- [`00-overview.md`](/grading/overview/) — Conformance language, interoperability as the main focus.
-- [`02-eligibility.md`](/grading/eligibility/) — Which endpoints are admitted (the maximalism boundary).
-- [`04-phases-single.md`](/grading/phases-single/) — the `single-test` / `tools-aggregate-schema` Areas carry the completeness-validation grading.
-
 ## Related
 
-- **Depends on:** [`00-overview.md`](/grading/overview/)
-- **Related:** [`02-eligibility.md`](/grading/eligibility/), [`04-phases-single.md`](/grading/phases-single/)
+- [`00-overview.md`](/grading/overview/)
+- [`02-eligibility.md`](/grading/eligibility/)
+- [`04-phases-single.md`](/grading/phases-single/)
 

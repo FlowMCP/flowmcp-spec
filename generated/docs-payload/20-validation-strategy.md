@@ -6,9 +6,9 @@ spec_file: "20-validation-strategy.md"
 order: 20
 section: "Specification"
 normative: true
-source_commit: "42b4603"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/spec/v4.3.0/20-validation-strategy.md"
-generated_at: "2026-06-21T01:06:21.418Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/spec/v4.3.0/20-validation-strategy.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "spec/v4.3.0/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/20-validation-strategy.md."

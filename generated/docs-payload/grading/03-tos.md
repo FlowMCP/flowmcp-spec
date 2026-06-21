@@ -6,9 +6,9 @@ spec_file: "03-tos.md"
 order: 3
 section: "Grading"
 normative: true
-source_commit: "42b4603"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/42b4603/grading/3.0.0/03-tos.md"
-generated_at: "2026-06-21T01:06:21.418Z"
+source_commit: "7abcedc"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/7abcedc/grading/3.0.0/03-tos.md"
+generated_at: "2026-06-21T11:29:22.373Z"
 generated_from: "grading/3.0.0/03-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/03-tos.md."

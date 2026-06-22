@@ -6,9 +6,9 @@ spec_file: "14-correctness-license.md"
 order: 14
 section: "Best Practice"
 normative: false
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/best-practice/0.1.0/schema-creation/14-correctness-license.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "95ebb83"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/95ebb83/best-practice/0.1.0/schema-creation/14-correctness-license.md"
+generated_at: "2026-06-22T15:23:11.485Z"
 generated_from: "best-practice/0.1.0/schema-creation/14-correctness-license.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: best-practice/0.1.0/schema-creation/14-correctness-license.md."

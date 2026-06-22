@@ -6,9 +6,9 @@ spec_file: "24-philosophy.md"
 order: 24
 section: "Specification"
 normative: false
-source_commit: "2291fc6"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2291fc6/spec/v4.3.0/24-philosophy.md"
-generated_at: "2026-06-22T12:04:02.745Z"
+source_commit: "95ebb83"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/95ebb83/spec/v4.3.0/24-philosophy.md"
+generated_at: "2026-06-22T15:23:11.485Z"
 generated_from: "spec/v4.3.0/24-philosophy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/24-philosophy.md."

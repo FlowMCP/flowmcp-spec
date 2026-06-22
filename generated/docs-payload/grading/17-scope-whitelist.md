@@ -6,9 +6,9 @@ spec_file: "17-scope-whitelist.md"
 order: 17
 section: "Grading"
 normative: true
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/grading/3.0.0/17-scope-whitelist.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "95ebb83"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/95ebb83/grading/3.0.0/17-scope-whitelist.md"
+generated_at: "2026-06-22T15:23:11.485Z"
 generated_from: "grading/3.0.0/17-scope-whitelist.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/17-scope-whitelist.md."

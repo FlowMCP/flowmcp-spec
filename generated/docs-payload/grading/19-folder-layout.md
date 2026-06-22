@@ -6,9 +6,9 @@ spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "fc45a46"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/fc45a46/grading/3.0.0/19-folder-layout.md"
-generated_at: "2026-06-22T13:53:50.864Z"
+source_commit: "95ebb83"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/95ebb83/grading/3.0.0/19-folder-layout.md"
+generated_at: "2026-06-22T15:23:11.485Z"
 generated_from: "grading/3.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/19-folder-layout.md."

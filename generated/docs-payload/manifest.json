@@ -1,6 +1,6 @@
 {
     "spec_version": "4.3.0",
-    "generated_at": "2026-06-21T18:39:36.463Z",
+    "generated_at": "2026-06-22T15:23:11.607Z",
     "generator": "scripts/generate-manifest.mjs",
     "files": [
         {
@@ -435,9 +435,9 @@
             "count_resources": 0,
             "count_skills": 0,
             "count_subset_required_keys": 91,
-            "timestamp": "2026-06-04T13:28:25.110Z",
+            "timestamp": "2026-06-22T15:22:48.586Z",
             "schema_version": "v4.0.0",
-            "build_hash": "2767b71"
+            "build_hash": "2ca1fd8"
         }
     },
     "grading": {

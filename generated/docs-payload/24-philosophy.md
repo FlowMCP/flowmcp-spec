@@ -6,9 +6,9 @@ spec_file: "24-philosophy.md"
 order: 24
 section: "Specification"
 normative: false
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/spec/v4.3.0/24-philosophy.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "2291fc6"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/2291fc6/spec/v4.3.0/24-philosophy.md"
+generated_at: "2026-06-22T12:04:02.745Z"
 generated_from: "spec/v4.3.0/24-philosophy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: spec/v4.3.0/24-philosophy.md."
@@ -16,7 +16,7 @@ edit_warning: "This file is auto-generated. Source: spec/v4.3.0/24-philosophy.md
 
 > **Informative.** This chapter describes the worldview behind FlowMCP — why a schema exists, what a graded tool is worth, and how an agent is meant to find and call it. It is written in prose; the normative rules that operationalize these convictions live in the chapters it points to.
 
-FlowMCP rests on a small set of convictions about how an autonomous agent and an unfamiliar API should meet: that a schema is a contract rather than a cage, that a tool is graded before it is trusted, that nothing fails silently, and that everything in the configured folders is discoverable without a hidden ceremony. None of these convictions is decorative. Each one was paid for by a concrete failure that the project has lived through, and each later chapter turns the conviction into a rule. This chapter records the worldview so that it stays explicit as the specification grows.
+FlowMCP rests on a small set of convictions about how an autonomous agent and an unfamiliar API should meet: that a schema is a contract rather than a cage, that a tool is graded before it is trusted, that nothing fails silently, and that everything in the configured folders is discoverable without a hidden ceremony. None of these convictions is decorative — each one exists to prevent a concrete failure mode, and each later chapter turns the conviction into a rule. This chapter records the worldview so that it stays explicit as the specification grows.
 
 ## The Guardrail (Highway) Analogy
 
@@ -34,13 +34,13 @@ This is why interoperability is the foreground concern, not an afterthought. A s
 
 A schema that parses is not yet a tool worth trusting. Before a tool earns a place in the trusted catalog it is graded — first by a deterministic data pretest, then by non-deterministic scoring. The deterministic pretest is blunt and unforgiving on purpose: it actually calls the live endpoint and checks two things together, that the response is HTTP 200 **and** that the data is non-empty.
 
-That second clause exists because of a real failure class. A tool can answer HTTP 200 and still hand back nothing — an empty array, a null payload, a polite shell with no content. A pretest that checked only the status code would wave that tool through as healthy, and an agent would later build on a contract that returns air. The "200-but-empty" case is treated as a genuine failure, caught at grading time, so that a tool in the trusted catalog is one that has been observed to return real data, not merely a successful status line. The grading workflow and its scoring areas are described in [09-validation-rules.md](/specification/validation-rules/).
+The second clause matters because a tool can answer HTTP 200 and still hand back nothing — an empty array, a null payload, a polite shell with no content. A pretest that checked only the status code would wave such a tool through as healthy, and an agent would then build on a contract that returns air. Treating "200 but empty" as a failure, caught at grading time, means a tool in the trusted catalog is one that has been observed to return real data, not merely a successful status line. The grading workflow and its scoring areas are described in [09-validation-rules.md](/specification/validation-rules/).
 
 ## No Silent Defaults — Fail Loudly
 
 FlowMCP never invents a value to paper over one that is missing. When a required parameter is absent, a credential is unset, or a configuration field is ambiguous, the system fails loudly rather than quietly substituting a plausible default and continuing. A silent default is a guess wearing the costume of a fact, and a guess that nobody was told about is the hardest kind of failure to find.
 
-The conviction is grounded in a specific incident. A routine that wrote a `.env` file silently — overwriting whatever was already there with default text — destroyed a user's real API keys, more than once, because the convenient default ran without ever asking. The lesson generalized into a project-wide rule: code that would write or assume on the user's behalf checks first and announces itself; it never overwrites or invents in silence. Loud failure is recoverable. Silent success on wrong data is not. The boundaries that enforce this around credentials and configuration are set out in [05-security.md](/specification/security/).
+The rule is strictest where it is most dangerous. Anything that would write or assume on the user's behalf — a credential, an environment file, a configuration value — checks first and announces what it is about to do; it never overwrites an existing value or invents a missing one in silence. Overwriting a real credential with a default, for instance, is the kind of quiet action that destroys data while reporting success. Loud failure is recoverable; silent success on wrong data is not. The boundaries that enforce this around credentials and configuration are set out in [05-security.md](/specification/security/).
 
 ## Search, Then Call
 
@@ -51,7 +51,7 @@ There is no hidden activation step. Every tool in the configured schema folders 
 | Discover | `search` / `list` | The matching tools, with their required parameters and a callable example |
 | Invoke | `call` | The live result of the tool, called directly |
 
-This was a deliberate simplification. An earlier model had an `add` or activation step between discovery and use, and that step was pure friction: a tool could be found yet not callable, which is a confusing state for a human and an outright trap for an autonomous agent. Removing it means the catalog the agent can see is exactly the catalog the agent can use.
+The simplification is deliberate: there is no intermediate state in which a tool is found but not yet callable. A gap between discovery and use — a tool that is visible but needs a separate activation step before it can run — is a confusing state for a person and an outright trap for an autonomous agent. The catalog an agent can see is exactly the catalog it can use.
 
 ## Disabled, Not Broken
 
@@ -61,13 +61,13 @@ This matters because the two failure modes it avoids are both worse. A hidden to
 
 ## The Catalog Is Indexed, Not Re-Derived
 
-At scale, you read the index; you do not rebuild the world. FlowMCP can hold a large catalog of schemas, and the cost of treating that catalog naively is not theoretical. A namespace index already records, ahead of time, which schema owns which tool. The correct move when resolving a single tool is to consult that index and load the one schema it points to.
+At scale, you read the index; you do not rebuild the world. FlowMCP can hold a large catalog of schemas, and the cost of treating that catalog naively grows with its size. A namespace index already records, ahead of time, which schema owns which tool. The correct move when resolving a single tool is to consult that index and load the one schema it points to.
 
-The discipline was learned from a regression. A configurator path ignored the existing namespace index and loaded the entire catalog — hundreds of schemas — to satisfy a single tool call that needed exactly one. The fix was not a faster loader; it was to trust the index that was already there. The principle generalizes: precomputed structure exists to be read, not re-derived on every request, and an operation whose cost scales with the size of the whole catalog when it should scale with one entry is a bug, however correct its output happens to be.
+The principle is simple: precomputed structure exists to be read, not re-derived on every request. Resolving one tool by loading the entire catalog produces the right answer at the wrong cost — and an operation whose cost scales with the size of the whole catalog when it should scale with a single entry is a defect, however correct its output happens to be. Reading the index keeps a single-tool call cheap no matter how large the catalog grows.
 
 ## A Home for Project Thinking
 
-These convictions are easy to hold while a project is small and easy to lose while it grows. A guardrail that nobody can name becomes bureaucracy; a rule whose original failure has been forgotten becomes a rule people quietly route around. This chapter exists so that does not happen — it is the place where FlowMCP's guiding ideas are written down, each one tied to the concrete failure that earned it, so the worldview stays explicit even as the normative chapters multiply. When a new rule is proposed, it can be measured against the philosophy recorded here; when an old rule is questioned, the incident behind it is on the record. The specification's letter lives in the chapters this page points to. Its spirit lives here.
+These convictions are easy to hold while a project is small and easy to lose while it grows. A guardrail that nobody can name becomes bureaucracy; a rule whose purpose has been forgotten becomes a rule people quietly route around. This chapter exists so that does not happen — it is the place where FlowMCP's guiding ideas are written down, each one paired with the failure mode it prevents, so the worldview stays explicit even as the normative chapters multiply. When a new rule is proposed, it can be measured against the philosophy recorded here. The specification's letter lives in the chapters this page points to. Its spirit lives here.
 
 ## Related
 

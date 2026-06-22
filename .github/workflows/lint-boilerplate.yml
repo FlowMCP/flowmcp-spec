@@ -1,8 +1,9 @@
 name: Lint Boilerplate
 
 # Caller for FlowMCP/.github reusable workflow check-boilerplate.yml.
-# Blocks PRs that introduce hardcoded Schema-/Tool-/Datenquellen numbers
-# in source files (Memo 060 Phase 8 PRD-026).
+# Blocks PRs that introduce hardcoded schema/tool/data-source numbers
+# in source files. Frozen spec version directories are whitelisted (their
+# historical numbers are immutable and must not trip the lint).
 
 on:
   pull_request:
@@ -14,4 +15,4 @@ jobs:
   check:
     uses: FlowMCP/.github/.github/workflows/check-boilerplate.yml@main
     with:
-      whitelist-paths: "node_modules,dist,generated,archive,.template.md,.template.mdx,template.txt,stats.json,registry.json,manifest.json,schemas-snapshot.json,refs.json,spec/v2.0.0,spec/v3.0.0,.git,personas"
+      whitelist-paths: "node_modules,dist,generated,archive,.template.md,.template.mdx,template.txt,stats.json,registry.json,manifest.json,schemas-snapshot.json,refs.json,spec/v2.0.0,spec/v3.0.0,spec/v4.0.0,spec/v4.1.0,spec/v4.2.0,.git,personas"

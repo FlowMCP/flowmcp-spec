@@ -28,6 +28,7 @@
         "sync-stats": "node scripts/sync-stats.mjs",
         "docs-payload": "node scripts/generate-docs-payload.mjs",
         "lint:spec-quality": "node scripts/generate-docs-payload.mjs && node scripts/lint-spec-quality.mjs",
+        "lint:versions": "node scripts/lint-versions.mjs",
         "test:refs-regex": "node scripts/test-refs-regex.mjs",
         "test:e2e": "node scripts/test-e2e-pipeline.mjs"
     },

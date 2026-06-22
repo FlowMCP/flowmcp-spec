@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildFrontmatter } from './lib/frontmatter.mjs'
 import { getSpecRepoRoot, getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 
 const specRoot = getSpecRepoRoot()
 const guideRepo = getGuideRepoPath()
@@ -15,7 +16,7 @@ const blocks = sources.map( ( rel ) => ( {
 const frontmatter = buildFrontmatter( {
     generator: 'gen-overview.mjs',
     sources,
-    specVersion: 'v4.0.0'
+    specVersion: getSpecVersionTag()
 } )
 
 const body = [

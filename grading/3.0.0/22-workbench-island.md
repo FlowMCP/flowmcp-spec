@@ -65,7 +65,7 @@ Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a 
 Workbench flows back toward the source:
 
 - The **primary hand-off is the `index.json`** — the complete graded state (status, grade, member resolution, lock snapshot).
-- The export lands the per-namespace rollup as the committed, CI-visible **provider-proof** `providers/<ns>/grade.json` inside the provider folder of the source repo (`flowmcp-schemas-private`); CI reads that **repo-resident** copy, never the island-local `index.json`. The data flow is specified in [`26-monitoring-track.md`](./26-monitoring-track.md).
+- The export lands the per-namespace rollup as the committed, CI-visible **provider-proof** `providers/<ns>/grade.json` inside the provider folder of the source schemas repository; CI reads that **repo-resident** copy, never the island-local `index.json`. The data flow is specified in [`26-monitoring-track.md`](./26-monitoring-track.md).
 - Optionally, the clean schema `.mjs` files (resolved via `resolveLatest`, names stripped) MAY accompany the export.
 - The export **MUST NOT overwrite the source**; it writes into a fresh export folder.
 

@@ -62,7 +62,7 @@ copying `grading/2.0.0/` forward; the legacy `grading/2.0.0/` directory is retai
 | `00-overview.md` | Kanban "out of scope" line removed — the monitoring track + board are now **in scope**; chapter map gains `26`; v3 version story added; header bumped to `gradingSpec/3.0.0`. |
 | `22-workbench-island.md` | Import-gate flip to emit-on-failure + namespace-folder fallback; non-destructive guarantees restated; OUT names the provider-proof. |
 | `08-grading-model.md` | NEW **status-record vs. grading-entry** artefact class: a `blocked`/`validation-failed` node is a status record (`gradings: []`, `aggregateGrade: null`, `blocked: true` + `blockedReason`), not a grading entry, and never becomes `stable`. |
-| `19-folder-layout.md` | Binding folder↔namespace invariant; unparseable-folder fallback key; rename-on-parse identity transition; provider-proof location (`providers/<ns>/grade.json` in `flowmcp-schemas-private`). |
+| `19-folder-layout.md` | Binding folder↔namespace invariant; unparseable-folder fallback key; rename-on-parse identity transition; provider-proof location (`providers/<ns>/grade.json` in the schemas repository). |
 | `06-determinism-and-tier.md` | `validation-failed` added as a documented `blocked` reason (status values unchanged). |
 | `16-selection-lockfile.md` | `gradingStatus` reason vocabulary synced — `validation-failed`-as-`blocked`. |
 | `23-index-json.md` | Pinned `blocked` `reason` value-set; status-record-without-grading; declares the repo-resident exported proof as the CI source; board driven by the rollup-operational vocabulary; `githubIssue` / `boardColumn` idempotency backref. |

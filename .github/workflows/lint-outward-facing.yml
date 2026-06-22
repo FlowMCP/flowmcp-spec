@@ -1,0 +1,19 @@
+name: Lint Outward-Facing
+
+# Caller for FlowMCP/.github reusable workflow check-outward-facing.yml.
+# Blocks inward-facing content (internal record IDs, decision/chapter refs,
+# German structure markers, the private source-repository name) on this
+# repository's outward-facing surface. Internal working-doc directories and
+# frozen historical version directories are allowlisted.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    uses: FlowMCP/.github/.github/workflows/check-outward-facing.yml@main
+    with:
+      allowlist-paths: "node_modules,dist,generated,.git,archive,.template.md,.template.mdx,tests,public/spec-generated,personas,scripts,skills,.github,examples,spec/v2.0.0,spec/v3.0.0,spec/v4.0.0,spec/v4.1.0,spec/v4.2.0,grading/1.0.0,grading/1.1.0,grading/1.2.0,grading/2.0.0"

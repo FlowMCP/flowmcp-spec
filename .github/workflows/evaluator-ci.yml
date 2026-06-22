@@ -3,12 +3,12 @@ name: Evaluator CI — RFC2119 Conformance
 on:
   pull_request:
     paths:
-      - 'spec/v4.2.0/**.md'
+      - 'spec/v*/**.md'
       - 'skills/spec-quality/evaluator-spec-rfc2119/**'
   push:
     branches: [main]
     paths:
-      - 'spec/v4.2.0/**.md'
+      - 'spec/v*/**.md'
   workflow_dispatch:
 
 permissions:
@@ -27,6 +27,18 @@ jobs:
         with:
           node-version: 22
 
+      - name: Resolve current spec directory
+        id: specdir
+        run: |
+          set -e
+          SPEC_VERSION=$(jq -r '.spec.currentVersion' data/refs.manual.json)
+          SPEC_DIR="spec/v${SPEC_VERSION}"
+          if [ ! -d "$SPEC_DIR" ]; then
+              SPEC_DIR=$(ls -d spec/v*/ | sed 's:/*$::' | sort -V | tail -1)
+          fi
+          echo "dir=$SPEC_DIR" >> "$GITHUB_OUTPUT"
+          echo "Resolved current spec dir: $SPEC_DIR"
+
       - name: Run RFC2119 evaluator on all spec files
         id: eval
         run: |
@@ -38,7 +50,7 @@ jobs:
           report+="| File | Grade | Errors | Warnings | Hints |\n"
           report+="|------|:-----:|:------:|:--------:|:-----:|\n"
 
-          for f in spec/v4.2.0/*.md; do
+          for f in ${{ steps.specdir.outputs.dir }}/*.md; do
               name=$(basename "$f")
               result=$(node skills/spec-quality/evaluator-spec-rfc2119/check.mjs --json "$f" 2>/dev/null || echo '{"grade":0,"issues":[]}')
               grade=$(echo "$result" | jq -r .grade)

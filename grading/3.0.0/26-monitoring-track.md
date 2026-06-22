@@ -58,7 +58,7 @@ The grading-issue metadata is sourced **only** from the provider-proof `provider
 
 ### Provider grade = `namespaceAggregate`
 
-The **provider grade is the `namespaceAggregate`** — the namespace-level rollup grade (Memo 093 F3/F4). A per-schema grade **rolls up** into the namespace aggregate; the per-schema grade is **not** the gate. This resolves the schema-spec conflict where the schema-lifecycle chapter implied a per-schema grade gate: that chapter now consumes the `namespaceAggregate`.
+The **provider grade is the `namespaceAggregate`** — the namespace-level rollup grade. A per-schema grade **rolls up** into the namespace aggregate; the per-schema grade is **not** the gate. This resolves the schema-spec conflict where the schema-lifecycle chapter implied a per-schema grade gate: that chapter now consumes the `namespaceAggregate`.
 
 ### Where the namespace name comes from
 
@@ -103,13 +103,13 @@ A `kanban-readonly` consumer reads the proof / board and answers "which provider
 This is the explicit data-flow contract: where `index.json` is born, where it is committed, and what CI reads.
 
 1. **Island** (`~/.flowmcp/grading` = `grading-data/`) is an internal workbench, **not a repo**. It is gitignored and **never CI-visible**. Grading runs here; `index.json` is **born and rebuilt** here (see [`22-workbench-island.md`](./22-workbench-island.md) and [`23-index-json.md`](./23-index-json.md)).
-2. **Repo** (`flowmcp-schemas-private`) holds the neutral source `.mjs` and **receives** the committed **provider-proof** `providers/<ns>/grade.json` — the CI-visible, per-namespace grade/status rollup (Memo 093 F10).
+2. **Repo** (the schemas repository) holds the neutral source `.mjs` and **receives** the committed **provider-proof** `providers/<ns>/grade.json` — the CI-visible, per-namespace grade/status rollup.
 3. The **export step** (`grading export`, the OUT side of [`22-workbench-island.md`](./22-workbench-island.md)) lands the proof into the provider folder of the repo. CI reads the **repo-resident** proof, **never** the island-local `index.json`.
-4. A **push on the provider-proof** triggers the deterministic sync workflow (Memo 093 F10, decision A). The push is the event; the sync is the deterministic reaction.
+4. A **push on the provider-proof** triggers the deterministic sync workflow. The push is the event; the sync is the deterministic reaction.
 
 ### Island compared to Repo
 
-| Aspect | Island (`grading-data/`) | Repo (`flowmcp-schemas-private`) |
+| Aspect | Island (`grading-data/`) | Repo (the schemas repository) |
 |--------|--------------------------|----------------------------------|
 | Nature | internal workbench, not a repo | versioned source repository |
 | Structure | verbose (timestamp + hash, per-primitive folders) | neutral `.mjs` + per-namespace `providers/<ns>/grade.json` |
@@ -132,7 +132,7 @@ flowchart TD
     I --> J[kanban-readonly: which provider next]
 ```
 
-The diagram mirrors the Soll-Ablauf of Memo 093 Kap. 10: `Backlog → import → {parse?} → blocked-node | grade+aggregate → provider-proof → git push → deterministic sync → 1 issue/namespace + board → kanban-readonly`. The only non-deterministic node is `grade 6 areas`.
+The diagram mirrors the data flow: `Backlog → import → {parse?} → blocked-node | grade+aggregate → provider-proof → git push → deterministic sync → 1 issue/namespace + board → kanban-readonly`. The only non-deterministic node is `grade 6 areas`.
 
 ## Relationship to the superseded Kanban Data Contract
 

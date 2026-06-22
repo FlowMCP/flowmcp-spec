@@ -1,0 +1,45 @@
+name: Lint Spec Quality
+
+# The spec-quality lint previously ran only locally; this wires it as a CI
+# gate. It regenerates the docs-payload from the current spec/grading/
+# best-practice sources (version read dynamically from data/refs.manual.json)
+# and runs the spec-quality linter against the result.
+
+on:
+  pull_request:
+    paths:
+      - 'spec/v*/**.md'
+      - 'grading/*/**.md'
+      - 'best-practice/*/**.md'
+      - 'data/refs.manual.json'
+      - 'scripts/**'
+  push:
+    branches: [main]
+    paths:
+      - 'spec/v*/**.md'
+      - 'grading/*/**.md'
+      - 'best-practice/*/**.md'
+      - 'data/refs.manual.json'
+      - 'scripts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run spec-quality lint (regenerate payload + lint)
+        run: npm run lint:spec-quality

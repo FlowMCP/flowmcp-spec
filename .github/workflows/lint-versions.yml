@@ -1,0 +1,44 @@
+name: Lint Versions
+
+# Structural version-drift gate (see scripts/lint-versions.mjs). Fails when
+# data/refs.manual.json drifts from the on-disk version directories, or when a
+# generator script reintroduces a hardcoded version literal instead of reading
+# it through the shared refs-loader.
+
+on:
+  pull_request:
+    paths:
+      - 'data/refs.manual.json'
+      - 'scripts/generators/**'
+      - 'scripts/lint-versions.mjs'
+      - 'spec/**'
+      - 'grading/**'
+      - 'best-practice/**'
+  push:
+    branches: [main]
+    paths:
+      - 'data/refs.manual.json'
+      - 'scripts/generators/**'
+      - 'scripts/lint-versions.mjs'
+      - 'spec/**'
+      - 'grading/**'
+      - 'best-practice/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run version-drift lint
+        run: npm run lint:versions

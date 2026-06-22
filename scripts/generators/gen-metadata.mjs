@@ -2,6 +2,7 @@ import { writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { hashFile } from './lib/sha256.mjs'
 import { getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 
 const guideRepo = getGuideRepoPath()
 
@@ -44,7 +45,7 @@ const files = expectedFiles.map( ( rel ) => ( {
 const metadata = {
     bundle_version: '0.1.0',
     generated_at: new Date().toISOString(),
-    spec_version: 'v4.0.0',
+    spec_version: getSpecVersionTag(),
     name: 'FlowMCP Guide',
     description: 'Your conversational guide to the FlowMCP ecosystem — CLI usage, schema authoring, agent deployment, and x402 payments. English and German supported.',
     recommended_model: 'GPT-5',

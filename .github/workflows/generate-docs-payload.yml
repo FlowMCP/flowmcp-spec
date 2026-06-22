@@ -2,8 +2,12 @@ name: Generate docs-payload
 
 on:
   push:
+    branches: [main]
     paths:
-      - 'spec/v4.2.0/*.md'
+      - 'spec/v*/*.md'
+      - 'grading/*/**.md'
+      - 'best-practice/*/**.md'
+      - 'data/refs.manual.json'
       - 'scripts/generate-docs-payload.mjs'
       - 'scripts/generate-manifest.mjs'
       - 'skills/spec-quality/evaluator-spec-rfc2119/**'

@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildFrontmatter } from './lib/frontmatter.mjs'
 import { getReposRoot, getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 import { ghFetchReadme } from './lib/gh-fetch.mjs'
 
 const reposRoot = getReposRoot()
@@ -27,7 +28,7 @@ if( existsSync( join( agentServerRepo, 'README.md' ) ) ) {
 const frontmatter = buildFrontmatter( {
     generator: 'gen-agent-server.mjs',
     sources: [ source ],
-    specVersion: 'v4.0.0'
+    specVersion: getSpecVersionTag()
 } )
 
 const body = [

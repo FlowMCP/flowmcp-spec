@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildFrontmatter } from './lib/frontmatter.mjs'
 import { getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 import { ghFetchReadme } from './lib/gh-fetch.mjs'
 
 const guideRepo = getGuideRepoPath()
@@ -49,7 +50,7 @@ const sources = repoGroups.flatMap( ( g ) => g.repos.map( ( r ) => `gh:FlowMCP/$
 const frontmatter = buildFrontmatter( {
     generator: 'gen-repos-overview.mjs',
     sources,
-    specVersion: 'v4.0.0'
+    specVersion: getSpecVersionTag()
 } )
 
 const body = `# FlowMCP Repository Overview (${totalCount} Repos)\n\nThe canonical org-startpage is https://github.com/FlowMCP/.github/blob/main/profile/README.md\n\n` + sections.join( '\n' )

@@ -6,9 +6,9 @@ spec_file: "23-index-json.md"
 order: 23
 section: "Grading"
 normative: true
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/grading/3.0.0/23-index-json.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "fc45a46"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/fc45a46/grading/3.0.0/23-index-json.md"
+generated_at: "2026-06-22T13:53:50.864Z"
 generated_from: "grading/3.0.0/23-index-json.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/23-index-json.md."
@@ -93,7 +93,7 @@ The grading-monitoring board columns (see [`26-monitoring-track.md`](/grading/mo
 
 ## Which `index.json` CI reads (exported, repo-resident copy)
 
-`index.json` is **born and rebuilt inside the workbench island** (`grading-data/`), which is gitignored and never CI-visible. The copy that CI and the board sync read is the **exported, repo-resident** per-namespace rollup committed into the provider folder of `flowmcp-schemas-private` (the **provider-proof** `providers/<ns>/grade.json`; see [`19-folder-layout.md`](/grading/folder-layout/) and the full data flow in [`26-monitoring-track.md`](/grading/monitoring-track/)). The island-local `index.json` is **never** CI-visible. The producer/sync detail lives in [`26-monitoring-track.md`](/grading/monitoring-track/); this chapter only pins the location rule.
+`index.json` is **born and rebuilt inside the workbench island** (`grading-data/`), which is gitignored and never CI-visible. The copy that CI and the board sync read is the **exported, repo-resident** per-namespace rollup committed into the provider folder of the schemas repository (the **provider-proof** `providers/<ns>/grade.json`; see [`19-folder-layout.md`](/grading/folder-layout/) and the full data flow in [`26-monitoring-track.md`](/grading/monitoring-track/)). The island-local `index.json` is **never** CI-visible. The producer/sync detail lives in [`26-monitoring-track.md`](/grading/monitoring-track/); this chapter only pins the location rule.
 
 ## Idempotency backref: `githubIssue` / `boardColumn`
 
@@ -193,7 +193,7 @@ When every schema in a folder fails the import validate gate, the namespace roll
   "updatedAt": "2026-06-02T09-00-00Z",
   "status": "blocked",
   "reason": "validation-failed",
-  "githubIssue": "FlowMCP/flowmcp-schemas-private#1234",
+  "githubIssue": "FlowMCP/schemas#1234",
   "boardColumn": "Blocked"
 }
 ```

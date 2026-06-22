@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildFrontmatter } from './lib/frontmatter.mjs'
 import { getReposRoot, getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 
 const reposRoot = getReposRoot()
 const guideRepo = getGuideRepoPath()
@@ -27,7 +28,7 @@ const sources = [
 const frontmatter = buildFrontmatter( {
     generator: 'gen-schemas-catalog.mjs',
     sources,
-    specVersion: 'v4.0.0'
+    specVersion: getSpecVersionTag()
 } )
 
 const body = [

@@ -6,9 +6,9 @@ spec_file: "22-workbench-island.md"
 order: 22
 section: "Grading"
 normative: true
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/grading/3.0.0/22-workbench-island.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "fc45a46"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/fc45a46/grading/3.0.0/22-workbench-island.md"
+generated_at: "2026-06-22T13:53:50.864Z"
 generated_from: "grading/3.0.0/22-workbench-island.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/22-workbench-island.md."
@@ -69,7 +69,7 @@ Up to and including `gradingSpec/2.0.x`, the import gate was a **hard gate**: a 
 Workbench flows back toward the source:
 
 - The **primary hand-off is the `index.json`** — the complete graded state (status, grade, member resolution, lock snapshot).
-- The export lands the per-namespace rollup as the committed, CI-visible **provider-proof** `providers/<ns>/grade.json` inside the provider folder of the source repo (`flowmcp-schemas-private`); CI reads that **repo-resident** copy, never the island-local `index.json`. The data flow is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
+- The export lands the per-namespace rollup as the committed, CI-visible **provider-proof** `providers/<ns>/grade.json` inside the provider folder of the source schemas repository; CI reads that **repo-resident** copy, never the island-local `index.json`. The data flow is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
 - Optionally, the clean schema `.mjs` files (resolved via `resolveLatest`, names stripped) MAY accompany the export.
 - The export **MUST NOT overwrite the source**; it writes into a fresh export folder.
 

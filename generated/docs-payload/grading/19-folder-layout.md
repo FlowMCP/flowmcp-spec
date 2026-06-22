@@ -6,9 +6,9 @@ spec_file: "19-folder-layout.md"
 order: 19
 section: "Grading"
 normative: true
-source_commit: "659863f"
-source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/659863f/grading/3.0.0/19-folder-layout.md"
-generated_at: "2026-06-21T18:39:36.331Z"
+source_commit: "fc45a46"
+source_url: "https://github.com/FlowMCP/flowmcp-spec/blob/fc45a46/grading/3.0.0/19-folder-layout.md"
+generated_at: "2026-06-22T13:53:50.864Z"
 generated_from: "grading/3.0.0/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/19-folder-layout.md."
@@ -76,12 +76,12 @@ Once **≥1** schema in the folder parses and exposes `main.namespace`, that fie
 
 #### Provider-proof location
 
-The committed, CI-visible per-namespace grade/status rollup — the **provider-proof** `providers/<ns>/grade.json` — lives **inside the provider folder** in `flowmcp-schemas-private` (Memo 093 Kap. 4, F10). It is distinct from the island-local `index.json`:
+The committed, CI-visible per-namespace grade/status rollup — the **provider-proof** `providers/<ns>/grade.json` — lives **inside the provider folder** in the schemas repository. It is distinct from the island-local `index.json`:
 
 | Artefact | Location | Nature | CI-visible |
 |----------|----------|--------|------------|
 | `index.json` | `grading-data/providers/<ns>/` (the island) | born + rebuilt on the workbench, gitignored | no |
-| `grade.json` (provider-proof) | `flowmcp-schemas-private/providers/<ns>/` (the repo) | exported, committed, per-namespace rollup | yes |
+| `grade.json` (provider-proof) | the schemas repository, `providers/<ns>/` | exported, committed, per-namespace rollup | yes |
 
 The full data flow (where each is born, where it is committed, what the board sync reads) is specified in [`26-monitoring-track.md`](/grading/monitoring-track/).
 

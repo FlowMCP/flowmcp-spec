@@ -38,7 +38,7 @@ Additive release introducing two new schema-header fields that ride alongside th
 
 ### Migration
 
-- Migration script in `flowmcp-schemas-private`: `scripts/add-schema-version-field.mjs` (additive, idempotent, dry-run capable).
+- Migration script in the schemas repository: `scripts/add-schema-version-field.mjs` (additive, idempotent, dry-run capable).
 - 406 production schemas in `schemas/v4.0.0/providers/` migrated. Skill-files under `<namespace>/skills/` excluded (no `main`/`schema` export, by design).
 - Verification: `tests/manual/check-schemas-have-schema-version.mjs` asserts 100 % coverage and recomputes hash to ensure consistency.
 

@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { buildFrontmatter } from './lib/frontmatter.mjs'
 import { getReposRoot, getGuideRepoPath } from './lib/config.mjs'
+import { getSpecVersionTag } from './lib/refs-loader.mjs'
 import { ghFetchReadme } from './lib/gh-fetch.mjs'
 
 const reposRoot = getReposRoot()
@@ -25,7 +26,7 @@ const sources = [
 const frontmatter = buildFrontmatter( {
     generator: 'gen-core-arch.mjs',
     sources,
-    specVersion: 'v4.0.0'
+    specVersion: getSpecVersionTag()
 } )
 
 const body = [

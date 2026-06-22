@@ -90,7 +90,7 @@ The grading-monitoring board columns (see [`26-monitoring-track.md`](./26-monito
 
 ## Which `index.json` CI reads (exported, repo-resident copy)
 
-`index.json` is **born and rebuilt inside the workbench island** (`grading-data/`), which is gitignored and never CI-visible. The copy that CI and the board sync read is the **exported, repo-resident** per-namespace rollup committed into the provider folder of `flowmcp-schemas-private` (the **provider-proof** `providers/<ns>/grade.json`; see [`19-folder-layout.md`](./19-folder-layout.md) and the full data flow in [`26-monitoring-track.md`](./26-monitoring-track.md)). The island-local `index.json` is **never** CI-visible. The producer/sync detail lives in [`26-monitoring-track.md`](./26-monitoring-track.md); this chapter only pins the location rule.
+`index.json` is **born and rebuilt inside the workbench island** (`grading-data/`), which is gitignored and never CI-visible. The copy that CI and the board sync read is the **exported, repo-resident** per-namespace rollup committed into the provider folder of the schemas repository (the **provider-proof** `providers/<ns>/grade.json`; see [`19-folder-layout.md`](./19-folder-layout.md) and the full data flow in [`26-monitoring-track.md`](./26-monitoring-track.md)). The island-local `index.json` is **never** CI-visible. The producer/sync detail lives in [`26-monitoring-track.md`](./26-monitoring-track.md); this chapter only pins the location rule.
 
 ## Idempotency backref: `githubIssue` / `boardColumn`
 
@@ -190,7 +190,7 @@ When every schema in a folder fails the import validate gate, the namespace roll
   "updatedAt": "2026-06-02T09-00-00Z",
   "status": "blocked",
   "reason": "validation-failed",
-  "githubIssue": "FlowMCP/flowmcp-schemas-private#1234",
+  "githubIssue": "FlowMCP/schemas#1234",
   "boardColumn": "Blocked"
 }
 ```

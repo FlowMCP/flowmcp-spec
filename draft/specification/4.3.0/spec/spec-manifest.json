@@ -1,0 +1,65 @@
+{
+    "namespace": "specification",
+    "version": "4.3.0",
+    "namespaceToken": "FMS",
+    "hasRequirements": false,
+    "hasGrading": false,
+    "requirementsRef": null,
+    "gradingRef": null,
+    "groups": [
+        {
+            "id": "introduction",
+            "label": "Introduction",
+            "order": 1,
+            "pages": [
+                "00-overview",
+                "24-philosophy"
+            ]
+        },
+        {
+            "id": "primitives",
+            "label": "Primitives",
+            "order": 2,
+            "pages": [
+                "02-parameters",
+                "06-agents",
+                "13-resources",
+                "14-skills",
+                "17-selections",
+                "18-prefill"
+            ]
+        },
+        {
+            "id": "specification",
+            "label": "Specification",
+            "order": 3,
+            "pages": [
+                "01-schema-format",
+                "03-shared-lists",
+                "04-output-schema",
+                "05-security",
+                "07-tasks",
+                "08-migration",
+                "09-validation-rules",
+                "10-tests",
+                "11-preload",
+                "12-prompt-architecture",
+                "15-catalog",
+                "16-id-schema",
+                "19-mcp-integration"
+            ]
+        },
+        {
+            "id": "guides",
+            "label": "Guides",
+            "order": 4,
+            "pages": [
+                "20-validation-strategy",
+                "21-schema-lifecycle",
+                "22-scoring-protocol",
+                "23-license-and-tos"
+            ]
+        }
+    ],
+    "fallback": "append-by-NN"
+}

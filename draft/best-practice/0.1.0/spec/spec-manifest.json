@@ -1,0 +1,32 @@
+{
+    "namespace": "best-practice",
+    "version": "0.1.0",
+    "namespaceToken": "FMB",
+    "hasRequirements": false,
+    "hasGrading": false,
+    "requirementsRef": null,
+    "gradingRef": null,
+    "groups": [
+        {
+            "id": "introduction",
+            "label": "Introduction",
+            "order": 1,
+            "pages": [
+                "01-overview"
+            ]
+        },
+        {
+            "id": "schema-creation",
+            "label": "Schema Creation",
+            "order": 2,
+            "pages": [
+                "10-readable-interface",
+                "11-reference-data",
+                "12-load-and-scale",
+                "13-geo-conventions",
+                "14-correctness-license"
+            ]
+        }
+    ],
+    "fallback": "append-by-NN"
+}

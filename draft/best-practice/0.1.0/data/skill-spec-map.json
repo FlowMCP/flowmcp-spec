@@ -1,0 +1,10 @@
+{
+    "note": "Per-family skill->spec map for the FlowMCP Best-Practice Specification. FlowMCP implementer skills are PRIVATE (F9=A, Memo 060 Z5-14): the public spec repo carries spec + build-plan only, so this map is intentionally empty (0 implementers). It exists so the family is symmetric with the meta-spec map layer and the bridge renders an honest \"nothing published here\" projection.",
+    "totals": {
+        "skills": 0,
+        "register": 0,
+        "withGaps": 0,
+        "withPrimary": 0
+    },
+    "skills": []
+}

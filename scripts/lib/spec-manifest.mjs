@@ -38,7 +38,7 @@ const readSpecManifest = ( { specDir } ) => {
     const fallback = typeof parsed.fallback === 'string' ? parsed.fallback : DEFAULT_FALLBACK
     const groups = [ ...parsed.groups ].sort( ( a, b ) => ( a.order || 0 ) - ( b.order || 0 ) )
 
-    return { found: true, path, namespace: parsed.namespace, version: parsed.version, groups, fallback, messages: [] }
+    return { found: true, path, namespace: parsed.namespace, namespaceToken: parsed.namespaceToken, version: parsed.version, groups, fallback, messages: [] }
 }
 
 

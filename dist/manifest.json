@@ -1,11 +1,11 @@
 {
-    "generated_at": "2026-07-02T14:22:43.470Z",
+    "generated_at": "2026-07-02T14:25:24.225Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {
             "name": "specification",
             "title": "specification",
-            "namespaceToken": null,
+            "namespaceToken": "FMS",
             "version": "4.3.0",
             "docEntry": "/specification/overview/",
             "sidebar": {
@@ -288,7 +288,7 @@
         {
             "name": "grading",
             "title": "grading",
-            "namespaceToken": null,
+            "namespaceToken": "FMG",
             "version": "3.0.0",
             "docEntry": "/grading/overview/",
             "sidebar": {
@@ -591,7 +591,7 @@
         {
             "name": "best-practice",
             "title": "best-practice",
-            "namespaceToken": null,
+            "namespaceToken": "FMB",
             "version": "0.1.0",
             "docEntry": "/best-practice/overview/",
             "sidebar": {

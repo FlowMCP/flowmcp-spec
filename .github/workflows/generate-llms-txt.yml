@@ -1,9 +1,14 @@
 name: Generate llms.txt
 
+# WI-200 (Memo 060 P5): the generator logic now lives in scripts/generate-llms-txt.mjs so the
+# chain is locally reproducible (`npm run generate-llms-txt`); this workflow just calls it.
+
 on:
   push:
     paths:
-      - 'spec/**/*.md'
+      - 'draft/specification/**/*.md'
+      - 'data/refs.manual.json'
+      - 'scripts/generate-llms-txt.mjs'
       - 'package.json'
   workflow_dispatch:
 
@@ -17,127 +22,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Generate llms.txt from spec files
-        run: |
-          SPEC_VERSION=$(node -p "require('./package.json').version")
-          SPEC_DIR="spec/v${SPEC_VERSION}"
-          # A patch release reuses the minor spec directory (e.g. package version 4.3.1
-          # has no spec/v4.3.1 — the docs live in spec/v4.3.0). Fall back to the highest
-          # existing spec/vX.Y.Z directory rather than silently emitting an empty file.
-          if [ ! -d "$SPEC_DIR" ]; then
-            FALLBACK_DIR=$(ls -d spec/v*/ 2>/dev/null | sed 's:/*$::' | sort -V | tail -1)
-            echo "WARN: $SPEC_DIR not found; falling back to ${FALLBACK_DIR} for v${SPEC_VERSION}"
-            SPEC_DIR="$FALLBACK_DIR"
-          fi
-          if [ -z "$SPEC_DIR" ] || [ ! -d "$SPEC_DIR" ]; then
-            echo "FAIL: no spec/v* directory found to build llms.txt"
-            exit 1
-          fi
-          OUTPUT_DIR="generated"
-          OUTPUT="$OUTPUT_DIR/llms.txt"
-          OUTPUT_ALIAS="$OUTPUT_DIR/llms-schema-spec.txt"
-          mkdir -p "$OUTPUT_DIR"
-
-          TITLES=(
-            "Overview"
-            "Schema Format"
-            "Parameters"
-            "Shared Lists"
-            "Output Schema"
-            "Security Model"
-            "Agents"
-            "MCP Tasks"
-            "Migration Guide"
-            "Validation Rules"
-            "Tests"
-            "Preload & Caching"
-            "Prompt Architecture"
-            "Resources"
-            "Skills"
-            "Catalog"
-            "ID Schema"
-            "Selections"
-            "Prefill"
-            "MCP Integration"
-            "Validation Strategy"
-            "Schema Lifecycle"
-            "Scoring Protocol"
-          )
-
-          FILES=(
-            "00-overview.md"
-            "01-schema-format.md"
-            "02-parameters.md"
-            "03-shared-lists.md"
-            "04-output-schema.md"
-            "05-security.md"
-            "06-agents.md"
-            "07-tasks.md"
-            "08-migration.md"
-            "09-validation-rules.md"
-            "10-tests.md"
-            "11-preload.md"
-            "12-prompt-architecture.md"
-            "13-resources.md"
-            "14-skills.md"
-            "15-catalog.md"
-            "16-id-schema.md"
-            "17-selections.md"
-            "18-prefill.md"
-            "19-mcp-integration.md"
-            "20-validation-strategy.md"
-            "21-schema-lifecycle.md"
-            "22-scoring-protocol.md"
-          )
-
-          # Header
-          cat > "$OUTPUT" << HEADER
-          # FlowMCP Specification v${SPEC_VERSION}
-          > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
-          >
-          > This file concatenates all 23 specification documents into a single file for LLM consumption.
-          > Source: https://github.com/FlowMCP/flowmcp-spec
-
-          ## Table of Contents
-
-          HEADER
-
-          # Remove leading whitespace from heredoc
-          sed -i 's/^          //' "$OUTPUT"
-
-          # Generate TOC
-          for i in "${!TITLES[@]}"; do
-            echo "$((i + 1)). ${TITLES[$i]}" >> "$OUTPUT"
-          done
-
-          echo "" >> "$OUTPUT"
-          echo "---" >> "$OUTPUT"
-
-          # Concatenate spec files. A missing file is surfaced (never silently skipped),
-          # and concatenating ZERO files is a hard failure — that is exactly the bug that
-          # produced a header-and-TOC-only llms.txt.
-          CONCATENATED=0
-          for i in "${!FILES[@]}"; do
-            FILE="$SPEC_DIR/${FILES[$i]}"
-            if [ -f "$FILE" ]; then
-              echo "" >> "$OUTPUT"
-              cat "$FILE" >> "$OUTPUT"
-              echo "" >> "$OUTPUT"
-              echo "---" >> "$OUTPUT"
-              CONCATENATED=$((CONCATENATED + 1))
-            else
-              echo "WARN: spec file not found, skipped: $FILE"
-            fi
-          done
-
-          if [ "$CONCATENATED" -eq 0 ]; then
-            echo "FAIL: 0 spec files concatenated from $SPEC_DIR — refusing to write a header-only llms.txt"
-            exit 1
-          fi
-          echo "Concatenated $CONCATENATED spec files from $SPEC_DIR into $OUTPUT"
-
-          # Mirror llms.txt as llms-schema-spec.txt (alias for docs-site convention)
-          cp "$OUTPUT" "$OUTPUT_ALIAS"
+        run: npm run generate-llms-txt
 
       - name: Check for changes
         id: diff

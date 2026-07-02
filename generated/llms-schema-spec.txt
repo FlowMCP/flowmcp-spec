@@ -1,7 +1,7 @@
-# FlowMCP Specification v4.3.1
+# FlowMCP Specification v4.3.0
 > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
 >
-> This file concatenates all 23 specification documents into a single file for LLM consumption.
+> This file concatenates all 25 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 
 ## Table of Contents
@@ -24,19 +24,23 @@
 16. Catalog
 17. ID Schema
 18. Selections
-19. Prefill
-20. MCP Integration
+19. Prefill and Placeholders
+20. MCP Server Integration
 21. Validation Strategy
 22. Schema Lifecycle
 23. Scoring Protocol
+24. License & Terms of Services
+25. Philosophy
 
 ---
-
-# FlowMCP Specification v4.3.0 — Overview
+# 00. Overview
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Informative |
 | Related | [01-schema-format.md](./01-schema-format.md), [06-agents.md](./06-agents.md), [17-selections.md](./17-selections.md), [15-catalog.md](./15-catalog.md) |
+
+> **Informative.**
 
 FlowMCP is a **Tool Catalog with pre-built API templates** and a **Knowledge Base for API workflows**. It unifies access to APIs through two equal channels:
 
@@ -405,16 +409,24 @@ The v2.0.0 release restructures the schema format around a fundamental insight: 
 
 The migration path from v1.2.0 to v2.0.0 is documented in `08-migration.md`.
 
----
 
-# FlowMCP Specification v4.3.0 — Schema Format
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./15-catalog.md](./15-catalog.md) — see chapter 15.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+
+
+---
+# 01. Schema Format
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md) |
 | Related | [02-parameters.md](./02-parameters.md), [04-output-schema.md](./04-output-schema.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [16-id-schema.md](./16-id-schema.md), [19-mcp-integration.md](./19-mcp-integration.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A FlowMCP schema is a single `.mjs` module that describes how to reach an API and turn its endpoints into tools. It splits into two named exports: a static, JSON-serializable `main` block that holds all declarative configuration, and an optional `handlers` factory that transforms requests and responses. The sections below walk through both exports, the tool and field definitions inside `main`, the naming conventions, and the constraints the runtime enforces at load time.
 
@@ -1046,7 +1058,6 @@ export const main = {
     }
 }
 
-
 export const handlers = ( { sharedLists } ) => ({
     getSourceCode: {
         postRequest: async ( { response, struct, payload } ) => {
@@ -1081,16 +1092,27 @@ export const handlers = ( { sharedLists } ) => ({
 10. **An output schema** on `getContractAbi` declaring the expected response shape.
 11. **Zero import statements** — the schema file has no imports. Dependencies (`sharedLists`) are injected through the factory function.
 
----
 
-# FlowMCP Specification v4.3.0 — Parameters
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+
+
+---
+# 02. Parameters
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [03-shared-lists.md](./03-shared-lists.md), [04-output-schema.md](./04-output-schema.md), [18-prefill.md](./18-prefill.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A parameter declares where a value is placed in the outgoing API request and how it is validated before the call is made. Each tool parameter pairs a `position` block (placement) with a `z` block (validation); resource parameters reuse the same pairing without a `location` field, and skill input uses a simpler shape.
 
@@ -1716,16 +1738,25 @@ input: [
 
 See `14-skills.md` for the complete skill specification.
 
----
 
-# FlowMCP Specification v4.3.0 — Shared Lists
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./03-shared-lists.md](./03-shared-lists.md) — see chapter 03.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./18-prefill.md](./18-prefill.md) — see chapter 18.
+
+
+---
+# 03. Shared Lists
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
 | Related | [15-catalog.md](./15-catalog.md), [16-id-schema.md](./16-id-schema.md), [09-validation-rules.md](./09-validation-rules.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Shared lists eliminate duplication of common value sets across schemas. Instead of every Etherscan schema maintaining its own chain list, they reference a single `evmChains` shared list that is versioned, validated, and centrally maintained. The sections below cover the list file format, the meta and field definitions, the dependency model between lists, how schemas reference and filter lists, how the runtime injects resolved data into handlers, and the validation rules that keep the registry consistent.
 
@@ -2266,16 +2297,26 @@ _lists/
 
 Each `.mjs` file contains exactly one shared list. Combining multiple lists in a single file is not supported.
 
----
 
-# FlowMCP Specification v4.3.0 — Output Schema
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./15-catalog.md](./15-catalog.md) — see chapter 15.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+
+
+---
+# 04. Output Schema
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
 | Related | [10-tests.md](./10-tests.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [19-mcp-integration.md](./19-mcp-integration.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Output schemas make tool responses predictable. By declaring the expected shape of a response at the route level, an AI client knows in advance what fields it will receive and can reason about them without parsing guesswork. The sections below cover the output declaration format, the supported types and MIME-types, the standard response envelope, how output interacts with `postRequest` handlers, and the validation rules applied to every declaration.
 
@@ -2778,16 +2819,26 @@ flowchart TD
 
 The diagram shows the non-blocking validation flow: mismatches produce warnings but do not prevent the response from being delivered.
 
----
 
-# FlowMCP Specification v4.3.0 — Security Model
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+- [./22-scoring-protocol.md](./22-scoring-protocol.md) — see chapter 22.
+
+
+---
+# 05. Security Model
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [09-validation-rules.md](./09-validation-rules.md), [13-resources.md](./13-resources.md), [23-license-and-tos.md](./23-license-and-tos.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 FlowMCP enforces a layered security model that prevents schema files from accessing the network, filesystem, or process environment. All potentially dangerous operations are restricted to the trusted core runtime. Dependencies are injected through a factory function pattern, and external libraries are gated by an allowlist.
 
@@ -3125,16 +3176,25 @@ All violations in a single file are reported together (the scan does not stop at
 | SEC203 | Template literal with expression found in shared list |
 | SEC204 | Forbidden pattern (same as SEC001-SEC016) found in shared list |
 
----
 
-# FlowMCP Specification v4.3.0 — Agents
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./23-license-and-tos.md](./23-license-and-tos.md) — see chapter 23.
+
+
+---
+# 06. Agents
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [14-skills.md](./14-skills.md), [17-selections.md](./17-selections.md), [16-id-schema.md](./16-id-schema.md), [10-tests.md](./10-tests.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 An Agent is a complete, purpose-driven definition that bundles tools from multiple providers for a specific task. Unlike a plain tool list, an Agent is a full composition: it cherry-picks tools across providers, binds them to a specific LLM, defines a system prompt and behavioral guidelines, and ships with its own tests, explanatory prompts, instructional skills, and optional resources. The sections below cover the agent manifest format, how tool references are resolved, model binding, the system prompt, integrity verification through hashes, and the validation rules applied at activation.
 
@@ -4189,16 +4249,27 @@ export const agent = {
 }
 ```
 
----
 
-# FlowMCP Specification v4.3.0 — MCP Tasks
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./12-prompt-architecture.md](./12-prompt-architecture.md) — see chapter 12.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+
+
+---
+# 07. MCP Tasks
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [04-output-schema.md](./04-output-schema.md), [10-tests.md](./10-tests.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 MCP Tasks describe long-running asynchronous operations — a query that takes thirty seconds to finish, a job that is submitted now and collected later. The underlying MCP protocol gives such operations a lifecycle of creation, polling, completion, and cancellation. FlowMCP does not yet model this lifecycle: task support is a reserved, forward-looking area of the specification, and this page documents what is held back and why.
 
@@ -4225,14 +4296,26 @@ Schema authors MAY include an `async` field in tool definitions for forward comp
 - [MCP Tasks Specification](https://modelcontextprotocol.io/specification/basic/utilities/tasks)
 - [SEP-1686: Tasks — protocol discussion](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1686)
 
----
 
-# FlowMCP Specification v4.3.0 — Migration Guide
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+
+
+---
+# 08. Migration Guide
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Informative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [06-agents.md](./06-agents.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
+
+> **Informative.**
 
 This guide covers migrating schemas between FlowMCP versions in chronological order. Section 1 covers v1.2.0 to v2.0.0 migration, Section 2 covers v2.0.0 to v3.0.0, and Section 3 covers v3.0.0 to v4.0.0.
 
@@ -4824,16 +4907,26 @@ export const schema = {
 }
 ```
 
----
 
-# FlowMCP Specification v4.3.0 — Validation Rules
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./21-schema-lifecycle.md](./21-schema-lifecycle.md) — see chapter 21.
+
+
+---
+# 09. Validation Rules
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [05-security.md](./05-security.md), [02-parameters.md](./02-parameters.md), [06-agents.md](./06-agents.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [16-id-schema.md](./16-id-schema.md), [17-selections.md](./17-selections.md), [20-validation-strategy.md](./20-validation-strategy.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Every validation rule that `flowmcp schema-check` enforces carries a code, a severity, and a one-line description. Rather than collect those rules into a single distant list, the specification keeps each family of rules next to the feature it governs — resource rules live with the resource spec, skill rules with the skill spec, and so on. This page is the wayfinder for that arrangement: it names each rule family, explains its code prefix, and links straight to the section where the rules are defined and explained.
 
@@ -4911,16 +5004,30 @@ flowmcp schema-check --security etherscan/contracts.mjs
   Schema cannot be loaded (has errors)
 ```
 
----
 
-# FlowMCP Specification v4.3.0 — Tests
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./05-security.md](./05-security.md) — see chapter 05.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+- [./20-validation-strategy.md](./20-validation-strategy.md) — see chapter 20.
+
+
+---
+# 10. Tests
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
 | Related | [04-output-schema.md](./04-output-schema.md), [06-agents.md](./06-agents.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [13-resources.md](./13-resources.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Tests are executable examples embedded in tool and resource query definitions. For agents, tests are prompts paired with expected tool usage and content assertions. They serve three purposes: they document what a tool or resource query can do, they provide the input data needed to capture real responses, and those captured responses become the basis for generating accurate output schemas. The sections below cover the test format for tools, resources, and agents, the design principles that keep tests useful, and the response-capture lifecycle that turns a test into an output schema.
 
@@ -5592,16 +5699,27 @@ See `14-skills.md` (One-Shot Design Principle) for authoring guidelines.
 | TST012 | warning | Agent tests SHOULD cover different tool combinations |
 | TST013 | info | Consider adding expectedContent assertions for richer validation |
 
----
 
-# FlowMCP Specification v4.3.0 — Preload & Caching
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./22-scoring-protocol.md](./22-scoring-protocol.md) — see chapter 22.
+
+
+---
+# 11. Preload & Caching
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [13-resources.md](./13-resources.md), [10-tests.md](./10-tests.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Some tools return data that barely moves — a full list of hospitals in a country, every memorial stone in a city, a reference table that is refreshed once a week. Re-fetching such a dataset on every call costs bandwidth and time for no benefit. The optional `preload` field lets a schema author declare that a tool's response is safe to cache and for how long, so a runtime can serve a stored copy instead of hitting the network each time. Caching always stays optional on the runtime's side: `preload` expresses intent, and the runtime decides whether to honour it. The sections below specify the field, its validation rules, the cache key derivation, the runtime cache flow, and the author guidelines for choosing a sensible time-to-live.
 
@@ -5798,16 +5916,24 @@ Tool tests (see [10-tests.md](./10-tests.md)) always bypass the cache to ensure 
 
 The output schema (see [04-output-schema.md](./04-output-schema.md)) describes the response shape regardless of whether the response comes from cache or a live fetch. Caching does not affect the output contract.
 
----
 
-# FlowMCP Specification v4.3.0 — Prompt Architecture
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+
+
+---
+# 12. Prompt Architecture
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [14-skills.md](./14-skills.md), [06-agents.md](./06-agents.md), [18-prefill.md](./18-prefill.md), [16-id-schema.md](./16-id-schema.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 FlowMCP uses a two-tier prompt system to bridge deterministic tools with non-deterministic AI orchestration. **Provider-Prompts** explain how to use a single provider's tools effectively. **Agent-Prompts** compose tools from multiple providers into tested workflows. Both types use the `{{type:name}}` placeholder syntax for references and parameters. Provider-Prompts are defined in `main.prompts` with content loaded from external `.mjs` files via `contentFile`. Agent-Prompts are standalone `.mjs` files with `export const prompt = { ... }` containing inline content.
 
@@ -5964,7 +6090,6 @@ If Etherscan returns an unverified contract, skip the ABI analysis and focus on
 the pricing data. Use {{tool:coingecko/coinMarkets}} as a fallback for additional
 market context.
 `
-
 
 export const prompt = {
     name: 'token-deep-dive',
@@ -6666,7 +6791,6 @@ Produce a Markdown report with sections: Contract Overview, Price Analysis,
 Market Position, and Risk Assessment.
 `
 
-
 export const prompt = {
     name: 'token-deep-dive',
     version: 'flowmcp-prompt/1.0.0',
@@ -6712,16 +6836,26 @@ agents/
         +-- token-deep-dive.mjs        # Agent-Prompt (export const prompt)
 ```
 
----
 
-# FlowMCP Specification v4.3.0 — Resources
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./18-prefill.md](./18-prefill.md) — see chapter 18.
+
+
+---
+# 13. Resources
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [02-parameters.md](./02-parameters.md) |
 | Related | [04-output-schema.md](./04-output-schema.md), [11-preload.md](./11-preload.md), [05-security.md](./05-security.md), [19-mcp-integration.md](./19-mcp-integration.md), [14-skills.md](./14-skills.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Resources give a schema local, deterministic data access alongside its network tools. They map to the MCP `server.resource` primitive and live in `main.resources` next to `main.tools`. A resource is backed by a SQLite database (read-only in-memory or writable file-based), a remote SQLite file fetched over HTTPS, or a Markdown document — and the runtime exposes each through a small set of typed queries, with the auto-injected `runSql` and `describeTables` rounding out the query surface. Where a tool reaches out to a third-party API, a resource serves data that should always be available: reference tables, lookups, agent-collected results, and inline documentation.
 
@@ -8182,16 +8316,28 @@ providers/
 
 The SQLite database `duneanalytics-templates.db` is not in the schema directory — its `origin: 'global'` places it at `~/.flowmcp/resources/duneanalytics-templates.db`.
 
----
 
-# FlowMCP Specification v4.3.0 — Skills
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./05-security.md](./05-security.md) — see chapter 05.
+- [./11-preload.md](./11-preload.md) — see chapter 11.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+
+
+---
+# 14. Skills
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [18-prefill.md](./18-prefill.md), [16-id-schema.md](./16-id-schema.md), [06-agents.md](./06-agents.md), [17-selections.md](./17-selections.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Skills are reusable, self-contained instruction sets that an AI agent can load and follow. They map to the MCP `server.prompt` primitive and live in `.mjs` files, each with a structured `export const skill` object that pairs Markdown instructions with typed metadata. A skill declares the tools and resources it needs, the input it expects, and the output it produces, and its instructions reference those primitives through `{{tool:...}}`, `{{resource:...}}`, and `{{input:...}}` placeholders resolved at load time.
 
@@ -9114,16 +9260,27 @@ etherscan/
     └── full-contract-audit.mjs    # Skill file with content + metadata
 ```
 
----
 
-# FlowMCP Specification v4.3.0 — Catalog
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./12-prompt-architecture.md](./12-prompt-architecture.md) — see chapter 12.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+- [./18-prefill.md](./18-prefill.md) — see chapter 18.
+
+
+---
+# 15. Catalog
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [03-shared-lists.md](./03-shared-lists.md), [06-agents.md](./06-agents.md), [16-id-schema.md](./16-id-schema.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
@@ -9512,16 +9669,26 @@ flowmcp validate-catalog <catalog-directory>
 
 The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be imported or published.
 
----
 
-# FlowMCP Specification v4.3.0 — ID Schema
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./03-shared-lists.md](./03-shared-lists.md) — see chapter 03.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./21-schema-lifecycle.md](./21-schema-lifecycle.md) — see chapter 21.
+
+
+---
+# 16. ID Schema
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [18-prefill.md](./18-prefill.md), [12-prompt-architecture.md](./12-prompt-architecture.md), [14-skills.md](./14-skills.md), [17-selections.md](./17-selections.md), [15-catalog.md](./15-catalog.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A FlowMCP catalog exposes three MCP primitives — Tools, Resources, and Skills (prompts) — across potentially hundreds of schemas from dozens of providers, and references to those primitives turn up everywhere: group definitions, skill placeholders, registry entries, CLI commands, and cross-schema dependencies. Without a unified scheme, a bare name like `lookupItem` is ambiguous — is it a tool, a resource, or a prompt, and which provider owns it? The ID schema removes that ambiguity by giving every tool, resource, prompt, and shared list exactly one canonical, human-readable, resolvable identifier built from a namespace, a type discriminator, and a name.
 
@@ -9937,16 +10104,27 @@ The ID schema unifies several existing identification mechanisms:
 
 The ID schema provides a single, consistent format that replaces these context-specific referencing styles. Backward compatibility with existing formats is maintained during migration — see `08-migration.md`.
 
----
 
-# FlowMCP Specification v4.3.0 — Selections
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./12-prompt-architecture.md](./12-prompt-architecture.md) — see chapter 12.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./15-catalog.md](./15-catalog.md) — see chapter 15.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+- [./18-prefill.md](./18-prefill.md) — see chapter 18.
+
+
+---
+# 17. Selections
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [16-id-schema.md](./16-id-schema.md) |
 | Related | [06-agents.md](./06-agents.md), [18-prefill.md](./18-prefill.md), [14-skills.md](./14-skills.md), [12-prompt-architecture.md](./12-prompt-architecture.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 A **Selection** is a named, thematically-coherent collection of Primitives (Tools, Resources, Prompts, Skills) that an agent can activate together in a single operation.
 
@@ -10062,16 +10240,27 @@ If a Selection includes inline-skill objects, the SelectionValidator additionall
 - Example: `"Selection evm-research/selection/contract-analysis: Reference 'etherscan-io/tool/getSmartContractAbi' not found"`
 - AGT030: Agent startup fails if a referenced Selection cannot be loaded.
 
----
 
-# FlowMCP Specification v4.3.0 — Prefill and Placeholders
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./06-agents.md](./06-agents.md) — see chapter 06.
+- [./12-prompt-architecture.md](./12-prompt-architecture.md) — see chapter 12.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./18-prefill.md](./18-prefill.md) — see chapter 18.
+
+
+---
+# 18. Prefill and Placeholders
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [16-id-schema.md](./16-id-schema.md), [14-skills.md](./14-skills.md) |
 | Related | [12-prompt-architecture.md](./12-prompt-architecture.md), [17-selections.md](./17-selections.md), [02-parameters.md](./02-parameters.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Skill content carries two complementary template mechanisms that the runtime processes before handing the Skill to an agent. *Placeholders* are tokens embedded directly in the content — `{{type:reference}}` — that are substituted with tool descriptions, resource references, user input, or shared-list values at resolution time. *Prefill* goes one step further: a Skill can declare tool calls in a `prefill` array that the runtime executes up front, then embeds the live results into the content via `{{prefill:...}}` tokens, so the agent receives a Skill already populated with current data.
 
@@ -10143,16 +10332,26 @@ If a placeholder cannot be resolved, the error message replaces the placeholder:
 
 This ensures the Skill is always delivered — even if some references are broken.
 
----
 
-# FlowMCP Specification v4.3.0 — MCP Server Integration
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./02-parameters.md](./02-parameters.md) — see chapter 02.
+- [./12-prompt-architecture.md](./12-prompt-architecture.md) — see chapter 12.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./17-selections.md](./17-selections.md) — see chapter 17.
+
+
+---
+# 19. MCP Server Integration
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [09-validation-rules.md](./09-validation-rules.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [04-output-schema.md](./04-output-schema.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared once, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
 
@@ -10231,16 +10430,26 @@ The structural rules for the `meta` block are defined alongside the other schema
 | VAL105 | error | `meta.aliases` required (string[]) |
 | VAL106 | error | `meta.alwaysLoad` required (boolean) |
 
----
 
-# FlowMCP Specification v4.3.0 — Validation Strategy
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./14-skills.md](./14-skills.md) — see chapter 14.
+
+
+---
+# 20. Validation Strategy
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [09-validation-rules.md](./09-validation-rules.md) |
 | Related | [22-scoring-protocol.md](./22-scoring-protocol.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md), [10-tests.md](./10-tests.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Validation in FlowMCP works in two layers. A **deterministic** layer checks structural correctness — that the schema is well-formed and every primitive declares the fields it must. A **probabilistic** layer adds an LLM-based quality judgement on top of a structurally clean schema. Together the two layers produce a **Grade Report** that assigns a single letter grade (A–F), which is the record this page defines.
 
@@ -10348,16 +10557,27 @@ A Language Model calling tools from `etherscan-io/contracts` receives the tool l
 
 **Rule:** 1 failing primitive gets removed — regardless of how many others pass.
 
----
 
-# FlowMCP Specification v4.3.0 — Schema Lifecycle
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./21-schema-lifecycle.md](./21-schema-lifecycle.md) — see chapter 21.
+- [./22-scoring-protocol.md](./22-scoring-protocol.md) — see chapter 22.
+
+
+---
+# 21. Schema Lifecycle
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Informative |
 | Depends on | [00-overview.md](./00-overview.md) |
 | Related | [20-validation-strategy.md](./20-validation-strategy.md), [22-scoring-protocol.md](./22-scoring-protocol.md), [10-tests.md](./10-tests.md), [09-validation-rules.md](./09-validation-rules.md), [15-catalog.md](./15-catalog.md) |
 
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
+> **Informative.**
 
 Every FlowMCP schema travels a defined path from an initial idea to a production deployment, and this page is the canonical description of that path: the six lifecycle stages, the special rules for static and migrated schemas, and the policy for handling schemas where only some primitives pass. It is the recommended way to develop a schema, and where other lifecycle descriptions in the project (README files, runbooks, skill documentation) disagree, this page is authoritative.
 
@@ -10483,16 +10703,26 @@ A primitive fails the API test when:
 
 A primitive passes when at least one of its test cases returns a 2xx response with a parseable body that matches the declared output shape.
 
----
 
-# Scoring Protocol v1
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./15-catalog.md](./15-catalog.md) — see chapter 15.
+- [./20-validation-strategy.md](./20-validation-strategy.md) — see chapter 20.
+- [./22-scoring-protocol.md](./22-scoring-protocol.md) — see chapter 22.
+
+
+---
+# 22. Scoring Protocol
 
 | Field | Value |
-|-------|-------|
+|---|---|
+| Status | Normative |
 | Depends on | [00-overview.md](./00-overview.md), [20-validation-strategy.md](./20-validation-strategy.md) |
 | Related | [21-schema-lifecycle.md](./21-schema-lifecycle.md), [10-tests.md](./10-tests.md), [04-output-schema.md](./04-output-schema.md), [09-validation-rules.md](./09-validation-rules.md) |
-
-> Normative language (MUST/SHOULD/MAY) follows the conventions defined in [00-overview.md](./00-overview.md) (Conformance Language).
 
 Specification for grading FlowMCP v4 schemas via LLM evaluation. Documents the data formats exchanged between the CLI and an external Grader (e.g. Claude Code harness, third-party implementation).
 
@@ -10704,5 +10934,208 @@ A Grader MUST NOT:
 
 - [`20-validation-strategy.md`](./20-validation-strategy.md) — overall validation strategy
 - [`21-schema-lifecycle.md`](./21-schema-lifecycle.md) — when grading happens in the lifecycle
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./04-output-schema.md](./04-output-schema.md) — see chapter 04.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./10-tests.md](./10-tests.md) — see chapter 10.
+- [./20-validation-strategy.md](./20-validation-strategy.md) — see chapter 20.
+- [./21-schema-lifecycle.md](./21-schema-lifecycle.md) — see chapter 21.
+
+
+---
+# 23. License & Terms of Services
+
+| Field | Value |
+|---|---|
+| Status | Normative |
+| Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
+| Related | [19-mcp-integration.md](./19-mcp-integration.md), [05-security.md](./05-security.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
+
+FlowMCP sits between its own code, the third-party APIs a schema calls, and the data those APIs return — and each of those carries its own legal terms. The purpose of this page is to draw a clear line around what FlowMCP takes responsibility for and what it deliberately leaves to the user: FlowMCP records and links the relevant Terms of Services and data licenses, but it never interprets or certifies them. The page describes that three-layer model, the optional schema fields that carry the links, and where responsibility for compliance ultimately rests.
+
+## Three-Layer License Model
+
+FlowMCP operates in a three-layer license model. **Schema authors and users MUST understand all three layers.**
+
+| Layer | What | Who Decides | What FlowMCP Does |
+|-------|------|-------------|---------------------|
+| **1. FlowMCP Schema Code** | The schema definition (`.mjs` files), core library, CLI | FlowMCP (we) | MIT-licensed |
+| **2. API Provider ToS** | Terms of Services for using the third-party API | API Provider | **Link only — no classification** |
+| **3. Data License** | License of returned data (e.g. CC-BY, Public Domain) | Data publisher | **Link only — no classification** |
+
+## What FlowMCP Does NOT Do
+
+We **do not** classify or interpret Terms of Services. This is intentional:
+
+- ToS are living documents — they change without notice
+- ToS interpretation requires legal expertise
+- We have no jurisdiction to make compliance statements
+- Users are solely responsible for compliance
+
+## Schema-Level Optional Fields
+
+Schemas MAY include optional ToS-related fields in the `main` block:
+
+```javascript
+export const schema = {
+    main: {
+        namespace: 'coingecko',
+        version: '4.0.0',
+        // ... required fields ...
+
+        // Optional ToS Fields (informational only)
+        docs: ['https://docs.coingecko.com'],
+        termsOfService: 'https://www.coingecko.com/en/terms',
+        termsOfServiceCheckedAt: '2026-05-18',
+        termsOfServiceLanguage: 'en',
+        dataLicense: null,
+        dataLicenseName: null
+    },
+    tools: { ... }
+}
+```
+
+### Field Semantics
+
+| Field | Set when | Null when |
+|-------|----------|-----------|
+| `termsOfService` | ToS URL is known and verified | No ToS found, or not yet researched |
+| `termsOfServiceCheckedAt` | URL was verified to be live and applicable to the API | URL not yet checked |
+| `termsOfServiceLanguage` | Primary language of ToS document detected | URL not yet checked |
+| `dataLicense` | Provider explicitly publishes a separate data license URL | No explicit data license |
+| `dataLicenseName` | Common name of the data license (e.g. CC-BY) | No explicit data license |
+
+## Implementation in flowmcp-cli
+
+Schema authors are encouraged to use the `tos-research` skill to populate these fields semi-automatically.
+
+The CLI exposes an opt-in disclaimer flag:
+
+```bash
+# In flowmcp.config.json
+{
+    "licenseDisclaimer": true
+}
+
+# Then:
+flowmcp call coingecko_market_chart
+# [License Info] Provider: coingecko
+# [License Info] ToS: https://www.coingecko.com/en/terms (last checked: 2026-05-18)
+# [License Info] We do not interpret ToS. Please review before commercial use.
+```
+
+Default: `licenseDisclaimer: false` (off).
+
+## User Responsibility
+
+Users are solely responsible for:
+
+- Reviewing each API provider's ToS before use
+- Complying with rate limits, attribution, and re-distribution rules
+- Determining commercial vs non-commercial fit
+- Adhering to LLM-training restrictions where present
+
+FlowMCP makes **no warranty** about ToS compliance, data licensing, or fitness for any purpose.
+
+## Update Strategy
+
+ToS change. FlowMCP recommends:
+
+- **6-month re-check cadence** for all schemas with `termsOfService`
+- Reactive update when a known provider changes its ToS
+- Audit script `audit-tos-freshness.mjs` flags schemas with stale `termsOfServiceCheckedAt`
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./05-security.md](./05-security.md) — see chapter 05.
+- [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+- [./21-schema-lifecycle.md](./21-schema-lifecycle.md) — see chapter 21.
+
+
+---
+# 24. Philosophy
+
+| Field | Value |
+|---|---|
+| Status | Informative |
+| Depends on | [00-overview.md](./00-overview.md) |
+| Related | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md), [05-security.md](./05-security.md), [09-validation-rules.md](./09-validation-rules.md), [19-mcp-integration.md](./19-mcp-integration.md) |
+
+> **Informative.**
+
+> **Informative.** This chapter describes the worldview behind FlowMCP — why a schema exists, what a graded tool is worth, and how an agent is meant to find and call it. It is written in prose; the normative rules that operationalize these convictions live in the chapters it points to.
+
+FlowMCP rests on a small set of convictions about how an autonomous agent and an unfamiliar API should meet: that a schema is a contract rather than a cage, that a tool is graded before it is trusted, that nothing fails silently, and that everything in the configured folders is discoverable without a hidden ceremony. None of these convictions is decorative — each one exists to prevent a concrete failure mode, and each later chapter turns the conviction into a rule. This chapter records the worldview so that it stays explicit as the specification grows.
+
+## The Guardrail (Highway) Analogy
+
+A schema is a guardrail, not a cage. FlowMCP does not try to drive the agent's car for it; it lines the highway so that the car can move fast on a road it has never seen. The whole point of the project is to let an agent drive an unfamiliar API at speed — without reading the provider's documentation, without guessing the authentication flow, without learning the parameter names by trial and error — and still not go off the cliff.
+
+A guardrail is a constraint that is cheap to set up and expensive to omit. The schema names the parameters, fixes their types, encodes the route, and labels the credentials a call needs. Inside that frame the agent is free; outside it, it drifts into invented endpoints, malformed requests, and silent wrong answers. The schema is never there to slow the agent down. It is there so that going fast is the same thing as staying on the road.
+
+## Schema as Contract — the Wall Socket
+
+Push the analogy one step further and the schema becomes a standardized socket. The agent plugs in without knowing the wiring behind the wall. It does not need to know whether the data comes from REST or GraphQL, whether the provider paginates by cursor or by offset, whether the timestamps are Unix seconds or ISO strings — the socket presents one shape, and the agent calls it the same way it calls every other tool in the catalog.
+
+This is why interoperability is the foreground concern, not an afterthought. A socket is only worth standardizing if a great many things can plug into it. FlowMCP's value grows with the number of other tools, agents, and MCP clients it can connect — through the CLI and through the MCP/A2A server alike (see [19-mcp-integration.md](./19-mcp-integration.md)). A schema that only one caller can use is a custom wire; a schema that any conformant agent can call is a socket. The specification optimizes for the socket.
+
+## Grade Before Trust
+
+A schema that parses is not yet a tool worth trusting. Before a tool earns a place in the trusted catalog it is graded — first by a deterministic data pretest, then by non-deterministic scoring. The deterministic pretest is blunt and unforgiving on purpose: it actually calls the live endpoint and checks two things together, that the response is HTTP 200 **and** that the data is non-empty.
+
+The second clause matters because a tool can answer HTTP 200 and still hand back nothing — an empty array, a null payload, a polite shell with no content. A pretest that checked only the status code would wave such a tool through as healthy, and an agent would then build on a contract that returns air. Treating "200 but empty" as a failure, caught at grading time, means a tool in the trusted catalog is one that has been observed to return real data, not merely a successful status line. The grading workflow and its scoring areas are described in [09-validation-rules.md](./09-validation-rules.md).
+
+## No Silent Defaults — Fail Loudly
+
+FlowMCP never invents a value to paper over one that is missing. When a required parameter is absent, a credential is unset, or a configuration field is ambiguous, the system fails loudly rather than quietly substituting a plausible default and continuing. A silent default is a guess wearing the costume of a fact, and a guess that nobody was told about is the hardest kind of failure to find.
+
+The rule is strictest where it is most dangerous. Anything that would write or assume on the user's behalf — a credential, an environment file, a configuration value — checks first and announces what it is about to do; it never overwrites an existing value or invents a missing one in silence. Overwriting a real credential with a default, for instance, is the kind of quiet action that destroys data while reporting success. Loud failure is recoverable; silent success on wrong data is not. The boundaries that enforce this around credentials and configuration are set out in [05-security.md](./05-security.md).
+
+## Search, Then Call
+
+There is no hidden activation step. Every tool in the configured schema folders is immediately discoverable through search and list, and immediately callable through call. An agent does not register a tool, enable it, install it into a session, or perform any ceremony between finding a tool and using it — it searches the catalog, reads the required parameters and example from the search result, and calls. The interaction model is exactly two moves:
+
+| Step | Move | What it returns |
+|------|------|-----------------|
+| Discover | `search` / `list` | The matching tools, with their required parameters and a callable example |
+| Invoke | `call` | The live result of the tool, called directly |
+
+The simplification is deliberate: there is no intermediate state in which a tool is found but not yet callable. A gap between discovery and use — a tool that is visible but needs a separate activation step before it can run — is a confusing state for a person and an outright trap for an autonomous agent. The catalog an agent can see is exactly the catalog it can use.
+
+## Disabled, Not Broken
+
+The "search, then call" promise raises an obvious question: what about a tool whose credentials are missing? FlowMCP answers it by degrading gracefully. A tool that needs a key the environment does not have is not hidden and is not broken — it appears in the catalog clearly labeled, as `[disabled: missing KEY]`, naming the exact credential it is waiting for.
+
+This matters because the two failure modes it avoids are both worse. A hidden tool leaves the agent unable to discover a capability that exists; a tool that looks callable but throws an opaque error at call time leaves the agent debugging the framework instead of its task. A disabled-but-visible tool tells the truth: the capability exists, here is precisely what it needs to come online, and nothing about it is mysterious. Key-gating is honesty about credentials, not concealment of capability.
+
+## The Catalog Is Indexed, Not Re-Derived
+
+At scale, you read the index; you do not rebuild the world. FlowMCP can hold a large catalog of schemas, and the cost of treating that catalog naively grows with its size. A namespace index already records, ahead of time, which schema owns which tool. The correct move when resolving a single tool is to consult that index and load the one schema it points to.
+
+The principle is simple: precomputed structure exists to be read, not re-derived on every request. Resolving one tool by loading the entire catalog produces the right answer at the wrong cost — and an operation whose cost scales with the size of the whole catalog when it should scale with a single entry is a defect, however correct its output happens to be. Reading the index keeps a single-tool call cheap no matter how large the catalog grows.
+
+## A Home for Project Thinking
+
+These convictions are easy to hold while a project is small and easy to lose while it grows. A guardrail that nobody can name becomes bureaucracy; a rule whose purpose has been forgotten becomes a rule people quietly route around. This chapter exists so that does not happen — it is the place where FlowMCP's guiding ideas are written down, each one paired with the failure mode it prevents, so the worldview stays explicit even as the normative chapters multiply. When a new rule is proposed, it can be measured against the philosophy recorded here. The specification's letter lives in the chapters this page points to. Its spirit lives here.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./01-schema-format.md](./01-schema-format.md) — see chapter 01.
+- [./05-security.md](./05-security.md) — see chapter 05.
+- [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
+- [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+
 
 ---

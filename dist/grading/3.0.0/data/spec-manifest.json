@@ -1,0 +1,67 @@
+{
+    "namespace": "grading",
+    "version": "3.0.0",
+    "namespaceToken": "FMG",
+    "hasRequirements": false,
+    "hasGrading": false,
+    "requirementsRef": null,
+    "gradingRef": null,
+    "groups": [
+        {
+            "id": "introduction",
+            "label": "Introduction",
+            "order": 1,
+            "pages": [
+                "00-overview",
+                "01-default-journey"
+            ]
+        },
+        {
+            "id": "core-model",
+            "label": "Core Model",
+            "order": 2,
+            "pages": [
+                "02-eligibility",
+                "03-tos",
+                "04-phases-single",
+                "05-phases-selection",
+                "06-determinism-and-tier",
+                "07-scoring-vs-grading",
+                "08-grading-model"
+            ]
+        },
+        {
+            "id": "process-contracts",
+            "label": "Process Contracts",
+            "order": 3,
+            "pages": [
+                "09-security-and-development",
+                "10-domain-knowledge",
+                "11-about-convention",
+                "12-personas-contract",
+                "13-skills",
+                "14-kanban-data-contract",
+                "18-flywheel-loop",
+                "25-harness-and-goal"
+            ]
+        },
+        {
+            "id": "reference",
+            "label": "Reference",
+            "order": 4,
+            "pages": [
+                "15-versioning-axes",
+                "16-selection-lockfile",
+                "17-scope-whitelist",
+                "19-folder-layout",
+                "20-entry-point-prompt",
+                "21-pre-conditions",
+                "22-workbench-island",
+                "23-index-json",
+                "24-selection-aggregate",
+                "26-monitoring-track"
+            ]
+        }
+    ],
+    "fallback": "append-by-NN"
+}

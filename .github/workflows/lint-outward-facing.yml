@@ -16,4 +16,4 @@ jobs:
   check:
     uses: FlowMCP/.github/.github/workflows/check-outward-facing.yml@main
     with:
-      allowlist-paths: "node_modules,dist,generated,.git,archive,.template.md,.template.mdx,tests,public/spec-generated,personas,scripts,skills,.github,examples,spec/v2.0.0,spec/v3.0.0,spec/v4.0.0,spec/v4.1.0,spec/v4.2.0,grading/1.0.0,grading/1.1.0,grading/1.2.0,grading/2.0.0"
+      allowlist-paths: "node_modules,dist,generated,.git,archive,.template.md,.template.mdx,tests,public/spec-generated,personas,scripts,.github,examples,draft/specification/2.0.0,draft/specification/3.0.0,draft/specification/4.0.0,draft/specification/4.1.0,draft/specification/4.2.0,draft/grading/1.0.0,draft/grading/1.1.0,draft/grading/1.2.0,draft/grading/2.0.0"

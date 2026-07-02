@@ -4,9 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'spec/v*/**'
-      - 'grading/*/**'
-      - 'best-practice/*/**'
+      - 'draft/**'
+      - 'dist/**'
       - 'generated/**'
   workflow_dispatch:
 

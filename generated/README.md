@@ -56,12 +56,13 @@ Consumers MUST NOT:
 
 | Source change | Trigger |
 |---------------|---------|
-| Push to `spec/v4.0.0/**.md` | `generate-llms-txt.yml` regenerates `generated/llms.txt` and `generated/llms-schema-spec.txt` |
-| Push to `spec/v4.0.0/**.md` | `generate-docs-payload.yml` regenerates `generated/docs-payload/` and `generated/docs-payload/manifest.json` |
-| Push to `generated/**` | `notify-docs-site.yml` dispatches a `spec-generated-updated` event to `flowmcp.github.io`, which pulls `generated/` via `sync-spec.mjs` |
+| Push to `draft/specification/**.md` | `generate-llms-txt.yml` regenerates `generated/llms.txt` and `generated/llms-schema-spec.txt` |
+| Push to `draft/**.md` | `generate-docs-payload.yml` rebuilds the per-family payload + bridge + manifest under `dist/` |
+| Push to `generated/**` or `dist/**` | `notify-docs-site.yml` dispatches a `spec-generated-updated` event to `flowmcp.github.io` |
 
 ## See Also
 
 - [`../README.md`](../README.md) — Repository overview with Conventions & Quality Standards
-- [`../spec/v4.0.0/`](../spec/v4.0.0/) — Specification source (hand-pflege)
+- [`../draft/specification/4.3.0/spec/`](../draft/specification/4.3.0/spec/) — Specification source (hand-authored)
+- [`../dist/`](../dist/) — Generated per-family docs payload, bridge, and manifest
 - Memo 049 REV-06 (`.memo/049-spec-internal-refs-cleanup/revisions/REV-06.md`) — Interface contract specification

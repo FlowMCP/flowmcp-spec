@@ -11,18 +11,16 @@ on:
       - 'data/refs.manual.json'
       - 'scripts/generators/**'
       - 'scripts/lint-versions.mjs'
-      - 'spec/**'
-      - 'grading/**'
-      - 'best-practice/**'
+      - 'scripts/lib/discover-specs.mjs'
+      - 'draft/**'
   push:
     branches: [main]
     paths:
       - 'data/refs.manual.json'
       - 'scripts/generators/**'
       - 'scripts/lint-versions.mjs'
-      - 'spec/**'
-      - 'grading/**'
-      - 'best-practice/**'
+      - 'scripts/lib/discover-specs.mjs'
+      - 'draft/**'
   workflow_dispatch:
 
 permissions:

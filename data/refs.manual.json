@@ -3,20 +3,22 @@
     "spec": {
         "currentVersion": "4.3.0",
         "recommendedRelease": "v4.3.0",
-        "historicalVersions": [ "4.0.0", "4.1.0", "4.2.0", "4.3.0" ],
-        "specDir": "spec/v4.3.0",
+        "historicalVersions": [ "2.0.0", "3.0.0", "4.0.0", "4.1.0", "4.2.0", "4.3.0" ],
+        "specDir": "draft/specification/4.3.0/spec",
         "miniSkillTemplate": "data/mini-skill.template.md"
     },
     "grading": {
         "currentVersion": "3.0.0",
         "recommendedRelease": "3.0.0",
-        "specDir": "grading/3.0.0",
+        "historicalVersions": [ "1.0.0", "1.1.0", "1.2.0", "2.0.0", "3.0.0" ],
+        "specDir": "draft/grading/3.0.0/spec",
         "url": "https://flowmcp.github.io/grading/overview/"
     },
     "bestPractice": {
         "currentVersion": "0.1.0",
         "recommendedRelease": "0.1.0",
-        "specDir": "best-practice/0.1.0",
+        "historicalVersions": [ "0.1.0" ],
+        "specDir": "draft/best-practice/0.1.0/spec",
         "url": "https://flowmcp.github.io/best-practice/overview/"
     },
     "imports": {

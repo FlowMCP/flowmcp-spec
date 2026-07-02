@@ -25,12 +25,17 @@
     ],
     "scripts": {
         "generate-refs": "node scripts/generate-refs.mjs",
+        "generate-docs-payload": "node scripts/generate-docs-payload.mjs",
+        "generate-bridge": "node scripts/generate-bridge.mjs",
+        "generate-manifest": "node scripts/generate-manifest.mjs",
+        "audit-spec-quality": "node scripts/audit-spec-quality.mjs",
+        "check-bridge-inverse": "node scripts/check-bridge-inverse.mjs",
+        "generate-llms-txt": "node scripts/generate-llms-txt.mjs",
         "sync-stats": "node scripts/sync-stats.mjs",
-        "docs-payload": "node scripts/generate-docs-payload.mjs",
-        "lint:spec-quality": "node scripts/generate-docs-payload.mjs && node scripts/lint-spec-quality.mjs",
         "lint:versions": "node scripts/lint-versions.mjs",
         "test:refs-regex": "node scripts/test-refs-regex.mjs",
-        "test:e2e": "node scripts/test-e2e-pipeline.mjs"
+        "build": "npm run generate-refs && npm run generate-docs-payload && npm run generate-bridge && npm run generate-manifest && npm run check-bridge-inverse",
+        "test": "node scripts/audit-spec-quality.mjs && node scripts/check-bridge-inverse.mjs && node scripts/lint-versions.mjs"
     },
     "devDependencies": {
         "ajv": "^8.20.0"

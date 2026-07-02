@@ -20,7 +20,7 @@
                     "type": "array",
                     "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
                 },
-                "specDir": { "type": "string", "pattern": "^spec/v\\d+\\.\\d+\\.\\d+$" },
+                "specDir": { "type": "string", "pattern": "^draft/specification/\\d+\\.\\d+\\.\\d+/spec$" },
                 "miniSkillTemplate": { "type": "string", "pattern": "^data/.*\\.md$" }
             }
         },
@@ -31,7 +31,11 @@
             "properties": {
                 "currentVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
                 "recommendedRelease": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-                "specDir": { "type": "string", "pattern": "^grading/\\d+\\.\\d+\\.\\d+$" },
+                "historicalVersions": {
+                    "type": "array",
+                    "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+                },
+                "specDir": { "type": "string", "pattern": "^draft/grading/\\d+\\.\\d+\\.\\d+/spec$" },
                 "url": { "type": "string", "pattern": "^https://.+$" }
             }
         },
@@ -42,7 +46,11 @@
             "properties": {
                 "currentVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
                 "recommendedRelease": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
-                "specDir": { "type": "string", "pattern": "^best-practice/\\d+\\.\\d+\\.\\d+$" },
+                "historicalVersions": {
+                    "type": "array",
+                    "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+                },
+                "specDir": { "type": "string", "pattern": "^draft/best-practice/\\d+\\.\\d+\\.\\d+/spec$" },
                 "url": { "type": "string", "pattern": "^https://.+$" }
             }
         },

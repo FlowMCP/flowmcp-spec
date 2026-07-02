@@ -1,0 +1,43 @@
+{
+    "note": "F9=A (Memo 060, Z5-14): FlowMCP implementer/authoring skills are IMPLEMENTATION, not spec. They were physically removed from this PUBLIC spec repo (publishing principle: the public repo carries spec + build-plan only). No publishing switch was added. This file is the RECORD of what was externalized.",
+    "externalizedOn": "2026-07-02",
+    "movedTo": "a private, unpublished skills store kept as a sibling of this repo (outside version control of the public spec); not committed here",
+    "skillCount": 11,
+    "skills": [
+        "external/flowmcp-create-agent",
+        "schema/flowmcp-schema",
+        "schema/flowmcp-schema-create",
+        "schema/flowmcp-schema-deploy",
+        "schema/flowmcp-schema-diagnose",
+        "schema/flowmcp-schema-discover",
+        "schema/flowmcp-schema-fix",
+        "schema/flowmcp-schema-inspect",
+        "schema/flowmcp-schema-test",
+        "schema/flowmcp-schema-tos",
+        "spec-quality/evaluator-spec-rfc2119"
+    ],
+    "files": [
+        "README.md",
+        "external/README.md",
+        "external/flowmcp-create-agent/.MIGRATION_PLANNED.md",
+        "external/flowmcp-create-agent/SKILL.md",
+        "grading/README.md",
+        "schema/README.md",
+        "schema/flowmcp-schema-create/SKILL.md",
+        "schema/flowmcp-schema-deploy/SKILL.md",
+        "schema/flowmcp-schema-diagnose/SKILL.md",
+        "schema/flowmcp-schema-discover/SKILL.md",
+        "schema/flowmcp-schema-fix/SKILL.md",
+        "schema/flowmcp-schema-inspect/SKILL.md",
+        "schema/flowmcp-schema-test/SKILL.md",
+        "schema/flowmcp-schema-tos/SKILL.md",
+        "schema/flowmcp-schema/SKILL.md",
+        "spec-quality/README.md",
+        "spec-quality/evaluator-spec-rfc2119/SKILL.md",
+        "spec-quality/evaluator-spec-rfc2119/check.mjs",
+        "spec-quality/evaluator-spec-rfc2119/tests/fixtures/grade-1-broken.md",
+        "spec-quality/evaluator-spec-rfc2119/tests/fixtures/grade-3-medium.md",
+        "spec-quality/evaluator-spec-rfc2119/tests/fixtures/grade-5-perfect.md",
+        "spec-quality/evaluator-spec-rfc2119/tests/run-tests.mjs"
+    ]
+}

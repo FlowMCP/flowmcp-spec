@@ -7,7 +7,7 @@ spec_file: "14-correctness-license.md"
 order: 14
 section: "best-practice"
 normative: true
-generated_at: "2026-07-04T23:14:30.554Z"
+generated_at: "2026-07-04T23:17:13.844Z"
 generated_from: "draft/best-practice/0.1.0/spec/14-correctness-license.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/best-practice/0.1.0/spec/14-correctness-license.md."

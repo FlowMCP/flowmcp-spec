@@ -7,7 +7,7 @@ spec_file: "17-scope-whitelist.md"
 order: 17
 section: "grading"
 normative: true
-generated_at: "2026-07-04T23:14:30.554Z"
+generated_at: "2026-07-04T23:17:13.844Z"
 generated_from: "draft/grading/3.0.0/spec/17-scope-whitelist.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/17-scope-whitelist.md."

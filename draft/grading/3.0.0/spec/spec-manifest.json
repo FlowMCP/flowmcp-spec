@@ -61,6 +61,14 @@
                 "24-selection-aggregate",
                 "26-monitoring-track"
             ]
+        },
+        {
+            "id": "bridge",
+            "label": "Bridge",
+            "order": 5,
+            "pages": [
+                "27-bridge"
+            ]
         }
     ],
     "fallback": "append-by-NN"

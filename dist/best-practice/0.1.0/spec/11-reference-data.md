@@ -7,7 +7,7 @@ spec_file: "11-reference-data.md"
 order: 11
 section: "best-practice"
 normative: true
-generated_at: "2026-07-04T22:33:11.511Z"
+generated_at: "2026-07-04T23:14:30.554Z"
 generated_from: "draft/best-practice/0.1.0/spec/11-reference-data.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/best-practice/0.1.0/spec/11-reference-data.md."

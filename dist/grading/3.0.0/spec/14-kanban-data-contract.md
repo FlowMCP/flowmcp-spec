@@ -7,7 +7,7 @@ spec_file: "14-kanban-data-contract.md"
 order: 14
 section: "grading"
 normative: true
-generated_at: "2026-07-04T22:33:11.511Z"
+generated_at: "2026-07-04T23:14:30.554Z"
 generated_from: "draft/grading/3.0.0/spec/14-kanban-data-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/14-kanban-data-contract.md."

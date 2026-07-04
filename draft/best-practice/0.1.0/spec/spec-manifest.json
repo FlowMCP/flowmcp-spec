@@ -26,6 +26,14 @@
                 "13-geo-conventions",
                 "14-correctness-license"
             ]
+        },
+        {
+            "id": "bridge",
+            "label": "Bridge",
+            "order": 3,
+            "pages": [
+                "15-bridge"
+            ]
         }
     ],
     "fallback": "append-by-NN"

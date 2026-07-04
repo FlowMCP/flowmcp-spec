@@ -7,7 +7,7 @@ spec_file: "14-skills.md"
 order: 14
 section: "specification"
 normative: true
-generated_at: "2026-07-04T22:33:11.511Z"
+generated_at: "2026-07-04T23:14:30.554Z"
 generated_from: "draft/specification/4.3.0/spec/14-skills.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/14-skills.md."

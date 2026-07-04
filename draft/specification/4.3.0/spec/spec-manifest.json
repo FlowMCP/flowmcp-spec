@@ -59,6 +59,14 @@
                 "22-scoring-protocol",
                 "23-license-and-tos"
             ]
+        },
+        {
+            "id": "bridge",
+            "label": "Bridge",
+            "order": 5,
+            "pages": [
+                "25-bridge"
+            ]
         }
     ],
     "fallback": "append-by-NN"

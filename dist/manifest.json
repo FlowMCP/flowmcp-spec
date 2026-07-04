@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-07-04T22:33:14.336Z",
+    "generated_at": "2026-07-04T23:14:32.087Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {
@@ -281,7 +281,7 @@
                     "order": 25,
                     "section": "specification",
                     "normative": false,
-                    "sidebar_group": "introduction"
+                    "sidebar_group": "bridge"
                 }
             ]
         },
@@ -584,7 +584,7 @@
                     "order": 27,
                     "section": "grading",
                     "normative": false,
-                    "sidebar_group": "introduction"
+                    "sidebar_group": "bridge"
                 }
             ]
         },
@@ -673,7 +673,7 @@
                     "order": 15,
                     "section": "best-practice",
                     "normative": false,
-                    "sidebar_group": "introduction"
+                    "sidebar_group": "bridge"
                 }
             ]
         }

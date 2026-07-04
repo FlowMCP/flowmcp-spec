@@ -7,7 +7,7 @@ spec_file: "25-harness-and-goal.md"
 order: 25
 section: "grading"
 normative: true
-generated_at: "2026-07-02T14:22:41.848Z"
+generated_at: "2026-07-04T22:33:11.511Z"
 generated_from: "draft/grading/3.0.0/spec/25-harness-and-goal.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/25-harness-and-goal.md."

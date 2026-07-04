@@ -26,8 +26,72 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
 const MANIFEST_PATH = join( REPO, 'dist', 'manifest.json' )
 const GENERATOR = 'scripts/generate-manifest.mjs'
+// Schema-registry stats (Memo 061 P4 restore of #45/Memo 059 Phase 4): flowmcp-schemas-public is
+// the source of truth for schema/tool/datasource counts — never the docs-payload manifest's own
+// file-count stats block below. Consumed by flowmcp.github.io/scripts/fetch-refs.mjs via
+// manifest.meta.stats (Single-Source-of-Truth, Memo 059 Phase 4 PRD-017).
+const STATS_URL = 'https://raw.githubusercontent.com/FlowMCP/flowmcp-schemas-public/main/stats.json'
+const STATS_FETCH_TIMEOUT_MS = 10000
+const STATS_NULL_BLOCK = {
+    count_schemas: null,
+    count_unique_datasources: null,
+    count_tools: null,
+    count_resources: null,
+    count_skills: null,
+    timestamp: null,
+    schema_version: null,
+    build_hash: null
+}
 
 const FAMILIES = discoverSpecs( { repoRoot: REPO } )
+
+
+const fetchStats = async () => {
+    const controller = new AbortController()
+    const timer = setTimeout( () => controller.abort(), STATS_FETCH_TIMEOUT_MS )
+    try {
+        const response = await fetch( STATS_URL, { signal: controller.signal } )
+        if( !response.ok ) {
+            throw new Error( `HTTP ${ response.status }` )
+        }
+        const stats = await response.json()
+        return { stats, source: 'fetch' }
+    } catch( error ) {
+        console.warn( `Stats fetch failed: ${ error.message }` )
+        return { stats: null, source: 'fetch-failed' }
+    } finally {
+        clearTimeout( timer )
+    }
+}
+
+
+const readPreviousStats = async ( { manifestPath } ) => {
+    try {
+        const previous = JSON.parse( await readFile( manifestPath, 'utf-8' ) )
+        if( previous?.meta?.stats ) {
+            return previous.meta.stats
+        }
+        return null
+    } catch( error ) {
+        console.warn( `No previous manifest available: ${ error.message }` )
+        return null
+    }
+}
+
+
+const getStats = async ( { manifestPath } ) => {
+    const { stats: fetched } = await fetchStats()
+    if( fetched ) {
+        return fetched
+    }
+    const previous = await readPreviousStats( { manifestPath } )
+    if( previous ) {
+        console.warn( 'Stats fetch failed, using fallback from previous payload' )
+        return previous
+    }
+    console.warn( 'No stats available — using null placeholders' )
+    return STATS_NULL_BLOCK
+}
 
 
 const parseFrontmatter = ( { content } ) => {
@@ -155,6 +219,7 @@ const main = async () => {
     console.log( 'Building manifest from docs-payload...' )
     const families = await Promise.all( FAMILIES.map( ( family ) => buildFamilyBlock( { family } ) ) )
     const allFiles = families.flatMap( ( f ) => f.files )
+    const schemaStats = await getStats( { manifestPath: MANIFEST_PATH } )
 
     const manifest = {
         generated_at: now,
@@ -166,6 +231,9 @@ const main = async () => {
             per_family: Object.fromEntries( families.map( ( f ) => [ f.name, f.files.length ] ) ),
             normative_files: allFiles.filter( ( f ) => f.normative ).length,
             informative_files: allFiles.filter( ( f ) => !f.normative ).length
+        },
+        meta: {
+            stats: schemaStats
         }
     }
 

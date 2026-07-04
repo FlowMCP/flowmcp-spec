@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-07-02T14:25:24.225Z",
+    "generated_at": "2026-07-04T22:33:14.336Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {
@@ -688,5 +688,18 @@
         },
         "normative_files": 52,
         "informative_files": 9
+    },
+    "meta": {
+        "stats": {
+            "count_schemas": 373,
+            "count_unique_datasources": 291,
+            "count_tools": 1608,
+            "count_resources": 0,
+            "count_skills": 0,
+            "count_subset_required_keys": 91,
+            "timestamp": "2026-06-22T15:22:48.586Z",
+            "schema_version": "v4.0.0",
+            "build_hash": "2ca1fd8"
+        }
     }
 }

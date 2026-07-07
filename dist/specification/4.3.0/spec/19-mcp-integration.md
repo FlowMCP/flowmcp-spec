@@ -7,7 +7,7 @@ spec_file: "19-mcp-integration.md"
 order: 19
 section: "specification"
 normative: true
-generated_at: "2026-07-04T23:17:13.844Z"
+generated_at: "2026-07-07T06:11:41.152Z"
 generated_from: "draft/specification/4.3.0/spec/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/19-mcp-integration.md."

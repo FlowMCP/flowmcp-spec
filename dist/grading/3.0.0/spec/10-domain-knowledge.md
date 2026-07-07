@@ -7,7 +7,7 @@ spec_file: "10-domain-knowledge.md"
 order: 10
 section: "grading"
 normative: true
-generated_at: "2026-07-04T23:17:13.844Z"
+generated_at: "2026-07-07T06:11:41.152Z"
 generated_from: "draft/grading/3.0.0/spec/10-domain-knowledge.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/10-domain-knowledge.md."

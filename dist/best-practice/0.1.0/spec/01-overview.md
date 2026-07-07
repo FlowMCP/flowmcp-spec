@@ -7,7 +7,7 @@ spec_file: "01-overview.md"
 order: 1
 section: "best-practice"
 normative: false
-generated_at: "2026-07-04T23:17:13.844Z"
+generated_at: "2026-07-07T06:11:41.152Z"
 generated_from: "draft/best-practice/0.1.0/spec/01-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/best-practice/0.1.0/spec/01-overview.md."

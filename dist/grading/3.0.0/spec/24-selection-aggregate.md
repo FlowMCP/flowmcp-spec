@@ -7,7 +7,7 @@ spec_file: "24-selection-aggregate.md"
 order: 24
 section: "grading"
 normative: true
-generated_at: "2026-07-04T23:17:13.844Z"
+generated_at: "2026-07-07T06:11:41.152Z"
 generated_from: "draft/grading/3.0.0/spec/24-selection-aggregate.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/24-selection-aggregate.md."

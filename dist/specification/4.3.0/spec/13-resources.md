@@ -7,7 +7,7 @@ spec_file: "13-resources.md"
 order: 13
 section: "specification"
 normative: true
-generated_at: "2026-07-04T23:17:13.844Z"
+generated_at: "2026-07-07T06:11:41.152Z"
 generated_from: "draft/specification/4.3.0/spec/13-resources.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/13-resources.md."

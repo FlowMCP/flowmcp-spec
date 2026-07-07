@@ -35,6 +35,29 @@ Each rule family is owned by one topic page. Follow the link to read the rules, 
 
 ---
 
+## CLI Runtime Error Codes
+
+The families above are **schema-check** rules — emitted when `flowmcp schema-check` validates a schema file. The `flowmcp` CLI *also* emits `PREFIX-NNN` codes at **runtime**, when a command (`call`, `serve`, `list`, `grading`, …) hits a caught failure. These share the same format (3–4 uppercase letters, `-`, three digits; regex `^([A-Z]{3,4}-\d{3})`) and the same three severities, but their authoritative home is the CLI implementation, not a schema-spec page: every runtime code is defined at its `try`/`catch` site in `flowmcp-cli` (`src/task/FlowMcpCli.mjs`). `flowmcp doctor` reads them back structurally.
+
+| Namespace | Code prefix | Concern |
+|-----------|-------------|---------|
+| Shared-list resolution (runtime) | `LST`, `HND` | a declared `sharedLists` ref that cannot be located/resolved fails loud (never a silent empty list) |
+| Config / single-source | `CFG` | reading/validating `~/.flowmcp/config.json` and `schemaFolders[]` |
+| Schema load / resolve | `SCH` | loading a schema module or resolving its on-disk path |
+| Tool call / dispatch | `CAL`, `CLI` | `call`/argument parsing, tool matching, generic CLI failures |
+| Libraries | `LIB` | resolving `requiredLibraries` from the CLI base |
+| SQLite / resource add-ons | `SQL` | sqlite-gtfs pipeline, resource create/migrate |
+| Cache / seal | `CCH` | read/write of the response and seal caches (a missing cache is a normal empty state, not surfaced) |
+| Grading | `GRD` | grading module load, gradings dirs |
+| Health / doctor | `HLT` | health-check probes and `doctor` |
+| Selections | `SEL` | selection list/show/validate at runtime |
+| Skills | `SKL` | skills-block discovery and count |
+| Env / addons / import / misc | `ENV`, `ADN`, `IMP`, `GRP`, `NET`, `HSH` | env prompts, add-on load, import, group append, fetch, hashing |
+
+`LST` and `SEC` are shared with the schema-check namespace by design — the same subject (shared lists, security) keeps one prefix across both static validation and runtime. `SEC200`–`SEC299` is reserved for runtime security codes.
+
+---
+
 ## Severity Levels
 
 | Severity | Description | Effect |

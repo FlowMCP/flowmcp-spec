@@ -7,7 +7,7 @@ spec_file: "09-validation-rules.md"
 order: 9
 section: "specification"
 normative: true
-generated_at: "2026-07-10T11:41:13.977Z"
+generated_at: "2026-07-10T13:11:48.112Z"
 generated_from: "specification/4.3.0/draft/spec/09-validation-rules.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/09-validation-rules.md."

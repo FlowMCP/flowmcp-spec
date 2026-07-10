@@ -1,7 +1,7 @@
 {
     "version": "4.3.0",
-    "sha": "82e9358",
-    "generated_at": "2026-07-10T11:41:15.452Z",
+    "sha": "eba8a6d",
+    "generated_at": "2026-07-10T13:11:50.131Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {

@@ -1,7 +1,7 @@
 {
     "note": "Inverted skill->spec projection (read-only): one entry per non-bridge spec page, listing its public implementer skills with role. Generated from skill-spec-map.json. Two internal fields are NEVER published here: the gaps roll-up and the per-record provenance hash.",
     "generator": "scripts/generate-bridge.mjs",
-    "mapHash": "2fd90730533e",
+    "mapHash": "8cd6da02670a",
     "pages": [
         {
             "family": "specification",

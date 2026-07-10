@@ -1,5 +1,5 @@
 {
-    "note": "F9=A (Memo 060, Z5-14): FlowMCP implementer/authoring skills are IMPLEMENTATION, not spec. They were physically removed from this PUBLIC spec repo (publishing principle: the public repo carries spec + build-plan only). No publishing switch was added. This file is the RECORD of what was externalized.",
+    "note": "FlowMCP implementer/authoring skills are IMPLEMENTATION, not spec. They were physically removed from this PUBLIC spec repo (publishing principle: the public repo carries spec + build-plan only). No publishing switch was added. This file is the RECORD of what was externalized.",
     "externalizedOn": "2026-07-02",
     "movedTo": "a private, unpublished skills store kept as a sibling of this repo (outside version control of the public spec); not committed here",
     "skillCount": 11,

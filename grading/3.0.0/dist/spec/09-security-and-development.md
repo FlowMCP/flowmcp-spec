@@ -7,7 +7,7 @@ spec_file: "09-security-and-development.md"
 order: 9
 section: "grading"
 normative: true
-generated_at: "2026-07-10T11:41:13.977Z"
+generated_at: "2026-07-10T13:11:48.112Z"
 generated_from: "grading/3.0.0/draft/spec/09-security-and-development.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/09-security-and-development.md."

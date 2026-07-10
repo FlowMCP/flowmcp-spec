@@ -7,7 +7,7 @@ spec_file: "20-entry-point-prompt.md"
 order: 20
 section: "grading"
 normative: true
-generated_at: "2026-07-10T11:41:13.977Z"
+generated_at: "2026-07-10T13:11:48.112Z"
 generated_from: "grading/3.0.0/draft/spec/20-entry-point-prompt.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/20-entry-point-prompt.md."

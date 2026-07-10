@@ -4,10 +4,10 @@
 > This file concatenates all 25 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 > version: 4.3.0
-> sha: 6fa76a1
-> generated_at: 2026-07-10T04:27:02.808Z
+> sha: d55fda8
+> generated_at: 2026-07-10T06:57:13.508Z
 
-Source: specification@4.3.0:6fa76a1
+Source: specification@4.3.0:d55fda8
 
 ## Table of Contents
 

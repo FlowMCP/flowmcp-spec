@@ -7,7 +7,7 @@ spec_file: "05-phases-selection.md"
 order: 5
 section: "grading"
 normative: true
-generated_at: "2026-07-10T04:03:59.458Z"
+generated_at: "2026-07-10T06:57:11.013Z"
 generated_from: "draft/grading/3.0.0/spec/05-phases-selection.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/05-phases-selection.md."

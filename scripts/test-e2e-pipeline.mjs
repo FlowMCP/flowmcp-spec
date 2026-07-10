@@ -8,7 +8,8 @@ const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO_ROOT = resolve( __dirname, '..' )
 const REFS_PATH = resolve( REPO_ROOT, 'data/refs.manual.json' )
 const BACKUP_PATH = resolve( REPO_ROOT, 'data/refs.manual.json.bak' )
-const RESOLVED_PATH = resolve( REPO_ROOT, 'generated/refs.resolved.json' )
+// Workshop flat layout (Memo 064 FM-S5): the resolved refs aggregate lives at the container root.
+const RESOLVED_PATH = resolve( REPO_ROOT, 'refs.resolved.json' )
 
 
 const main = async () => {

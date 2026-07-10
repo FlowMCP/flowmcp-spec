@@ -3,9 +3,9 @@
 // Memo 060 P5). Proves the rendered Bridge artifacts agree, edge for edge, with the skill-to-spec
 // map. For every non-bridge chapter across all families it asserts that
 //   (1) the source carries ONLY the placeholder (never a full "## Implemented by" block),
-//   (1b) dist/<family>/<version>/bridge/<stem>.backlink.md lists EXACTLY the map's implementer set,
-//   (2) dist/<family>/<version>/bridge/<stem>.md exists (the per-page projection is materialized),
-//   (3) dist/inverted-map.json lists EXACTLY the map's implementer set for it.
+//   (1b) <family>/<version>/dist/bridge/<stem>.backlink.md lists EXACTLY the map's implementer set,
+//   (2) <family>/<version>/dist/bridge/<stem>.md exists (the per-page projection is materialized),
+//   (3) the root-level inverted-map.json lists EXACTLY the map's implementer set for it.
 // Any divergence is a hard violation. The gate regenerates nothing; it only reads.
 // Exit 0 when the projection is consistent, 1 on any drift.
 
@@ -15,13 +15,16 @@ import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { discoverSpecs } from './lib/discover-specs.mjs'
 import { loadSkillMap, sentinelMapPath } from './lib/load-skill-map.mjs'
+import { distBridgeDir, distSpecDir, aggregatePath } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
 const SENTINEL_MAP = sentinelMapPath( { repoRoot: REPO } )
-const INVERTED_PATH = join( REPO, 'dist', 'inverted-map.json' )
-const bridgeDirFor = ( { name, version } ) => join( REPO, 'dist', name, version, 'bridge' )
+// Workshop flat layout (Memo 064 FM-S5): inverted-map aggregate at the container root; per-family
+// bridge/spec payloads namespace-first under <ns>/<version>/dist.
+const INVERTED_PATH = aggregatePath( { repoRoot: REPO, file: 'inverted-map.json' } )
+const bridgeDirFor = ( { name, version } ) => distBridgeDir( { repoRoot: REPO, name, version } )
 
 const NN_RE = /^\d{2}-.*\.md$/
 const BACKLINK_START = '<!-- BRIDGE:IMPLEMENTED-BY START — generated, do not edit -->'
@@ -102,7 +105,7 @@ const assertNoInternalLeak = async ( { families, inverted } ) => {
 
     await Promise.all( families.map( async ( family ) => {
         const bridgeDir = bridgeDirFor( { name: family.key, version: family.version } )
-        const specDir = join( REPO, 'dist', family.key, family.version, 'spec' )
+        const specDir = distSpecDir( { repoRoot: REPO, name: family.key, version: family.version } )
         const bridgeFiles = ( await readdir( bridgeDir ).catch( () => [] ) )
             .filter( ( name ) => name.endsWith( '.md' ) )
             .map( ( name ) => join( bridgeDir, name ) )
@@ -139,7 +142,7 @@ const main = async () => {
     }
 
     if( existsSync( INVERTED_PATH ) === false ) {
-        console.error( 'check-bridge-inverse: dist/inverted-map.json missing — run the spec build first.' )
+        console.error( 'check-bridge-inverse: inverted-map.json missing — run the spec build first.' )
         process.exit( 1 )
     }
     const inverted = JSON.parse( await readFile( INVERTED_PATH, 'utf-8' ) )

@@ -4,8 +4,8 @@
 // Pulls the best-practices bundle generation from the site (flowmcp.github.io) onto the spec side, so
 // the spec repo is the single generation point (F14=B: docs sites do not generate content, they only
 // serve). It concatenates the generated best-practice family payload
-// (dist/best-practice/<version>/spec/NN-*.md, bridge hub excluded) — frontmatter stripped — in file
-// order into generated/best-practices.txt. The site step (FM-T6) then only copies this artifact
+// (best-practice/<version>/dist/spec/NN-*.md, bridge hub excluded) — frontmatter stripped — in file
+// order into best-practice/<version>/dist/generated/best-practices.txt. The site step (FM-T6) then only copies this artifact
 // through. Deterministic: readdir -> sort -> concat -> write, no timestamps or hashes in the output.
 
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises'
@@ -14,13 +14,20 @@ import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 
+import { distSpecDir, distGeneratedDir } from './lib/layout.mjs'
+
+
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
 const REFS = JSON.parse( readFileSync( join( REPO, 'data/refs.manual.json' ), 'utf-8' ) )
 
+// Workshop flat layout (Memo 064 FM-S5): the best-practice family lives namespace-first, its dist
+// payload at best-practice/<version>/dist/spec and its bundle INSIDE dist
+// (best-practice/<version>/dist/generated/) — the atomic copy unit (Kap 15).
+const BP_NAME = 'best-practice'
 const BP_VERSION = REFS.bestPractice.currentVersion
-const PAYLOAD_DIR = join( REPO, 'dist', 'best-practice', BP_VERSION, 'spec' )
-const OUTPUT_DIR = join( REPO, 'generated' )
+const PAYLOAD_DIR = distSpecDir( { repoRoot: REPO, name: BP_NAME, version: BP_VERSION } )
+const OUTPUT_DIR = distGeneratedDir( { repoRoot: REPO, name: BP_NAME, version: BP_VERSION } )
 const OUTPUT = join( OUTPUT_DIR, 'best-practices.txt' )
 
 
@@ -81,7 +88,7 @@ const main = async () => {
     await mkdir( OUTPUT_DIR, { recursive: true } )
     await writeFile( OUTPUT, output, 'utf-8' )
 
-    console.log( `[OK] Concatenated ${ files.length } best-practice pages from dist/best-practice/${ BP_VERSION }/spec into generated/best-practices.txt.` )
+    console.log( `[OK] Concatenated ${ files.length } best-practice pages from ${ BP_NAME }/${ BP_VERSION }/dist/spec into ${ BP_NAME }/${ BP_VERSION }/dist/generated/best-practices.txt.` )
 }
 
 

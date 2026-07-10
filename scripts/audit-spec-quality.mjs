@@ -24,6 +24,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { discoverSpecs } from './lib/discover-specs.mjs'
+import { familyHeadPath } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -138,7 +139,8 @@ const crossFamilyRelativeLinks = ( { content } ) => {
 
 
 const tokenConsistency = ( { familyName, specDirAbs } ) => {
-    const specJsonPath = join( REPO, 'draft', familyName, 'spec.json' )
+    // Workshop flat layout (Memo 064 FM-S5): the family head lives at <namespace>/spec.json.
+    const specJsonPath = familyHeadPath( { repoRoot: REPO, name: familyName } )
     const manifestPath = join( specDirAbs, 'spec-manifest.json' )
     if( existsSync( specJsonPath ) === false || existsSync( manifestPath ) === false ) return []
     const specToken = JSON.parse( readFileSync( specJsonPath, 'utf-8' ) ).namespaceToken

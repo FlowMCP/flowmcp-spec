@@ -10,7 +10,7 @@
 //
 // Emits, across all families, ONE per-page bridge for every non-bridge chapter (the NN-bridge.md
 // hub pages are excluded), a per-page backlink into the dist, a reshaped NN-bridge.md hub in the
-// source spec dir, an enhanced dist hub with Astro frontmatter, and dist/inverted-map.json.
+// source spec dir, an enhanced dist hub with Astro frontmatter, and the root-level inverted-map.json.
 // It also ensures each source chapter carries ONLY the implemented-by placeholder (authored-vs-
 // derived split); the rendered block lives in the dist. Idempotent, no network, no secrets.
 
@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 import { discoverSpecs } from './lib/discover-specs.mjs'
 import { loadSkillMap, sentinelMapPath } from './lib/load-skill-map.mjs'
+import { distBridgeDir, distSpecDir, aggregatePath } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -31,9 +32,11 @@ const SENTINEL_MAP = sentinelMapPath( { repoRoot: REPO } )
 const GENERATOR = 'scripts/generate-bridge.mjs'
 const NN_RE = /^\d{2}-.*\.md$/
 const BRIDGE_RE = /^\d{2}-bridge\.md$/
-const INVERTED_MAP_PATH = join( REPO, 'dist', 'inverted-map.json' )
-const bridgeDirFor = ( { name, version } ) => join( REPO, 'dist', name, version, 'bridge' )
-const specPayloadDirFor = ( { name, version } ) => join( REPO, 'dist', name, version, 'spec' )
+// Workshop flat layout (Memo 064 FM-S5): inverted-map is a cross-namespace aggregate at the
+// container root; per-family bridge/spec payloads live namespace-first under <ns>/<version>/dist.
+const INVERTED_MAP_PATH = aggregatePath( { repoRoot: REPO, file: 'inverted-map.json' } )
+const bridgeDirFor = ( { name, version } ) => distBridgeDir( { repoRoot: REPO, name, version } )
+const specPayloadDirFor = ( { name, version } ) => distSpecDir( { repoRoot: REPO, name, version } )
 
 const BACKLINK_START = '<!-- BRIDGE:IMPLEMENTED-BY START — generated, do not edit -->'
 const BACKLINK_END = '<!-- BRIDGE:IMPLEMENTED-BY END -->'

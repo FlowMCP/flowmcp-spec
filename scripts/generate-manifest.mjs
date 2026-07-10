@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // generate-manifest.mjs — FlowMCP docs-payload cross-family manifest (Memo 060 P5 adoption).
 //
-// Ported from memo-init repos/spec and generalized: reads dist/<name>/<version>/spec/**/*.md,
-// parses each frontmatter, and writes dist/manifest.json summarizing every family discovered under
-// draft/*/spec.json (specification, grading, best-practice).
+// Ported from memo-init repos/spec and generalized: reads <name>/<version>/dist/spec/**/*.md,
+// parses each frontmatter, and writes the root-level manifest.json summarizing every family
+// discovered under <name>/spec.json (specification, grading, best-practice).
 //
 // Each family's sidebar sub-category grouping is NOT hardcoded here (the three former per-order
 // maps are dissolved). The single source is the per-version spec-manifest.json on the spec level
@@ -11,7 +11,7 @@
 // chapter's sidebar_group is the id of the manifest group whose pages[] lists it; an unlisted
 // chapter falls back to the manifest's first group.
 //
-// Output format documented in dist/README.md.
+// Output format documented in README.md (Layout section).
 
 import { readdir, readFile, writeFile, copyFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
@@ -21,11 +21,14 @@ import { fileURLToPath } from 'node:url'
 import { discoverSpecs } from './lib/discover-specs.mjs'
 import { readSpecManifest, groupForFile } from './lib/spec-manifest.mjs'
 import { buildStamp } from './lib/build-stamp.mjs'
+import { distSpecDir, distDataDir, aggregatePath } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
-const MANIFEST_PATH = join( REPO, 'dist', 'manifest.json' )
+// Workshop flat layout (Memo 064 FM-S5): the cross-namespace docs-payload manifest is an aggregate,
+// so it lives at the container root, not under a top-level dist/ dir.
+const MANIFEST_PATH = aggregatePath( { repoRoot: REPO, file: 'manifest.json' } )
 const GENERATOR = 'scripts/generate-manifest.mjs'
 // Schema-registry stats (Memo 061 P4 restore of #45/Memo 059 Phase 4): flowmcp-schemas-public is
 // the source of truth for schema/tool/datasource counts — never the docs-payload manifest's own
@@ -183,7 +186,7 @@ const collectEntries = async ( { dir, groupFn, label } ) => {
 const buildFamilyBlock = async ( { family } ) => {
     const manifest = loadFamilyManifest( { specDir: family.specDir, label: family.name } )
     const groupFn = makeGroupFn( { manifest } )
-    const dir = join( REPO, 'dist', family.name, family.version, 'spec' )
+    const dir = distSpecDir( { repoRoot: REPO, name: family.name, version: family.version } )
     const files = await collectEntries( { dir, groupFn, label: family.name } )
 
     return {
@@ -206,7 +209,7 @@ const copySpecManifestsToPayload = async () => {
 
             return
         }
-        const dataDir = join( REPO, 'dist', family.name, family.version, 'data' )
+        const dataDir = distDataDir( { repoRoot: REPO, name: family.name, version: family.version } )
         await mkdir( dataDir, { recursive: true } )
         await copyFile( src, join( dataDir, 'spec-manifest.json' ) )
         console.log( `  ✓ spec-manifest → ${ join( dataDir, 'spec-manifest.json' ).replace( REPO + '/', '' ) }` )

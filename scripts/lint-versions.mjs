@@ -2,13 +2,14 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { discoverSpecs } from './lib/discover-specs.mjs'
+import { familyHeadPath, draftSpecDirRel } from './lib/layout.mjs'
 
-// lint:versions — structural version-drift gate (Memo 060 P5: updated to the draft/head layout).
+// lint:versions — structural version-drift gate (Memo 064 FM-S5: flat namespace-first layout).
 //
 // Two guarantees, both blocking:
-//   1. Every family's HEAD (draft/<name>/spec.json) is in step with the on-disk directory reality:
+//   1. Every family's HEAD (<name>/spec.json) is in step with the on-disk directory reality:
 //      its currentVersion + specDir directory exists, and every historicalVersions entry has a
-//      draft/<name>/<version>/spec directory (a frozen version present in the head must be carried
+//      <name>/<version>/draft/spec directory (a frozen version present in the head must be carried
 //      on disk, and vice versa). data/refs.manual.json mirror fields must match the head.
 //   2. No generator script (scripts/generators/gen-*.mjs) hardcodes a version literal — generators
 //      read the version through scripts/generators/lib/refs-loader.mjs.
@@ -41,7 +42,7 @@ const refsBySpecDir = [ refs.spec, refs.grading, refs.bestPractice ]
     .filter( ( block ) => block !== undefined )
 
 families.forEach( ( family ) => {
-    const headPath = join( REPO, 'draft', family.name, 'spec.json' )
+    const headPath = familyHeadPath( { repoRoot: REPO, name: family.name } )
     const head = JSON.parse( readFileSync( headPath, 'utf8' ) )
 
     // currentVersion dir exists
@@ -52,14 +53,14 @@ families.forEach( ( family ) => {
     // every historicalVersions entry is carried on disk
     const historical = Array.isArray( head.historicalVersions ) ? head.historicalVersions : []
     historical.forEach( ( v ) => {
-        const dir = `draft/${ family.name }/${ v }/spec`
+        const dir = draftSpecDirRel( { name: family.name, version: v } )
         if( !existsSync( join( REPO, dir ) ) ) {
             errors.push( `${ family.name }: historicalVersions entry "${ v }" has no directory "${ dir }"` )
         }
     } )
 
     // every on-disk version is declared in historicalVersions (no orphan frozen dir)
-    const onDisk = semverDirsUnder( join( 'draft', family.name ) )
+    const onDisk = semverDirsUnder( family.name )
     onDisk.forEach( ( v ) => {
         if( !historical.includes( v ) ) {
             errors.push( `${ family.name }: on-disk version "${ v }" is not listed in spec.json historicalVersions` )
@@ -72,7 +73,7 @@ families.forEach( ( family ) => {
     }
 
     // refs.manual.json mirror (if a matching block exists) must point at the head specDir
-    const mirror = refsBySpecDir.find( ( block ) => typeof block.specDir === 'string' && block.specDir.startsWith( `draft/${ family.name }/` ) )
+    const mirror = refsBySpecDir.find( ( block ) => typeof block.specDir === 'string' && block.specDir.startsWith( `${ family.name }/` ) )
     if( mirror !== undefined && mirror.specDir !== family.specDir ) {
         errors.push( `${ family.name }: refs.manual.json specDir "${ mirror.specDir }" != head specDir "${ family.specDir }"` )
     }

@@ -20,7 +20,7 @@
                     "type": "array",
                     "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
                 },
-                "specDir": { "type": "string", "pattern": "^draft/specification/\\d+\\.\\d+\\.\\d+/spec$" },
+                "specDir": { "type": "string", "pattern": "^specification/\\d+\\.\\d+\\.\\d+/draft/spec$" },
                 "miniSkillTemplate": { "type": "string", "pattern": "^data/.*\\.md$" }
             }
         },
@@ -35,7 +35,7 @@
                     "type": "array",
                     "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
                 },
-                "specDir": { "type": "string", "pattern": "^draft/grading/\\d+\\.\\d+\\.\\d+/spec$" },
+                "specDir": { "type": "string", "pattern": "^grading/\\d+\\.\\d+\\.\\d+/draft/spec$" },
                 "url": { "type": "string", "pattern": "^https://.+$" }
             }
         },
@@ -50,7 +50,7 @@
                     "type": "array",
                     "items": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
                 },
-                "specDir": { "type": "string", "pattern": "^draft/best-practice/\\d+\\.\\d+\\.\\d+/spec$" },
+                "specDir": { "type": "string", "pattern": "^best-practice/\\d+\\.\\d+\\.\\d+/draft/spec$" },
                 "url": { "type": "string", "pattern": "^https://.+$" }
             }
         },

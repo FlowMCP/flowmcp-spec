@@ -11,13 +11,14 @@
 // a `family` + `spec_version` frontmatter field. The layout is draft/<family>/<version>/spec for
 // every family, so one build path serves all families and a new family drops into the same tree.
 //
-// Output format documented in dist/README.md.
+// Output format documented in README.md (Layout section).
 
 import { readdir, readFile, writeFile, mkdir, rm } from 'node:fs/promises'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { execSync } from 'node:child_process'
 import { discoverSpecs } from './lib/discover-specs.mjs'
+import { distSpecDir } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -261,7 +262,7 @@ const main = async () => {
     const passInputs = FAMILIES.map( ( family ) => ( {
         name: family.name,
         sourceDir: join( REPO, family.specDir ),
-        targetDir: join( REPO, 'dist', family.name, family.version, 'spec' ),
+        targetDir: distSpecDir( { repoRoot: REPO, name: family.name, version: family.version } ),
         section: family.name,
         routeBase: routeBaseFromDocEntry( { docEntry: family.docEntry } ),
         versionValue: family.version,

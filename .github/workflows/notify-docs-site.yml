@@ -3,10 +3,15 @@ name: Notify Docs Site
 on:
   push:
     branches: [main]
+    # Flat namespace-first layout (Memo 064 flatten): fire on generated artifacts only —
+    # per-family <ns>/<version>/dist/** and the root-level cross-family aggregates. Every
+    # authored draft edit is committed together with its regenerated dist, so a generated-only
+    # trigger still covers all content changes while avoiding a double site deploy.
     paths:
-      - 'draft/**'
-      - 'dist/**'
-      - 'generated/**'
+      - '**/dist/**'
+      - 'manifest.json'
+      - 'inverted-map.json'
+      - 'refs.resolved.json'
   workflow_dispatch:
 
 jobs:

@@ -12,7 +12,8 @@ on:
       - 'scripts/generators/**'
       - 'scripts/lint-versions.mjs'
       - 'scripts/lib/discover-specs.mjs'
-      - 'draft/**'
+      - '*/*/draft/**'
+      - '*/spec.json'
   push:
     branches: [main]
     paths:
@@ -20,7 +21,8 @@ on:
       - 'scripts/generators/**'
       - 'scripts/lint-versions.mjs'
       - 'scripts/lib/discover-specs.mjs'
-      - 'draft/**'
+      - '*/*/draft/**'
+      - '*/spec.json'
   workflow_dispatch:
 
 permissions:

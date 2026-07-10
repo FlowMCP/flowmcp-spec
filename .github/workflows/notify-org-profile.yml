@@ -11,7 +11,7 @@ on:
     branches:
       - main
     paths:
-      - 'generated/refs.resolved.json'
+      - 'refs.resolved.json'
       - 'data/mini-skill.template.md'
   workflow_dispatch:
 
@@ -33,7 +33,7 @@ jobs:
               "commit_sha": "${{ github.sha }}",
               "source_repo": "${{ github.repository }}",
               "trigger_paths": [
-                "generated/refs.resolved.json",
+                "refs.resolved.json",
                 "data/mini-skill.template.md"
               ]
             }

@@ -4,21 +4,21 @@
         "currentVersion": "4.3.0",
         "recommendedRelease": "v4.3.0",
         "historicalVersions": [ "2.0.0", "3.0.0", "4.0.0", "4.1.0", "4.2.0", "4.3.0" ],
-        "specDir": "draft/specification/4.3.0/spec",
+        "specDir": "specification/4.3.0/draft/spec",
         "miniSkillTemplate": "data/mini-skill.template.md"
     },
     "grading": {
         "currentVersion": "3.0.0",
         "recommendedRelease": "3.0.0",
         "historicalVersions": [ "1.0.0", "1.1.0", "1.2.0", "2.0.0", "3.0.0" ],
-        "specDir": "draft/grading/3.0.0/spec",
+        "specDir": "grading/3.0.0/draft/spec",
         "url": "https://flowmcp.github.io/grading/overview/"
     },
     "bestPractice": {
         "currentVersion": "0.1.0",
         "recommendedRelease": "0.1.0",
         "historicalVersions": [ "0.1.0" ],
-        "specDir": "draft/best-practice/0.1.0/spec",
+        "specDir": "best-practice/0.1.0/draft/spec",
         "url": "https://flowmcp.github.io/best-practice/overview/"
     },
     "imports": {
@@ -45,7 +45,7 @@
         "indexUrl": "https://flowmcp.github.io/llms.txt",
         "docsUrl": "https://flowmcp.github.io/docs-llms.txt",
         "fullUrl": "https://flowmcp.github.io/llms-full.txt",
-        "specUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/generated/llms.txt"
+        "specUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/specification/4.3.0/dist/generated/llms.txt"
     },
     "robotsTxt": {
         "publishedLlmsFiles": [

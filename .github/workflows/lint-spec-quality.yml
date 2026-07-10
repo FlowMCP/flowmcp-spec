@@ -1,25 +1,26 @@
 name: Lint Spec Quality
 
 # The spec-quality gate: it builds the docs-payload + bridge from the current draft sources
-# (draft/<family>/<version>/spec) and runs the structural audit + the inverse-projection gate
-# against the result (ported from memo-init repos/spec, Memo 060 P5).
+# (<family>/<version>/draft/spec, flat namespace-first layout) and runs the structural audit +
+# the inverse-projection gate against the result (ported from memo-init repos/spec, Memo 060 P5;
+# Memo 064 flatten).
 
 on:
   pull_request:
     paths:
-      - 'draft/**/*.md'
-      - 'draft/**/spec.json'
-      - 'draft/**/spec-manifest.json'
-      - 'draft/**/skill-spec-map.json'
+      - '*/*/draft/**/*.md'
+      - '*/spec.json'
+      - '*/*/draft/**/spec-manifest.json'
+      - '*/*/draft/**/skill-spec-map.json'
       - 'data/refs.manual.json'
       - 'scripts/**'
   push:
     branches: [main]
     paths:
-      - 'draft/**/*.md'
-      - 'draft/**/spec.json'
-      - 'draft/**/spec-manifest.json'
-      - 'draft/**/skill-spec-map.json'
+      - '*/*/draft/**/*.md'
+      - '*/spec.json'
+      - '*/*/draft/**/spec-manifest.json'
+      - '*/*/draft/**/skill-spec-map.json'
       - 'data/refs.manual.json'
       - 'scripts/**'
   workflow_dispatch:

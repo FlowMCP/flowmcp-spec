@@ -4,13 +4,16 @@ import { fileURLToPath } from 'node:url'
 import Ajv from 'ajv'
 
 import { buildStamp } from './lib/build-stamp.mjs'
+import { aggregatePath } from './lib/layout.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO_ROOT = join( __dirname, '..' )
 const MANUAL_PATH = join( REPO_ROOT, 'data/refs.manual.json' )
 const SCHEMA_PATH = join( REPO_ROOT, 'data/refs.schema.json' )
-const RESOLVED_PATH = join( REPO_ROOT, 'generated/refs.resolved.json' )
+// Workshop flat layout (Memo 064 FM-S5): the cross-namespace refs aggregate lives at the container
+// root, not under a top-level generated/ dir (the public repo's medium-first location).
+const RESOLVED_PATH = aggregatePath( { repoRoot: REPO_ROOT, file: 'refs.resolved.json' } )
 
 const IMPORT_REGEX = /^github:FlowMCP\/[\w-]+(#[\w./-]+)?$/
 

@@ -1,32 +1,32 @@
-// discover-specs.mjs — central family discovery helper (ported from memo-init repos/spec,
-// Memo 060 P5 FlowMCP meta-spec adoption).
+// discover-specs.mjs — central family discovery helper (Memo 064 FM-S5 workshop; flat namespace-first).
 //
-// Real directory scanner: reads draft/*/spec.json (glob the draft dir), derives a full family
-// record for each family found. The spec.json is the single source of family identity; specDir
-// and dataDir are structurally derived from the slug and currentVersion so the record shape never
-// drifts from the on-disk layout.
+// Real directory scanner: reads each family's spec.json and derives a full family record. The
+// spec.json is the single source of family identity; specDir and dataDir are structurally derived
+// from the name and currentVersion (flat namespace-first layout) so the record shape never drifts
+// from the on-disk tree. A family is discovered directly at the container root (<name>/spec.json) —
+// the container itself is the spec container.
 //
 // Record shape:
 //   { name, namespace, prefix, version, specDir, dataDir, sopAnchor, docEntry, relatedRefs, manifestMeta }
-// where:
-//   specDir  = 'draft/<name>/<version>/spec'
-//   dataDir  = 'draft/<name>/<version>/data'
-//   manifestMeta = { order:[...], labels:{...} } (sidebar group meta from sidebarMeta)
+// where specDir/dataDir are namespace-first (<name>/<version>/draft/{spec,data}) — resolved via
+// ./layout.mjs.
 //
 // Family ORDER is canonical: specification -> grading -> best-practice. Unknown families are
 // appended after the known ones (alphabetically), so a new parallel spec slots in deterministically.
-// Callers MUST NOT re-implement the family list — add a spec.json under draft/<name>/ and
+// Callers MUST NOT re-implement the family list — add a spec.json under the container and
 // discoverSpecs picks it up automatically.
 
 import { readdirSync, readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { draftSpecDirRel, draftDataDirRel } from './layout.mjs'
 
 
 // Canonical family order for sorting. Unknown families sort after the known ones.
 const FAMILY_ORDER = [ 'specification', 'grading', 'best-practice' ]
 
 
-// Read a spec.json from a draft family directory. Returns null when absent or unreadable.
+// Read a spec.json from a family directory. Returns null when absent or unreadable.
 const readSpecJson = ( { familyDirAbs } ) => {
     const path = join( familyDirAbs, 'spec.json' )
     if( existsSync( path ) === false ) return null
@@ -38,13 +38,13 @@ const readSpecJson = ( { familyDirAbs } ) => {
 }
 
 
-// Build a full family record from a spec.json manifest at draft/<name>/spec.json.
-// specDir and dataDir are structurally derived (never read verbatim from spec.json) so the layout
-// is always consistent: draft/<name>/<version>/spec and draft/<name>/<version>/data.
+// Build a full family record from a spec.json manifest. specDir and dataDir are structurally
+// derived (never read from spec.json) so the on-disk tree is always consistent:
+// <name>/<version>/draft/spec and <name>/<version>/draft/data.
 const buildFamilyRecord = ( { name, specJson } ) => {
     const version = specJson.currentVersion
-    const specDir = `draft/${ name }/${ version }/spec`
-    const dataDir = `draft/${ name }/${ version }/data`
+    const specDir = draftSpecDirRel( { name, version } )
+    const dataDir = draftDataDirRel( { name, version } )
 
     return {
         name,
@@ -61,24 +61,27 @@ const buildFamilyRecord = ( { name, specJson } ) => {
 }
 
 
-// Discover all spec families from draft/*/spec.json in canonical order:
-// specification -> grading -> best-practice, then any additional families alphabetically.
-// Falls back gracefully (returns empty array) when the draft dir does not exist yet.
-export const discoverSpecs = ( { repoRoot } ) => {
-    const draftDir = join( repoRoot, 'draft' )
-    if( existsSync( draftDir ) === false ) return []
+// Scan the container root for family subdirs holding a <name>/spec.json. Non-family directories
+// (scripts/, data/, node_modules/, …) carry no spec.json and are filtered out.
+const scanContainer = ( { repoRoot } ) => {
+    if( existsSync( repoRoot ) === false ) return []
 
-    const entries = readdirSync( draftDir, { withFileTypes: true } )
-    const records = entries
+    return readdirSync( repoRoot, { withFileTypes: true } )
         .filter( ( e ) => e.isDirectory() === true )
         .map( ( e ) => {
-            const name = e.name
-            const specJson = readSpecJson( { familyDirAbs: join( draftDir, name ) } )
+            const specJson = readSpecJson( { familyDirAbs: join( repoRoot, e.name ) } )
             if( specJson === null ) return null
 
-            return buildFamilyRecord( { name, specJson } )
+            return buildFamilyRecord( { name: e.name, specJson } )
         } )
         .filter( ( r ) => r !== null )
+}
+
+
+// Discover all spec families in canonical order: specification -> grading -> best-practice, then any
+// additional families alphabetically. Scans the container root, where each family lives at <name>/spec.json.
+export const discoverSpecs = ( { repoRoot } ) => {
+    const records = scanContainer( { repoRoot } )
 
     return records.sort( ( a, b ) => {
         const ia = FAMILY_ORDER.indexOf( a.name )

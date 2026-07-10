@@ -1,0 +1,133 @@
+{
+    "schemaVersion": "refs/1.0.0",
+    "generated": {
+        "at": "2026-07-10T11:41:13.463Z",
+        "fromCommit": "82e9358",
+        "generator": "scripts/generate-refs.mjs",
+        "version": "4.3.0",
+        "sha": "82e9358",
+        "generated_at": "2026-07-10T11:41:13.463Z"
+    },
+    "spec": {
+        "currentVersion": "4.3.0",
+        "recommendedRelease": "v4.3.0",
+        "specDir": "specification/4.3.0/draft/spec",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/v4.3.0/specification/4.3.0/draft/spec",
+        "llmsTxtUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/specification/4.3.0/dist/generated/llms.txt",
+        "miniSkillTemplate": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/data/mini-skill.template.md"
+    },
+    "imports": {
+        "cli": {
+            "github": "github:FlowMCP/flowmcp-cli#v4.1.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-cli#v4.1.0",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-cli/tree/v4.1.0"
+        },
+        "core": {
+            "github": "github:FlowMCP/flowmcp-core#v4.1.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-core#v4.1.0",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-core/tree/v4.1.0"
+        },
+        "schemasPublic": {
+            "github": "github:FlowMCP/flowmcp-schemas-public#main",
+            "npmInstallCommand": "npm install -g github:FlowMCP/flowmcp-schemas-public#main",
+            "browseUrl": "https://github.com/FlowMCP/flowmcp-schemas-public/tree/main"
+        },
+        "gtfsToolkit": {
+            "github": "github:FlowMCP/geo-gtfs-toolkit#v1.0.0",
+            "npmInstallCommand": "npm install -g github:FlowMCP/geo-gtfs-toolkit#v1.0.0",
+            "browseUrl": "https://github.com/FlowMCP/geo-gtfs-toolkit/tree/v1.0.0"
+        }
+    },
+    "docs": {
+        "canonical": "https://flowmcp.github.io",
+        "entryPoints": {
+            "hackathon": "/quickstart/quickstart/",
+            "aiEngineer": "/specification/overview/",
+            "schemaMaintainer": "/specification/schema-format/",
+            "decisionMaker": "/about/for-decision-makers/"
+        }
+    },
+    "github": {
+        "organization": "https://github.com/flowmcp",
+        "specRepo": "https://github.com/FlowMCP/flowmcp-spec",
+        "sponsorsUrl": "https://github.com/sponsors/FlowMCP"
+    },
+    "llmsFiles": {
+        "indexUrl": "https://flowmcp.github.io/llms.txt",
+        "docsUrl": "https://flowmcp.github.io/docs-llms.txt",
+        "fullUrl": "https://flowmcp.github.io/llms-full.txt",
+        "specUrl": "https://raw.githubusercontent.com/FlowMCP/flowmcp-spec/main/specification/4.3.0/dist/generated/llms.txt"
+    },
+    "robotsTxt": {
+        "publishedLlmsFiles": [
+            "/llms.txt",
+            "/best-practices.txt"
+        ]
+    },
+    "addons": [
+        {
+            "name": "geo-gtfs-toolkit",
+            "import": "github:FlowMCP/geo-gtfs-toolkit",
+            "description": "Convert GTFS Schedule feeds to a sealed SQLite database (source-key: sqlite-gtfs)"
+        },
+        {
+            "name": "geo-geojson-toolkit",
+            "import": "github:FlowMCP/geo-geojson-toolkit",
+            "description": "Load a GeoJSON FeatureCollection from a URL into memory for spatial queries (source-key: geo-geojson)"
+        },
+        {
+            "name": "geo-csv-tsv-toolkit",
+            "import": "github:FlowMCP/geo-csv-tsv-toolkit",
+            "description": "Load geo CSV/TSV from a URL into memory with a mandatory parse config (source-key: geo-csv)"
+        },
+        {
+            "name": "geo-overpass-toolkit",
+            "import": "github:FlowMCP/geo-overpass-toolkit",
+            "description": "Run live HTTP Overpass queries against OpenStreetMap with caching (source-key: geo-overpass)"
+        }
+    ],
+    "validation": {
+        "passed": true,
+        "checks": [
+            {
+                "field": "spec.currentVersion",
+                "regex": "^4\\.\\d+\\.\\d+$",
+                "ok": true
+            },
+            {
+                "field": "imports.cli",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.core",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.schemasPublic",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            },
+            {
+                "field": "imports.gtfsToolkit",
+                "regex": "^github:FlowMCP\\/[\\w-]+(#[\\w./-]+)?$",
+                "ok": true
+            }
+        ]
+    },
+    "grading": {
+        "currentVersion": "3.0.0",
+        "recommendedRelease": "3.0.0",
+        "specDir": "grading/3.0.0/draft/spec",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/grading/3.0.0/draft/spec",
+        "url": "https://flowmcp.github.io/grading/overview/"
+    },
+    "bestPractice": {
+        "currentVersion": "0.1.0",
+        "recommendedRelease": "0.1.0",
+        "specDir": "best-practice/0.1.0/draft/spec",
+        "specDirAbsoluteUrl": "https://github.com/FlowMCP/flowmcp-spec/tree/main/best-practice/0.1.0/draft/spec",
+        "url": "https://flowmcp.github.io/best-practice/overview/"
+    }
+}

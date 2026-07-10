@@ -1,0 +1,406 @@
+# FlowMCP — Schema Best Practices (bestPracticeSpec/0.1.0)
+
+> Advisory, not normative ("you should, not you must"). Read this BEFORE building a
+> schema. Every recommendation is backed by a real code reference (file:line) or a
+> memo. The normative rules live in the Schemas Specification and the Grading-Spec.
+
+Source: https://flowmcp.github.io/best-practice/overview/
+
+---
+
+# Overview
+/best-practice/overview/
+
+> **Informative.**
+
+The Best-Practice track is the third FlowMCP spec track, sitting alongside the normative **Specification** and the **Grading** spec. Where those two define what a schema *is* and how it is *evaluated*, this track is **advisory and non-normative**: it gathers the recommendations and hard-won learnings for writing good schemas, not compliance rules. Nothing on these pages can disqualify a schema — they raise quality systematically, beyond the mere absence of errors.
+
+> This track is informative and advisory. It introduces no new normative keywords of its own and uses "should", never "MUST" — the normative-language conventions (MUST / SHOULD / MAY) are defined once in the [Specification overview](/specification/overview/) and are not redefined here.
+
+---
+
+## What this track is
+
+The character of the track in one line:
+
+> **You don't have to, but you should.**
+
+It holds recommendations and learnings, not validation rules. The normative rules stay in the Specification and the Grading-Spec; this track is where quality grows *systematically*, beyond the mere absence of errors.
+
+## The problem it solves — alignment
+
+Subagents that pick up a new prospect or build a new schema used to start **without a shared knowledge base**. Whatever one agent learned (a cryptic API key convention, a geo axis-order gotcha, a license trap) stayed with that agent. The next subagent rediscovered it — or didn't, and produced rework.
+
+The Best-Practice track is published as a single generated text file, **`best-practices.txt`**, that is attached to every schema-building subagent prompt as a **mandatory link**. So every subagent shares the same gotchas. It scales: thirty parallel subagents all append the same, **updatable** file → better schemas from the start, less rework.
+
+## Why it exists — a concrete learning
+
+When working through prospects, an agent once handed subagents **self-invented prompts** instead of reading the source first ("just search for something about IHK") to finish faster. Subagents are smart enough to produce output even from poor input — but the bad start cost roughly ten schemas of rework.
+
+The lesson — **read the source first** — is exactly why this track exists. The learning moves from *luck* (a capable agent happening to do the right thing) to *structure* (every subagent receives the best practices as a mandatory source).
+
+A second truth: **"no errors" is not a quality standard.** Error-freeness is the floor; real quality shows over weeks. Best practices lift quality systematically, not just the error count.
+
+## Character
+
+- **Recommendation, not rule** — "should", never "MUST".
+- **Living and extensible** — new patterns grow *into* an existing area, not into a new stub page.
+- **Source-first** — every recommendation is backed by a real code reference (`file:line`) or a memo.
+
+---
+
+## How to read this track
+
+The track is organised into **categories**. The first — and currently only — category is **Schema Creation**: how to build a FlowMCP schema that reads well for an LLM and grades well. It is split into five **areas**, each a single page:
+
+| Area | Page | Core recommendation |
+|------|------|---------------------|
+| BP-1 | [Readable Interface](/best-practice/readable-interface/) | Make the schema readable for the LLM, not for the API |
+| BP-2 | [Reference Data](/best-practice/reference-data/) | Maintain recurring lists and value formats once, inherit everywhere |
+| BP-3 | [Load & Scale](/best-practice/load-and-scale/) | Pick the load/store strategy by data size and query ability |
+| BP-4 | [Geo Conventions](/best-practice/geo-conventions/) | Use the established geo defaults instead of rolling your own |
+| BP-5 | [Correctness & License](/best-practice/correctness-license/) | Assume nothing silently, fake nothing, document provenance and rights |
+
+The principle behind the cut is **few strong pages over many thin ones**: fifteen documented patterns are bundled into five thematic areas, so new patterns grow into an existing area rather than into a new stub.
+
+## Versioning
+
+The Best-Practice track is independently versioned as `bestPracticeSpec/0.1.0` — analogous to the Specification and Grading tracks. The documentation site surfaces the version as a sidebar badge.
+
+`0.1.0` ships **schema-creation only**. Further categories (e.g. schema maintenance, grading hints) are deliberately a later backlog — first the scaffold, then the growth.
+
+## Naming
+
+The source folder is `best-practice/` (singular, consistent with `spec/` and `grading/`); the published file is **`best-practices.txt`** (plural). The generation maps between them.
+
+## Bundled one-liners
+
+Small, sharp learnings that do not warrant a full page:
+
+- **Events are not in OpenStreetMap.** Querying OSM for concerts, markets, or exhibitions returns nothing useful — reach for a dedicated events/culture source instead.
+- **"No errors" is the floor, not the ceiling.** A schema that passes `flowmcp grading deterministic` is the *minimum* bar — real quality shows over weeks of use.
+- **Read the source first.** Never build from an invented prompt; the prospect issue's `URL` + `Typ` are the authoritative starting point.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./10-readable-interface.md](/best-practice/readable-interface/) — see chapter 10.
+
+---
+
+# Readable Interface: Enums, Parameter Names & Handler Phases
+/best-practice/readable-interface/
+
+Design the schema for the **model that calls it**, not for the API behind it. An upstream API often speaks in terse codes; the language model should not have to decode them. Translate at the edge so the surface the model sees is self-explaining.
+
+---
+
+## Human-readable enums
+
+Say a fictional `AcmeWeather` API takes `?step=h1|d1|w1`. Those codes mean nothing to a model. Expose readable values and map them to the wire format in `preRequest`:
+
+```js
+// What the model sees — clear, guessable values:
+parameters: [ {
+    position: { key: 'interval', value: '{{USER_PARAM}}', location: 'query' },
+    z: { primitive: 'enum(1-hour,1-day,1-week)', options: [] }
+} ]
+
+// preRequest translates to the API's codes (flat payload access):
+preRequest: async ( { struct, payload } ) => {
+    const wire = { '1-hour': 'h1', '1-day': 'd1', '1-week': 'w1' }
+    struct.url = struct.url.replace( `interval=${ payload.interval }`, `step=${ wire[ payload.interval ] }` )
+    return { struct }
+}
+```
+
+The caller picks a value it understands; the handler does the translation. The API contract is unchanged — only the surface improves.
+
+## Speaking parameter names
+
+The same idea applies to opaque keys in a **response**. A fictional `AcmeMarkets` candles endpoint returns `{ o, h, l, c, v, t }`. Rename them to descriptive fields in `postRequest` so downstream tools get a stable, obvious shape:
+
+```js
+postRequest: async ( { response } ) => {
+    const candles = response.data.map( ( { o, h, l, c, v, t } ) => ( {
+        open: o, high: h, low: l, close: c, volume: v, time: t
+    } ) )
+    return { response: { candles } }
+}
+```
+
+A model can chart `candles[].close`; it cannot reliably guess what `c` means.
+
+## The handler-phase contract
+
+The two snippets above read the payload differently on purpose. Handlers run in three phases, and each sees the payload in one shape only:
+
+| Phase | When | Reads the payload as |
+|-------|------|----------------------|
+| `preRequest` | before the call | **flat** — `payload.interval` |
+| `executeRequest` | the call itself | **nested** — `payload.userParams.interval` |
+| `postRequest` | after the call | **flat** — `payload.interval` |
+
+Reading the wrong shape raises no error — the handler just never fires. So when a `preRequest` rewrite seems to do nothing, first check it reads `payload.interval` (flat), not `payload.userParams.interval`. `preRequest` is the canonical place for enum and key rewrites because it runs before the call with flat access to every parameter.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./14-correctness-license.md](/best-practice/correctness-license/) — see chapter 14.
+
+---
+
+# Reference Data Without Duplicates: Shared Lists & Canonical Values
+/best-practice/reference-data/
+
+Maintain recurring lists and value formats **once**, and inherit them everywhere. Duplicated reference data drifts: one copy gets a new entry, the others quietly fall behind. A single canonical source cannot drift against itself.
+
+---
+
+## Shared lists
+
+Say three tools in a schema all accept the same set of supported chains. Instead of repeating the enum in each tool, define the list once and reference it with an interpolation token. The loader expands the token at load time, so every tool always offers the current set:
+
+```js
+// Defined once (a shared list named "chains"):
+// values: [ { id: 'eth', label: 'Ethereum' }, { id: 'base', label: 'Base' } ]
+
+main = {
+    sharedLists: [ 'chains' ],
+    tools: {
+        getBalance: {
+            parameters: [ {
+                position: { key: 'chain', value: '{{USER_PARAM}}', location: 'query' },
+                z: { primitive: 'enum({{chains:id}})', options: [] }   // → enum(eth,base) at load
+            } ]
+        }
+    }
+}
+```
+
+Add a new chain in one place and all three tools gain it. (Directories like `_shared/` are just a tidy place to keep such lists — what makes a list shared is the `sharedLists` declaration, not the folder.)
+
+## ISO-8601 as the canonical time format
+
+A fictional API returns `{ "ts": 1717000000 }` — epoch seconds. Don't overwrite it; **add** a canonical ISO-8601 field next to it, so the response stays faithful *and* becomes usable:
+
+```js
+postRequest: async ( { response } ) => {
+    return { response: {
+        ...response,
+        ts_ISO8601: new Date( response.ts * 1000 ).toISOString()   // keep ts, add "2024-05-29T18:13:20.000Z"
+    } }
+}
+```
+
+ISO-8601 sorts lexically, carries its own UTC offset, and parses without a format guess — keep time in it internally.
+
+## Keyless-first ordering
+
+When several providers can answer the same question, try the open ones first. A fictional geocoder should reach for a key-free service before a key-bound one, so a first-time user gets an answer before configuring anything:
+
+```js
+// order of attempts: open first, keyed as fallback
+const providers = [ 'nominatim',          // no key
+                    'acme-geo' ]           // needs ACME_GEO_KEY
+```
+
+Never force a key at the very start of a journey when a keyless path exists.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./10-readable-interface.md](/best-practice/readable-interface/) — see chapter 10.
+
+---
+
+# Load & Scale: In-Memory, SQLite, Add-ons, Query Bundling
+/best-practice/load-and-scale/
+
+Choose the load and storage strategy by **data size** and by the **query ability** of the source. A small static file and a large queryable corpus do not deserve the same machinery — match the mechanism to the data.
+
+---
+
+## Preload small static data into memory
+
+A fictional schema needs to turn postal codes into city names from a 5,000-row reference file with no query API. Fetch it **once** at init, parse it into a lookup, and serve every call from memory — not one network round-trip per request:
+
+```js
+// once, at init:
+const rows = parseCsv( await fetchText( 'https://data.example/plz-cities.csv' ) )
+const cityByPlz = new Map( rows.map( ( r ) => [ r.plz, r.city ] ) )
+
+// per call: instant, offline
+getCity: async ( { payload } ) => ( { response: { city: cityByPlz.get( payload.plz ) ?? null } } )
+```
+
+Preload is a *pattern* — load-on-init plus an in-memory cache — not a schema field.
+
+## Escalate to SQLite for large static data
+
+If that reference set were 5 *million* rows with range and geo queries, holding it in memory is wasteful. Escalate to an embedded SQLite file, declare the driver, and guard the handler so it fails clearly when the driver is missing:
+
+```js
+main = { requiredLibraries: [ 'better-sqlite3' ], /* … */ }
+
+findNearby: async ( { libraries, payload } ) => {
+    if( !libraries[ 'better-sqlite3' ] ) { throw new Error( 'STOPS-001: SQLite driver not injected' ) }
+    // query the prepared DB by bounding box …
+}
+```
+
+Large + static + queryable → SQLite. Smaller or one-off → keep it in memory.
+
+## Package reusable data as an add-on
+
+When one dataset backs many methods, expose it as a thin add-on that names the source and how to load it, and let init parse it once:
+
+```js
+main = { source: 'acme-stops', mode: 'url', url: 'https://data.example/stops.geojson', addon: 'geo-geojson' }
+// init parses the file once → memory; every method serves from that single parsed copy
+```
+
+## Over-fetch beats under-fetch
+
+A fictional places API rate-limits hard. Asking for cafés, then bakeries, then pharmacies as three calls burns three slots; one combined query costs one:
+
+```text
+BAD : query(type=cafe) ; query(type=bakery) ; query(type=pharmacy)   → 3 rate-limit slots
+GOOD: query(type in [cafe,bakery,pharmacy])                          → 1 slot
+```
+
+Be precise about what the limit governs: the number of clauses is **not** the limit — the size of the **result set** is. Where a source allows it, ship **selections**: pre-built query templates with the known gotchas already baked in, so callers don't rediscover them.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./13-geo-conventions.md](/best-practice/geo-conventions/) — see chapter 13.
+
+---
+
+# Geo Conventions
+/best-practice/geo-conventions/
+
+Geo has a few conventions that everyone trips over once. Adopt the established defaults instead of inventing your own — it keeps schemas interoperable and spares the model a class of silent mistakes.
+
+---
+
+## Longitude-first bounding boxes
+
+A bounding box is `[ minLon, minLat, maxLon, maxLat ]` — **longitude first** (RFC 7946 / GeoJSON order). Swapping the pair sends a query to the wrong hemisphere and returns plausible-but-wrong results, with no error to warn you. A bbox around Berlin:
+
+```js
+// [ minLon, minLat, maxLon, maxLat ]
+const berlin = [ 13.088, 52.338, 13.761, 52.675 ]
+```
+
+If a schema must accept the other order, make it **explicit** — never guess:
+
+```js
+{ position: { key: 'axisOrder', value: '{{USER_PARAM}}', location: 'query' },
+  z: { primitive: 'enum(lonlat,latlon)', options: [] } }   // no silent default
+```
+
+## One selector per call
+
+Geo tools that accept several ways to locate a place (free text, coordinates, a postal code, an OSM id) should take **exactly one** per call. Two selectors is ambiguous — reject it rather than picking one silently:
+
+```js
+// caller sends exactly one of: text | latlon | postalCode | osmId
+if( selectorCount !== 1 ) { throw new Error( 'GEO-RESOLVE-001: provide exactly one location selector' ) }
+```
+
+## A join key vs. a human anchor
+
+Use a stable administrative code as the **join key** between datasets, and a human-friendly code only as a display **anchor**. For German data, that means joining on the municipality key (AGS) and showing the postal code (PLZ) — not the other way around:
+
+```text
+join on:   ags  = "11000000"   (stable, 1:1 with the municipality)
+show as:    plz = "10115"       (familiar, but many PLZ per municipality)
+```
+
+## One-liner
+
+- **Events are not in OpenStreetMap.** Querying OSM for concerts, markets, or exhibitions returns nothing useful — reach for a dedicated events/culture source instead.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./12-load-and-scale.md](/best-practice/load-and-scale/) — see chapter 12.
+
+---
+
+# Correctness, License & Provenance
+/best-practice/correctness-license/
+
+Assume nothing silently, fake nothing, and document where the data comes from and under which rights. Correctness and provenance are what separate a schema that *passes* from one that can be *trusted*.
+
+---
+
+## No silent defaults; a 4xx is not a pass
+
+Don't paper over a missing parameter or a failed call. The model needs to know the difference between "no result" and "the call broke":
+
+```js
+// BAD — hides a missing input and a failed request:
+const limit = payload.limit || 10
+if( res.status >= 400 ) { return { response: { items: [] } } }   // looks empty, was actually a 401
+
+// GOOD — explicit:
+if( payload.limit === undefined ) { throw new Error( 'REQ-001: limit is required' ) }
+if( res.status >= 400 ) { throw new Error( `HTTP-${ res.status }: upstream rejected the request` ) }
+```
+
+A result counts as *working* only when the call succeeded **and** returned non-empty, non-duplicate data. A `4xx`/`5xx` or an empty body is a failure, never a quiet success.
+
+## Make parse rules explicit
+
+When a schema ingests a flat file, state every parse rule — separator, date format, column mapping, type coercion. Guessing turns `0`/`1` flags into booleans, or `"01/02"` into the wrong month:
+
+```js
+parseConfig: {
+    delimiter: ';',
+    dateFormat: 'YYYY-MM-DD',
+    columns: { plz: 'string', active: 'integer' }   // active = 0|1 stays an integer, not a boolean
+}
+// missing parseConfig → fail loudly (e.g. CSV-CFG-001), never assume defaults
+```
+
+## Use synthetic, CC0 test data
+
+Never commit real provider responses to a public repo — that can breach the source's license. Ship small **synthetic** fixtures under a permissive license (CC0) for tests, and keep production data separate:
+
+```text
+tests/fixtures/markets.sample.json   ← hand-made, CC0, 3 rows — safe to publish
+(real API responses)                 ← never committed
+```
+
+## Cover the documented surface
+
+Expose all endpoints the API documents, and justify any you leave out. An unjustified reduction lowers interoperability — fewer tools means fewer connections to other schemas.
+
+## Record the Terms of Service
+
+Put the ToS URL in the schema itself, so nobody has to hunt for it twice:
+
+```js
+main = {
+    termsOfService: 'https://acme.example/terms',
+    termsOfServiceCheckedAt: '2024-05-29',
+    termsOfServiceLanguage: 'en'
+    // sentinel 'no-tos-found' is allowed when a source genuinely has none
+}
+```
+
+A small workflow can fetch the URL, run a robots/legal check, and stamp these fields — turning a one-off search into a recorded fact.
+
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./10-readable-interface.md](/best-practice/readable-interface/) — see chapter 10.

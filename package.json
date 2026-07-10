@@ -31,10 +31,11 @@
         "audit-spec-quality": "node scripts/audit-spec-quality.mjs",
         "check-bridge-inverse": "node scripts/check-bridge-inverse.mjs",
         "generate-llms-txt": "node scripts/generate-llms-txt.mjs",
+        "generate-best-practices-txt": "node scripts/generate-best-practices-txt.mjs",
         "sync-stats": "node scripts/sync-stats.mjs",
         "lint:versions": "node scripts/lint-versions.mjs",
         "test:refs-regex": "node scripts/test-refs-regex.mjs",
-        "build": "npm run generate-refs && npm run generate-docs-payload && npm run generate-bridge && npm run generate-manifest && npm run check-bridge-inverse",
+        "build": "npm run generate-refs && npm run generate-docs-payload && npm run generate-bridge && npm run generate-manifest && npm run check-bridge-inverse && npm run generate-llms-txt && npm run generate-best-practices-txt",
         "test": "node scripts/audit-spec-quality.mjs && node scripts/check-bridge-inverse.mjs && node scripts/lint-versions.mjs"
     },
     "devDependencies": {

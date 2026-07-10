@@ -50,8 +50,6 @@
     "robotsTxt": {
         "publishedLlmsFiles": [
             "/llms.txt",
-            "/docs-llms.txt",
-            "/llms-full.txt",
             "/best-practices.txt"
         ]
     },

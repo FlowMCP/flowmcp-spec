@@ -20,6 +20,8 @@ const frontmatter = buildFrontmatter( {
 const body = [
     `# FlowMCP Glossary (${terms.length} terms)`,
     '',
+    '> This glossary follows the org anchor-term convention (memo-init upstream, meta-spec `06-conventions-writing`): each term has one canonical label owned by one chapter. FlowMCP terms are namespace-qualified via the family `namespaceToken` so they stay distinct from other families in the org anchor-term register. Grounding by consistent use, not declaration alone.',
+    '',
     '| Term | Definition |',
     '|------|------------|',
     ...terms.map( ( { term, definition } ) => `| **${term}** | ${definition} |` )

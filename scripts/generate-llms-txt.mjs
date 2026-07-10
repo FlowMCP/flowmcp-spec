@@ -25,6 +25,19 @@ const OUTPUT_DIR = join( REPO, 'generated' )
 const OUTPUT = join( OUTPUT_DIR, 'llms.txt' )
 const OUTPUT_ALIAS = join( OUTPUT_DIR, 'llms-schema-spec.txt' )
 
+// FM-S3 (Memo 064, Kap 17 — Provenance-Threading): the header carries the provenance stamp
+// `Source: <namespaceToken>@<version>:<shortSha>` at the source, so the docs site only reaches it
+// through. <namespaceToken> is the family's lowercase slug (the same lowercase namespace name the
+// reference-ID up front uses — NOT the uppercase spec-manifest token), read from the family-head
+// spec.json so it is never hardcoded and stays one token, front and back.
+const FAMILY_HEAD = join( dirname( dirname( SPEC_DIR ) ), 'spec.json' )
+const SPEC_TOKEN = JSON.parse( readFileSync( FAMILY_HEAD, 'utf-8' ) ).slug
+
+if( typeof SPEC_TOKEN !== 'string' || SPEC_TOKEN.length === 0 ) {
+    console.error( `FAIL: family-head spec.json at ${ FAMILY_HEAD } has no string slug — cannot compose the Source: stamp` )
+    process.exit( 1 )
+}
+
 
 const titleOf = ( { content, filename } ) => {
     const match = content.match( /^#\s+(.+?)\s*$/m )
@@ -52,6 +65,11 @@ const main = async () => {
     } ) )
 
     const stamp = buildStamp( { version: SPEC_VERSION, cwd: REPO } )
+    // Provenance stamp (Kap 17): shortSha is the 7-char prefix of the same short HEAD SHA the
+    // freshness triplet carries (buildStamp -> git rev-parse --short HEAD); the `unknown` sentinel
+    // is already 7 chars, so slice( 0, 7 ) passes it through visibly.
+    const shortSha = stamp.sha.slice( 0, 7 )
+    const specId = `${ SPEC_TOKEN }@${ SPEC_VERSION }:${ shortSha }`
     const toc = chapters.map( ( c, i ) => `${ i + 1 }. ${ c.title }` ).join( '\n' )
     const header = [
         `# FlowMCP Specification v${ SPEC_VERSION }`,
@@ -62,6 +80,8 @@ const main = async () => {
         `> version: ${ stamp.version }`,
         `> sha: ${ stamp.sha }`,
         `> generated_at: ${ stamp.generated_at }`,
+        '',
+        `Source: ${ specId }`,
         '',
         '## Table of Contents',
         '',

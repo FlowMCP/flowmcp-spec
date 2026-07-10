@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url'
 
 import { discoverSpecs } from './lib/discover-specs.mjs'
 import { readSpecManifest, groupForFile } from './lib/spec-manifest.mjs'
+import { buildStamp } from './lib/build-stamp.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -214,7 +215,8 @@ const copySpecManifestsToPayload = async () => {
 
 
 const main = async () => {
-    const now = new Date().toISOString()
+    const specFamily = FAMILIES.find( ( family ) => family.name === 'specification' )
+    const stamp = buildStamp( { version: specFamily?.version ?? null, cwd: REPO } )
 
     console.log( 'Building manifest from docs-payload...' )
     const families = await Promise.all( FAMILIES.map( ( family ) => buildFamilyBlock( { family } ) ) )
@@ -222,7 +224,9 @@ const main = async () => {
     const schemaStats = await getStats( { manifestPath: MANIFEST_PATH } )
 
     const manifest = {
-        generated_at: now,
+        version: stamp.version,
+        sha: stamp.sha,
+        generated_at: stamp.generated_at,
         generator: GENERATOR,
         families,
         stats: {

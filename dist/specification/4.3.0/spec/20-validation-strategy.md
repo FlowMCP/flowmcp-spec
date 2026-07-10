@@ -7,7 +7,7 @@ spec_file: "20-validation-strategy.md"
 order: 20
 section: "specification"
 normative: true
-generated_at: "2026-07-07T06:11:41.152Z"
+generated_at: "2026-07-10T04:03:59.458Z"
 generated_from: "draft/specification/4.3.0/spec/20-validation-strategy.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/20-validation-strategy.md."

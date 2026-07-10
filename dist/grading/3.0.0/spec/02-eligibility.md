@@ -7,7 +7,7 @@ spec_file: "02-eligibility.md"
 order: 2
 section: "grading"
 normative: true
-generated_at: "2026-07-07T06:11:41.152Z"
+generated_at: "2026-07-10T04:03:59.458Z"
 generated_from: "draft/grading/3.0.0/spec/02-eligibility.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/02-eligibility.md."

@@ -12,6 +12,8 @@ import { readFileSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { buildStamp } from './lib/build-stamp.mjs'
+
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
 const REPO = resolve( __dirname, '..' )
@@ -49,6 +51,7 @@ const main = async () => {
         return { filename, title: titleOf( { content, filename } ), content }
     } ) )
 
+    const stamp = buildStamp( { version: SPEC_VERSION, cwd: REPO } )
     const toc = chapters.map( ( c, i ) => `${ i + 1 }. ${ c.title }` ).join( '\n' )
     const header = [
         `# FlowMCP Specification v${ SPEC_VERSION }`,
@@ -56,6 +59,9 @@ const main = async () => {
         '>',
         `> This file concatenates all ${ chapters.length } specification documents into a single file for LLM consumption.`,
         '> Source: https://github.com/FlowMCP/flowmcp-spec',
+        `> version: ${ stamp.version }`,
+        `> sha: ${ stamp.sha }`,
+        `> generated_at: ${ stamp.generated_at }`,
         '',
         '## Table of Contents',
         '',

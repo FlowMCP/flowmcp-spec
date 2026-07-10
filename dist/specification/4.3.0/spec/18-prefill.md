@@ -7,7 +7,7 @@ spec_file: "18-prefill.md"
 order: 18
 section: "specification"
 normative: true
-generated_at: "2026-07-07T06:11:41.152Z"
+generated_at: "2026-07-10T04:03:59.458Z"
 generated_from: "draft/specification/4.3.0/spec/18-prefill.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/18-prefill.md."

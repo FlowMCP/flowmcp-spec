@@ -7,7 +7,7 @@ spec_file: "08-migration.md"
 order: 8
 section: "specification"
 normative: false
-generated_at: "2026-07-07T06:11:41.152Z"
+generated_at: "2026-07-10T04:03:59.458Z"
 generated_from: "draft/specification/4.3.0/spec/08-migration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/specification/4.3.0/spec/08-migration.md."

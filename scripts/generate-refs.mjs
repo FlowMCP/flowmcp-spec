@@ -1,8 +1,9 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { execSync } from 'node:child_process'
 import Ajv from 'ajv'
+
+import { buildStamp } from './lib/build-stamp.mjs'
 
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) )
@@ -50,15 +51,6 @@ const main = async () => {
         process.exit( 1 )
     }
 
-    let fromCommit = 'unknown'
-    try {
-        fromCommit = execSync( 'git rev-parse --short HEAD', { cwd: REPO_ROOT } )
-            .toString()
-            .trim()
-    } catch( err ) {
-        fromCommit = 'unknown'
-    }
-
     const resolvedImports = Object
         .fromEntries( importEntries.map( ( [ key, value ] ) => {
             const [ repoPart, tagPart ] = value.replace( 'github:FlowMCP/', '' ).split( '#' )
@@ -77,12 +69,17 @@ const main = async () => {
     const specRecommended = manual.spec.recommendedRelease
     const specDir = manual.spec.specDir
 
+    const stamp = buildStamp( { version: specVersion, cwd: REPO_ROOT } )
+
     const resolved = {
         schemaVersion: 'refs/1.0.0',
         generated: {
-            at: new Date().toISOString(),
-            fromCommit,
-            generator: 'scripts/generate-refs.mjs'
+            at: stamp.generated_at,
+            fromCommit: stamp.sha,
+            generator: 'scripts/generate-refs.mjs',
+            version: stamp.version,
+            sha: stamp.sha,
+            generated_at: stamp.generated_at
         },
         spec: {
             currentVersion: specVersion,

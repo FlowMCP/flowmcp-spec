@@ -7,7 +7,7 @@ spec_file: "19-folder-layout.md"
 order: 19
 section: "grading"
 normative: true
-generated_at: "2026-07-07T06:11:41.152Z"
+generated_at: "2026-07-10T04:03:59.458Z"
 generated_from: "draft/grading/3.0.0/spec/19-folder-layout.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: draft/grading/3.0.0/spec/19-folder-layout.md."

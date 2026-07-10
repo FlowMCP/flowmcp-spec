@@ -1,9 +1,12 @@
 {
     "schemaVersion": "refs/1.0.0",
     "generated": {
-        "at": "2026-07-10T01:57:31.758Z",
-        "fromCommit": "b245010",
-        "generator": "scripts/generate-refs.mjs"
+        "at": "2026-07-10T04:03:58.996Z",
+        "fromCommit": "3367d99",
+        "generator": "scripts/generate-refs.mjs",
+        "version": "4.3.0",
+        "sha": "3367d99",
+        "generated_at": "2026-07-10T04:03:58.996Z"
     },
     "spec": {
         "currentVersion": "4.3.0",

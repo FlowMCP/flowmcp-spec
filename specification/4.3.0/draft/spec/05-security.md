@@ -99,6 +99,30 @@ Because schema files have zero import statements and all dependencies are inject
 
 ---
 
+## Where the Scan Runs — Trusted vs. Private Load Paths
+
+The static scan is the gate for **uncurated** schemas. FlowMCP loads schemas through two paths with different trust properties, and the scan protects exactly the one that is not curated:
+
+| Load path | How a schema enters the runtime | Static scan | Discoverable |
+|-----------|---------------------------------|-------------|--------------|
+| **Trusted path** | Registered in `schemaFolders[]` and merged into the catalog | **Skipped** | Yes — `search` / `list` / `serve` |
+| **Private ad-hoc path** | Loaded by exact file path for a single call | **Active** — runs before `import()` | No — never registered, never merged |
+
+**Trusted path.** Schemas placed in a configured `schemaFolders[]` source are reviewed once, at registration time, by the operator who adds the folder. Loading them does not re-run the static scan. This is a deliberate design choice: a universal scan on every load would reject the small number of curated add-on schemas that legitimately import Node built-ins (for example a geo add-on that opens a TLS connection or reads a bundled SQLite file), and most substring matches on real schema files are false positives. The trust for these schemas comes from the registration step, not from the scanner.
+
+**Private ad-hoc path.** A private schema is invoked by its path — `private call <schema-path> <tool> '{json}'` — and is **never** written into `schemaFolders[]` nor merged into the shared catalog. Two consequences follow:
+
+1. **Structural invisibility.** Because the schema never enters the registration/merge machinery, it cannot appear in `search`, `list`, or an MCP `serve` session. This is invisibility by construction, not a visibility filter.
+2. **Scan on load.** Because the schema was never curated, the private path runs the **security scan before any `import()`**. A file that matches a forbidden pattern is rejected and never executed; only a clean file is dynamically imported and run.
+
+This is the "scan on the private path" rule: the scan defends the uncurated ad-hoc load, while trusted, already-reviewed schemas keep loading scan-free.
+
+### Known gap
+
+The zero-import target ([`00-overview.md`](./00-overview.md), Principle 3) is a `SHOULD`, and a small number of registered add-on schemas still carry top-level imports of Node built-ins. They load scan-free over the trusted path, so those imports are not blocked today. Closing the gap fully would require every registered schema to reach zero-import conformance. A private ad-hoc call of the **same** file is still rejected by the scan — the private path holds the line regardless of the trusted-path state. A universal scan across all load paths remains a possible future step, contingent on that conformance and on further scanner hardening.
+
+---
+
 ## Library Allowlist
 
 The runtime maintains an allowlist of approved npm packages. Only packages on this list can be declared in `main.requiredLibraries` and injected into the `handlers()` factory function.

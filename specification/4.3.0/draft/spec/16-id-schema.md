@@ -171,6 +171,17 @@ The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to 
 
 This mapping is internal. Users and agents always use full Spec-IDs.
 
+### Resource Queries in the MCP Tool Name
+
+A resource does not map to a single tool — each **query** it declares is exposed as its own callable MCP tool. The wire name is built from the **query** name and the namespace, using the same `name_namespace` rule:
+
+| External Spec-ID (resource query) | Internal MCP Tool Name |
+|-----------------------------------|------------------------|
+| `mailarchive/resource/mail`, query `searchMail` | `searchMail_mailarchive` |
+| auto-injected `runSql` on namespace `tokens` | `runSql_tokens` |
+
+**Mapping Rule (resource query):** `${queryName}_${namespace}` — the **query** name, not the resource name, is the wire name. The auto-injected `runSql` and `describeTables` follow the same rule. This is the single convention shared by `search`, `call`, and `serve` (see [13-resources.md](./13-resources.md#mcp-exposure-of-resource-queries)).
+
 ### Source Coordinate in the MCP Tool Name
 
 When the CLI aggregates several `schemaFolders[]` and two folders expose the same namespace, the bare `routeName_namespace` tool name would collide at the MCP layer (the MCP protocol requires unique tool names). To let both folders coexist, the source coordinate (see [Source Coordinate](#source-coordinate)) is carried through `#buildToolName()` and appended to the internal MCP tool name on collision, so each tool stays addressable:

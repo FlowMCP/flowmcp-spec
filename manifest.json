@@ -1,7 +1,7 @@
 {
     "version": "4.3.0",
-    "sha": "eba8a6d",
-    "generated_at": "2026-07-10T13:11:50.131Z",
+    "sha": "5289206",
+    "generated_at": "2026-07-15T23:49:33.209Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {
@@ -179,7 +179,7 @@
                     "filename": "15-catalog.md",
                     "slug": "catalog",
                     "title": "Catalog",
-                    "description": "A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions...",
+                    "description": "A Catalog is the top-level organizational unit in FlowMCP v4. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions...",
                     "order": 15,
                     "section": "specification",
                     "normative": true,
@@ -284,6 +284,16 @@
                     "section": "specification",
                     "normative": false,
                     "sidebar_group": "bridge"
+                },
+                {
+                    "filename": "26-agent-cli-usage.md",
+                    "slug": "agent-cli-usage",
+                    "title": "Agent CLI Usage Contract",
+                    "description": "This chapter is the normative contract for how an AI client or an agent uses the FlowMCP CLI to discover and invoke tools. Where [24-philosophy.md](./24-philosophy.md) explains *why* the interaction...",
+                    "order": 26,
+                    "section": "specification",
+                    "normative": true,
+                    "sidebar_group": "specification"
                 }
             ]
         },
@@ -681,14 +691,14 @@
         }
     ],
     "stats": {
-        "total_files": 61,
+        "total_files": 62,
         "family_count": 3,
         "per_family": {
-            "specification": 26,
+            "specification": 27,
             "grading": 28,
             "best-practice": 7
         },
-        "normative_files": 52,
+        "normative_files": 53,
         "informative_files": 9
     },
     "meta": {

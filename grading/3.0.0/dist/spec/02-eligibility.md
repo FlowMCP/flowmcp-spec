@@ -7,7 +7,7 @@ spec_file: "02-eligibility.md"
 order: 2
 section: "grading"
 normative: true
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "grading/3.0.0/draft/spec/02-eligibility.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/02-eligibility.md."
@@ -37,8 +37,19 @@ The following endpoints MUST NOT be included in a gradable schema:
 2. **Non-general endpoints** — customer- or tenant-specific administration APIs (e.g. account-management endpoints scoped to a single tenant).
 3. **Write/update/delete endpoints without justification** — write operations that lack a specific, documented reason for inclusion.
 4. **Reachable but undocumented endpoints** — endpoints that are publicly reachable but **not actually documented**. These MAY indicate a provider-side defect (an endpoint that was unintentionally exposed) and MUST NOT be included on the assumption that "reachable = public-intent".
+5. **Private runtime schemas (`requires-private-data`)** — schemas that require private, local-only, or otherwise non-public data and are invoked ad-hoc by path (never registered in a shared `schemaFolders[]` catalog). Being unregistered, they are structurally outside the discoverable corpus; being non-public, they are outside the graded corpus.
 
 The **undocumented-endpoint exclusion** is a distinct, named exclusion ground. Reachability is not documentation.
+
+### Public-only Grading Corpus
+
+Grading operates on the **public** corpus only. A schema marked `requires-private-data` — one that depends on private or local-only data and is reached through a private ad-hoc call rather than through a registered catalog — is **out of grading scope by definition**:
+
+- It never appears in the shared catalog, so it is not enumerable by a grader.
+- Its data is not publicly reachable, so a grader cannot reproduce a call.
+- Excluding it is not a quality judgement; the schema is simply outside the public target audience this chapter grades against.
+
+Graders MUST NOT attempt to score a `requires-private-data` schema, and a corpus report MUST NOT count it as an ungraded public schema.
 
 ---
 

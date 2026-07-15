@@ -7,7 +7,7 @@ spec_file: "00-overview.md"
 order: 0
 section: "grading"
 normative: false
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "grading/3.0.0/draft/spec/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/00-overview.md."

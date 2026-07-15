@@ -1,7 +1,7 @@
 {
     "note": "Inverted skill->spec projection (read-only): one entry per non-bridge spec page, listing its public implementer skills with role. Generated from skill-spec-map.json. Two internal fields are NEVER published here: the gaps roll-up and the per-record provenance hash.",
     "generator": "scripts/generate-bridge.mjs",
-    "mapHash": "8cd6da02670a",
+    "mapHash": "c16662dea81e",
     "pages": [
         {
             "family": "specification",
@@ -553,6 +553,31 @@
             "clusters": [],
             "requirementCount": 0,
             "internalCount": 0
+        },
+        {
+            "family": "specification",
+            "id": "specification/26-agent-cli-usage",
+            "stem": "26-agent-cli-usage",
+            "sopAnchor": "00-overview",
+            "publicEntries": [],
+            "publicEntriesInferred": true,
+            "detailPages": [
+                "00-overview",
+                "05-security",
+                "13-resources",
+                "15-catalog",
+                "16-id-schema",
+                "24-philosophy"
+            ],
+            "implementers": [],
+            "grader": null,
+            "outOfScope": [
+                "flowmcp-sop",
+                "flowmcp-usage"
+            ],
+            "clusters": [],
+            "requirementCount": 0,
+            "internalCount": 2
         },
         {
             "family": "grading",

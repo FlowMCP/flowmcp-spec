@@ -1,10 +1,31 @@
 {
-    "note": "Per-family skill->spec map for the FlowMCP Schemas Specification. FlowMCP implementer skills are PRIVATE: the public spec repo carries spec + build-plan only, so this map is intentionally empty (0 implementers). It exists so the family is symmetric with the meta-spec map layer and the bridge renders an honest \"nothing published here\" projection.",
+    "note": "Per-family skill->spec map for the FlowMCP Schemas Specification. Schema-AUTHORING implementer skills stay PRIVATE and are NOT listed (F9=A, Memo 060 Z5-14). The usage/routing skills below ARE listed (Memo 157 PRD-10): they implement the Agent CLI Usage Contract (specification/26-agent-cli-usage). Both carry visibility:internal, so the bridge withholds them from the public projection while keeping the map the single source of truth for the edge.",
     "totals": {
-        "skills": 0,
+        "skills": 2,
         "register": 0,
         "withGaps": 0,
-        "withPrimary": 0
+        "withPrimary": 2
     },
-    "skills": []
+    "skills": [
+        {
+            "skill": "flowmcp-usage",
+            "category": "flowmcp",
+            "path": "spec/specification/4.3.0/skills/flowmcp-usage/SKILL.md",
+            "primary": "specification/26-agent-cli-usage",
+            "all": [
+                "specification/26-agent-cli-usage"
+            ],
+            "visibility": "internal"
+        },
+        {
+            "skill": "flowmcp-sop",
+            "category": "flowmcp",
+            "path": "spec/specification/4.3.0/skills/flowmcp-sop/SKILL.md",
+            "primary": "specification/26-agent-cli-usage",
+            "all": [
+                "specification/26-agent-cli-usage"
+            ],
+            "visibility": "internal"
+        }
+    ]
 }

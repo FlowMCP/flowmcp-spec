@@ -41,7 +41,8 @@ _(no skill dependencies declared in this family)_
 | [22-scoring-protocol](./22-scoring-protocol.md) | — | 0 | — |
 | [23-license-and-tos](./23-license-and-tos.md) | — | 0 | — |
 | [24-philosophy](./24-philosophy.md) | — | 0 | — |
-| **Summary** | **0 / 25** | — | — |
+| [26-agent-cli-usage](./26-agent-cli-usage.md) | — | 0 | — |
+| **Summary** | **0 / 26** | — | — |
 
 ## Skills by namespace
 
@@ -78,6 +79,7 @@ _(no skill dependencies declared in this family)_
 - [15-catalog](./15-catalog.md) — _— no implementer skill yet —_
 - [16-id-schema](./16-id-schema.md) — _— no implementer skill yet —_
 - [19-mcp-integration](./19-mcp-integration.md) — _— no implementer skill yet —_
+- [26-agent-cli-usage](./26-agent-cli-usage.md) — _— no implementer skill yet —_
 
 ### Guides
 

@@ -1,13 +1,13 @@
 # FlowMCP Specification v4.3.0
 > Complete specification for FlowMCP — a schema-driven normalization layer that transforms REST APIs, local databases, and workflows into MCP-compatible tools for AI agents.
 >
-> This file concatenates all 25 specification documents into a single file for LLM consumption.
+> This file concatenates all 26 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 > version: 4.3.0
-> sha: eba8a6d
-> generated_at: 2026-07-10T13:11:52.894Z
+> sha: 5289206
+> generated_at: 2026-07-15T23:49:34.483Z
 
-Source: specification@4.3.0:eba8a6d
+Source: specification@4.3.0:5289206
 
 ## Table of Contents
 
@@ -36,6 +36,7 @@ Source: specification@4.3.0:eba8a6d
 23. Scoring Protocol
 24. License & Terms of Services
 25. Philosophy
+26. Agent CLI Usage Contract
 
 ---
 # 00. Overview
@@ -312,7 +313,7 @@ Maximize the `main` block, minimize handlers. Every field that can be expressed 
 
 ### 3. Inject over import
 
-Schemas receive data through dependency injection, never import. A handler that needs EVM chain data does not `import` a chain list — it receives `sharedLists.evmChains` via the factory function. Libraries are declared in `requiredLibraries` and injected by the runtime from an allowlist. Schema files contain zero import statements.
+Schemas receive data through dependency injection, never import. A handler that needs EVM chain data does not `import` a chain list — it receives `sharedLists.evmChains` via the factory function. Libraries are declared in `requiredLibraries` and injected by the runtime from an allowlist. Schema files SHOULD contain zero import statements — this is the normative target the security scanner enforces on the private ad-hoc load path (see [Private ad-hoc calls](#private-ad-hoc-calls) and [05-security.md](./05-security.md)). A small number of trusted, registered add-on schemas still carry top-level imports of Node built-ins; they load scan-free over the trusted path and are the known gap the zero-import target closes.
 
 ### 4. Hash over trust
 
@@ -320,7 +321,20 @@ Integrity verification through SHA-256 hashes. The `main` block is hashable beca
 
 ### 5. Constrain over permit
 
-Security by default, explicit opt-in for capabilities. Schema files have zero import statements — all dependencies are declared in `requiredLibraries` and injected from a runtime allowlist. The security scanner rejects schemas with forbidden patterns at load-time, before any tool is exposed to an AI client.
+Security by default, explicit opt-in for capabilities. Schema files declare all dependencies in `requiredLibraries` and receive them injected from a runtime allowlist. The security scanner rejects schemas with forbidden patterns at load-time, before any tool is exposed to an AI client — this gate is **enforced on the private ad-hoc load path**, where an unregistered schema is loaded by path. Trusted schemas registered in `schemaFolders[]` are curated at registration time and load scan-free; the scanner is the gate for schemas that were **not** curated that way. See [Private ad-hoc calls](#private-ad-hoc-calls) and [05-security.md](./05-security.md).
+
+---
+
+## Private ad-hoc calls
+
+FlowMCP separates two load paths, and they have different trust properties:
+
+| Path | How a schema is loaded | Security scan | Discoverability |
+|------|------------------------|---------------|-----------------|
+| **Trusted path** | Registered in `schemaFolders[]`, merged into the catalog | **Off** (curated at registration time) | Visible in `search` / `list` / `serve` |
+| **Private ad-hoc path** | Loaded by exact file path, one call at a time | **On** (scan runs before `import()`) | Never registered, never merged — structurally invisible to `search` / `list` / `serve` |
+
+A private schema is invoked by its path: it is **never** written into `schemaFolders[]` and **never** merged into the shared catalog, so it cannot appear in `search`, `list`, or an MCP `serve` session — invisibility is structural, not a filter. Because such a schema was never curated, the private path runs the **security scan before any `import()`**: a file that matches a forbidden pattern is rejected without ever executing. This is the "scan on private path" rule — the scan protects exactly the uncurated load, while trusted, already-reviewed schemas keep loading scan-free.
 
 ---
 
@@ -2935,6 +2949,30 @@ The scan runs in four sequential steps before the schema file is dynamically imp
 ```
 
 Because schema files have zero import statements and all dependencies are injected, there is no need to distinguish between "main block region" and "handler block region". The entire file is scanned uniformly against the same forbidden pattern list.
+
+---
+
+## Where the Scan Runs — Trusted vs. Private Load Paths
+
+The static scan is the gate for **uncurated** schemas. FlowMCP loads schemas through two paths with different trust properties, and the scan protects exactly the one that is not curated:
+
+| Load path | How a schema enters the runtime | Static scan | Discoverable |
+|-----------|---------------------------------|-------------|--------------|
+| **Trusted path** | Registered in `schemaFolders[]` and merged into the catalog | **Skipped** | Yes — `search` / `list` / `serve` |
+| **Private ad-hoc path** | Loaded by exact file path for a single call | **Active** — runs before `import()` | No — never registered, never merged |
+
+**Trusted path.** Schemas placed in a configured `schemaFolders[]` source are reviewed once, at registration time, by the operator who adds the folder. Loading them does not re-run the static scan. This is a deliberate design choice: a universal scan on every load would reject the small number of curated add-on schemas that legitimately import Node built-ins (for example a geo add-on that opens a TLS connection or reads a bundled SQLite file), and most substring matches on real schema files are false positives. The trust for these schemas comes from the registration step, not from the scanner.
+
+**Private ad-hoc path.** A private schema is invoked by its path — `private call <schema-path> <tool> '{json}'` — and is **never** written into `schemaFolders[]` nor merged into the shared catalog. Two consequences follow:
+
+1. **Structural invisibility.** Because the schema never enters the registration/merge machinery, it cannot appear in `search`, `list`, or an MCP `serve` session. This is invisibility by construction, not a visibility filter.
+2. **Scan on load.** Because the schema was never curated, the private path runs the **security scan before any `import()`**. A file that matches a forbidden pattern is rejected and never executed; only a clean file is dynamically imported and run.
+
+This is the "scan on the private path" rule: the scan defends the uncurated ad-hoc load, while trusted, already-reviewed schemas keep loading scan-free.
+
+### Known gap
+
+The zero-import target ([`00-overview.md`](./00-overview.md), Principle 3) is a `SHOULD`, and a small number of registered add-on schemas still carry top-level imports of Node built-ins. They load scan-free over the trusted path, so those imports are not blocked today. Closing the gap fully would require every registered schema to reach zero-import conformance. A private ad-hoc call of the **same** file is still rejected by the scan — the private path holds the line regardless of the trusted-path state. A universal scan across all load paths remains a possible future step, contingent on that conformance and on further scanner hardening.
 
 ---
 
@@ -8131,7 +8169,7 @@ export const main = {
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
 | Markdown file extension | `.md` | Standardized file extension for Markdown documents. |
 | Resource folder name | `resources/` | Standardized folder name (not `data/`). |
-| `source` value | `'sqlite'` or `'markdown'` | Only these two types are supported. |
+| `source` value | `'sqlite'`, `'markdown'`, or `'http'` | Three supported resource sources (see `RES001`). |
 | `mode` value (sqlite only) | `'in-memory'` or `'file-based'` | Two explicit modes. |
 | `origin` value | `'global'`, `'project'`, or `'inline'` | Three storage locations. |
 | `runSql` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
@@ -8178,6 +8216,23 @@ The following fields are part of the `main` export and therefore included in the
 The Resource route name `about` is reserved as a namespace-level convention by the FlowMCP Grading Specification ([`flowmcp-grading` — `spec/1.0.0/11-about-convention.md`](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/11-about-convention.md)). A namespace MAY expose a `Resource.About` route; when it does, the resource is expected to follow the content contract defined in the Grading-Spec.
 
 This is a **forward-looking convention**, not a v4.1 validation rule. The Schemas-Spec does NOT enforce the reservation; conformant schemas MUST NOT use the route name `about` for a resource that is not an About Resource per the Grading-Spec contract. The binding content contract lives in the Grading-Spec.
+
+---
+
+## MCP Exposure of Resource Queries
+
+Resources map to the MCP `server.resource` primitive (see the introduction), but every **query** a resource declares is *also* exposed as a callable MCP tool, so an agent invokes it exactly the way it invokes any other tool. The exposure is deterministic and identical across `search`, `call`, and `serve`:
+
+| Concern | Contract |
+|---------|----------|
+| **Wire name** | Each query is exposed under `${queryName}_${namespace}` — the same `name_namespace` convention that tools use (see [16-id-schema.md](./16-id-schema.md#cli-adapter)). The **query** name, not the resource name, is the wire name. |
+| **Auto-injected queries** | `runSql` and `describeTables` are exposed the same way (`runSql_${namespace}`, `describeTables_${namespace}`). |
+| **`search` == `call` == `serve`** | The name advertised by `search`, the name resolved by `call`, and the name registered by `serve` MUST be the identical `${queryName}_${namespace}` string. A schema author never declares a `tools` entry to make a resource query callable. |
+| **`about` reads** | An About resource (reserved route `about`, above) is a Markdown resource with no queries; it is read through the MCP `server.resource` primitive, not exposed as a query tool. Surfaces that enumerate callable queries (e.g. `search`) skip it. |
+| **Max query surface** | At most 7 schema-defined queries per resource, plus the 2 auto-injected (`runSql`, `describeTables`) = 9 callable names per resource (`RES028`). |
+| **`http` source** | `source: 'http'` is a first-class resource source alongside `sqlite` and `markdown`; its queries are exposed under the same `${queryName}_${namespace}` contract (`RES001`, `RES024`). |
+
+This is the single canonical resource-call convention: one query, one wire name, consistent across every surface.
 
 ---
 
@@ -9310,7 +9365,7 @@ etherscan/
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [03-shared-lists.md](./03-shared-lists.md), [06-agents.md](./06-agents.md), [16-id-schema.md](./16-id-schema.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
 
-A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
+A Catalog is the top-level organizational unit in FlowMCP v4. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
 ---
 
@@ -9320,9 +9375,9 @@ As FlowMCP grows beyond individual schemas and shared lists, a higher-level stru
 
 - **No manifest** — the runtime MUST scan directories and infer relationships between schemas, lists, and agents
 - **No isolation** — company-internal schemas mix with community schemas in a flat namespace
-- **No import boundary** — importing from a remote registry requires knowledge of internal file structure
+- **No load boundary** — a runtime that consumes the directory needs knowledge of its internal file structure
 
-Catalogs solve this by providing a single `registry.json` manifest that declares everything the directory contains. The runtime reads this manifest instead of scanning the filesystem, and import commands use it as the entry point for downloading and resolving dependencies.
+Catalogs solve this by providing a single `registry.json` manifest that declares everything the directory contains. The runtime reads this manifest instead of scanning the filesystem, and the CLI uses it as the entry point when the directory is registered in `schemaFolders[]`. Schemas load directly from the configured folder — there is no separate remote-import or download step.
 
 ```mermaid
 flowchart LR
@@ -9345,7 +9400,7 @@ The diagram shows how the catalog directory contains a manifest that references 
 A catalog is a named directory containing a `registry.json` manifest and three content areas: shared lists, provider schemas, and agent definitions.
 
 ```
-schemas/v3.0.0/
+schemas/v4.0.0/
 └── flowmcp-community/              <- Named catalog directory
     ├── registry.json                <- Catalog manifest
     ├── _lists/                      <- Shared Lists (root level)
@@ -9411,7 +9466,7 @@ schemas/v3.0.0/
 Multiple catalogs can exist side by side under the same parent directory. Each catalog is fully self-contained — its `registry.json` references only files within its own directory tree. There are no cross-catalog dependencies.
 
 ```
-schemas/v3.0.0/
+schemas/v4.0.0/
 ├── flowmcp-community/           <- Official community catalog
 │   └── registry.json
 ├── my-company-tools/            <- Company-internal catalog
@@ -9508,7 +9563,7 @@ All file paths in `registry.json` are relative to the catalog root directory. Ab
 | `name` | `string` | Yes | Catalog name. Must match the catalog directory name. Kebab-case. |
 | `version` | `string` | Yes | Catalog version (semver). Independent of schema spec version. |
 | `description` | `string` | Yes | Human-readable description of the catalog's purpose. |
-| `schemaSpec` | `string` | Yes | FlowMCP specification version this catalog conforms to (e.g. `"3.0.0"`). |
+| `schemaSpec` | `string` | Yes | FlowMCP specification version this catalog conforms to (e.g. `"4.0.0"`). |
 | `shared` | `array` | Yes | Shared list references. May be empty (`[]`). |
 | `schemas` | `array` | Yes | Schema entries. May be empty (`[]`). |
 | `agents` | `array` | Yes | Agent entries. May be empty (`[]`). |
@@ -9581,15 +9636,6 @@ The diagram shows how a catalog referenced in `schemaFolders[]` is resolved: reg
 2. **Resolve tool dependencies** — identify which provider schemas the agent requires.
 3. **Make tools available** — the agent's required tools become callable from the resolved catalog.
 4. **Register prompts** — make the agent's prompts available as MCP prompts.
-
-### v2 vs v3 Comparison
-
-| Step | v2 (Current) | v3 (New) |
-|------|-------------|----------|
-| Load | Schemas + shared lists | Schemas + shared lists + agent manifests |
-| Agent setup | User composes tool sets manually | Pre-built agents available from the catalog |
-| Tool composition | Manual cherry-picking | Agent manifest declares required tools |
-| Prompts | Set-level prompts only | Schema-level + agent-level prompts |
 
 ---
 
@@ -9695,7 +9741,7 @@ The following rules are enforced when loading and validating a catalog.
 flowmcp validate-catalog <catalog-directory>
 ```
 
-The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be imported or published.
+The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be loaded or published.
 
 
 <!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
@@ -9882,6 +9928,17 @@ The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to 
 **Mapping Rule:** `routeName_namespace` (underscore separator, namespace at end). Implemented in `#buildToolName()` in the CLI.
 
 This mapping is internal. Users and agents always use full Spec-IDs.
+
+### Resource Queries in the MCP Tool Name
+
+A resource does not map to a single tool — each **query** it declares is exposed as its own callable MCP tool. The wire name is built from the **query** name and the namespace, using the same `name_namespace` rule:
+
+| External Spec-ID (resource query) | Internal MCP Tool Name |
+|-----------------------------------|------------------------|
+| `mailarchive/resource/mail`, query `searchMail` | `searchMail_mailarchive` |
+| auto-injected `runSql` on namespace `tokens` | `runSql_tokens` |
+
+**Mapping Rule (resource query):** `${queryName}_${namespace}` — the **query** name, not the resource name, is the wire name. The auto-injected `runSql` and `describeTables` follow the same rule. This is the single convention shared by `search`, `call`, and `serve` (see [13-resources.md](./13-resources.md#mcp-exposure-of-resource-queries)).
 
 ### Source Coordinate in the MCP Tool Name
 
@@ -10809,7 +10866,7 @@ The score-to-grade banding, the production gate, the tier-trim rule and the Cate
 
 ### `prompts.json` — Emitted by CLI
 
-Written by `flowmcp dev grade <schema> --emit-prompts`. Read by Grader.
+Written by `flowmcp grading non-deterministic <schema> --emit-prompts`. Read by Grader.
 
 ```json
 {
@@ -10833,7 +10890,7 @@ Written by `flowmcp dev grade <schema> --emit-prompts`. Read by Grader.
 
 ### `scores.json` — Written by Grader
 
-Read by `flowmcp dev grade <schema> --consume-scores <path>`.
+Read by `flowmcp grading non-deterministic <schema> --consume-scores <path>`.
 
 ```json
 {
@@ -10868,7 +10925,7 @@ Read by `flowmcp dev grade <schema> --consume-scores <path>`.
 
 ### Grade Report — Written by CLI
 
-`flowmcp dev grade <schema> --consume-scores <path>` writes the final report:
+`flowmcp grading non-deterministic <schema> --consume-scores <path>` writes the final report:
 
 ```json
 {
@@ -10953,7 +11010,7 @@ A Grader MUST NOT:
 |----------------|------|----------|
 | `grade-score-single` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-single/SKILL.md` |
 | `grade-score-batch` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-batch/SKILL.md` |
-| `flowmcp dev grade` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs:grade()` |
+| `flowmcp grading non-deterministic` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs` — `gradingDeterministic()` / `gradingNonDeterministic()` |
 | `GradeReporter` | Core Module | `flowmcp-core/src/v4/task/GradeReporter.mjs` |
 
 ---
@@ -11164,6 +11221,147 @@ These convictions are easy to hold while a project is small and easy to lose whi
 - [./05-security.md](./05-security.md) — see chapter 05.
 - [./09-validation-rules.md](./09-validation-rules.md) — see chapter 09.
 - [./19-mcp-integration.md](./19-mcp-integration.md) — see chapter 19.
+
+
+---
+# 26. Agent CLI Usage Contract
+
+| Field | Value |
+|---|---|
+| Status | Normative |
+| Depends on | [00-overview.md](./00-overview.md), [16-id-schema.md](./16-id-schema.md) |
+| Related | [05-security.md](./05-security.md), [13-resources.md](./13-resources.md), [15-catalog.md](./15-catalog.md), [24-philosophy.md](./24-philosophy.md) |
+
+This chapter is the normative contract for how an AI client or an agent uses the FlowMCP CLI to discover and invoke tools. Where [24-philosophy.md](./24-philosophy.md) explains *why* the interaction model is shaped the way it is (search-then-call, disabled-not-broken, fail loudly), this chapter states the binding rules an agent MUST follow. It is the specification home for the FlowMCP usage and SOP skills.
+
+The contract has one governing idea: **the catalog an agent can see is exactly the catalog it can use, and every callable name is the same across `search`, `call`, and `serve`.** There is no activation step, no hidden registry, and no per-surface name drift.
+
+---
+
+## The Two-Move Workflow
+
+An agent interacts with the trusted catalog through exactly two moves. There is no third, intermediate move.
+
+| Step | Move | Command | Returns |
+|------|------|---------|---------|
+| Discover | `search` / `list` | `flowmcp search <query>` · `flowmcp list` | Matching tools, each with its `requiredParams` and a callable `example` |
+| Invoke | `call` | `flowmcp call <tool-name> '{json}'` | The live result of the tool, called directly |
+
+Rules:
+
+1. An agent MUST discover a tool through `search` or `list` before calling it, and MUST read the `requiredParams` and `example` from the discovery result to build the call — it MUST NOT construct tool names or parameter shapes from memory.
+2. An agent MUST NOT perform any activation, registration, installation, or enable step between discovery and invocation. No such step exists — a tool that appears in `search`/`list` is immediately callable via `call`.
+3. Every tool in the folders configured in `schemaFolders[]` (see [15-catalog.md](./15-catalog.md)) is part of the trusted catalog and is discoverable and callable without further ceremony.
+4. `list` MAY be used instead of `search` to enumerate the whole catalog; `flowmcp call list-tools` enumerates the callable wire names (tools **and** resource queries, see [Call-ID Grammar](#call-id-grammar)).
+
+This two-move model is normative precisely because a gap between discovery and use — a tool that is visible but needs a separate step before it runs — is a trap for an autonomous agent.
+
+---
+
+## Private Ad-Hoc Calls
+
+A schema that is **not** registered in `schemaFolders[]` is never part of the trusted catalog: it does not appear in `search`, `list`, or an MCP `serve` session (invisibility is structural, see [05-security.md](./05-security.md)). Such a schema is invoked by its exact file path through a distinct move:
+
+```
+flowmcp private call <schema-path> <tool> '{json}'
+```
+
+Rules:
+
+1. `private call` takes an explicit filesystem path to the schema file, a tool (or resource-query) name, and a JSON argument object.
+2. The runtime MUST run the security scan **before** any `import()` of the private schema file. A file matching a forbidden pattern is rejected and never executed. Only a clean file is imported and run. See [05-security.md](./05-security.md) (the "scan on the private path" rule).
+3. A private schema MUST NOT be written into `schemaFolders[]` and MUST NOT be merged into the shared catalog. `private call` is the single supported way to invoke it — there is no registered "private folder".
+4. `private call` resolves resource queries the same way `call` does: a resource query is addressed by its wire name `${queryName}_${namespace}` (see [Call-ID Grammar](#call-id-grammar)).
+
+---
+
+## Parameter Types
+
+The JSON argument object passed to `call` / `private call` is built from the parameter declarations carried in the discovery result. An agent MUST supply parameters that conform to the declared type.
+
+| Declared type | Meaning | Example declaration |
+|---------------|---------|---------------------|
+| `string` | Text value | `"address": { "type": "string", "required": true }` |
+| `number` | Numeric value | `"start": { "type": "number", "required": false }` |
+| `enum` | One value from a fixed list | `"interval": { "type": "enum", "values": ["h1", "d1"] }` |
+| `array` | List of values | `"ids": { "type": "array", "required": true }` |
+
+Modifiers:
+
+- `"required": true` — the parameter MUST be present in the call. A missing required parameter MUST fail loudly (no silent default, see [24-philosophy.md](./24-philosophy.md)); it MUST NOT be substituted with an invented value.
+- `"required": false` — the parameter MAY be omitted.
+- `"default": <value>` — when the parameter is omitted, the runtime applies the declared default. Defaults are always declared in the schema; the runtime MUST NOT invent an undeclared default.
+
+For an `enum` parameter, the supplied value MUST be one of the declared `values`. The full parameter model is specified in [02-parameters.md](./02-parameters.md).
+
+---
+
+## Disabled Tools — Missing Keys
+
+A tool whose required credential (a `requiredServerParams` key, see [15-catalog.md](./15-catalog.md)) is not present in the environment is **disabled, not hidden and not removed**.
+
+Rules:
+
+1. A key-gated tool with a missing key MUST still appear in `search` / `list`, clearly labeled `[disabled: missing KEY]`, naming the exact credential it requires.
+2. Calling a disabled tool MUST return a clear, actionable message that names the missing key and states that the other tools remain callable — it MUST NOT throw an opaque framework error.
+3. A missing key MUST NOT hide the capability and MUST NOT silently return empty data disguised as success.
+
+This "disabled, not broken" behavior is honesty about credentials: the capability exists, the message names precisely what it needs to come online, and every other tool stays usable.
+
+---
+
+## Call-ID Grammar
+
+Every reference an agent uses resolves through the ID schema in [16-id-schema.md](./16-id-schema.md). The forms an agent encounters are:
+
+| Form | Slashes | Meaning | Example |
+|------|---------|---------|---------|
+| `namespace` | 0 | A whole namespace / provider | `weather` |
+| `namespace/schema-name` | 1 | A schema file (container) | `directory-io/records` |
+| `namespace/tool/name` | 2 | A tool primitive | `weather/tool/getForecast` |
+| `namespace/resource/name` | 2 | A resource primitive | `weather/resource/supportedCities` |
+| `namespace/prompt/name` | 2 | A prompt primitive | `weather/prompt/forecast-summary` |
+| `namespace/selection/name` | 2 | A selection | `record-research/selection/lookup` |
+
+Any form MAY carry an optional source coordinate prefix `<source>:` to pin one folder when the CLI aggregates several `schemaFolders[]` that expose the same namespace — e.g. `folder-b:weather/tool/getForecast` (see [16-id-schema.md](./16-id-schema.md#source-coordinate)). Short form (a bare name without namespace/type) is not supported.
+
+### MCP Wire Names
+
+The MCP protocol forbids `/` in tool names, so the CLI maps a Spec-ID to an internal wire name with the `name_namespace` rule. Two cases matter to an agent that reads a served tool list:
+
+| Primitive | Wire name | Example |
+|-----------|-----------|---------|
+| Tool | `${routeName}_${namespace}` | `getForecast_weather` |
+| Resource query | `${queryName}_${namespace}` | `searchMail_mailarchive` |
+
+A resource does not map to a single tool: **each query it declares is exposed as its own callable wire name** `${queryName}_${namespace}` — the query name, not the resource name, is the wire name. The auto-injected `runSql` and `describeTables` follow the same rule (`runSql_${namespace}`, `describeTables_${namespace}`). This wire name MUST be identical across `search` (advertised), `call` (resolved), and `serve` (registered) — a single canonical convention with no per-surface drift. See [13-resources.md](./13-resources.md#mcp-exposure-of-resource-queries).
+
+---
+
+## Forbidden Patterns
+
+An agent MUST NOT:
+
+1. Call `flowmcp schemas` directly — the output is unbounded.
+2. Pipe CLI output through `node -e`, `sh -c`, or similar shells to post-process it.
+3. Guess flags. Flags that are not declared in a command's help do not exist and MUST NOT be invented.
+4. Construct tool wire names, Spec-IDs, or schema paths by hand — these come from the `search` / `list` result.
+5. Use an activation, registration, or install step (`add`, `group`, `import`, `update`) — none exist; every catalog tool is immediately callable.
+6. Treat an HTTP 4xx/5xx or an empty result as success — a call that does not return real data is a failure, not a pass.
+
+Structural validation and grading are separate developer-track commands (`flowmcp schema-check`, `flowmcp grading …`, `flowmcp doctor`, `flowmcp --version`) and are not part of the agent invocation path.
+
+---
+
+<!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->
+## Related
+
+- [./00-overview.md](./00-overview.md) — see chapter 00.
+- [./05-security.md](./05-security.md) — see chapter 05.
+- [./13-resources.md](./13-resources.md) — see chapter 13.
+- [./15-catalog.md](./15-catalog.md) — see chapter 15.
+- [./16-id-schema.md](./16-id-schema.md) — see chapter 16.
+- [./24-philosophy.md](./24-philosophy.md) — see chapter 24.
 
 
 ---

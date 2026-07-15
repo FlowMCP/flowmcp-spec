@@ -6,7 +6,7 @@
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [03-shared-lists.md](./03-shared-lists.md), [06-agents.md](./06-agents.md), [16-id-schema.md](./16-id-schema.md), [21-schema-lifecycle.md](./21-schema-lifecycle.md) |
 
-A Catalog is the top-level organizational unit in FlowMCP v3. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
+A Catalog is the top-level organizational unit in FlowMCP v4. It is a named directory containing a `registry.json` manifest that describes all shared lists, provider schemas, and agent definitions within that directory. Multiple catalogs can coexist side by side, enabling community, company-internal, and experimental tool collections to operate independently.
 
 ---
 
@@ -16,9 +16,9 @@ As FlowMCP grows beyond individual schemas and shared lists, a higher-level stru
 
 - **No manifest** — the runtime MUST scan directories and infer relationships between schemas, lists, and agents
 - **No isolation** — company-internal schemas mix with community schemas in a flat namespace
-- **No import boundary** — importing from a remote registry requires knowledge of internal file structure
+- **No load boundary** — a runtime that consumes the directory needs knowledge of its internal file structure
 
-Catalogs solve this by providing a single `registry.json` manifest that declares everything the directory contains. The runtime reads this manifest instead of scanning the filesystem, and import commands use it as the entry point for downloading and resolving dependencies.
+Catalogs solve this by providing a single `registry.json` manifest that declares everything the directory contains. The runtime reads this manifest instead of scanning the filesystem, and the CLI uses it as the entry point when the directory is registered in `schemaFolders[]`. Schemas load directly from the configured folder — there is no separate remote-import or download step.
 
 ```mermaid
 flowchart LR
@@ -41,7 +41,7 @@ The diagram shows how the catalog directory contains a manifest that references 
 A catalog is a named directory containing a `registry.json` manifest and three content areas: shared lists, provider schemas, and agent definitions.
 
 ```
-schemas/v3.0.0/
+schemas/v4.0.0/
 └── flowmcp-community/              <- Named catalog directory
     ├── registry.json                <- Catalog manifest
     ├── _lists/                      <- Shared Lists (root level)
@@ -107,7 +107,7 @@ schemas/v3.0.0/
 Multiple catalogs can exist side by side under the same parent directory. Each catalog is fully self-contained — its `registry.json` references only files within its own directory tree. There are no cross-catalog dependencies.
 
 ```
-schemas/v3.0.0/
+schemas/v4.0.0/
 ├── flowmcp-community/           <- Official community catalog
 │   └── registry.json
 ├── my-company-tools/            <- Company-internal catalog
@@ -204,7 +204,7 @@ All file paths in `registry.json` are relative to the catalog root directory. Ab
 | `name` | `string` | Yes | Catalog name. Must match the catalog directory name. Kebab-case. |
 | `version` | `string` | Yes | Catalog version (semver). Independent of schema spec version. |
 | `description` | `string` | Yes | Human-readable description of the catalog's purpose. |
-| `schemaSpec` | `string` | Yes | FlowMCP specification version this catalog conforms to (e.g. `"3.0.0"`). |
+| `schemaSpec` | `string` | Yes | FlowMCP specification version this catalog conforms to (e.g. `"4.0.0"`). |
 | `shared` | `array` | Yes | Shared list references. May be empty (`[]`). |
 | `schemas` | `array` | Yes | Schema entries. May be empty (`[]`). |
 | `agents` | `array` | Yes | Agent entries. May be empty (`[]`). |
@@ -277,15 +277,6 @@ The diagram shows how a catalog referenced in `schemaFolders[]` is resolved: reg
 2. **Resolve tool dependencies** — identify which provider schemas the agent requires.
 3. **Make tools available** — the agent's required tools become callable from the resolved catalog.
 4. **Register prompts** — make the agent's prompts available as MCP prompts.
-
-### v2 vs v3 Comparison
-
-| Step | v2 (Current) | v3 (New) |
-|------|-------------|----------|
-| Load | Schemas + shared lists | Schemas + shared lists + agent manifests |
-| Agent setup | User composes tool sets manually | Pre-built agents available from the catalog |
-| Tool composition | Manual cherry-picking | Agent manifest declares required tools |
-| Prompts | Set-level prompts only | Schema-level + agent-level prompts |
 
 ---
 
@@ -391,7 +382,7 @@ The following rules are enforced when loading and validating a catalog.
 flowmcp validate-catalog <catalog-directory>
 ```
 
-The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be imported or published.
+The command runs all CAT rules and reports errors and warnings. A catalog with any error-level violations cannot be loaded or published.
 
 
 <!-- IMPLEMENTED-BY — rendered backlink lives in the dist (generated/bridge/<family>/<stem>.backlink.md); source stays authored-only (F2 Dist-Split) -->

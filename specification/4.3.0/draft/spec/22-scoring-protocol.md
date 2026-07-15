@@ -63,7 +63,7 @@ The score-to-grade banding, the production gate, the tier-trim rule and the Cate
 
 ### `prompts.json` — Emitted by CLI
 
-Written by `flowmcp dev grade <schema> --emit-prompts`. Read by Grader.
+Written by `flowmcp grading non-deterministic <schema> --emit-prompts`. Read by Grader.
 
 ```json
 {
@@ -87,7 +87,7 @@ Written by `flowmcp dev grade <schema> --emit-prompts`. Read by Grader.
 
 ### `scores.json` — Written by Grader
 
-Read by `flowmcp dev grade <schema> --consume-scores <path>`.
+Read by `flowmcp grading non-deterministic <schema> --consume-scores <path>`.
 
 ```json
 {
@@ -122,7 +122,7 @@ Read by `flowmcp dev grade <schema> --consume-scores <path>`.
 
 ### Grade Report — Written by CLI
 
-`flowmcp dev grade <schema> --consume-scores <path>` writes the final report:
+`flowmcp grading non-deterministic <schema> --consume-scores <path>` writes the final report:
 
 ```json
 {
@@ -207,7 +207,7 @@ A Grader MUST NOT:
 |----------------|------|----------|
 | `grade-score-single` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-single/SKILL.md` |
 | `grade-score-batch` | Workbench Skill | `projects/memo-init/repos/core/skills/grade/grade-score-batch/SKILL.md` |
-| `flowmcp dev grade` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs:grade()` |
+| `flowmcp grading non-deterministic` | CLI Producer/Consumer | `flowmcp-cli/src/task/FlowMcpCli.mjs` — `gradingDeterministic()` / `gradingNonDeterministic()` |
 | `GradeReporter` | Core Module | `flowmcp-core/src/v4/task/GradeReporter.mjs` |
 
 ---

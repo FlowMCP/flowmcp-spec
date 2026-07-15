@@ -7,7 +7,7 @@ spec_file: "16-id-schema.md"
 order: 16
 section: "specification"
 normative: true
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "specification/4.3.0/draft/spec/16-id-schema.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/16-id-schema.md."
@@ -178,6 +178,17 @@ The MCP protocol does not allow slashes in tool names. The CLI maps Spec-IDs to 
 **Mapping Rule:** `routeName_namespace` (underscore separator, namespace at end). Implemented in `#buildToolName()` in the CLI.
 
 This mapping is internal. Users and agents always use full Spec-IDs.
+
+### Resource Queries in the MCP Tool Name
+
+A resource does not map to a single tool — each **query** it declares is exposed as its own callable MCP tool. The wire name is built from the **query** name and the namespace, using the same `name_namespace` rule:
+
+| External Spec-ID (resource query) | Internal MCP Tool Name |
+|-----------------------------------|------------------------|
+| `mailarchive/resource/mail`, query `searchMail` | `searchMail_mailarchive` |
+| auto-injected `runSql` on namespace `tokens` | `runSql_tokens` |
+
+**Mapping Rule (resource query):** `${queryName}_${namespace}` — the **query** name, not the resource name, is the wire name. The auto-injected `runSql` and `describeTables` follow the same rule. This is the single convention shared by `search`, `call`, and `serve` (see [13-resources.md](/specification/resources/#mcp-exposure-of-resource-queries)).
 
 ### Source Coordinate in the MCP Tool Name
 

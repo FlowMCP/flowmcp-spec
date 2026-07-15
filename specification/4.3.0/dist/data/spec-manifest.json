@@ -46,7 +46,8 @@
                 "12-prompt-architecture",
                 "15-catalog",
                 "16-id-schema",
-                "19-mcp-integration"
+                "19-mcp-integration",
+                "26-agent-cli-usage"
             ]
         },
         {

@@ -7,7 +7,7 @@ spec_file: "12-personas-contract.md"
 order: 12
 section: "grading"
 normative: true
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "grading/3.0.0/draft/spec/12-personas-contract.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/12-personas-contract.md."

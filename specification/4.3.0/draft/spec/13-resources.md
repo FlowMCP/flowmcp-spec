@@ -1252,7 +1252,7 @@ export const main = {
 | Database file extension | `.db` | Standardized file extension for SQLite databases. |
 | Markdown file extension | `.md` | Standardized file extension for Markdown documents. |
 | Resource folder name | `resources/` | Standardized folder name (not `data/`). |
-| `source` value | `'sqlite'` or `'markdown'` | Only these two types are supported. |
+| `source` value | `'sqlite'`, `'markdown'`, or `'http'` | Three supported resource sources (see `RES001`). |
 | `mode` value (sqlite only) | `'in-memory'` or `'file-based'` | Two explicit modes. |
 | `origin` value | `'global'`, `'project'`, or `'inline'` | Three storage locations. |
 | `runSql` LIMIT | Default 100, max 1000 | Prevents unbounded result sets. |
@@ -1299,6 +1299,23 @@ The following fields are part of the `main` export and therefore included in the
 The Resource route name `about` is reserved as a namespace-level convention by the FlowMCP Grading Specification ([`flowmcp-grading` — `spec/1.0.0/11-about-convention.md`](https://github.com/FlowMCP/flowmcp-grading/blob/main/spec/1.0.0/11-about-convention.md)). A namespace MAY expose a `Resource.About` route; when it does, the resource is expected to follow the content contract defined in the Grading-Spec.
 
 This is a **forward-looking convention**, not a v4.1 validation rule. The Schemas-Spec does NOT enforce the reservation; conformant schemas MUST NOT use the route name `about` for a resource that is not an About Resource per the Grading-Spec contract. The binding content contract lives in the Grading-Spec.
+
+---
+
+## MCP Exposure of Resource Queries
+
+Resources map to the MCP `server.resource` primitive (see the introduction), but every **query** a resource declares is *also* exposed as a callable MCP tool, so an agent invokes it exactly the way it invokes any other tool. The exposure is deterministic and identical across `search`, `call`, and `serve`:
+
+| Concern | Contract |
+|---------|----------|
+| **Wire name** | Each query is exposed under `${queryName}_${namespace}` — the same `name_namespace` convention that tools use (see [16-id-schema.md](./16-id-schema.md#cli-adapter)). The **query** name, not the resource name, is the wire name. |
+| **Auto-injected queries** | `runSql` and `describeTables` are exposed the same way (`runSql_${namespace}`, `describeTables_${namespace}`). |
+| **`search` == `call` == `serve`** | The name advertised by `search`, the name resolved by `call`, and the name registered by `serve` MUST be the identical `${queryName}_${namespace}` string. A schema author never declares a `tools` entry to make a resource query callable. |
+| **`about` reads** | An About resource (reserved route `about`, above) is a Markdown resource with no queries; it is read through the MCP `server.resource` primitive, not exposed as a query tool. Surfaces that enumerate callable queries (e.g. `search`) skip it. |
+| **Max query surface** | At most 7 schema-defined queries per resource, plus the 2 auto-injected (`runSql`, `describeTables`) = 9 callable names per resource (`RES028`). |
+| **`http` source** | `source: 'http'` is a first-class resource source alongside `sqlite` and `markdown`; its queries are exposed under the same `${queryName}_${namespace}` contract (`RES001`, `RES024`). |
+
+This is the single canonical resource-call convention: one query, one wire name, consistent across every surface.
 
 ---
 

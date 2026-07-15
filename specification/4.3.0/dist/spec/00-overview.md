@@ -7,7 +7,7 @@ spec_file: "00-overview.md"
 order: 0
 section: "specification"
 normative: false
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "specification/4.3.0/draft/spec/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/00-overview.md."
@@ -281,7 +281,7 @@ Maximize the `main` block, minimize handlers. Every field that can be expressed 
 
 ### 3. Inject over import
 
-Schemas receive data through dependency injection, never import. A handler that needs EVM chain data does not `import` a chain list — it receives `sharedLists.evmChains` via the factory function. Libraries are declared in `requiredLibraries` and injected by the runtime from an allowlist. Schema files contain zero import statements.
+Schemas receive data through dependency injection, never import. A handler that needs EVM chain data does not `import` a chain list — it receives `sharedLists.evmChains` via the factory function. Libraries are declared in `requiredLibraries` and injected by the runtime from an allowlist. Schema files SHOULD contain zero import statements — this is the normative target the security scanner enforces on the private ad-hoc load path (see [Private ad-hoc calls](#private-ad-hoc-calls) and [05-security.md](/specification/security/)). A small number of trusted, registered add-on schemas still carry top-level imports of Node built-ins; they load scan-free over the trusted path and are the known gap the zero-import target closes.
 
 ### 4. Hash over trust
 
@@ -289,7 +289,20 @@ Integrity verification through SHA-256 hashes. The `main` block is hashable beca
 
 ### 5. Constrain over permit
 
-Security by default, explicit opt-in for capabilities. Schema files have zero import statements — all dependencies are declared in `requiredLibraries` and injected from a runtime allowlist. The security scanner rejects schemas with forbidden patterns at load-time, before any tool is exposed to an AI client.
+Security by default, explicit opt-in for capabilities. Schema files declare all dependencies in `requiredLibraries` and receive them injected from a runtime allowlist. The security scanner rejects schemas with forbidden patterns at load-time, before any tool is exposed to an AI client — this gate is **enforced on the private ad-hoc load path**, where an unregistered schema is loaded by path. Trusted schemas registered in `schemaFolders[]` are curated at registration time and load scan-free; the scanner is the gate for schemas that were **not** curated that way. See [Private ad-hoc calls](#private-ad-hoc-calls) and [05-security.md](/specification/security/).
+
+---
+
+## Private ad-hoc calls
+
+FlowMCP separates two load paths, and they have different trust properties:
+
+| Path | How a schema is loaded | Security scan | Discoverability |
+|------|------------------------|---------------|-----------------|
+| **Trusted path** | Registered in `schemaFolders[]`, merged into the catalog | **Off** (curated at registration time) | Visible in `search` / `list` / `serve` |
+| **Private ad-hoc path** | Loaded by exact file path, one call at a time | **On** (scan runs before `import()`) | Never registered, never merged — structurally invisible to `search` / `list` / `serve` |
+
+A private schema is invoked by its path: it is **never** written into `schemaFolders[]` and **never** merged into the shared catalog, so it cannot appear in `search`, `list`, or an MCP `serve` session — invisibility is structural, not a filter. Because such a schema was never curated, the private path runs the **security scan before any `import()`**: a file that matches a forbidden pattern is rejected without ever executing. This is the "scan on private path" rule — the scan protects exactly the uncurated load, while trusted, already-reviewed schemas keep loading scan-free.
 
 ---
 

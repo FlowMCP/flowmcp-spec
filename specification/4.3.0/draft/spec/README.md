@@ -42,8 +42,11 @@ After these five files, the remaining documents fill in details — read them as
 | 21 | [`21-schema-lifecycle.md`](./21-schema-lifecycle.md) | Stages, gates, hold/blocked states; two-track split (development lifecycle here, grading-monitoring in the Grading-Spec) | nein (prosaisch + stages) |
 | 22 | [`22-scoring-protocol.md`](./22-scoring-protocol.md) | GradeReporter scoring v1 | ja, hoch |
 | 23 | [`23-license-and-tos.md`](./23-license-and-tos.md) | Three-layer license model, ToS handling | ja, mittel |
+| 24 | [`24-philosophy.md`](./24-philosophy.md) | Design philosophy and interaction model | nein (prosaisch) |
+| 25 | [`25-bridge.md`](./25-bridge.md) | Chapter-to-skill implementation map | nein (prosaisch) |
+| 26 | [`26-agent-cli-usage.md`](./26-agent-cli-usage.md) | Normative agent CLI usage contract (search/list→call, private call, wire names) | ja, hoch |
 
-**Total:** 24 specification documents (00..23). 21 normative, 3 prosaisch.
+**Total:** 27 specification documents (00..26). 22 normative, 5 prosaisch.
 
 ## Source vs Derived
 

@@ -7,7 +7,7 @@ spec_file: "23-license-and-tos.md"
 order: 23
 section: "specification"
 normative: true
-generated_at: "2026-07-10T13:11:48.112Z"
+generated_at: "2026-07-15T23:49:32.183Z"
 generated_from: "specification/4.3.0/draft/spec/23-license-and-tos.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/23-license-and-tos.md."

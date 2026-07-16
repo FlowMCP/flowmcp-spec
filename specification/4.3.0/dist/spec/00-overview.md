@@ -7,7 +7,7 @@ spec_file: "00-overview.md"
 order: 0
 section: "specification"
 normative: false
-generated_at: "2026-07-15T23:49:32.183Z"
+generated_at: "2026-07-16T12:43:22.312Z"
 generated_from: "specification/4.3.0/draft/spec/00-overview.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/00-overview.md."
@@ -328,12 +328,13 @@ The v4.3.0 release adds remote-data resources, a fifth primitive, and richer age
 - **HTTP Resources** — `source: 'http'` references remote files (typically SQLite databases) fetched via HTTPS and cached locally. Validated by RES024 (HTTPS required). See `13-resources.md`.
 - **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.
 - **Extended Agent rules** — `agent.selections` references MUST resolve to valid Selection IDs (AGT030). `elicitation.maxRounds` MUST be a positive integer (AGT031). See `06-agents.md`.
+- **`meta` block relaxed to optional** — A Tool's `meta` block is now optional; VAL100 no longer fires when it is absent. When present, it must still be complete (VAL101–VAL106). See `19-mcp-integration.md`.
 
 ### v4.0.0
 
 The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integration layer:
 
-- **Required `meta` block per Tool** — Every Tool MUST declare `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). Missing `meta` is a validation error.
+- **`meta` block per Tool** — v4.0.0 introduced a `meta` block declaring `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). It was mandatory in v4.0.0 and relaxed to optional in v4.3.0 (see above); when present it must be complete.
 - **Skills as a scoped primitive** — `main.skills` is removed. Skills are namespace-, selection-, or agent-scoped instead. See `14-skills.md`.
 - **Enum / Shared List enforcement** — Enum values matching a Shared List MUST use `{{listName:alias}}` rather than hardcoded duplicates (VAL107).
 - **Unified spec version** — Skills and agents adopt `flowmcp/4.0.0` as the unified version identifier.

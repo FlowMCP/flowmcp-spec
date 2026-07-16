@@ -7,7 +7,7 @@ spec_file: "07-scoring-vs-grading.md"
 order: 7
 section: "grading"
 normative: true
-generated_at: "2026-07-15T23:49:32.183Z"
+generated_at: "2026-07-16T12:43:22.312Z"
 generated_from: "grading/3.0.0/draft/spec/07-scoring-vs-grading.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: grading/3.0.0/draft/spec/07-scoring-vs-grading.md."

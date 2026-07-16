@@ -7,7 +7,7 @@ spec_file: "12-prompt-architecture.md"
 order: 12
 section: "specification"
 normative: true
-generated_at: "2026-07-15T23:49:32.183Z"
+generated_at: "2026-07-16T12:43:22.312Z"
 generated_from: "specification/4.3.0/draft/spec/12-prompt-architecture.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/12-prompt-architecture.md."

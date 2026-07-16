@@ -530,14 +530,14 @@ Per agent:
 
 ## Section 3: v3.0.0 to v4.0.0
 
-The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every Tool and removing `main.skills`. There is no automatic migration command — the changes require domain knowledge about each tool.
+The v3.0.0 to v4.0.0 migration removes `main.skills` and may optionally add a `meta` block to Tools (the `meta` block is optional as of v4.3.0). There is no automatic migration command — the changes require domain knowledge about each tool.
 
 ### What Changes
 
 | Step | What | How |
 |------|------|-----|
 | 1 | Remove `main.skills` | Move skills into a Selection or Agent Manifest |
-| 2 | Add meta block per Tool | Set all 6 fields explicitly, `alwaysLoad: false` as default |
+| 2 | Add meta block per Tool (optional) | When adding one, set all 6 fields explicitly, `alwaysLoad: false` as default |
 | 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
 | 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
 | 5 | Validate | `flowmcp schema-check` → PASS |
@@ -546,11 +546,11 @@ The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every 
 ### Breaking Changes
 
 - `main.skills` removal is a hard breaking change (no deprecation). Skills must be referenced via Selections or Agent Manifests.
-- `meta` block is required for every Tool (VAL100–VAL106). Missing `meta` is a validation error.
+- `meta` block is optional (as of v4.3.0); when present, all 6 fields are required (VAL101–VAL106). Missing `meta` is valid.
 
 ### Why No Automatic Migration
 
-The v3→v4 migration is more complex than v2→v3. Adding `meta` blocks requires domain knowledge about each tool (Is it read-only? Is it safe to call concurrently? What are good search keywords?). An automatic migration would generate incorrect defaults. Therefore: manual process guided by this document.
+The v3→v4 migration is more complex than v2→v3. Adding `meta` blocks (now optional) requires domain knowledge about each tool (Is it read-only? Is it safe to call concurrently? What are good search keywords?). An automatic migration would generate incorrect defaults. Therefore: manual process guided by this document.
 
 ### Example: Before and After
 

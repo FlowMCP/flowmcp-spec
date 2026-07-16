@@ -4,10 +4,10 @@
 > This file concatenates all 26 specification documents into a single file for LLM consumption.
 > Source: https://github.com/FlowMCP/flowmcp-spec
 > version: 4.3.0
-> sha: 5289206
-> generated_at: 2026-07-15T23:49:34.483Z
+> sha: 934e619
+> generated_at: 2026-07-16T12:43:24.686Z
 
-Source: specification@4.3.0:5289206
+Source: specification@4.3.0:934e619
 
 ## Table of Contents
 
@@ -360,12 +360,13 @@ The v4.3.0 release adds remote-data resources, a fifth primitive, and richer age
 - **HTTP Resources** — `source: 'http'` references remote files (typically SQLite databases) fetched via HTTPS and cached locally. Validated by RES024 (HTTPS required). See `13-resources.md`.
 - **Selection primitive** — A fifth primitive: a named collection of Tools, Resources, Prompts, and Skills that belong together thematically, activated as a coherent set. See `17-selections.md`.
 - **Extended Agent rules** — `agent.selections` references MUST resolve to valid Selection IDs (AGT030). `elicitation.maxRounds` MUST be a positive integer (AGT031). See `06-agents.md`.
+- **`meta` block relaxed to optional** — A Tool's `meta` block is now optional; VAL100 no longer fires when it is absent. When present, it must still be complete (VAL101–VAL106). See `19-mcp-integration.md`.
 
 ### v4.0.0
 
 The v4.0.0 release establishes the major-4 baseline with a mandatory MCP integration layer:
 
-- **Required `meta` block per Tool** — Every Tool MUST declare `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). Missing `meta` is a validation error.
+- **`meta` block per Tool** — v4.0.0 introduced a `meta` block declaring `isReadOnly`, `isConcurrencySafe`, `isDestructive`, `searchHint`, `aliases`, and `alwaysLoad` (VAL100–VAL106). It was mandatory in v4.0.0 and relaxed to optional in v4.3.0 (see above); when present it must be complete.
 - **Skills as a scoped primitive** — `main.skills` is removed. Skills are namespace-, selection-, or agent-scoped instead. See `14-skills.md`.
 - **Enum / Shared List enforcement** — Enum values matching a Shared List MUST use `{{listName:alias}}` rather than hardcoded duplicates (VAL107).
 - **Unified spec version** — Skills and agents adopt `flowmcp/4.0.0` as the unified version identifier.
@@ -519,7 +520,7 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `schemaVersion` | `string` | Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
-| `meta` | `object` | MCP integration metadata block applied to all tools. Required when the schema defines at least one tool. See `19-mcp-integration.md`. |
+| `meta` | `object` | Optional MCP integration metadata block per tool. When present it must be complete (all 6 fields). See `19-mcp-integration.md`. |
 
 #### Two Version Axes
 
@@ -4882,14 +4883,14 @@ Per agent:
 
 ## Section 3: v3.0.0 to v4.0.0
 
-The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every Tool and removing `main.skills`. There is no automatic migration command — the changes require domain knowledge about each tool.
+The v3.0.0 to v4.0.0 migration removes `main.skills` and may optionally add a `meta` block to Tools (the `meta` block is optional as of v4.3.0). There is no automatic migration command — the changes require domain knowledge about each tool.
 
 ### What Changes
 
 | Step | What | How |
 |------|------|-----|
 | 1 | Remove `main.skills` | Move skills into a Selection or Agent Manifest |
-| 2 | Add meta block per Tool | Set all 6 fields explicitly, `alwaysLoad: false` as default |
+| 2 | Add meta block per Tool (optional) | When adding one, set all 6 fields explicitly, `alwaysLoad: false` as default |
 | 3 | Enum enforcement | Enums matching a Shared List MUST use `{{listName:alias}}` |
 | 4 | Update version to 4.0.0 | `main.version: '4.0.0'` |
 | 5 | Validate | `flowmcp schema-check` → PASS |
@@ -4898,11 +4899,11 @@ The v3.0.0 to v4.0.0 migration requires adding a required `meta` block to every 
 ### Breaking Changes
 
 - `main.skills` removal is a hard breaking change (no deprecation). Skills must be referenced via Selections or Agent Manifests.
-- `meta` block is required for every Tool (VAL100–VAL106). Missing `meta` is a validation error.
+- `meta` block is optional (as of v4.3.0); when present, all 6 fields are required (VAL101–VAL106). Missing `meta` is valid.
 
 ### Why No Automatic Migration
 
-The v3→v4 migration is more complex than v2→v3. Adding `meta` blocks requires domain knowledge about each tool (Is it read-only? Is it safe to call concurrently? What are good search keywords?). An automatic migration would generate incorrect defaults. Therefore: manual process guided by this document.
+The v3→v4 migration is more complex than v2→v3. Adding `meta` blocks (now optional) requires domain knowledge about each tool (Is it read-only? Is it safe to call concurrently? What are good search keywords?). An automatic migration would generate incorrect defaults. Therefore: manual process guided by this document.
 
 ### Example: Before and After
 
@@ -10438,13 +10439,13 @@ This ensures the Skill is always delivered — even if some references are broke
 | Depends on | [00-overview.md](./00-overview.md), [01-schema-format.md](./01-schema-format.md) |
 | Related | [09-validation-rules.md](./09-validation-rules.md), [13-resources.md](./13-resources.md), [14-skills.md](./14-skills.md), [04-output-schema.md](./04-output-schema.md) |
 
-When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared once, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
+When FlowMCP runs as an MCP Server, each Tool may be exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared optionally, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
 
 ---
 
-## Meta Block (Required per Tool)
+## Meta Block (Optional per Tool)
 
-Every Tool MUST have a `meta` block:
+A Tool MAY declare a `meta` block. It is optional — a Tool without a `meta` block is valid. When a `meta` block IS present, it MUST be complete: all fields below are required (VAL101–VAL106).
 
 ```javascript
 export const schema = {
@@ -10467,6 +10468,8 @@ export const schema = {
 ```
 
 ## Meta Fields
+
+The `meta` block is optional, but when present every field below is required:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -10507,7 +10510,7 @@ The structural rules for the `meta` block are defined alongside the other schema
 
 | Code | Severity | Rule |
 |------|----------|------|
-| VAL100 | error | Every Tool MUST have a `meta` block |
+| VAL100 | error | `meta` block is optional; when present it MUST be a plain object (absent `meta` is allowed) |
 | VAL101 | error | `meta.isReadOnly` required (boolean) |
 | VAL102 | error | `meta.isConcurrencySafe` required (boolean) |
 | VAL103 | error | `meta.isDestructive` required (boolean) |

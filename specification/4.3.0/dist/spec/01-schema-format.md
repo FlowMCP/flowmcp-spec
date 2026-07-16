@@ -7,7 +7,7 @@ spec_file: "01-schema-format.md"
 order: 1
 section: "specification"
 normative: true
-generated_at: "2026-07-15T23:49:32.183Z"
+generated_at: "2026-07-16T12:43:22.312Z"
 generated_from: "specification/4.3.0/draft/spec/01-schema-format.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/01-schema-format.md."
@@ -86,7 +86,7 @@ All fields in `main` must be JSON-serializable. No functions, no dynamic values,
 | `schemaVersion` | `string` | Schema-Content-Version, must match pattern `\d+\.\d+\.\d+` (semver, free per schema). Bump rules defined in the grading specification. Initial value for migrated schemas: `1.0.0`. |
 | `root` | `string` | Base URL for all tools. Must start with `https://` (no trailing slash). Not required for resource-only schemas. |
 | `tools` | `object` | Tool definitions. Keys are tool names in camelCase. Maximum 8 tools. May be empty `{}` if the schema defines resources or skills. |
-| `meta` | `object` | MCP integration metadata block applied to all tools. Required when the schema defines at least one tool. See `19-mcp-integration.md`. |
+| `meta` | `object` | Optional MCP integration metadata block per tool. When present it must be complete (all 6 fields). See `19-mcp-integration.md`. |
 
 #### Two Version Axes
 

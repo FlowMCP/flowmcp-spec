@@ -1,7 +1,7 @@
 {
     "version": "4.3.0",
-    "sha": "5289206",
-    "generated_at": "2026-07-15T23:49:33.209Z",
+    "sha": "934e619",
+    "generated_at": "2026-07-16T12:43:23.316Z",
     "generator": "scripts/generate-manifest.mjs",
     "families": [
         {
@@ -219,7 +219,7 @@
                     "filename": "19-mcp-integration.md",
                     "slug": "mcp-integration",
                     "title": "MCP Server Integration",
-                    "description": "When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is...",
+                    "description": "When FlowMCP runs as an MCP Server, each Tool may be exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is...",
                     "order": 19,
                     "section": "specification",
                     "normative": true,

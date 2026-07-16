@@ -1,26 +1,26 @@
 ---
 title: "MCP Server Integration"
-description: "When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is..."
+description: "When FlowMCP runs as an MCP Server, each Tool may be exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is..."
 family: "specification"
 spec_version: "4.3.0"
 spec_file: "19-mcp-integration.md"
 order: 19
 section: "specification"
 normative: true
-generated_at: "2026-07-15T23:49:32.183Z"
+generated_at: "2026-07-16T12:43:22.312Z"
 generated_from: "specification/4.3.0/draft/spec/19-mcp-integration.md"
 generator: "scripts/generate-docs-payload.mjs"
 edit_warning: "This file is auto-generated. Source: specification/4.3.0/draft/spec/19-mcp-integration.md."
 ---
 
 
-When FlowMCP runs as an MCP Server, each Tool is exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared once, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
+When FlowMCP runs as an MCP Server, each Tool may be exposed to the agent with MCP-specific metadata that an MCP host can read before it decides whether and how to invoke the Tool. That metadata is declared optionally, per Tool, in a `meta` block, and the CLI/Core translates the relevant fields into MCP annotations at registration time. This page describes the `meta` block, how its fields map to MCP, and the behaviour of the search-related and loading-related fields.
 
 ---
 
-## Meta Block (Required per Tool)
+## Meta Block (Optional per Tool)
 
-Every Tool MUST have a `meta` block:
+A Tool MAY declare a `meta` block. It is optional — a Tool without a `meta` block is valid. When a `meta` block IS present, it MUST be complete: all fields below are required (VAL101–VAL106).
 
 ```javascript
 export const schema = {
@@ -43,6 +43,8 @@ export const schema = {
 ```
 
 ## Meta Fields
+
+The `meta` block is optional, but when present every field below is required:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -83,7 +85,7 @@ The structural rules for the `meta` block are defined alongside the other schema
 
 | Code | Severity | Rule |
 |------|----------|------|
-| VAL100 | error | Every Tool MUST have a `meta` block |
+| VAL100 | error | `meta` block is optional; when present it MUST be a plain object (absent `meta` is allowed) |
 | VAL101 | error | `meta.isReadOnly` required (boolean) |
 | VAL102 | error | `meta.isConcurrencySafe` required (boolean) |
 | VAL103 | error | `meta.isDestructive` required (boolean) |
